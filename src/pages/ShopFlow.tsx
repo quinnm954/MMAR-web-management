@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
-import { ArrowLeft, Wrench, Package, Clock, Settings } from "lucide-react";
+import { ArrowLeft, Package, Clock, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import mmarLogo from "@/assets/mmar-logo.jpeg";
 
 const ShopFlow = () => {
   return (
@@ -9,11 +10,12 @@ const ShopFlow = () => {
       <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16 md:h-20">
-            <Link to="/" className="flex items-center gap-2">
-              <Wrench className="w-8 h-8 text-primary" />
-              <span className="font-display text-2xl md:text-3xl tracking-wide text-foreground">
-                MMAR
-              </span>
+            <Link to="/" className="flex items-center gap-3">
+              <img 
+                src={mmarLogo} 
+                alt="MMAR Logo" 
+                className="h-12 md:h-14 w-auto rounded"
+              />
             </Link>
             <Button variant="outline" asChild>
               <Link to="/" className="flex items-center gap-2">
@@ -35,7 +37,8 @@ const ShopFlow = () => {
             </div>
             
             <h1 className="font-display text-5xl md:text-7xl lg:text-8xl tracking-wide mb-6 animate-slide-up">
-              <span className="gradient-text">SHOP FLOW</span>
+              <span className="text-sky">SHOP</span>{" "}
+              <span className="text-gold">FLOW</span>
             </h1>
             
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8 animate-slide-up" style={{ animationDelay: "0.1s" }}>
@@ -51,8 +54,8 @@ const ShopFlow = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="font-display text-4xl md:text-5xl tracking-wide mb-6">
-              <span className="text-foreground">KEY</span>{" "}
-              <span className="gradient-text">FEATURES</span>
+              <span className="text-sky">KEY</span>{" "}
+              <span className="text-gold">FEATURES</span>
             </h2>
           </div>
 
@@ -70,8 +73,8 @@ const ShopFlow = () => {
             </div>
 
             <div className="glass-card rounded-2xl p-8 text-center hover-lift">
-              <div className="w-16 h-16 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-6">
-                <Clock className="w-8 h-8 text-primary" />
+              <div className="w-16 h-16 rounded-xl bg-accent/10 flex items-center justify-center mx-auto mb-6">
+                <Clock className="w-8 h-8 text-accent" />
               </div>
               <h3 className="font-display text-2xl tracking-wide text-foreground mb-3">
                 Job Scheduling

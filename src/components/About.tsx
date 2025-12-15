@@ -29,8 +29,8 @@ const About = () => {
       <div className="container mx-auto px-4">
         <div className="max-w-3xl mx-auto text-center mb-16">
           <h2 className="font-display text-4xl md:text-5xl lg:text-6xl tracking-wide mb-6">
-            <span className="text-foreground">ABOUT</span>{" "}
-            <span className="gradient-text">US</span>
+            <span className="text-sky">ABOUT</span>{" "}
+            <span className="text-gold">US</span>
           </h2>
           <p className="text-lg text-muted-foreground leading-relaxed">
             Mike's Mobile Auto Repair LLC is committed to delivering professional,
