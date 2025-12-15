@@ -1,41 +1,8 @@
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Phone, Mail, Facebook } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { Phone, Mail, Facebook, Star, ExternalLink } from "lucide-react";
 import mmarLogo from "@/assets/mmar-logo.jpeg";
 
 const Contact = () => {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    message: "",
-  });
-  const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-
-    // Create mailto link with form data
-    const subject = encodeURIComponent(`Contact from ${formData.name}`);
-    const body = encodeURIComponent(
-      `Name: ${formData.name}\nEmail: ${formData.email}\n\nMessage:\n${formData.message}`
-    );
-    window.location.href = `mailto:mikesmarllc@gmail.com?subject=${subject}&body=${body}`;
-
-    setTimeout(() => {
-      toast({
-        title: "Opening email client",
-        description: "Complete sending your message in your email app.",
-      });
-      setFormData({ name: "", email: "", message: "" });
-      setIsLoading(false);
-    }, 500);
-  };
-
   return (
     <section id="contact" className="py-16 md:py-20 lg:py-32">
       <div className="container mx-auto px-4">
@@ -103,79 +70,30 @@ const Contact = () => {
             </div>
           </div>
 
-          {/* Contact Form */}
-          <div className="glass-card rounded-2xl p-6 md:p-8">
-            <h3 className="font-display text-xl md:text-2xl tracking-wide text-foreground mb-5 md:mb-6">
-              SEND US A MESSAGE
+          {/* Google Reviews */}
+          <div className="glass-card rounded-2xl p-6 md:p-8 flex flex-col items-center text-center">
+            <div className="flex items-center gap-1 mb-4">
+              {[...Array(5)].map((_, i) => (
+                <Star key={i} className="w-8 h-8 text-gold fill-gold" />
+              ))}
+            </div>
+            <h3 className="font-display text-xl md:text-2xl tracking-wide text-foreground mb-3">
+              5-STAR RATED
             </h3>
-            <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
-              <div>
-                <label
-                  htmlFor="name"
-                  className="block text-sm font-medium text-muted-foreground mb-2"
-                >
-                  Name
-                </label>
-                <Input
-                  id="name"
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, name: e.target.value })
-                  }
-                  required
-                  className="bg-card border-border focus:border-primary min-h-[48px] text-base"
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor="email"
-                  className="block text-sm font-medium text-muted-foreground mb-2"
-                >
-                  Email
-                </label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) =>
-                    setFormData({ ...formData, email: e.target.value })
-                  }
-                  required
-                  className="bg-card border-border focus:border-primary min-h-[48px] text-base"
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor="message"
-                  className="block text-sm font-medium text-muted-foreground mb-2"
-                >
-                  Message
-                </label>
-                <Textarea
-                  id="message"
-                  value={formData.message}
-                  onChange={(e) =>
-                    setFormData({ ...formData, message: e.target.value })
-                  }
-                  required
-                  rows={4}
-                  className="bg-card border-border focus:border-primary resize-none text-base"
-                />
-              </div>
-
-              <Button
-                type="submit"
-                variant="hero"
-                size="lg"
-                className="w-full min-h-[52px] text-base"
-                disabled={isLoading}
+            <p className="text-muted-foreground mb-6 max-w-md">
+              See what our customers are saying about Mike's Mobile Auto Repair. We're proud to maintain a 5-star rating on Google!
+            </p>
+            <Button variant="hero" size="lg" className="min-h-[52px]" asChild>
+              <a
+                href="https://maps.app.goo.gl/Ehqid46B2NAxUshB9"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2"
               >
-                {isLoading ? "Sending..." : "Send Message"}
-              </Button>
-            </form>
+                <span>View Our Reviews</span>
+                <ExternalLink className="w-5 h-5" />
+              </a>
+            </Button>
           </div>
         </div>
       </div>
