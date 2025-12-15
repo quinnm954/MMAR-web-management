@@ -3,7 +3,7 @@ import { ArrowLeft, Package, Clock, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import mmarLogo from "@/assets/mmar-logo.jpeg";
 
-const ShopFlow = () => {
+const GarageAce = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
@@ -37,8 +37,8 @@ const ShopFlow = () => {
             </div>
             
             <h1 className="font-display text-5xl md:text-7xl lg:text-8xl tracking-wide mb-6 animate-slide-up">
-              <span className="text-sky">SHOP</span>{" "}
-              <span className="text-gold">FLOW</span>
+              <span className="text-sky">GARAGE</span>{" "}
+              <span className="text-gold">ACE</span>
             </h1>
             
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8 animate-slide-up" style={{ animationDelay: "0.1s" }}>
@@ -107,7 +107,7 @@ const ShopFlow = () => {
               FULL DEMO COMING SOON
             </h2>
             <p className="text-muted-foreground mb-8">
-              This space will showcase the complete Shop Flow application with live 
+              This space will showcase the complete Garage Ace application with live 
               functionality and interactive demonstrations.
             </p>
             <Button variant="hero" size="lg" asChild>
@@ -129,4 +129,4 @@ const ShopFlow = () => {
   );
 };
 
-export default ShopFlow;
+export default GarageAce;

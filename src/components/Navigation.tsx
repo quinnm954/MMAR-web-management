@@ -39,10 +39,10 @@ const Navigation = () => {
               </a>
             ))}
             <Link
-              to="/shopflow"
+              to="/garage-ace"
               className="text-accent font-semibold hover:text-accent/80 transition-colors duration-200"
             >
-              Shop Flow
+              Garage Ace
             </Link>
             <Button variant="hero" size="default" asChild>
               <a href="#contact">Get a Quote</a>
@@ -74,11 +74,11 @@ const Navigation = () => {
                 </a>
               ))}
               <Link
-                to="/shopflow"
+                to="/garage-ace"
                 onClick={() => setIsOpen(false)}
                 className="text-accent font-semibold hover:text-accent/80 transition-colors duration-200 py-2"
               >
-                Shop Flow
+                Garage Ace
               </Link>
               <Button variant="hero" size="lg" asChild className="mt-2">
                 <a href="#contact" onClick={() => setIsOpen(false)}>
