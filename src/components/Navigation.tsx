@@ -45,7 +45,7 @@ const Navigation = () => {
               Garage Ace
             </Link>
             <Button variant="hero" size="default" asChild>
-              <a href="#contact">Get a Quote</a>
+              <a href="tel:8039536194">Get a Quote</a>
             </Button>
           </div>
 
@@ -81,7 +81,7 @@ const Navigation = () => {
                 Garage Ace
               </Link>
               <Button variant="hero" size="lg" asChild className="mt-3 min-h-[48px]">
-                <a href="#contact" onClick={() => setIsOpen(false)}>
+                <a href="tel:8039536194" onClick={() => setIsOpen(false)}>
                   Get a Quote
                 </a>
               </Button>

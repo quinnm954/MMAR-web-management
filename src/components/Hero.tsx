@@ -37,7 +37,7 @@ const Hero = () => {
             style={{ animationDelay: "0.2s" }}
           >
             <Button variant="hero" size="lg" className="w-full sm:w-auto min-h-[48px]" asChild>
-              <a href="#contact">Get in Touch</a>
+              <a href="tel:8039536194">Get a Quote</a>
             </Button>
             <Button variant="heroOutline" size="lg" className="w-full sm:w-auto min-h-[48px]" asChild>
               <a href="#services">View Services</a>
