@@ -85,7 +85,7 @@ const Contact = () => {
             </p>
             <Button variant="hero" size="lg" className="min-h-[52px]" asChild>
               <a
-                href="https://maps.app.goo.gl/Ehqid46B2NAxUshB9"
+                href="https://share.google/81sCiU8gosp3ZhCJD"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2"
