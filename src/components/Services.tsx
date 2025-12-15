@@ -50,8 +50,8 @@ const Services = () => {
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="font-display text-4xl md:text-5xl lg:text-6xl tracking-wide mb-6">
-            <span className="text-foreground">COMPLETE AUTOMOTIVE</span>{" "}
-            <span className="gradient-text">SERVICES</span>
+            <span className="text-sky">COMPLETE AUTOMOTIVE</span>{" "}
+            <span className="text-gold">SERVICES</span>
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Click any service below to request a quote instantly via email

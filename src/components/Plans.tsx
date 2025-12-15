@@ -71,8 +71,8 @@ const Plans = () => {
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="font-display text-4xl md:text-5xl lg:text-6xl tracking-wide mb-6">
-            <span className="text-foreground">MAINTENANCE</span>{" "}
-            <span className="gradient-text">PLANS</span>
+            <span className="text-sky">MAINTENANCE</span>{" "}
+            <span className="text-gold">PLANS</span>
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Subscribe to a maintenance plan and save on regular service
@@ -84,13 +84,13 @@ const Plans = () => {
             <div
               key={plan.name}
               className={`glass-card rounded-2xl p-6 relative hover-lift animate-slide-up ${
-                plan.popular ? "ring-2 ring-primary glow-border" : ""
+                plan.popular ? "ring-2 ring-accent glow-border-gold" : ""
               }`}
               style={{ animationDelay: `${index * 0.1}s` }}
             >
               {plan.popular && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                  <span className="bg-primary text-primary-foreground text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-1">
+                  <span className="bg-accent text-accent-foreground text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-1">
                     <Star className="w-3 h-3" /> Popular
                   </span>
                 </div>
@@ -109,7 +109,7 @@ const Plans = () => {
               <ul className="space-y-3 mb-6">
                 {plan.features.map((feature) => (
                   <li key={feature} className="flex items-start gap-2 text-sm">
-                    <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                    <Check className="w-4 h-4 text-accent shrink-0 mt-0.5" />
                     <span className="text-muted-foreground">{feature}</span>
                   </li>
                 ))}

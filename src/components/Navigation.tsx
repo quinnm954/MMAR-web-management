@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Menu, X, Wrench } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import mmarLogo from "@/assets/mmar-logo.jpeg";
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -18,11 +19,12 @@ const Navigation = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
-          <a href="#" className="flex items-center gap-2">
-            <Wrench className="w-8 h-8 text-primary" />
-            <span className="font-display text-2xl md:text-3xl tracking-wide text-foreground">
-              MMAR
-            </span>
+          <a href="#" className="flex items-center gap-3">
+            <img 
+              src={mmarLogo} 
+              alt="MMAR Logo" 
+              className="h-12 md:h-14 w-auto rounded"
+            />
           </a>
 
           {/* Desktop Navigation */}
@@ -38,7 +40,7 @@ const Navigation = () => {
             ))}
             <Link
               to="/shopflow"
-              className="text-primary font-semibold hover:text-primary/80 transition-colors duration-200"
+              className="text-accent font-semibold hover:text-accent/80 transition-colors duration-200"
             >
               Shop Flow
             </Link>
@@ -74,7 +76,7 @@ const Navigation = () => {
               <Link
                 to="/shopflow"
                 onClick={() => setIsOpen(false)}
-                className="text-primary font-semibold hover:text-primary/80 transition-colors duration-200 py-2"
+                className="text-accent font-semibold hover:text-accent/80 transition-colors duration-200 py-2"
               >
                 Shop Flow
               </Link>

@@ -61,6 +61,8 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        sky: "hsl(var(--color-sky))",
+        gold: "hsl(var(--color-gold))",
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -77,8 +79,8 @@ export default {
           to: { height: "0" },
         },
         "pulse-glow": {
-          "0%, 100%": { boxShadow: "0 0 20px hsl(15 90% 55% / 0.3)" },
-          "50%": { boxShadow: "0 0 40px hsl(15 90% 55% / 0.5)" },
+          "0%, 100%": { boxShadow: "0 0 20px hsl(200 80% 55% / 0.3)" },
+          "50%": { boxShadow: "0 0 40px hsl(200 80% 55% / 0.5)" },
         },
       },
       animation: {

@@ -19,9 +19,9 @@ const Hero = () => {
       <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="font-display text-5xl md:text-7xl lg:text-8xl tracking-wide mb-6 animate-slide-up">
-            <span className="text-foreground">MOBILE AUTO REPAIR</span>
+            <span className="text-sky">MIKES MOBILE</span>
             <br />
-            <span className="gradient-text">ACROSS UPSTATE SC</span>
+            <span className="text-gold">AUTO REPAIR</span>
           </h1>
 
           <p
@@ -54,8 +54,8 @@ const Hero = () => {
               <span>Greenville & Spartanburg County, SC</span>
             </div>
             <div className="flex items-center gap-2">
-              <Phone className="w-5 h-5 text-primary" />
-              <a href="tel:8039536194" className="hover:text-primary transition-colors">
+              <Phone className="w-5 h-5 text-accent" />
+              <a href="tel:8039536194" className="hover:text-accent transition-colors">
                 (803) 953-6194
               </a>
             </div>
