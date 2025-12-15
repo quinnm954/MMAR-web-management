@@ -14,7 +14,7 @@ const Footer = () => {
           </div>
 
           <p className="text-xs md:text-sm text-muted-foreground text-center order-3 md:order-2">
-            © {new Date().getFullYear()} Mike's Mobile Auto Repair LLC. All rights reserved.
+            © {new Date().getFullYear()} Capital Services Management, INC. All rights reserved.
           </p>
 
           <div className="flex items-center gap-4 text-xs md:text-sm text-muted-foreground order-2 md:order-3">
