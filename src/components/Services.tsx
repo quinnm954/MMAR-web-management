@@ -42,7 +42,7 @@ const Services = () => {
     const body = encodeURIComponent(
       `Hi, I would like to request a quote for: ${serviceName}\n\nPlease let me know the estimated cost and availability.\n\nThank you!`
     );
-    window.location.href = `mailto:mikesmobileautorepairllc@outlook.com?subject=${subject}&body=${body}`;
+    window.location.href = `mailto:mikesmarllc@gmail.com?subject=${subject}&body=${body}`;
   };
 
   return (

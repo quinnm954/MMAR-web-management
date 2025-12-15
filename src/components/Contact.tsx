@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Phone, Mail, Facebook } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import contactSign from "@/assets/contact-sign.jpg";
+import mmarLogo from "@/assets/mmar-logo.jpeg";
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -24,7 +24,7 @@ const Contact = () => {
     const body = encodeURIComponent(
       `Name: ${formData.name}\nEmail: ${formData.email}\n\nMessage:\n${formData.message}`
     );
-    window.location.href = `mailto:mikesmobileautorepairllc@outlook.com?subject=${subject}&body=${body}`;
+    window.location.href = `mailto:mikesmarllc@gmail.com?subject=${subject}&body=${body}`;
 
     setTimeout(() => {
       toast({
@@ -41,19 +41,19 @@ const Contact = () => {
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="font-display text-4xl md:text-5xl lg:text-6xl tracking-wide mb-6">
-            <span className="text-foreground">CONTACT</span>{" "}
-            <span className="gradient-text">US</span>
+            <span className="text-sky">CONTACT</span>{" "}
+            <span className="text-gold">US</span>
           </h2>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
           {/* Contact Info */}
           <div className="space-y-8">
-            <div className="glass-card rounded-2xl overflow-hidden">
+            <div className="glass-card rounded-2xl overflow-hidden p-8 flex items-center justify-center">
               <img
-                src={contactSign}
-                alt="Mike's Mobile Auto Repair Contact"
-                className="w-full h-64 object-cover"
+                src={mmarLogo}
+                alt="Mike's Mobile Auto Repair"
+                className="w-full max-w-md h-auto rounded-lg"
               />
             </div>
 
@@ -72,7 +72,7 @@ const Contact = () => {
               </a>
 
               <a
-                href="mailto:mikesmobileautorepairllc@outlook.com"
+                href="mailto:mikesmarllc@gmail.com"
                 className="flex items-center gap-4 p-4 glass-card rounded-xl hover-lift group"
               >
                 <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
@@ -81,7 +81,7 @@ const Contact = () => {
                 <div>
                   <p className="text-sm text-muted-foreground">Email</p>
                   <p className="text-foreground font-semibold break-all">
-                    mikesmobileautorepairllc@outlook.com
+                    mikesmarllc@gmail.com
                   </p>
                 </div>
               </a>
