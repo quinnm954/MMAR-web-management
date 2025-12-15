@@ -6,6 +6,7 @@ import Plans from "@/components/Plans";
 import Newsletter from "@/components/Newsletter";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
+import FloatingCallButton from "@/components/FloatingCallButton";
 
 const Index = () => {
   return (
@@ -18,6 +19,7 @@ const Index = () => {
       <Newsletter />
       <Contact />
       <Footer />
+      <FloatingCallButton />
     </div>
   );
 };
