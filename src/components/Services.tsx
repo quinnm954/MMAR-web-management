@@ -46,31 +46,31 @@ const Services = () => {
   };
 
   return (
-    <section id="services" className="py-20 md:py-32 bg-secondary/30">
+    <section id="services" className="py-16 md:py-20 lg:py-32 bg-secondary/30">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
-          <h2 className="font-display text-4xl md:text-5xl lg:text-6xl tracking-wide mb-6">
+        <div className="text-center mb-10 md:mb-16">
+          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl tracking-wide mb-4 md:mb-6">
             <span className="text-sky">COMPLETE AUTOMOTIVE</span>{" "}
             <span className="text-gold">SERVICES</span>
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Click any service below to request a quote instantly via email
+          <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto px-2">
+            Tap any service below to request a quote instantly via email
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
           {services.map((service, index) => (
             <button
               key={service.name}
               onClick={() => handleServiceClick(service.name)}
-              className="glass-card rounded-xl p-5 text-left hover-lift group transition-all duration-300 hover:border-primary/50 animate-slide-up"
+              className="glass-card rounded-xl p-4 md:p-5 text-left hover-lift group transition-all duration-300 hover:border-primary/50 animate-slide-up active:scale-[0.98] min-h-[64px]"
               style={{ animationDelay: `${index * 0.03}s` }}
             >
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+              <div className="flex items-center gap-3 md:gap-4">
+                <div className="w-10 h-10 md:w-10 md:h-10 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors shrink-0">
                   <service.icon className="w-5 h-5 text-primary" />
                 </div>
-                <span className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">
+                <span className="text-sm font-medium text-foreground group-hover:text-primary transition-colors leading-tight">
                   {service.name}
                 </span>
               </div>

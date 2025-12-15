@@ -15,20 +15,20 @@ const Navigation = () => {
   ];
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border safe-area-inset">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
-          <a href="#" className="flex items-center gap-3">
+          <a href="#" className="flex items-center gap-3 active:scale-95 transition-transform">
             <img 
               src={mmarLogo} 
               alt="MMAR Logo" 
-              className="h-12 md:h-14 w-auto rounded"
+              className="h-10 sm:h-12 md:h-14 w-auto rounded"
             />
           </a>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-8">
+          <div className="hidden lg:flex items-center gap-6 xl:gap-8">
             {navLinks.map((link) => (
               <a
                 key={link.href}
@@ -52,7 +52,7 @@ const Navigation = () => {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden p-2 text-foreground hover:text-primary transition-colors"
+            className="lg:hidden p-3 -mr-2 text-foreground hover:text-primary transition-colors active:scale-95"
             aria-label="Toggle menu"
           >
             {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -61,14 +61,14 @@ const Navigation = () => {
 
         {/* Mobile Navigation */}
         {isOpen && (
-          <div className="md:hidden py-4 border-t border-border animate-fade-in">
-            <div className="flex flex-col gap-4">
+          <div className="lg:hidden py-4 border-t border-border animate-fade-in max-h-[calc(100vh-4rem)] overflow-y-auto">
+            <div className="flex flex-col gap-1">
               {navLinks.map((link) => (
                 <a
                   key={link.href}
                   href={link.href}
                   onClick={() => setIsOpen(false)}
-                  className="text-muted-foreground hover:text-primary transition-colors duration-200 font-medium py-2"
+                  className="text-muted-foreground hover:text-primary hover:bg-secondary/50 transition-colors duration-200 font-medium py-3 px-2 rounded-lg active:scale-[0.98]"
                 >
                   {link.label}
                 </a>
@@ -76,11 +76,11 @@ const Navigation = () => {
               <Link
                 to="/garage-ace"
                 onClick={() => setIsOpen(false)}
-                className="text-accent font-semibold hover:text-accent/80 transition-colors duration-200 py-2"
+                className="text-accent font-semibold hover:text-accent/80 hover:bg-secondary/50 transition-colors duration-200 py-3 px-2 rounded-lg active:scale-[0.98]"
               >
                 Garage Ace
               </Link>
-              <Button variant="hero" size="lg" asChild className="mt-2">
+              <Button variant="hero" size="lg" asChild className="mt-3 min-h-[48px]">
                 <a href="#contact" onClick={() => setIsOpen(false)}>
                   Get a Quote
                 </a>

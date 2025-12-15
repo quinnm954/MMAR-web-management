@@ -37,50 +37,50 @@ const Contact = () => {
   };
 
   return (
-    <section id="contact" className="py-20 md:py-32">
+    <section id="contact" className="py-16 md:py-20 lg:py-32">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
-          <h2 className="font-display text-4xl md:text-5xl lg:text-6xl tracking-wide mb-6">
+        <div className="text-center mb-10 md:mb-16">
+          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl tracking-wide mb-4 md:mb-6">
             <span className="text-sky">CONTACT</span>{" "}
             <span className="text-gold">US</span>
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-start max-w-6xl mx-auto">
           {/* Contact Info */}
-          <div className="space-y-8">
-            <div className="glass-card rounded-2xl overflow-hidden p-8 flex items-center justify-center">
+          <div className="space-y-6 md:space-y-8">
+            <div className="glass-card rounded-2xl overflow-hidden p-6 md:p-8 flex items-center justify-center">
               <img
                 src={mmarLogo}
                 alt="Mike's Mobile Auto Repair"
-                className="w-full max-w-md h-auto rounded-lg"
+                className="w-full max-w-sm h-auto rounded-lg"
               />
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-3 md:space-y-4">
               <a
                 href="tel:8039536194"
-                className="flex items-center gap-4 p-4 glass-card rounded-xl hover-lift group"
+                className="flex items-center gap-4 p-4 glass-card rounded-xl hover-lift group active:scale-[0.98] transition-transform"
               >
-                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors shrink-0">
                   <Phone className="w-6 h-6 text-primary" />
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Phone</p>
-                  <p className="text-foreground font-semibold">(803) 953-6194</p>
+                  <p className="text-foreground font-semibold text-lg">(803) 953-6194</p>
                 </div>
               </a>
 
               <a
                 href="mailto:mikesmarllc@gmail.com"
-                className="flex items-center gap-4 p-4 glass-card rounded-xl hover-lift group"
+                className="flex items-center gap-4 p-4 glass-card rounded-xl hover-lift group active:scale-[0.98] transition-transform"
               >
-                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors shrink-0">
                   <Mail className="w-6 h-6 text-primary" />
                 </div>
-                <div>
+                <div className="min-w-0">
                   <p className="text-sm text-muted-foreground">Email</p>
-                  <p className="text-foreground font-semibold break-all">
+                  <p className="text-foreground font-semibold truncate">
                     mikesmarllc@gmail.com
                   </p>
                 </div>
@@ -90,9 +90,9 @@ const Contact = () => {
                 href="https://www.facebook.com/mikesmobileautorepairllc/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-4 p-4 glass-card rounded-xl hover-lift group"
+                className="flex items-center gap-4 p-4 glass-card rounded-xl hover-lift group active:scale-[0.98] transition-transform"
               >
-                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors shrink-0">
                   <Facebook className="w-6 h-6 text-primary" />
                 </div>
                 <div>
@@ -104,11 +104,11 @@ const Contact = () => {
           </div>
 
           {/* Contact Form */}
-          <div className="glass-card rounded-2xl p-8">
-            <h3 className="font-display text-2xl tracking-wide text-foreground mb-6">
+          <div className="glass-card rounded-2xl p-6 md:p-8">
+            <h3 className="font-display text-xl md:text-2xl tracking-wide text-foreground mb-5 md:mb-6">
               SEND US A MESSAGE
             </h3>
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
               <div>
                 <label
                   htmlFor="name"
@@ -124,7 +124,7 @@ const Contact = () => {
                     setFormData({ ...formData, name: e.target.value })
                   }
                   required
-                  className="bg-card border-border focus:border-primary"
+                  className="bg-card border-border focus:border-primary min-h-[48px] text-base"
                 />
               </div>
 
@@ -143,7 +143,7 @@ const Contact = () => {
                     setFormData({ ...formData, email: e.target.value })
                   }
                   required
-                  className="bg-card border-border focus:border-primary"
+                  className="bg-card border-border focus:border-primary min-h-[48px] text-base"
                 />
               </div>
 
@@ -161,8 +161,8 @@ const Contact = () => {
                     setFormData({ ...formData, message: e.target.value })
                   }
                   required
-                  rows={5}
-                  className="bg-card border-border focus:border-primary resize-none"
+                  rows={4}
+                  className="bg-card border-border focus:border-primary resize-none text-base"
                 />
               </div>
 
@@ -170,7 +170,7 @@ const Contact = () => {
                 type="submit"
                 variant="hero"
                 size="lg"
-                className="w-full"
+                className="w-full min-h-[52px] text-base"
                 disabled={isLoading}
               >
                 {isLoading ? "Sending..." : "Send Message"}

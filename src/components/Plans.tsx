@@ -60,30 +60,30 @@ const plans = [
 ];
 
 const addOns = [
-  "Add a 3rd or 4th vehicle to any plan – $30/month each (starting at)",
-  "Premium Brake Upgrades (e.g., Ceramic Pads) – $10/month",
-  "Mobile Battery Delivery & Install – $10/month",
+  "Add vehicle – $30/mo",
+  "Brake Upgrades – $10/mo",
+  "Battery Delivery – $10/mo",
 ];
 
 const Plans = () => {
   return (
-    <section id="plans" className="py-20 md:py-32">
+    <section id="plans" className="py-16 md:py-20 lg:py-32">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
-          <h2 className="font-display text-4xl md:text-5xl lg:text-6xl tracking-wide mb-6">
+        <div className="text-center mb-10 md:mb-16">
+          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl tracking-wide mb-4 md:mb-6">
             <span className="text-sky">MAINTENANCE</span>{" "}
             <span className="text-gold">PLANS</span>
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto px-2">
             Subscribe to a maintenance plan and save on regular service
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8 md:mb-12">
           {plans.map((plan, index) => (
             <div
               key={plan.name}
-              className={`glass-card rounded-2xl p-6 relative hover-lift animate-slide-up ${
+              className={`glass-card rounded-2xl p-5 md:p-6 relative hover-lift animate-slide-up ${
                 plan.popular ? "ring-2 ring-accent glow-border-gold" : ""
               }`}
               style={{ animationDelay: `${index * 0.1}s` }}
@@ -96,34 +96,34 @@ const Plans = () => {
                 </div>
               )}
 
-              <div className="text-center mb-6">
-                <h3 className="font-display text-xl tracking-wide text-foreground mb-3">
+              <div className="text-center mb-5 md:mb-6">
+                <h3 className="font-display text-lg md:text-xl tracking-wide text-foreground mb-2 md:mb-3 min-h-[2.5rem] flex items-center justify-center">
                   {plan.name}
                 </h3>
                 <div className="flex items-baseline justify-center gap-1">
-                  <span className="text-4xl font-bold text-primary">{plan.price}</span>
-                  <span className="text-muted-foreground">{plan.period}</span>
+                  <span className="text-3xl md:text-4xl font-bold text-primary">{plan.price}</span>
+                  <span className="text-muted-foreground text-sm">{plan.period}</span>
                 </div>
               </div>
 
-              <ul className="space-y-3 mb-6">
+              <ul className="space-y-2 md:space-y-3 mb-5 md:mb-6">
                 {plan.features.map((feature) => (
                   <li key={feature} className="flex items-start gap-2 text-sm">
                     <Check className="w-4 h-4 text-accent shrink-0 mt-0.5" />
-                    <span className="text-muted-foreground">{feature}</span>
+                    <span className="text-muted-foreground leading-tight">{feature}</span>
                   </li>
                 ))}
               </ul>
 
               {plan.highlight && (
-                <p className="text-xs text-muted-foreground italic mb-6 border-t border-border pt-4">
+                <p className="text-xs text-muted-foreground italic mb-5 md:mb-6 border-t border-border pt-3 md:pt-4">
                   {plan.highlight}
                 </p>
               )}
 
               <Button
                 variant={plan.popular ? "hero" : "outline"}
-                className="w-full"
+                className="w-full min-h-[44px]"
                 asChild
               >
                 <a href={plan.href} target="_blank" rel="noopener noreferrer">
@@ -135,31 +135,30 @@ const Plans = () => {
         </div>
 
         {/* Fleet Plans */}
-        <div className="glass-card rounded-2xl p-8 mb-12 text-center animate-slide-up">
-          <h3 className="font-display text-2xl tracking-wide text-foreground mb-4">
+        <div className="glass-card rounded-2xl p-6 md:p-8 mb-8 md:mb-12 text-center animate-slide-up">
+          <h3 className="font-display text-xl md:text-2xl tracking-wide text-foreground mb-3 md:mb-4">
             Fleet Plans for Business – Custom Pricing
           </h3>
-          <p className="text-muted-foreground max-w-3xl mx-auto mb-6">
+          <p className="text-sm md:text-base text-muted-foreground max-w-3xl mx-auto mb-5 md:mb-6 px-2">
             Designed for small business owners & fleet operators with 3 or more
             vehicles. Custom coverage options, priority dispatch, dedicated support,
-            monthly billing with itemized service summaries, and streamlined
-            scheduling & service history management.
+            monthly billing with itemized service summaries.
           </p>
-          <Button variant="heroOutline" size="lg" asChild>
+          <Button variant="heroOutline" size="lg" className="min-h-[48px]" asChild>
             <a href="#contact">Contact for Custom Quote</a>
           </Button>
         </div>
 
         {/* Add-ons */}
         <div className="text-center">
-          <h3 className="font-display text-xl tracking-wide text-foreground mb-4">
+          <h3 className="font-display text-lg md:text-xl tracking-wide text-foreground mb-3 md:mb-4">
             Add-On Options
           </h3>
-          <div className="flex flex-wrap justify-center gap-4">
+          <div className="flex flex-wrap justify-center gap-2 md:gap-4">
             {addOns.map((addon) => (
               <span
                 key={addon}
-                className="bg-secondary text-secondary-foreground text-sm px-4 py-2 rounded-full"
+                className="bg-secondary text-secondary-foreground text-xs md:text-sm px-3 md:px-4 py-2 rounded-full"
               >
                 {addon}
               </span>
