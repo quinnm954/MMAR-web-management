@@ -53,7 +53,7 @@ const Services = () => {
             <span className="text-gold">SERVICES</span>
           </h2>
           <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto px-2">
-            Tap any service below to request a quote instantly via email
+            Tap any service below to request a quote instantly via text
           </p>
         </div>
 
