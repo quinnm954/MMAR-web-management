@@ -38,11 +38,10 @@ const services = [
 
 const Services = () => {
   const handleServiceClick = (serviceName: string) => {
-    const subject = encodeURIComponent(`Quote Request: ${serviceName}`);
     const body = encodeURIComponent(
-      `Hi, I would like to request a quote for: ${serviceName}\n\nPlease let me know the estimated cost and availability.\n\nThank you!`
+      `Hi, I'd like a quote for: ${serviceName}`
     );
-    window.location.href = `mailto:mikesmarllc@gmail.com?subject=${subject}&body=${body}`;
+    window.location.href = `sms:8039536194?body=${body}`;
   };
 
   return (
