@@ -10,7 +10,7 @@ const testimonials = [
   },
   {
     name: "Sarah Thompson",
-    location: "Spartanburg, SC",
+    location: "Greenville, SC",
     rating: 5,
     text: "Honest, reliable, and professional. My car broke down on a Saturday and Mike was there within an hour. Highly recommend!",
   },
