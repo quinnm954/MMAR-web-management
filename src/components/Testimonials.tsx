@@ -1,4 +1,5 @@
-import { Star, Quote } from "lucide-react";
+import { Star, Quote, ExternalLink } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const testimonials = [
   {
@@ -71,16 +72,29 @@ const Testimonials = () => {
           ))}
         </div>
 
-        <div className="text-center mt-10 md:mt-12">
-          <div className="inline-flex items-center gap-2 glass-card rounded-full px-6 py-3">
-            <div className="flex gap-0.5">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <Star key={i} className="w-4 h-4 fill-accent text-accent" />
-              ))}
-            </div>
-            <span className="text-foreground font-semibold">5.0</span>
-            <span className="text-muted-foreground text-sm">Average Rating</span>
+        <div className="glass-card rounded-2xl p-6 md:p-8 flex flex-col items-center text-center max-w-xl mx-auto mt-10 md:mt-12">
+          <div className="flex items-center gap-1 mb-4">
+            {[...Array(5)].map((_, i) => (
+              <Star key={i} className="w-8 h-8 text-accent fill-accent" />
+            ))}
           </div>
+          <h3 className="font-display text-xl md:text-2xl tracking-wide text-foreground mb-3">
+            5-STAR RATED
+          </h3>
+          <p className="text-muted-foreground mb-6 max-w-md">
+            See what our customers are saying about Mike's Mobile Auto Repair. We're proud to maintain a 5-star rating on Google!
+          </p>
+          <Button variant="hero" size="lg" className="min-h-[52px]" asChild>
+            <a
+              href="https://share.google/81sCiU8gosp3ZhCJD"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2"
+            >
+              <span>View Our Reviews</span>
+              <ExternalLink className="w-5 h-5" />
+            </a>
+          </Button>
         </div>
       </div>
     </section>
