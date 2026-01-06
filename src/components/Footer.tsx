@@ -18,7 +18,7 @@ const Footer = () => {
           </p>
 
           <div className="flex items-center gap-4 text-xs md:text-sm text-muted-foreground order-2 md:order-3">
-            <span>Greenville, SC</span>
+            <span>Greenville County, SC</span>
           </div>
         </div>
       </div>
