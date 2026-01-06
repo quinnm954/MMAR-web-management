@@ -14,7 +14,7 @@ const features = [
   {
     icon: MapPin,
     title: "Local Experts",
-    description: "Proudly serving the Greenville community",
+    description: "Proudly serving Greenville County",
   },
   {
     icon: Award,
@@ -36,7 +36,7 @@ const About = () => {
             Mike's Mobile Auto Repair LLC is committed to delivering professional,
             on-site auto repair services with excellence and convenience. What
             started as a local service in South Carolina remains proudly dedicated
-            to serving the Greenville community.
+            to serving the Greenville County community.
           </p>
           <p className="text-base md:text-lg text-muted-foreground leading-relaxed mt-4 px-2">
             With years of experience, ASE-level quality, and a customer-first

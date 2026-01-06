@@ -29,7 +29,7 @@ const Hero = () => {
             style={{ animationDelay: "0.1s" }}
           >
             On-site, dependable, professional auto repair wherever you are.
-            Serving Greenville, SC with ASE-level quality.
+            Serving Greenville County, SC with ASE-level quality.
           </p>
 
           <div
@@ -51,7 +51,7 @@ const Hero = () => {
           >
             <div className="flex items-center gap-2">
               <MapPin className="w-5 h-5 text-primary shrink-0" />
-              <span className="text-sm sm:text-base">Greenville, SC</span>
+              <span className="text-sm sm:text-base">Greenville County, SC</span>
             </div>
             <a href="tel:8643656444" className="flex items-center gap-2 hover:text-accent transition-colors active:scale-95">
               <Phone className="w-5 h-5 text-accent shrink-0" />
