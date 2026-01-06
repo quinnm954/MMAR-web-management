@@ -26,7 +26,7 @@ const Contact = () => {
 
             <div className="space-y-3 md:space-y-4">
               <a
-                href="tel:8039536194"
+                href="tel:8643656444"
                 className="flex items-center gap-4 p-4 glass-card rounded-xl hover-lift group active:scale-[0.98] transition-transform"
               >
                 <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors shrink-0">
@@ -34,7 +34,7 @@ const Contact = () => {
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Phone</p>
-                  <p className="text-foreground font-semibold text-lg">(803) 953-6194</p>
+                  <p className="text-foreground font-semibold text-lg">(864) 365-6444</p>
                 </div>
               </a>
 

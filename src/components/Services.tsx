@@ -41,7 +41,7 @@ const Services = () => {
     const body = encodeURIComponent(
       `Hi, I'd like a quote for: ${serviceName}`
     );
-    window.location.href = `sms:8039536194?body=${body}`;
+    window.location.href = `sms:8643656444?body=${body}`;
   };
 
   return (
