@@ -1,7 +1,12 @@
 import { Phone, Mail } from "lucide-react";
 import mmarLogo from "@/assets/mmar-logo.jpeg";
+import { trackConversion } from "@/lib/gtag";
 
 const Contact = () => {
+  const handleContactClick = () => {
+    trackConversion();
+  };
+
   return (
     <section id="contact" className="py-16 md:py-20 lg:py-32">
       <div className="container mx-auto px-4">
@@ -24,6 +29,7 @@ const Contact = () => {
           <div className="space-y-3 md:space-y-4">
             <a
               href="tel:8643656444"
+              onClick={handleContactClick}
               className="flex items-center gap-4 p-4 glass-card rounded-xl hover-lift group active:scale-[0.98] transition-transform"
             >
               <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors shrink-0">
@@ -37,6 +43,7 @@ const Contact = () => {
 
             <a
               href="mailto:mikesmarllc@gmail.com"
+              onClick={handleContactClick}
               className="flex items-center gap-4 p-4 glass-card rounded-xl hover-lift group active:scale-[0.98] transition-transform"
             >
               <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors shrink-0">
