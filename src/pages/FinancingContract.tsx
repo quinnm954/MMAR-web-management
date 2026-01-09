@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, Printer, Save, Download, Trash2 } from "lucide-react";
 import mmarLogo from "@/assets/mmar-logo.jpeg";
+import SignaturePad from "@/components/financing/SignaturePad";
 
 interface EditableContractData {
   clientName: string;
@@ -17,6 +18,20 @@ interface EditableContractData {
   totalServicePrice: string;
   firstPaymentDate: string;
   vehicleInfo: string;
+}
+
+interface SignatureData {
+  clientSignature: string | null;
+  clientSignedAt: string | null;
+  providerSignature: string | null;
+  providerSignedAt: string | null;
+  initials: {
+    terms: string | null;
+    securityInterest: string | null;
+    defaultConsequences: string | null;
+    infoAccuracy: string | null;
+    receivedCopy: string | null;
+  };
 }
 
 const PROVIDER = {
@@ -49,7 +64,22 @@ const defaultEditableData: EditableContractData = {
   vehicleInfo: "",
 };
 
+const defaultSignatureData: SignatureData = {
+  clientSignature: null,
+  clientSignedAt: null,
+  providerSignature: null,
+  providerSignedAt: null,
+  initials: {
+    terms: null,
+    securityInterest: null,
+    defaultConsequences: null,
+    infoAccuracy: null,
+    receivedCopy: null,
+  },
+};
+
 const STORAGE_KEY = "mmar-financing-contract";
+const SIGNATURE_STORAGE_KEY = "mmar-financing-signatures";
 
 // Sanitize numeric input - removes $ and commas
 const sanitizeNumber = (value: string): number => {
@@ -74,6 +104,21 @@ const formatDate = (dateStr: string): string => {
     year: "numeric",
     month: "long",
     day: "numeric",
+  });
+};
+
+// Format date and time for signature timestamp
+const formatDateTime = (isoString: string | null): string => {
+  if (!isoString) return "";
+  const date = new Date(isoString);
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  }) + " at " + date.toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
   });
 };
 
@@ -103,12 +148,24 @@ const calculatePaymentDates = (startDate: string, months: number): Date[] => {
 
 const FinancingContract = () => {
   const [formData, setFormData] = useState<EditableContractData>(defaultEditableData);
+  const [signatures, setSignatures] = useState<SignatureData>(defaultSignatureData);
   const [hasSaved, setHasSaved] = useState(false);
 
   // Check for saved data on mount
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) setHasSaved(true);
+    const savedSignatures = localStorage.getItem(SIGNATURE_STORAGE_KEY);
+    if (saved) {
+      setHasSaved(true);
+    }
+    if (savedSignatures) {
+      try {
+        const parsed = JSON.parse(savedSignatures) as SignatureData;
+        setSignatures({ ...defaultSignatureData, ...parsed });
+      } catch {
+        // Ignore parsing errors
+      }
+    }
   }, []);
 
   // Auto-calculations
@@ -151,32 +208,98 @@ const FinancingContract = () => {
 
   const handleSave = () => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
+    localStorage.setItem(SIGNATURE_STORAGE_KEY, JSON.stringify(signatures));
     setHasSaved(true);
   };
 
   const handleLoad = () => {
     const saved = localStorage.getItem(STORAGE_KEY);
-    if (!saved) return;
-
-    try {
-      const parsed = JSON.parse(saved) as Partial<EditableContractData>;
-      setFormData({ ...defaultEditableData, ...parsed });
-      setHasSaved(true);
-    } catch {
-      // If saved data is malformed or from an older version, reset to defaults
-      setFormData(defaultEditableData);
-      setHasSaved(false);
+    const savedSignatures = localStorage.getItem(SIGNATURE_STORAGE_KEY);
+    
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved) as Partial<EditableContractData>;
+        setFormData({ ...defaultEditableData, ...parsed });
+        setHasSaved(true);
+      } catch {
+        setFormData(defaultEditableData);
+        setHasSaved(false);
+      }
+    }
+    
+    if (savedSignatures) {
+      try {
+        const parsed = JSON.parse(savedSignatures) as SignatureData;
+        setSignatures({ ...defaultSignatureData, ...parsed });
+      } catch {
+        setSignatures(defaultSignatureData);
+      }
     }
   };
 
   const handleClear = () => {
     localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(SIGNATURE_STORAGE_KEY);
     setFormData(defaultEditableData);
+    setSignatures(defaultSignatureData);
     setHasSaved(false);
   };
 
   const handlePrint = () => {
     window.print();
+  };
+
+  // Signature handlers
+  const handleClientSignature = (signature: string) => {
+    setSignatures((prev) => ({
+      ...prev,
+      clientSignature: signature,
+      clientSignedAt: new Date().toISOString(),
+    }));
+  };
+
+  const handleProviderSignature = (signature: string) => {
+    setSignatures((prev) => ({
+      ...prev,
+      providerSignature: signature,
+      providerSignedAt: new Date().toISOString(),
+    }));
+  };
+
+  const handleInitial = (field: keyof SignatureData["initials"], initial: string) => {
+    setSignatures((prev) => ({
+      ...prev,
+      initials: {
+        ...prev.initials,
+        [field]: initial,
+      },
+    }));
+  };
+
+  const clearClientSignature = () => {
+    setSignatures((prev) => ({
+      ...prev,
+      clientSignature: null,
+      clientSignedAt: null,
+    }));
+  };
+
+  const clearProviderSignature = () => {
+    setSignatures((prev) => ({
+      ...prev,
+      providerSignature: null,
+      providerSignedAt: null,
+    }));
+  };
+
+  const clearInitial = (field: keyof SignatureData["initials"]) => {
+    setSignatures((prev) => ({
+      ...prev,
+      initials: {
+        ...prev.initials,
+        [field]: null,
+      },
+    }));
   };
 
   return (
@@ -788,23 +911,142 @@ const FinancingContract = () => {
             <h2 className="text-lg font-bold mb-4">CLIENT ACKNOWLEDGMENTS (Initial Each)</h2>
             <div className="space-y-4">
               <div className="flex gap-4 items-start">
-                <div className="w-16 border-b border-black text-center">______</div>
+                <div className="w-24 flex-shrink-0">
+                  {signatures.initials.terms ? (
+                    <div className="flex items-center gap-1">
+                      <img
+                        src={signatures.initials.terms}
+                        alt="Initials"
+                        className="border border-gray-300 h-10 w-20 object-contain bg-white"
+                      />
+                      <button
+                        onClick={() => clearInitial("terms")}
+                        className="text-red-500 text-xs print:hidden hover:underline"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ) : (
+                    <SignaturePad
+                      compact
+                      label="Initial"
+                      onSignatureComplete={(sig) => handleInitial("terms", sig)}
+                      onClear={() => clearInitial("terms")}
+                    />
+                  )}
+                </div>
                 <p className="flex-1 text-sm">I have read and understand all terms of this Financing Agreement.</p>
               </div>
+              
               <div className="flex gap-4 items-start">
-                <div className="w-16 border-b border-black text-center">______</div>
+                <div className="w-24 flex-shrink-0">
+                  {signatures.initials.securityInterest ? (
+                    <div className="flex items-center gap-1">
+                      <img
+                        src={signatures.initials.securityInterest}
+                        alt="Initials"
+                        className="border border-gray-300 h-10 w-20 object-contain bg-white"
+                      />
+                      <button
+                        onClick={() => clearInitial("securityInterest")}
+                        className="text-red-500 text-xs print:hidden hover:underline"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ) : (
+                    <SignaturePad
+                      compact
+                      label="Initial"
+                      onSignatureComplete={(sig) => handleInitial("securityInterest", sig)}
+                      onClear={() => clearInitial("securityInterest")}
+                    />
+                  )}
+                </div>
                 <p className="flex-1 text-sm">I understand I am granting a security interest (lien) on my vehicle until the balance is paid in full.</p>
               </div>
+              
               <div className="flex gap-4 items-start">
-                <div className="w-16 border-b border-black text-center">______</div>
+                <div className="w-24 flex-shrink-0">
+                  {signatures.initials.defaultConsequences ? (
+                    <div className="flex items-center gap-1">
+                      <img
+                        src={signatures.initials.defaultConsequences}
+                        alt="Initials"
+                        className="border border-gray-300 h-10 w-20 object-contain bg-white"
+                      />
+                      <button
+                        onClick={() => clearInitial("defaultConsequences")}
+                        className="text-red-500 text-xs print:hidden hover:underline"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ) : (
+                    <SignaturePad
+                      compact
+                      label="Initial"
+                      onSignatureComplete={(sig) => handleInitial("defaultConsequences", sig)}
+                      onClear={() => clearInitial("defaultConsequences")}
+                    />
+                  )}
+                </div>
                 <p className="flex-1 text-sm">I understand the consequences of default, including acceleration, collection actions, and credit reporting.</p>
               </div>
+              
               <div className="flex gap-4 items-start">
-                <div className="w-16 border-b border-black text-center">______</div>
+                <div className="w-24 flex-shrink-0">
+                  {signatures.initials.infoAccuracy ? (
+                    <div className="flex items-center gap-1">
+                      <img
+                        src={signatures.initials.infoAccuracy}
+                        alt="Initials"
+                        className="border border-gray-300 h-10 w-20 object-contain bg-white"
+                      />
+                      <button
+                        onClick={() => clearInitial("infoAccuracy")}
+                        className="text-red-500 text-xs print:hidden hover:underline"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ) : (
+                    <SignaturePad
+                      compact
+                      label="Initial"
+                      onSignatureComplete={(sig) => handleInitial("infoAccuracy", sig)}
+                      onClear={() => clearInitial("infoAccuracy")}
+                    />
+                  )}
+                </div>
                 <p className="flex-1 text-sm">I confirm all information I have provided is true and accurate.</p>
               </div>
+              
               <div className="flex gap-4 items-start">
-                <div className="w-16 border-b border-black text-center">______</div>
+                <div className="w-24 flex-shrink-0">
+                  {signatures.initials.receivedCopy ? (
+                    <div className="flex items-center gap-1">
+                      <img
+                        src={signatures.initials.receivedCopy}
+                        alt="Initials"
+                        className="border border-gray-300 h-10 w-20 object-contain bg-white"
+                      />
+                      <button
+                        onClick={() => clearInitial("receivedCopy")}
+                        className="text-red-500 text-xs print:hidden hover:underline"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ) : (
+                    <SignaturePad
+                      compact
+                      label="Initial"
+                      onSignatureComplete={(sig) => handleInitial("receivedCopy", sig)}
+                      onClear={() => clearInitial("receivedCopy")}
+                    />
+                  )}
+                </div>
                 <p className="flex-1 text-sm">I have received a copy of this Agreement.</p>
               </div>
             </div>
@@ -819,18 +1061,82 @@ const FinancingContract = () => {
             <div className="grid md:grid-cols-2 gap-8">
               <div>
                 <p className="font-bold mb-4">PROVIDER:</p>
-                <div className="border-b border-black mb-2 h-12"></div>
+                {signatures.providerSignature ? (
+                  <div className="mb-2">
+                    <img
+                      src={signatures.providerSignature}
+                      alt="Provider Signature"
+                      className="border border-gray-300 h-20 w-full max-w-[300px] object-contain bg-white"
+                    />
+                    <button
+                      onClick={clearProviderSignature}
+                      className="text-red-500 text-xs mt-1 print:hidden hover:underline"
+                    >
+                      Clear signature
+                    </button>
+                  </div>
+                ) : (
+                  <div className="mb-2">
+                    <SignaturePad
+                      width={300}
+                      height={80}
+                      label="Sign here"
+                      onSignatureComplete={handleProviderSignature}
+                      onClear={clearProviderSignature}
+                    />
+                    {/* Print fallback */}
+                    <div className="hidden print:block border-b border-black h-12"></div>
+                  </div>
+                )}
                 <p>{PROVIDER.name}</p>
-                <div className="mt-4">
-                  <p>Date: _______________________</p>
+                <div className="mt-2">
+                  {signatures.providerSignedAt ? (
+                    <p className="text-sm">
+                      <strong>Signed:</strong> {formatDateTime(signatures.providerSignedAt)}
+                    </p>
+                  ) : (
+                    <p>Date: _______________________</p>
+                  )}
                 </div>
               </div>
               <div>
                 <p className="font-bold mb-4">CLIENT:</p>
-                <div className="border-b border-black mb-2 h-12"></div>
+                {signatures.clientSignature ? (
+                  <div className="mb-2">
+                    <img
+                      src={signatures.clientSignature}
+                      alt="Client Signature"
+                      className="border border-gray-300 h-20 w-full max-w-[300px] object-contain bg-white"
+                    />
+                    <button
+                      onClick={clearClientSignature}
+                      className="text-red-500 text-xs mt-1 print:hidden hover:underline"
+                    >
+                      Clear signature
+                    </button>
+                  </div>
+                ) : (
+                  <div className="mb-2">
+                    <SignaturePad
+                      width={300}
+                      height={80}
+                      label="Sign here"
+                      onSignatureComplete={handleClientSignature}
+                      onClear={clearClientSignature}
+                    />
+                    {/* Print fallback */}
+                    <div className="hidden print:block border-b border-black h-12"></div>
+                  </div>
+                )}
                 <p>{formData.clientName || "_______________"}</p>
-                <div className="mt-4">
-                  <p>Date: _______________________</p>
+                <div className="mt-2">
+                  {signatures.clientSignedAt ? (
+                    <p className="text-sm">
+                      <strong>Signed:</strong> {formatDateTime(signatures.clientSignedAt)}
+                    </p>
+                  ) : (
+                    <p>Date: _______________________</p>
+                  )}
                 </div>
               </div>
             </div>
