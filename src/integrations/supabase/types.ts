@@ -14,6 +14,99 @@ export type Database = {
   }
   public: {
     Tables: {
+      financing_contracts: {
+        Row: {
+          agreement_date: string
+          client_address: string
+          client_contact: string
+          client_name: string
+          client_signature_url: string | null
+          client_signed_at: string | null
+          created_at: string
+          down_payment: number
+          first_payment_date: string
+          id: string
+          initial_default_consequences: string | null
+          initial_info_accuracy: string | null
+          initial_received_copy: string | null
+          initial_security_interest: string | null
+          initial_terms: string | null
+          interest: number
+          ip_address: string | null
+          monthly_payment: number
+          principal: number
+          provider_signature_url: string | null
+          provider_signed_at: string | null
+          service_description: string | null
+          status: string
+          total_financed: number
+          total_service_price: number
+          updated_at: string
+          user_agent: string | null
+          vehicle_info: string | null
+        }
+        Insert: {
+          agreement_date: string
+          client_address: string
+          client_contact: string
+          client_name: string
+          client_signature_url?: string | null
+          client_signed_at?: string | null
+          created_at?: string
+          down_payment: number
+          first_payment_date: string
+          id?: string
+          initial_default_consequences?: string | null
+          initial_info_accuracy?: string | null
+          initial_received_copy?: string | null
+          initial_security_interest?: string | null
+          initial_terms?: string | null
+          interest: number
+          ip_address?: string | null
+          monthly_payment: number
+          principal: number
+          provider_signature_url?: string | null
+          provider_signed_at?: string | null
+          service_description?: string | null
+          status?: string
+          total_financed: number
+          total_service_price: number
+          updated_at?: string
+          user_agent?: string | null
+          vehicle_info?: string | null
+        }
+        Update: {
+          agreement_date?: string
+          client_address?: string
+          client_contact?: string
+          client_name?: string
+          client_signature_url?: string | null
+          client_signed_at?: string | null
+          created_at?: string
+          down_payment?: number
+          first_payment_date?: string
+          id?: string
+          initial_default_consequences?: string | null
+          initial_info_accuracy?: string | null
+          initial_received_copy?: string | null
+          initial_security_interest?: string | null
+          initial_terms?: string | null
+          interest?: number
+          ip_address?: string | null
+          monthly_payment?: number
+          principal?: number
+          provider_signature_url?: string | null
+          provider_signed_at?: string | null
+          service_description?: string | null
+          status?: string
+          total_financed?: number
+          total_service_price?: number
+          updated_at?: string
+          user_agent?: string | null
+          vehicle_info?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string

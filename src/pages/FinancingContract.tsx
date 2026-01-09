@@ -5,9 +5,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Printer, Save, Download, Trash2 } from "lucide-react";
+import { ArrowLeft, Printer, Save, Download, Trash2, Send, Loader2 } from "lucide-react";
 import mmarLogo from "@/assets/mmar-logo.jpeg";
 import SignaturePad from "@/components/financing/SignaturePad";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface EditableContractData {
   clientName: string;
@@ -150,6 +152,7 @@ const FinancingContract = () => {
   const [formData, setFormData] = useState<EditableContractData>(defaultEditableData);
   const [signatures, setSignatures] = useState<SignatureData>(defaultSignatureData);
   const [hasSaved, setHasSaved] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Check for saved data on mount
   useEffect(() => {
@@ -249,6 +252,116 @@ const FinancingContract = () => {
     window.print();
   };
 
+  // Upload signature to storage and return URL
+  const uploadSignature = async (signatureData: string, type: 'client' | 'provider'): Promise<string | null> => {
+    if (!signatureData) return null;
+    
+    try {
+      // Convert base64 to blob
+      const base64Data = signatureData.replace(/^data:image\/\w+;base64,/, '');
+      const byteCharacters = atob(base64Data);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: 'image/png' });
+      
+      // Generate unique filename
+      const fileName = `${type}-${Date.now()}-${Math.random().toString(36).substring(7)}.png`;
+      
+      const { data, error } = await supabase.storage
+        .from('signatures')
+        .upload(fileName, blob, { contentType: 'image/png' });
+      
+      if (error) throw error;
+      
+      // Get public URL
+      const { data: urlData } = supabase.storage
+        .from('signatures')
+        .getPublicUrl(data.path);
+      
+      return urlData.publicUrl;
+    } catch (error) {
+      console.error(`Error uploading ${type} signature:`, error);
+      return null;
+    }
+  };
+
+  const handleSubmitToDatabase = async () => {
+    // Validate required fields
+    if (!formData.clientName || !formData.clientAddress || !formData.clientContact) {
+      toast.error('Please fill in all client information fields');
+      return;
+    }
+    if (!formData.totalServicePrice || !formData.firstPaymentDate) {
+      toast.error('Please fill in total service price and first payment date');
+      return;
+    }
+
+    setIsSubmitting(true);
+    
+    try {
+      // Upload signatures if they exist
+      const clientSignatureUrl = signatures.clientSignature 
+        ? await uploadSignature(signatures.clientSignature, 'client')
+        : null;
+      const providerSignatureUrl = signatures.providerSignature
+        ? await uploadSignature(signatures.providerSignature, 'provider')
+        : null;
+
+      // Determine status based on signatures
+      let status = 'draft';
+      if (signatures.clientSignature && signatures.providerSignature) {
+        status = 'signed';
+      } else if (signatures.clientSignature || signatures.providerSignature) {
+        status = 'pending';
+      }
+
+      const { error } = await supabase
+        .from('financing_contracts')
+        .insert({
+          client_name: formData.clientName,
+          client_address: formData.clientAddress,
+          client_contact: formData.clientContact,
+          agreement_date: formData.agreementDate,
+          vehicle_info: formData.vehicleInfo || null,
+          service_description: formData.serviceDescription || null,
+          total_service_price: calculations.totalPrice,
+          first_payment_date: formData.firstPaymentDate,
+          down_payment: calculations.downPayment,
+          principal: calculations.principal,
+          interest: calculations.interest,
+          total_financed: calculations.totalFinanced,
+          monthly_payment: calculations.baseMonthlyPayment,
+          client_signature_url: clientSignatureUrl,
+          client_signed_at: signatures.clientSignedAt,
+          provider_signature_url: providerSignatureUrl,
+          provider_signed_at: signatures.providerSignedAt,
+          initial_terms: signatures.initials.terms,
+          initial_security_interest: signatures.initials.securityInterest,
+          initial_default_consequences: signatures.initials.defaultConsequences,
+          initial_info_accuracy: signatures.initials.infoAccuracy,
+          initial_received_copy: signatures.initials.receivedCopy,
+          status,
+          ip_address: null,
+          user_agent: navigator.userAgent,
+        });
+
+      if (error) throw error;
+
+      toast.success('Contract saved to database successfully!');
+      
+      // Clear form after successful submission
+      handleClear();
+    } catch (error) {
+      console.error('Error saving contract:', error);
+      toast.error('Failed to save contract to database');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   // Signature handlers
   const handleClientSignature = (signature: string) => {
     setSignatures((prev) => ({
@@ -314,7 +427,7 @@ const FinancingContract = () => {
             <div className="flex items-center gap-2">
               <Button variant="outline" size="sm" onClick={handleSave}>
                 <Save className="w-4 h-4 mr-2" />
-                Save
+                Save Draft
               </Button>
               {hasSaved && (
                 <Button variant="outline" size="sm" onClick={handleLoad}>
@@ -329,6 +442,20 @@ const FinancingContract = () => {
               <Button variant="hero" size="sm" onClick={handlePrint}>
                 <Printer className="w-4 h-4 mr-2" />
                 Print / PDF
+              </Button>
+              <Button 
+                variant="default" 
+                size="sm" 
+                onClick={handleSubmitToDatabase}
+                disabled={isSubmitting}
+                className="bg-green-600 hover:bg-green-700"
+              >
+                {isSubmitting ? (
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                ) : (
+                  <Send className="w-4 h-4 mr-2" />
+                )}
+                Submit Contract
               </Button>
             </div>
           </div>
