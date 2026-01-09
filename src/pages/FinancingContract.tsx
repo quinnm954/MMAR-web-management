@@ -16,6 +16,7 @@ interface EditableContractData {
   serviceDescription: string;
   totalServicePrice: string;
   firstPaymentDate: string;
+  vehicleInfo: string;
 }
 
 const PROVIDER = {
@@ -32,7 +33,9 @@ const TERMS = {
   // Fixed business terms (not editable)
   lateFee: 25,
   gracePeriodDays: 5,
+  returnedPaymentFee: 35,
   governingLaw: "South Carolina",
+  venue: "Greenville County, South Carolina",
 } as const;
 
 const defaultEditableData: EditableContractData = {
@@ -43,6 +46,7 @@ const defaultEditableData: EditableContractData = {
   serviceDescription: "",
   totalServicePrice: "",
   firstPaymentDate: "",
+  vehicleInfo: "",
 };
 
 const STORAGE_KEY = "mmar-financing-contract";
@@ -303,6 +307,15 @@ const FinancingContract = () => {
                   />
                 </div>
                 <div>
+                  <Label htmlFor="vehicleInfo">Vehicle Information (Year/Make/Model/VIN)</Label>
+                  <Input
+                    id="vehicleInfo"
+                    value={formData.vehicleInfo}
+                    onChange={(e) => handleInputChange("vehicleInfo", e.target.value)}
+                    placeholder="e.g., 2020 Toyota Camry, VIN: 1234567890"
+                  />
+                </div>
+                <div>
                   <Label htmlFor="serviceDescription">Service Description / Work Order Reference</Label>
                   <Textarea
                     id="serviceDescription"
@@ -382,6 +395,22 @@ const FinancingContract = () => {
             </p>
           </div>
 
+          {/* IMPORTANT NOTICE BOX */}
+          <section className="mb-6 print:mb-4 p-4 border-2 border-black bg-gray-100 print:bg-gray-100">
+            <h2 className="text-lg font-bold text-center mb-3">⚠️ IMPORTANT NOTICE TO CLIENT</h2>
+            <p className="text-sm mb-2">
+              <strong>READ BEFORE SIGNING:</strong> This is a legally binding financing agreement. By signing below, you agree to:
+            </p>
+            <ul className="text-sm list-disc ml-6 space-y-1">
+              <li>Pay all amounts due according to the schedule, including interest and fees</li>
+              <li>Grant Provider a security interest (lien) on the serviced vehicle until paid in full</li>
+              <li>Pay late fees of ${TERMS.lateFee} for payments more than {TERMS.gracePeriodDays} days late</li>
+              <li>Pay ${TERMS.returnedPaymentFee} for any returned check or failed electronic payment</li>
+              <li>Pay all collection costs, attorney's fees, and court costs if you default</li>
+              <li>Have your account reported to credit bureaus if delinquent</li>
+            </ul>
+          </section>
+
           {/* Parties Section */}
           <section className="mb-6 print:mb-4">
             <h2 className="text-lg font-bold border-b-2 border-black pb-1 mb-3">1. PARTIES</h2>
@@ -389,13 +418,13 @@ const FinancingContract = () => {
               This Financing Agreement ("Agreement") is entered into as of{" "}
               <strong>{formatDate(formData.agreementDate) || "_______________"}</strong> by and between:
             </p>
-              <div className="ml-4 mb-3">
-                <p>
-                  <strong>PROVIDER:</strong> {PROVIDER.name}
-                </p>
-                <p>Address: {PROVIDER.address}</p>
-                <p>Contact: {PROVIDER.contact}</p>
-              </div>
+            <div className="ml-4 mb-3">
+              <p>
+                <strong>PROVIDER:</strong> {PROVIDER.name}
+              </p>
+              <p>Address: {PROVIDER.address}</p>
+              <p>Contact: {PROVIDER.contact}</p>
+            </div>
             <div className="ml-4">
               <p>
                 <strong>CLIENT:</strong> {formData.clientName || "_______________"}
@@ -407,10 +436,14 @@ const FinancingContract = () => {
 
           {/* Services Section */}
           <section className="mb-6 print:mb-4">
-            <h2 className="text-lg font-bold border-b-2 border-black pb-1 mb-3">2. SERVICES</h2>
-            <p>
-              Provider has performed or will perform the following automotive repair services for Client:
+            <h2 className="text-lg font-bold border-b-2 border-black pb-1 mb-3">2. SERVICES & VEHICLE</h2>
+            <p className="mb-2">
+              Provider has performed or will perform automotive repair services for Client on the following vehicle:
             </p>
+            <div className="ml-4 mb-3">
+              <p><strong>Vehicle:</strong> {formData.vehicleInfo || "_______________________________________________"}</p>
+            </div>
+            <p className="mb-2"><strong>Services Performed:</strong></p>
             <div className="mt-2 p-3 bg-gray-50 print:bg-transparent print:border print:border-gray-300 rounded min-h-[60px]">
               {formData.serviceDescription || "_______________________________________________"}
             </div>
@@ -530,58 +563,258 @@ const FinancingContract = () => {
             <p>
               If any payment is not received within <strong>{TERMS.gracePeriodDays}</strong> days of its due date
               ("Grace Period"), Client agrees to pay a late fee of <strong>{formatCurrency(TERMS.lateFee)}</strong> for
-              each late payment.
+              each late payment. Late fees are cumulative and do not excuse Client from making the regularly scheduled payment.
             </p>
           </section>
 
-          {/* Default Section */}
+          {/* Returned Payment Fees Section */}
           <section className="mb-6 print:mb-4">
-            <h2 className="text-lg font-bold border-b-2 border-black pb-1 mb-3">8. DEFAULT</h2>
+            <h2 className="text-lg font-bold border-b-2 border-black pb-1 mb-3">8. RETURNED PAYMENT FEES</h2>
             <p>
-              If Client fails to make any payment within 30 days of its due date, Provider may declare
-              the entire remaining balance immediately due and payable. Provider may also pursue any
-              other remedies available under applicable law, including but not limited to collection
-              efforts and legal action to recover the outstanding balance plus reasonable attorney's
-              fees and court costs.
+              Client agrees to pay a fee of <strong>{formatCurrency(TERMS.returnedPaymentFee)}</strong> for any check 
+              returned unpaid or any electronic payment that fails due to insufficient funds, closed account, or any 
+              other reason attributable to Client. Client is also responsible for any bank fees incurred by Provider 
+              as a result of such returned or failed payment.
+            </p>
+          </section>
+
+          {/* Security Interest & Lien Rights Section */}
+          <section className="mb-6 print:mb-4">
+            <h2 className="text-lg font-bold border-b-2 border-black pb-1 mb-3">9. SECURITY INTEREST & LIEN RIGHTS</h2>
+            <p className="mb-2">
+              To secure payment of all amounts due under this Agreement, Client hereby grants Provider a security 
+              interest in the vehicle described in Section 2, including all accessories, additions, and replacements 
+              thereto ("Collateral"). Client acknowledges and agrees that:
+            </p>
+            <div className="ml-4 space-y-2">
+              <p>
+                <strong>a)</strong> Provider may file a mechanic's lien or possessory lien on the Collateral in accordance 
+                with applicable {TERMS.governingLaw} law if any amount under this Agreement remains unpaid.
+              </p>
+              <p>
+                <strong>b)</strong> Provider has the right to retain possession of the Collateral until all amounts due 
+                under this Agreement have been paid in full.
+              </p>
+              <p>
+                <strong>c)</strong> Client shall not sell, transfer, encumber, or otherwise dispose of the Collateral 
+                until all obligations under this Agreement are satisfied.
+              </p>
+              <p>
+                <strong>d)</strong> Upon default, Provider may exercise all rights available under the Uniform Commercial 
+                Code and applicable state law, including the right to repossess and sell the Collateral.
+              </p>
+            </div>
+          </section>
+
+          {/* Default & Acceleration Section */}
+          <section className="mb-6 print:mb-4">
+            <h2 className="text-lg font-bold border-b-2 border-black pb-1 mb-3">10. DEFAULT & ACCELERATION</h2>
+            <p className="mb-2">
+              Client shall be in default under this Agreement if any of the following occurs:
+            </p>
+            <div className="ml-4 space-y-1 mb-3">
+              <p><strong>a)</strong> Failure to make any payment within 30 days of its due date;</p>
+              <p><strong>b)</strong> Breach of any other term or condition of this Agreement;</p>
+              <p><strong>c)</strong> Death or incapacity of Client;</p>
+              <p><strong>d)</strong> Filing of bankruptcy or insolvency proceedings by or against Client;</p>
+              <p><strong>e)</strong> Any representation made by Client proves to be false or misleading.</p>
+            </div>
+            <p>
+              Upon default, Provider may, at its sole discretion, declare the entire remaining balance (including 
+              principal, accrued interest, late fees, and all other charges) immediately due and payable without 
+              further notice or demand. This right of acceleration is in addition to, and not in lieu of, any other 
+              remedies available to Provider.
+            </p>
+          </section>
+
+          {/* Collection Costs & Remedies Section */}
+          <section className="mb-6 print:mb-4">
+            <h2 className="text-lg font-bold border-b-2 border-black pb-1 mb-3">11. COLLECTION COSTS & REMEDIES</h2>
+            <p className="mb-2">
+              In the event of default, Client agrees to pay all costs and expenses incurred by Provider in collecting 
+              amounts due under this Agreement, including but not limited to:
+            </p>
+            <div className="ml-4 space-y-1 mb-3">
+              <p><strong>a)</strong> Reasonable attorney's fees and legal costs;</p>
+              <p><strong>b)</strong> Collection agency fees and commissions;</p>
+              <p><strong>c)</strong> Skip tracing and investigation costs;</p>
+              <p><strong>d)</strong> Court costs and filing fees;</p>
+              <p><strong>e)</strong> Costs of repossession, storage, and sale of Collateral.</p>
+            </div>
+            <p>
+              <strong>CREDIT REPORTING:</strong> Provider may report Client's payment history and any delinquency to 
+              consumer credit reporting agencies. Negative information may affect Client's credit score and ability 
+              to obtain credit in the future.
+            </p>
+          </section>
+
+          {/* Acknowledgment of Debt Section */}
+          <section className="mb-6 print:mb-4">
+            <h2 className="text-lg font-bold border-b-2 border-black pb-1 mb-3">12. ACKNOWLEDGMENT OF DEBT</h2>
+            <p>
+              Client acknowledges and agrees that: (a) the debt evidenced by this Agreement is valid, binding, and 
+              enforceable; (b) Client has received all services described herein or authorizes Provider to perform 
+              such services; (c) Client has no defenses, counterclaims, or setoffs against the amounts due; and 
+              (d) all information provided by Client to Provider is true, accurate, and complete. Client agrees 
+              not to dispute the validity or amount of this debt after execution of this Agreement except for 
+              claims of actual fraud.
+            </p>
+          </section>
+
+          {/* Client Representations Section */}
+          <section className="mb-6 print:mb-4">
+            <h2 className="text-lg font-bold border-b-2 border-black pb-1 mb-3">13. CLIENT REPRESENTATIONS & WARRANTIES</h2>
+            <p className="mb-2">Client represents and warrants that:</p>
+            <div className="ml-4 space-y-1">
+              <p><strong>a)</strong> Client is at least 18 years of age and has full legal capacity to enter into this Agreement;</p>
+              <p><strong>b)</strong> Client is the legal owner of the vehicle described herein or has authority to authorize repairs;</p>
+              <p><strong>c)</strong> All information provided by Client is true, accurate, and complete;</p>
+              <p><strong>d)</strong> Client has the financial ability to make all payments required under this Agreement;</p>
+              <p><strong>e)</strong> No bankruptcy, insolvency, or similar proceedings are pending or contemplated by Client;</p>
+              <p><strong>f)</strong> Client has read this entire Agreement and understands all terms and conditions.</p>
+            </div>
+          </section>
+
+          {/* Waiver of Defenses Section */}
+          <section className="mb-6 print:mb-4">
+            <h2 className="text-lg font-bold border-b-2 border-black pb-1 mb-3">14. WAIVER OF DEFENSES</h2>
+            <p>
+              Client agrees that Client's obligation to make all payments under this Agreement is absolute and 
+              unconditional and shall not be subject to any defense, setoff, counterclaim, or recoupment. Any 
+              disputes regarding the quality, completeness, or satisfaction with services shall be resolved 
+              separately and shall not excuse, delay, or reduce Client's payment obligations. Client waives 
+              any right to withhold payment based on alleged defects in workmanship or materials.
+            </p>
+          </section>
+
+          {/* Communication Consent Section */}
+          <section className="mb-6 print:mb-4">
+            <h2 className="text-lg font-bold border-b-2 border-black pb-1 mb-3">15. COMMUNICATION CONSENT</h2>
+            <p>
+              Client expressly consents to receive communications from Provider and its agents, representatives, 
+              or assigns regarding this account by any means, including but not limited to: telephone calls 
+              (including calls using automated dialing systems or prerecorded messages), text messages, emails, 
+              and written correspondence sent to any address, phone number, or email address provided by Client. 
+              Client agrees to notify Provider in writing within 10 days of any change to Client's contact information.
+            </p>
+          </section>
+
+          {/* Assignment Section */}
+          <section className="mb-6 print:mb-4">
+            <h2 className="text-lg font-bold border-b-2 border-black pb-1 mb-3">16. ASSIGNMENT</h2>
+            <p>
+              Provider may assign, sell, or transfer this Agreement and all rights hereunder to any third party, 
+              including but not limited to collection agencies, financial institutions, or other assignees, without 
+              notice to or consent from Client. Any such assignee shall have all rights and remedies available to 
+              Provider under this Agreement. Client may not assign this Agreement or any obligations hereunder 
+              without the prior written consent of Provider.
+            </p>
+          </section>
+
+          {/* Dispute Resolution Section */}
+          <section className="mb-6 print:mb-4">
+            <h2 className="text-lg font-bold border-b-2 border-black pb-1 mb-3">17. DISPUTE RESOLUTION & VENUE</h2>
+            <p className="mb-2">
+              <strong>a) Mandatory Mediation:</strong> Before initiating any legal action, the parties agree to 
+              attempt in good faith to resolve any dispute through non-binding mediation administered by a mutually 
+              agreed upon mediator in {TERMS.venue}.
+            </p>
+            <p className="mb-2">
+              <strong>b) Exclusive Venue:</strong> Any legal action arising out of or relating to this Agreement 
+              shall be brought exclusively in the courts of {TERMS.venue}, and both parties hereby consent to the 
+              personal jurisdiction of such courts.
+            </p>
+            <p>
+              <strong>c) Attorney's Fees:</strong> In any legal action to enforce this Agreement, the prevailing 
+              party shall be entitled to recover reasonable attorney's fees and costs from the non-prevailing party.
             </p>
           </section>
 
           {/* No Prepayment Penalty Section */}
           <section className="mb-6 print:mb-4">
-            <h2 className="text-lg font-bold border-b-2 border-black pb-1 mb-3">9. NO PREPAYMENT PENALTY</h2>
+            <h2 className="text-lg font-bold border-b-2 border-black pb-1 mb-3">18. NO PREPAYMENT PENALTY</h2>
             <p>
-              Client may prepay any or all of the remaining financed balance at any time without
-              penalty. If Client prepays in full, interest will not be reduced; the full interest
-              amount as calculated herein remains due.
+              Client may prepay any or all of the remaining financed balance at any time without penalty. If Client 
+              prepays in full, interest will not be reduced; the full interest amount as calculated herein remains due.
             </p>
           </section>
 
           {/* Governing Law Section */}
           <section className="mb-6 print:mb-4">
-            <h2 className="text-lg font-bold border-b-2 border-black pb-1 mb-3">10. GOVERNING LAW</h2>
+            <h2 className="text-lg font-bold border-b-2 border-black pb-1 mb-3">19. GOVERNING LAW</h2>
             <p>
               This Agreement shall be governed by and construed in accordance with the laws of the State of{" "}
               <strong>{TERMS.governingLaw}</strong>, without regard to its conflict of laws principles.
             </p>
           </section>
 
+          {/* Severability Section */}
+          <section className="mb-6 print:mb-4">
+            <h2 className="text-lg font-bold border-b-2 border-black pb-1 mb-3">20. SEVERABILITY</h2>
+            <p>
+              If any provision of this Agreement is held to be invalid, illegal, or unenforceable, such provision 
+              shall be modified to the minimum extent necessary to make it valid and enforceable, or if modification 
+              is not possible, such provision shall be severed from this Agreement. The invalidity, illegality, or 
+              unenforceability of any provision shall not affect the validity or enforceability of any other 
+              provision of this Agreement, and all remaining provisions shall continue in full force and effect.
+            </p>
+          </section>
+
+          {/* Waiver Section */}
+          <section className="mb-6 print:mb-4">
+            <h2 className="text-lg font-bold border-b-2 border-black pb-1 mb-3">21. WAIVER</h2>
+            <p>
+              No waiver by Provider of any breach or default of this Agreement shall constitute a waiver of any 
+              subsequent breach or default. Provider's failure or delay in exercising any right or remedy under 
+              this Agreement shall not constitute a waiver of such right or remedy. All waivers must be in writing 
+              and signed by Provider to be effective.
+            </p>
+          </section>
+
           {/* Entire Agreement Section */}
           <section className="mb-8 print:mb-6">
-            <h2 className="text-lg font-bold border-b-2 border-black pb-1 mb-3">11. ENTIRE AGREEMENT</h2>
+            <h2 className="text-lg font-bold border-b-2 border-black pb-1 mb-3">22. ENTIRE AGREEMENT</h2>
             <p>
-              This Agreement constitutes the entire agreement between the parties with respect to the
-              subject matter hereof and supersedes all prior and contemporaneous agreements,
-              representations, and understandings, whether written or oral. This Agreement may not be
-              amended or modified except by a written instrument signed by both parties.
+              This Agreement constitutes the entire agreement between the parties with respect to the subject matter 
+              hereof and supersedes all prior and contemporaneous agreements, representations, and understandings, 
+              whether written or oral. This Agreement may not be amended or modified except by a written instrument 
+              signed by both parties. Client acknowledges that Client has not relied on any representations or 
+              promises not expressly set forth in this Agreement.
             </p>
+          </section>
+
+          {/* Client Acknowledgments Section */}
+          <section className="mb-8 print:mb-6 p-4 border-2 border-black">
+            <h2 className="text-lg font-bold mb-4">CLIENT ACKNOWLEDGMENTS (Initial Each)</h2>
+            <div className="space-y-4">
+              <div className="flex gap-4 items-start">
+                <div className="w-16 border-b border-black text-center">______</div>
+                <p className="flex-1 text-sm">I have read and understand all terms of this Financing Agreement.</p>
+              </div>
+              <div className="flex gap-4 items-start">
+                <div className="w-16 border-b border-black text-center">______</div>
+                <p className="flex-1 text-sm">I understand I am granting a security interest (lien) on my vehicle until the balance is paid in full.</p>
+              </div>
+              <div className="flex gap-4 items-start">
+                <div className="w-16 border-b border-black text-center">______</div>
+                <p className="flex-1 text-sm">I understand the consequences of default, including acceleration, collection actions, and credit reporting.</p>
+              </div>
+              <div className="flex gap-4 items-start">
+                <div className="w-16 border-b border-black text-center">______</div>
+                <p className="flex-1 text-sm">I confirm all information I have provided is true and accurate.</p>
+              </div>
+              <div className="flex gap-4 items-start">
+                <div className="w-16 border-b border-black text-center">______</div>
+                <p className="flex-1 text-sm">I have received a copy of this Agreement.</p>
+              </div>
+            </div>
           </section>
 
           {/* Signatures Section */}
           <section className="mb-6 print:mb-4">
-            <h2 className="text-lg font-bold border-b-2 border-black pb-1 mb-3">12. SIGNATURES</h2>
+            <h2 className="text-lg font-bold border-b-2 border-black pb-1 mb-3">23. SIGNATURES</h2>
             <p className="mb-6">
-              IN WITNESS WHEREOF, the parties have executed this Agreement as of the date first
-              written above.
+              IN WITNESS WHEREOF, the parties have executed this Agreement as of the date first written above.
             </p>
             <div className="grid md:grid-cols-2 gap-8">
               <div>
