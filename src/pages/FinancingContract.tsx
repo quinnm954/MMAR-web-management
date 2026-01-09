@@ -8,10 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, Printer, Save, Download, Trash2 } from "lucide-react";
 import mmarLogo from "@/assets/mmar-logo.jpeg";
 
-interface ContractData {
-  providerName: string;
-  providerAddress: string;
-  providerContact: string;
+interface EditableContractData {
   clientName: string;
   clientAddress: string;
   clientContact: string;
@@ -19,16 +16,26 @@ interface ContractData {
   serviceDescription: string;
   totalServicePrice: string;
   firstPaymentDate: string;
-  lateFee: string;
-  gracePeriodDays: string;
-  paymentMethod: string;
-  governingLaw: string;
 }
 
-const defaultData: ContractData = {
-  providerName: "Mike's Mobile Auto Repair (MMAR)",
-  providerAddress: "Greenville County, SC",
-  providerContact: "(864) 365-6444 | mikesmarllc@gmail.com",
+const PROVIDER = {
+  name: "Mike's Mobile Auto Repair (MMAR)",
+  address: "Greenville County, SC",
+  contact: "(864) 365-6444 | mikesmarllc@gmail.com",
+} as const;
+
+const TERMS = {
+  downPaymentRate: 0.75,
+  financedRate: 0.25,
+  annualInterestRate: 0.25,
+  termMonths: 12,
+  // Fixed business terms (not editable)
+  lateFee: 25,
+  gracePeriodDays: 5,
+  governingLaw: "South Carolina",
+} as const;
+
+const defaultEditableData: EditableContractData = {
   clientName: "",
   clientAddress: "",
   clientContact: "",
@@ -36,10 +43,6 @@ const defaultData: ContractData = {
   serviceDescription: "",
   totalServicePrice: "",
   firstPaymentDate: "",
-  lateFee: "25.00",
-  gracePeriodDays: "5",
-  paymentMethod: "",
-  governingLaw: "South Carolina",
 };
 
 const STORAGE_KEY = "mmar-financing-contract";
@@ -74,49 +77,49 @@ const formatDate = (dateStr: string): string => {
 const calculatePaymentDates = (startDate: string, months: number): Date[] => {
   const dates: Date[] = [];
   if (!startDate) return dates;
-  
+
   const start = new Date(startDate + "T00:00:00");
   const originalDay = start.getDate();
-  
+
   for (let i = 0; i < months; i++) {
     const paymentDate = new Date(start);
     paymentDate.setMonth(start.getMonth() + i);
-    
+
     // Handle end-of-month edge cases (e.g., Jan 31 -> Feb 28)
     if (paymentDate.getDate() !== originalDay) {
       // Month rolled over due to fewer days, set to last day of previous month
       paymentDate.setDate(0);
     }
-    
+
     dates.push(paymentDate);
   }
-  
+
   return dates;
 };
 
 const FinancingContract = () => {
-  const [formData, setFormData] = useState<ContractData>(defaultData);
+  const [formData, setFormData] = useState<EditableContractData>(defaultEditableData);
   const [hasSaved, setHasSaved] = useState(false);
 
   // Check for saved data on mount
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      setHasSaved(true);
-    }
+    if (saved) setHasSaved(true);
   }, []);
 
   // Auto-calculations
   const calculations = useMemo(() => {
     const totalPrice = sanitizeNumber(formData.totalServicePrice);
-    const downPayment = totalPrice * 0.75;
-    const principal = totalPrice * 0.25;
-    const interest = principal * 0.25 * 1; // 25% annual simple interest for 1 year
+    const downPayment = totalPrice * TERMS.downPaymentRate;
+    const principal = totalPrice * TERMS.financedRate;
+    const interest = principal * TERMS.annualInterestRate * 1; // simple interest for 1 year
     const totalFinanced = principal + interest;
-    const baseMonthlyPayment = Math.floor((totalFinanced / 12) * 100) / 100;
-    const sumOfFirst11 = baseMonthlyPayment * 11;
+
+    // Ensure the final payment adjusts for rounding so the sum equals totalFinanced
+    const baseMonthlyPayment = Math.floor((totalFinanced / TERMS.termMonths) * 100) / 100;
+    const sumOfFirst11 = baseMonthlyPayment * (TERMS.termMonths - 1);
     const finalPayment = Math.round((totalFinanced - sumOfFirst11) * 100) / 100;
-    
+
     return {
       totalPrice,
       downPayment,
@@ -130,15 +133,15 @@ const FinancingContract = () => {
 
   // Payment schedule
   const paymentSchedule = useMemo(() => {
-    const dates = calculatePaymentDates(formData.firstPaymentDate, 12);
+    const dates = calculatePaymentDates(formData.firstPaymentDate, TERMS.termMonths);
     return dates.map((date, index) => ({
       number: index + 1,
       dueDate: date,
-      amount: index === 11 ? calculations.finalPayment : calculations.baseMonthlyPayment,
+      amount: index === TERMS.termMonths - 1 ? calculations.finalPayment : calculations.baseMonthlyPayment,
     }));
   }, [formData.firstPaymentDate, calculations]);
 
-  const handleInputChange = (field: keyof ContractData, value: string) => {
+  const handleInputChange = (field: keyof EditableContractData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -149,14 +152,22 @@ const FinancingContract = () => {
 
   const handleLoad = () => {
     const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      setFormData(JSON.parse(saved));
+    if (!saved) return;
+
+    try {
+      const parsed = JSON.parse(saved) as Partial<EditableContractData>;
+      setFormData({ ...defaultEditableData, ...parsed });
+      setHasSaved(true);
+    } catch {
+      // If saved data is malformed or from an older version, reset to defaults
+      setFormData(defaultEditableData);
+      setHasSaved(false);
     }
   };
 
   const handleClear = () => {
     localStorage.removeItem(STORAGE_KEY);
-    setFormData(defaultData);
+    setFormData(defaultEditableData);
     setHasSaved(false);
   };
 
@@ -221,7 +232,7 @@ const FinancingContract = () => {
               <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                 <div>
                   <p className="text-muted-foreground">Provider</p>
-                  <p className="font-medium">{defaultData.providerName}</p>
+                  <p className="font-medium">{PROVIDER.name}</p>
                 </div>
                 <div>
                   <p className="text-muted-foreground">Down Payment</p>
@@ -378,13 +389,13 @@ const FinancingContract = () => {
               This Financing Agreement ("Agreement") is entered into as of{" "}
               <strong>{formatDate(formData.agreementDate) || "_______________"}</strong> by and between:
             </p>
-            <div className="ml-4 mb-3">
-              <p>
-                <strong>PROVIDER:</strong> {formData.providerName || "_______________"}
-              </p>
-              <p>Address: {formData.providerAddress || "_______________"}</p>
-              <p>Contact: {formData.providerContact || "_______________"}</p>
-            </div>
+              <div className="ml-4 mb-3">
+                <p>
+                  <strong>PROVIDER:</strong> {PROVIDER.name}
+                </p>
+                <p>Address: {PROVIDER.address}</p>
+                <p>Contact: {PROVIDER.contact}</p>
+              </div>
             <div className="ml-4">
               <p>
                 <strong>CLIENT:</strong> {formData.clientName || "_______________"}
@@ -511,21 +522,15 @@ const FinancingContract = () => {
                 </tfoot>
               </table>
             </div>
-            {formData.paymentMethod && (
-              <p className="mt-3">
-                <strong>Accepted Payment Method(s):</strong> {formData.paymentMethod}
-              </p>
-            )}
           </section>
 
           {/* Late Fees Section */}
           <section className="mb-6 print:mb-4">
             <h2 className="text-lg font-bold border-b-2 border-black pb-1 mb-3">7. LATE FEES</h2>
             <p>
-              If any payment is not received within{" "}
-              <strong>{formData.gracePeriodDays || "5"}</strong> days of its due date ("Grace Period"),
-              Client agrees to pay a late fee of{" "}
-              <strong>{formatCurrency(sanitizeNumber(formData.lateFee))}</strong> for each late payment.
+              If any payment is not received within <strong>{TERMS.gracePeriodDays}</strong> days of its due date
+              ("Grace Period"), Client agrees to pay a late fee of <strong>{formatCurrency(TERMS.lateFee)}</strong> for
+              each late payment.
             </p>
           </section>
 
@@ -555,9 +560,8 @@ const FinancingContract = () => {
           <section className="mb-6 print:mb-4">
             <h2 className="text-lg font-bold border-b-2 border-black pb-1 mb-3">10. GOVERNING LAW</h2>
             <p>
-              This Agreement shall be governed by and construed in accordance with the laws of the
-              State of <strong>{formData.governingLaw || "South Carolina"}</strong>, without regard
-              to its conflict of laws principles.
+              This Agreement shall be governed by and construed in accordance with the laws of the State of{" "}
+              <strong>{TERMS.governingLaw}</strong>, without regard to its conflict of laws principles.
             </p>
           </section>
 
@@ -583,7 +587,7 @@ const FinancingContract = () => {
               <div>
                 <p className="font-bold mb-4">PROVIDER:</p>
                 <div className="border-b border-black mb-2 h-12"></div>
-                <p>{formData.providerName || "_______________"}</p>
+                <p>{PROVIDER.name}</p>
                 <div className="mt-4">
                   <p>Date: _______________________</p>
                 </div>
