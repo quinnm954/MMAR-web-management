@@ -14,7 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      warranty_acknowledgments: {
+        Row: {
+          created_at: string
+          customer_name: string
+          id: string
+          ip_address: string | null
+          signature_image: string
+          signed_at: string
+          user_agent: string | null
+          vehicle_info: string
+          vin_last6: string | null
+          work_order_number: string | null
+        }
+        Insert: {
+          created_at?: string
+          customer_name: string
+          id?: string
+          ip_address?: string | null
+          signature_image: string
+          signed_at?: string
+          user_agent?: string | null
+          vehicle_info: string
+          vin_last6?: string | null
+          work_order_number?: string | null
+        }
+        Update: {
+          created_at?: string
+          customer_name?: string
+          id?: string
+          ip_address?: string | null
+          signature_image?: string
+          signed_at?: string
+          user_agent?: string | null
+          vehicle_info?: string
+          vin_last6?: string | null
+          work_order_number?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

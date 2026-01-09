@@ -1,10 +1,14 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Printer } from "lucide-react";
+import { ArrowLeft, Printer, Download, CheckCircle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import SignaturePad from "@/components/financing/SignaturePad";
 import mmarLogo from "@/assets/mmar-logo.jpeg";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
 const WarrantyPolicy = () => {
   const [customerSignature, setCustomerSignature] = useState<string | null>(null);
@@ -12,9 +16,114 @@ const WarrantyPolicy = () => {
   const [vehicleInfo, setVehicleInfo] = useState("");
   const [vinLast6, setVinLast6] = useState("");
   const [workOrderNumber, setWorkOrderNumber] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+  const documentRef = useRef<HTMLDivElement>(null);
+  const { toast } = useToast();
 
   const handlePrint = () => {
     window.print();
+  };
+
+  const handleSaveAcknowledgment = async () => {
+    if (!customerName.trim()) {
+      toast({ title: "Error", description: "Please enter your name.", variant: "destructive" });
+      return false;
+    }
+    if (!vehicleInfo.trim()) {
+      toast({ title: "Error", description: "Please enter vehicle information.", variant: "destructive" });
+      return false;
+    }
+    if (!customerSignature) {
+      toast({ title: "Error", description: "Please sign the document.", variant: "destructive" });
+      return false;
+    }
+
+    setIsSaving(true);
+    try {
+      const { error } = await supabase.from("warranty_acknowledgments").insert({
+        customer_name: customerName.trim(),
+        vehicle_info: vehicleInfo.trim(),
+        vin_last6: vinLast6.trim() || null,
+        work_order_number: workOrderNumber.trim() || null,
+        signature_image: customerSignature,
+        user_agent: navigator.userAgent,
+      });
+
+      if (error) throw error;
+
+      setIsSaved(true);
+      toast({ title: "Success", description: "Warranty acknowledgment saved successfully." });
+      return true;
+    } catch (error) {
+      console.error("Error saving acknowledgment:", error);
+      toast({ title: "Error", description: "Failed to save acknowledgment. Please try again.", variant: "destructive" });
+      return false;
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleDownloadPdf = async () => {
+    if (!isSaved) {
+      const saved = await handleSaveAcknowledgment();
+      if (!saved) return;
+    }
+
+    if (!documentRef.current) return;
+
+    setIsGeneratingPdf(true);
+    try {
+      const canvas = await html2canvas(documentRef.current, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff'
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const imgWidth = canvas.width;
+      const imgHeight = canvas.height;
+      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+      const imgScaledWidth = imgWidth * ratio;
+      const imgScaledHeight = imgHeight * ratio;
+
+      // Handle multi-page PDFs for long documents
+      const pageHeight = pdfHeight;
+      let heightLeft = imgScaledHeight;
+      let position = 0;
+      let page = 1;
+
+      pdf.addImage(imgData, 'PNG', 0, position, imgScaledWidth, imgScaledHeight);
+      heightLeft -= pageHeight;
+
+      while (heightLeft > 0) {
+        position = -pageHeight * page;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, position, imgScaledWidth, imgScaledHeight);
+        heightLeft -= pageHeight;
+        page++;
+      }
+
+      const fileName = `MMAR_Warranty_${customerName.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
+      pdf.save(fileName);
+
+      toast({ title: "Success", description: "PDF downloaded successfully." });
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      toast({ title: "Error", description: "Failed to generate PDF. Please try again.", variant: "destructive" });
+    } finally {
+      setIsGeneratingPdf(false);
+    }
   };
 
   const currentDate = new Date().toLocaleDateString('en-US', {
@@ -38,15 +147,36 @@ const WarrantyPolicy = () => {
             <ArrowLeft className="w-4 h-4" />
             Back to Home
           </Link>
-          <Button onClick={handlePrint} variant="outline" size="sm">
-            <Printer className="w-4 h-4 mr-2" />
-            Print Policy
-          </Button>
+          <div className="flex items-center gap-2">
+            {isSaved && (
+              <span className="flex items-center gap-1 text-sm text-green-600">
+                <CheckCircle className="w-4 h-4" />
+                Saved
+              </span>
+            )}
+            <Button 
+              onClick={handleDownloadPdf} 
+              variant="default" 
+              size="sm"
+              disabled={isGeneratingPdf}
+            >
+              {isGeneratingPdf ? (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <Download className="w-4 h-4 mr-2" />
+              )}
+              Download PDF
+            </Button>
+            <Button onClick={handlePrint} variant="outline" size="sm">
+              <Printer className="w-4 h-4 mr-2" />
+              Print Policy
+            </Button>
+          </div>
         </div>
       </div>
 
       {/* Policy Document */}
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <div className="container mx-auto px-4 py-8 max-w-4xl" ref={documentRef}>
         <div className="bg-card border border-border rounded-lg shadow-sm p-8 md:p-12 contract-document">
           {/* Header */}
           <div className="text-center border-b-2 border-primary pb-6 mb-8">
