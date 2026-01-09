@@ -125,8 +125,8 @@ const WarrantyPolicy = () => {
               5. LIMITATION OF LIABILITY
             </h2>
             <div className="text-sm text-muted-foreground space-y-2 leading-relaxed">
-              <p>5.1. <strong>MAXIMUM LIABILITY:</strong> MMAR's maximum liability for any claim shall not exceed the original cost of the repair or service giving rise to the claim.</p>
-              <p>5.2. <strong>EXCLUSION OF DAMAGES:</strong> IN NO EVENT SHALL MMAR BE LIABLE FOR ANY CONSEQUENTIAL, INCIDENTAL, SPECIAL, PUNITIVE, OR INDIRECT DAMAGES, INCLUDING BUT NOT LIMITED TO:</p>
+              <p>5.1. <strong>MAXIMUM LIABILITY:</strong> Except for claims arising from gross negligence, willful misconduct, or reckless conduct by MMAR, MMAR's maximum liability for any claim shall not exceed the original cost of the repair or service giving rise to the claim.</p>
+              <p>5.2. <strong>EXCLUSION OF DAMAGES:</strong> TO THE FULLEST EXTENT PERMITTED BY LAW, AND EXCEPT FOR DAMAGES ARISING FROM GROSS NEGLIGENCE, WILLFUL MISCONDUCT, OR RECKLESS CONDUCT, MMAR SHALL NOT BE LIABLE FOR ANY CONSEQUENTIAL, INCIDENTAL, SPECIAL, PUNITIVE, OR INDIRECT DAMAGES, INCLUDING BUT NOT LIMITED TO:</p>
               <ul className="list-disc list-inside ml-4 space-y-1">
                 <li>Towing charges or roadside assistance</li>
                 <li>Rental car or substitute transportation costs</li>
@@ -134,9 +134,40 @@ const WarrantyPolicy = () => {
                 <li>Hotel, meal, or travel expenses</li>
                 <li>Delay in obtaining parts or completing repairs</li>
                 <li>Diminished vehicle value</li>
-                <li>Personal injury or property damage (except as caused by gross negligence)</li>
               </ul>
-              <p>5.3. Customer assumes all risk for vehicle operation and use during and after the repair process.</p>
+              <p>5.3. <strong>PRESERVATION OF RIGHTS:</strong> Nothing in this policy shall be construed to limit or exclude liability for personal injury or property damage caused by MMAR's gross negligence, willful misconduct, or reckless conduct, or any other liability that cannot be limited or excluded under applicable law.</p>
+              <p>5.4. Customer assumes all risk for vehicle operation and use during and after the repair process, except where damage results from MMAR's negligence.</p>
+            </div>
+          </section>
+
+          {/* Section 5A - Disclaimer of Implied Warranties */}
+          <section className="mb-8">
+            <h2 className="text-xl font-bold text-foreground mb-3 border-b border-border pb-2">
+              5A. DISCLAIMER OF IMPLIED WARRANTIES
+            </h2>
+            <div className="text-sm text-muted-foreground space-y-2 leading-relaxed">
+              <p>5A.1. <strong>DISCLAIMER:</strong> TO THE FULLEST EXTENT PERMITTED BY SOUTH CAROLINA LAW, MMAR EXPRESSLY DISCLAIMS ALL IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.</p>
+              <p>5A.2. THE LIMITED WARRANTY SET FORTH IN SECTION 2 OF THIS POLICY IS THE SOLE AND EXCLUSIVE WARRANTY PROVIDED BY MMAR. NO OTHER WARRANTIES, WHETHER EXPRESS OR IMPLIED, ARE MADE WITH RESPECT TO ANY SERVICES, PARTS, OR REPAIRS PROVIDED BY MMAR.</p>
+              <p>5A.3. Some jurisdictions do not allow limitations on implied warranties, so the above limitations may not apply to you. In such jurisdictions, MMAR's liability shall be limited to the maximum extent permitted by law.</p>
+              <p>5A.4. Customer acknowledges that the services provided by MMAR are provided "AS IS" except as expressly set forth in the Limited Warranty Coverage section of this policy.</p>
+            </div>
+          </section>
+
+          {/* Section 5B - Magnuson-Moss Act Compliance */}
+          <section className="mb-8">
+            <h2 className="text-xl font-bold text-foreground mb-3 border-b border-border pb-2">
+              5B. MAGNUSON-MOSS WARRANTY ACT COMPLIANCE
+            </h2>
+            <div className="text-sm text-muted-foreground space-y-2 leading-relaxed">
+              <p>5B.1. <strong>FEDERAL COMPLIANCE:</strong> This warranty policy is provided in compliance with the Magnuson-Moss Warranty Act, 15 U.S.C. §§ 2301-2312, and applicable Federal Trade Commission regulations.</p>
+              <p>5B.2. <strong>WARRANTY DESIGNATION:</strong> The limited warranty provided by MMAR is a "LIMITED WARRANTY" as defined under the Magnuson-Moss Warranty Act. This warranty gives you specific legal rights, and you may also have other rights which vary from state to state.</p>
+              <p>5B.3. <strong>WARRANTOR IDENTIFICATION:</strong> The warrantor of this limited warranty is Mike's Mobile Auto Repair ("MMAR"), located in Greenville, South Carolina. Contact: (864) 365-6444.</p>
+              <p>5B.4. <strong>COVERAGE SUMMARY:</strong> This limited warranty covers defects in workmanship and materials for parts installed by MMAR for twelve (12) months or 12,000 miles (whichever comes first) and labor for ninety (90) days from the date of service, subject to the exclusions and conditions stated herein.</p>
+              <p>5B.5. <strong>OBTAINING WARRANTY SERVICE:</strong> To obtain warranty service, Customer must return the vehicle to MMAR with the original repair invoice within the applicable warranty period. MMAR will, at its sole discretion, repair, replace, or refund the defective part or service.</p>
+              <p>5B.6. <strong>NO CHARGE FOR WARRANTY SERVICE:</strong> There is no charge for warranty service on covered repairs performed by MMAR during the warranty period.</p>
+              <p>5B.7. <strong>LIMITATIONS:</strong> Any implied warranties, including the implied warranties of merchantability and fitness for a particular purpose, are limited in duration to the duration of this written warranty to the extent permitted by law. Some states do not allow limitations on how long an implied warranty lasts, so the above limitation may not apply to you.</p>
+              <p>5B.8. <strong>EXCLUSION OF CONSEQUENTIAL DAMAGES:</strong> MMAR shall not be liable for incidental or consequential damages, except where such exclusion is prohibited by law. Some states do not allow the exclusion or limitation of incidental or consequential damages, so the above limitation or exclusion may not apply to you.</p>
+              <p>5B.9. <strong>STATE LAW RIGHTS:</strong> This warranty gives you specific legal rights. You may also have other rights which vary from state to state.</p>
             </div>
           </section>
 
