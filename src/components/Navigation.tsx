@@ -53,6 +53,11 @@ const Navigation = () => {
                     Financing Contract
                   </Link>
                 </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/warranty-policy" className="cursor-pointer">
+                    Warranty Policy
+                  </Link>
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
             <a
@@ -100,6 +105,13 @@ const Navigation = () => {
                   className="block text-muted-foreground hover:text-primary hover:bg-secondary/50 transition-colors duration-200 font-medium py-2 px-2 rounded-lg active:scale-[0.98]"
                 >
                   Financing Contract
+                </Link>
+                <Link
+                  to="/warranty-policy"
+                  onClick={() => setIsOpen(false)}
+                  className="block text-muted-foreground hover:text-primary hover:bg-secondary/50 transition-colors duration-200 font-medium py-2 px-2 rounded-lg active:scale-[0.98]"
+                >
+                  Warranty Policy
                 </Link>
               </div>
               <a
