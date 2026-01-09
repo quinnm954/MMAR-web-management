@@ -1,9 +1,18 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import SignaturePad from "@/components/financing/SignaturePad";
 import mmarLogo from "@/assets/mmar-logo.jpeg";
 
 const WarrantyPolicy = () => {
+  const [customerSignature, setCustomerSignature] = useState<string | null>(null);
+  const [customerName, setCustomerName] = useState("");
+  const [vehicleInfo, setVehicleInfo] = useState("");
+  const [vinLast6, setVinLast6] = useState("");
+  const [workOrderNumber, setWorkOrderNumber] = useState("");
+
   const handlePrint = () => {
     window.print();
   };
@@ -12,6 +21,12 @@ const WarrantyPolicy = () => {
     year: 'numeric',
     month: 'long',
     day: 'numeric'
+  });
+
+  const signatureDate = new Date().toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
   });
 
   return (
@@ -341,23 +356,93 @@ const WarrantyPolicy = () => {
               </p>
             </div>
 
-            {/* Print-only signature lines */}
+            {/* Digital Signature Section */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
-              <div>
-                <div className="border-b border-foreground pb-1 mb-2 h-12"></div>
-                <p className="text-sm text-muted-foreground">Customer Signature</p>
-                <div className="border-b border-foreground pb-1 mb-2 mt-4 h-8"></div>
-                <p className="text-sm text-muted-foreground">Printed Name</p>
-                <div className="border-b border-foreground pb-1 mb-2 mt-4 h-8"></div>
-                <p className="text-sm text-muted-foreground">Date</p>
+              <div className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium text-foreground mb-2 block">Customer Signature</label>
+                  <SignaturePad
+                    width={350}
+                    height={100}
+                    onSignatureComplete={(sig) => setCustomerSignature(sig)}
+                    onClear={() => setCustomerSignature(null)}
+                    existingSignature={customerSignature}
+                    label="Sign here"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-foreground mb-1 block print:hidden">Printed Name</label>
+                  <Input
+                    value={customerName}
+                    onChange={(e) => setCustomerName(e.target.value)}
+                    placeholder="Enter your full name"
+                    className="print:hidden"
+                  />
+                  {/* Print version */}
+                  <div className="hidden print:block">
+                    <div className="border-b border-foreground pb-1 min-h-[24px]">
+                      {customerName || <span className="text-muted-foreground">_________________</span>}
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">Printed Name</p>
+                  </div>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-foreground mb-1 block">Date</label>
+                  <div className="px-3 py-2 bg-muted rounded border border-border text-sm">
+                    {signatureDate}
+                  </div>
+                </div>
               </div>
-              <div>
-                <div className="border-b border-foreground pb-1 mb-2 h-12"></div>
-                <p className="text-sm text-muted-foreground">Vehicle Year/Make/Model</p>
-                <div className="border-b border-foreground pb-1 mb-2 mt-4 h-8"></div>
-                <p className="text-sm text-muted-foreground">VIN (Last 6 digits)</p>
-                <div className="border-b border-foreground pb-1 mb-2 mt-4 h-8"></div>
-                <p className="text-sm text-muted-foreground">Work Order Number</p>
+              <div className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium text-foreground mb-1 block print:hidden">Vehicle Year/Make/Model</label>
+                  <Input
+                    value={vehicleInfo}
+                    onChange={(e) => setVehicleInfo(e.target.value)}
+                    placeholder="e.g., 2020 Honda Accord"
+                    className="print:hidden"
+                  />
+                  {/* Print version */}
+                  <div className="hidden print:block">
+                    <div className="border-b border-foreground pb-1 min-h-[24px]">
+                      {vehicleInfo || <span className="text-muted-foreground">_________________</span>}
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">Vehicle Year/Make/Model</p>
+                  </div>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-foreground mb-1 block print:hidden">VIN (Last 6 digits)</label>
+                  <Input
+                    value={vinLast6}
+                    onChange={(e) => setVinLast6(e.target.value.toUpperCase().slice(0, 6))}
+                    placeholder="e.g., ABC123"
+                    maxLength={6}
+                    className="print:hidden"
+                  />
+                  {/* Print version */}
+                  <div className="hidden print:block">
+                    <div className="border-b border-foreground pb-1 min-h-[24px]">
+                      {vinLast6 || <span className="text-muted-foreground">_________________</span>}
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">VIN (Last 6 digits)</p>
+                  </div>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-foreground mb-1 block print:hidden">Work Order Number</label>
+                  <Input
+                    value={workOrderNumber}
+                    onChange={(e) => setWorkOrderNumber(e.target.value)}
+                    placeholder="e.g., WO-2024-001"
+                    className="print:hidden"
+                  />
+                  {/* Print version */}
+                  <div className="hidden print:block">
+                    <div className="border-b border-foreground pb-1 min-h-[24px]">
+                      {workOrderNumber || <span className="text-muted-foreground">_________________</span>}
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">Work Order Number</p>
+                  </div>
+                </div>
               </div>
             </div>
           </section>
