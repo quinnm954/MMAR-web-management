@@ -12,10 +12,8 @@ import mmarLogo from '@/assets/mmar-logo.jpeg';
 const AdminLogin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isSignUp, setIsSignUp] = useState(false);
-  const [fullName, setFullName] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { signIn, signUp, user, isAdmin, isLoading } = useAuth();
+  const { signIn, user, isAdmin, isLoading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -30,30 +28,13 @@ const AdminLogin = () => {
     setIsSubmitting(true);
 
     try {
-      if (isSignUp) {
-        const { error } = await signUp(email, password, fullName);
-        if (error) {
-          toast({
-            title: 'Sign up failed',
-            description: error.message,
-            variant: 'destructive',
-          });
-        } else {
-          toast({
-            title: 'Account created',
-            description: 'Your account has been created. Contact an administrator to get admin access.',
-          });
-          setIsSignUp(false);
-        }
-      } else {
-        const { error } = await signIn(email, password);
-        if (error) {
-          toast({
-            title: 'Login failed',
-            description: error.message,
-            variant: 'destructive',
-          });
-        }
+      const { error } = await signIn(email, password);
+      if (error) {
+        toast({
+          title: 'Login failed',
+          description: error.message,
+          variant: 'destructive',
+        });
       }
     } finally {
       setIsSubmitting(false);
@@ -90,32 +71,15 @@ const AdminLogin = () => {
         <Card className="glass-card border-border">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl font-display text-foreground">
-              {isSignUp ? 'Create Account' : 'Admin Login'}
+              Admin Login
             </CardTitle>
             <CardDescription>
-              {isSignUp
-                ? 'Create an account to request admin access'
-                : 'Sign in to access the admin dashboard'}
+              Sign in to access the admin dashboard
             </CardDescription>
           </CardHeader>
 
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
-              {isSignUp && (
-                <div className="space-y-2">
-                  <Label htmlFor="fullName">Full Name</Label>
-                  <Input
-                    id="fullName"
-                    type="text"
-                    placeholder="Enter your full name"
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    required={isSignUp}
-                    className="bg-input border-border"
-                  />
-                </div>
-              )}
-
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
@@ -151,25 +115,13 @@ const AdminLogin = () => {
                 {isSubmitting ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    {isSignUp ? 'Creating account...' : 'Signing in...'}
+                    Signing in...
                   </>
                 ) : (
-                  isSignUp ? 'Create Account' : 'Sign In'
+                  'Sign In'
                 )}
               </Button>
             </form>
-
-            <div className="mt-4 text-center">
-              <button
-                type="button"
-                onClick={() => setIsSignUp(!isSignUp)}
-                className="text-sm text-primary hover:underline"
-              >
-                {isSignUp
-                  ? 'Already have an account? Sign in'
-                  : "Don't have an account? Sign up"}
-              </button>
-            </div>
           </CardContent>
         </Card>
       </div>
