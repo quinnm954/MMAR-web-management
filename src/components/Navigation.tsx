@@ -1,8 +1,14 @@
 import { useState } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, X, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import mmarLogo from "@/assets/mmar-logo.jpeg";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -37,6 +43,18 @@ const Navigation = () => {
                 {link.label}
               </a>
             ))}
+            <DropdownMenu>
+              <DropdownMenuTrigger className="flex items-center gap-1 text-muted-foreground hover:text-primary transition-colors duration-200 font-medium">
+                Forms <ChevronDown className="w-4 h-4" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem asChild>
+                  <Link to="/financing-contract" className="cursor-pointer">
+                    Financing Contract
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
             <a
               href="https://garage-ace.mikesmautorepair.com"
               target="_blank"
@@ -74,6 +92,16 @@ const Navigation = () => {
                   {link.label}
                 </a>
               ))}
+              <div className="py-2 px-2">
+                <p className="text-xs uppercase tracking-wide text-muted-foreground mb-2">Forms</p>
+                <Link
+                  to="/financing-contract"
+                  onClick={() => setIsOpen(false)}
+                  className="block text-muted-foreground hover:text-primary hover:bg-secondary/50 transition-colors duration-200 font-medium py-2 px-2 rounded-lg active:scale-[0.98]"
+                >
+                  Financing Contract
+                </Link>
+              </div>
               <a
                 href="https://garage-ace.mikesmautorepair.com"
                 target="_blank"

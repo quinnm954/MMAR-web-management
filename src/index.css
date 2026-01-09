@@ -190,3 +190,67 @@
     }
   }
 }
+
+/* Print styles for financing contract */
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+    font-size: 11pt;
+    line-height: 1.4;
+  }
+
+  .print\\:hidden {
+    display: none !important;
+  }
+
+  .contract-document {
+    background: white !important;
+    color: black !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  .contract-document h1,
+  .contract-document h2 {
+    font-family: 'Times New Roman', serif !important;
+    color: black !important;
+  }
+
+  .contract-document h1 {
+    font-size: 18pt !important;
+  }
+
+  .contract-document h2 {
+    font-size: 12pt !important;
+  }
+
+  .contract-document p,
+  .contract-document td,
+  .contract-document th {
+    font-family: 'Times New Roman', serif !important;
+    color: black !important;
+  }
+
+  .contract-document table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+  }
+
+  .contract-document th,
+  .contract-document td {
+    border: 1px solid black !important;
+    padding: 4pt 6pt !important;
+  }
+
+  .contract-document section {
+    page-break-inside: avoid;
+  }
+
+  @page {
+    margin: 0.75in;
+    size: letter;
+  }
+}
