@@ -215,40 +215,31 @@ const FinancingContract = () => {
             Fill in the details below to generate a financing contract. All calculations are automatic.
           </p>
 
-          <div className="grid md:grid-cols-2 gap-6">
-            {/* Provider Information */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Provider Information</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
+          {/* Fixed Business Terms Notice */}
+          <Card className="bg-muted/50 border-muted">
+            <CardContent className="pt-6">
+              <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                 <div>
-                  <Label htmlFor="providerName">Provider Name</Label>
-                  <Input
-                    id="providerName"
-                    value={formData.providerName}
-                    onChange={(e) => handleInputChange("providerName", e.target.value)}
-                  />
+                  <p className="text-muted-foreground">Provider</p>
+                  <p className="font-medium">{defaultData.providerName}</p>
                 </div>
                 <div>
-                  <Label htmlFor="providerAddress">Address</Label>
-                  <Input
-                    id="providerAddress"
-                    value={formData.providerAddress}
-                    onChange={(e) => handleInputChange("providerAddress", e.target.value)}
-                  />
+                  <p className="text-muted-foreground">Down Payment</p>
+                  <p className="font-medium">75% of Total</p>
                 </div>
                 <div>
-                  <Label htmlFor="providerContact">Phone / Email</Label>
-                  <Input
-                    id="providerContact"
-                    value={formData.providerContact}
-                    onChange={(e) => handleInputChange("providerContact", e.target.value)}
-                  />
+                  <p className="text-muted-foreground">Finance Charge</p>
+                  <p className="font-medium">25% Annual Simple Interest</p>
                 </div>
-              </CardContent>
-            </Card>
+                <div>
+                  <p className="text-muted-foreground">Term</p>
+                  <p className="font-medium">12 Monthly Payments</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
+          <div className="grid md:grid-cols-2 gap-6">
             {/* Client Information */}
             <Card>
               <CardHeader>
@@ -256,7 +247,7 @@ const FinancingContract = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <Label htmlFor="clientName">Client Full Name</Label>
+                  <Label htmlFor="clientName">Client Full Name *</Label>
                   <Input
                     id="clientName"
                     value={formData.clientName}
@@ -265,7 +256,7 @@ const FinancingContract = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="clientAddress">Client Address</Label>
+                  <Label htmlFor="clientAddress">Client Address *</Label>
                   <Input
                     id="clientAddress"
                     value={formData.clientAddress}
@@ -274,7 +265,7 @@ const FinancingContract = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="clientContact">Client Phone / Email</Label>
+                  <Label htmlFor="clientContact">Client Phone / Email *</Label>
                   <Input
                     id="clientContact"
                     value={formData.clientContact}
@@ -285,10 +276,10 @@ const FinancingContract = () => {
               </CardContent>
             </Card>
 
-            {/* Service Details */}
+            {/* Service & Payment Details */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Service Details</CardTitle>
+                <CardTitle className="text-lg">Service & Payment Details</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
@@ -311,7 +302,7 @@ const FinancingContract = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="totalServicePrice">Total Service Price ($)</Label>
+                  <Label htmlFor="totalServicePrice">Total Service Price ($) *</Label>
                   <Input
                     id="totalServicePrice"
                     value={formData.totalServicePrice}
@@ -319,47 +310,13 @@ const FinancingContract = () => {
                     placeholder="e.g., 1000.00"
                   />
                 </div>
-              </CardContent>
-            </Card>
-
-            {/* Payment Terms */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Payment Terms</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
                 <div>
-                  <Label htmlFor="firstPaymentDate">First Payment Due Date</Label>
+                  <Label htmlFor="firstPaymentDate">First Payment Due Date *</Label>
                   <Input
                     id="firstPaymentDate"
                     type="date"
                     value={formData.firstPaymentDate}
                     onChange={(e) => handleInputChange("firstPaymentDate", e.target.value)}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="lateFee">Late Fee ($)</Label>
-                  <Input
-                    id="lateFee"
-                    value={formData.lateFee}
-                    onChange={(e) => handleInputChange("lateFee", e.target.value)}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="gracePeriodDays">Grace Period (Days)</Label>
-                  <Input
-                    id="gracePeriodDays"
-                    value={formData.gracePeriodDays}
-                    onChange={(e) => handleInputChange("gracePeriodDays", e.target.value)}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="paymentMethod">Payment Method (Optional)</Label>
-                  <Input
-                    id="paymentMethod"
-                    value={formData.paymentMethod}
-                    onChange={(e) => handleInputChange("paymentMethod", e.target.value)}
-                    placeholder="e.g., Cash, Check, Zelle, Venmo"
                   />
                 </div>
               </CardContent>
