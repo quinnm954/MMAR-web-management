@@ -40,7 +40,7 @@ const WarrantyPolicy = () => {
               WARRANTY & SERVICE POLICY
             </h1>
             <p className="text-muted-foreground mt-2">Mike's Mobile Auto Repair</p>
-            <p className="text-sm text-muted-foreground">Greenville, South Carolina</p>
+            <p className="text-sm text-muted-foreground">Fort Myers, Florida</p>
             <p className="text-xs text-muted-foreground mt-2">Effective Date: {currentDate}</p>
           </div>
 
@@ -161,7 +161,7 @@ const WarrantyPolicy = () => {
             <div className="text-sm text-muted-foreground space-y-2 leading-relaxed">
               <p>5B.1. <strong>FEDERAL COMPLIANCE:</strong> This warranty policy is provided in compliance with the Magnuson-Moss Warranty Act, 15 U.S.C. §§ 2301-2312, and applicable Federal Trade Commission regulations.</p>
               <p>5B.2. <strong>WARRANTY DESIGNATION:</strong> The limited warranty provided by MMAR is a "LIMITED WARRANTY" as defined under the Magnuson-Moss Warranty Act. This warranty gives you specific legal rights, and you may also have other rights which vary from state to state.</p>
-              <p>5B.3. <strong>WARRANTOR IDENTIFICATION:</strong> The warrantor of this limited warranty is Mike's Mobile Auto Repair ("MMAR"), located in Greenville, South Carolina. Contact: (864) 365-6444.</p>
+              <p>5B.3. <strong>WARRANTOR IDENTIFICATION:</strong> The warrantor of this limited warranty is Mike's Mobile Auto Repair ("MMAR"), located in Fort Myers, Florida. Contact: (864) 365-6444.</p>
               <p>5B.4. <strong>COVERAGE SUMMARY:</strong> This limited warranty covers defects in workmanship and materials for parts installed by MMAR for twelve (12) months or 12,000 miles (whichever comes first) and labor for ninety (90) days from the date of service, subject to the exclusions and conditions stated herein.</p>
               <p>5B.5. <strong>OBTAINING WARRANTY SERVICE:</strong> To obtain warranty service, Customer must return the vehicle to MMAR with the original repair invoice within the applicable warranty period. MMAR will, at its sole discretion, repair, replace, or refund the defective part or service.</p>
               <p>5B.6. <strong>NO CHARGE FOR WARRANTY SERVICE:</strong> There is no charge for warranty service on covered repairs performed by MMAR during the warranty period.</p>
@@ -283,8 +283,8 @@ const WarrantyPolicy = () => {
             <div className="text-sm text-muted-foreground space-y-2 leading-relaxed">
               <p>13.1. <strong>Informal Resolution:</strong> Customer agrees to first attempt informal resolution by contacting MMAR management directly.</p>
               <p>13.2. <strong>Mediation:</strong> If informal resolution fails, disputes shall be submitted to non-binding mediation before any legal action is filed.</p>
-              <p>13.3. <strong>Venue:</strong> Exclusive venue for any legal action shall be Greenville County, South Carolina.</p>
-              <p>13.4. <strong>Governing Law:</strong> This agreement shall be governed by and construed in accordance with the laws of the State of South Carolina.</p>
+              <p>13.3. <strong>Venue:</strong> Exclusive venue for any legal action shall be Lee County, Florida.</p>
+              <p>13.4. <strong>Governing Law:</strong> This agreement shall be governed by and construed in accordance with the laws of the State of Florida.</p>
               <p>13.5. <strong>Attorney Fees:</strong> In any legal action arising from this agreement, the prevailing party shall be entitled to recover reasonable attorney fees and costs.</p>
               <p>13.6. <strong>Limitation Period:</strong> Any claim must be filed within one (1) year of the date of service.</p>
             </div>

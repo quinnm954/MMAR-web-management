@@ -34,7 +34,7 @@ const Hero = () => {
             style={{ animationDelay: "0.1s" }}
           >
             On-site, dependable, professional auto repair wherever you are.
-            Serving Greenville County, SC with ASE-level quality.
+            Serving Fort Myers, Lehigh Acres, Naples & surrounding areas with ASE-level quality.
           </p>
 
           <div
@@ -56,7 +56,7 @@ const Hero = () => {
           >
             <div className="flex items-center gap-2">
               <MapPin className="w-5 h-5 text-primary shrink-0" />
-              <span className="text-sm sm:text-base">Greenville County, SC</span>
+              <span className="text-sm sm:text-base">Southwest Florida</span>
             </div>
             <a href="tel:8643656444" onClick={handleContactClick} className="flex items-center gap-2 hover:text-accent transition-colors active:scale-95">
               <Phone className="w-5 h-5 text-accent shrink-0" />

@@ -4,25 +4,25 @@ import { Button } from "@/components/ui/button";
 const testimonials = [
   {
     name: "Marcus Johnson",
-    location: "Greenville, SC",
+    location: "Fort Myers, FL",
     rating: 5,
     text: "Mike came out to my office parking lot and fixed my brakes while I was in meetings. Incredible service and saved me so much time!",
   },
   {
     name: "Sarah Thompson",
-    location: "Greenville, SC",
+    location: "Lehigh Acres, FL",
     rating: 5,
     text: "Honest, reliable, and professional. My car broke down on a Saturday and Mike was there within an hour. Highly recommend!",
   },
   {
     name: "David Chen",
-    location: "Greer, SC",
+    location: "Naples, FL",
     rating: 5,
-    text: "Best mobile mechanic in the Upstate. Fair prices and he explains everything clearly. Been using him for all my vehicles.",
+    text: "Best mobile mechanic in Southwest Florida. Fair prices and he explains everything clearly. Been using him for all my vehicles.",
   },
   {
     name: "Jennifer Williams",
-    location: "Mauldin, SC",
+    location: "Cape Coral, FL",
     rating: 5,
     text: "As a single mom, having a mechanic come to my home is a lifesaver. Mike is trustworthy and does excellent work every time.",
   },
