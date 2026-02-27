@@ -14,7 +14,7 @@ const features = [
   {
     icon: MapPin,
     title: "Local Experts",
-    description: "Proudly serving Greenville County",
+    description: "Proudly serving Southwest Florida",
   },
   {
     icon: Award,
@@ -35,8 +35,8 @@ const About = () => {
           <p className="text-base md:text-lg text-muted-foreground leading-relaxed px-2">
             Mike's Mobile Auto Repair LLC is committed to delivering professional,
             on-site auto repair services with excellence and convenience. What
-            started as a local service in South Carolina remains proudly dedicated
-            to serving the Greenville County community.
+            started as a local service remains proudly dedicated
+            to serving the Southwest Florida community — Fort Myers, Lehigh Acres, Naples, and beyond.
           </p>
           <p className="text-base md:text-lg text-muted-foreground leading-relaxed mt-4 px-2">
             With years of experience, ASE-level quality, and a customer-first

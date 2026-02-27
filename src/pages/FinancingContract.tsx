@@ -38,7 +38,7 @@ interface SignatureData {
 
 const PROVIDER = {
   name: "Mike's Mobile Auto Repair (MMAR)",
-  address: "Greenville County, SC",
+  address: "Fort Myers, FL",
   contact: "(864) 365-6444 | mikesmarllc@gmail.com",
 } as const;
 
@@ -51,8 +51,8 @@ const TERMS = {
   lateFee: 25,
   gracePeriodDays: 5,
   returnedPaymentFee: 35,
-  governingLaw: "South Carolina",
-  venue: "Greenville County, South Carolina",
+  governingLaw: "Florida",
+  venue: "Lee County, Florida",
 } as const;
 
 const defaultEditableData: EditableContractData = {
