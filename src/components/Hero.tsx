@@ -42,7 +42,7 @@ const Hero = () => {
             style={{ animationDelay: "0.2s" }}
           >
             <Button variant="hero" size="lg" className="w-full sm:w-auto min-h-[48px]" asChild>
-              <a href="tel:8643656444" onClick={handleContactClick}>Get a Quote</a>
+              <a href="tel:8135017572" onClick={handleContactClick}>Get a Quote</a>
             </Button>
             <Button variant="heroOutline" size="lg" className="w-full sm:w-auto min-h-[48px]" asChild>
               <a href="#services">View Services</a>
@@ -58,9 +58,9 @@ const Hero = () => {
               <MapPin className="w-5 h-5 text-primary shrink-0" />
               <span className="text-sm sm:text-base">Southwest Florida</span>
             </div>
-            <a href="tel:8643656444" onClick={handleContactClick} className="flex items-center gap-2 hover:text-accent transition-colors active:scale-95">
+            <a href="tel:8135017572" onClick={handleContactClick} className="flex items-center gap-2 hover:text-accent transition-colors active:scale-95">
               <Phone className="w-5 h-5 text-accent shrink-0" />
-              <span className="text-sm sm:text-base font-medium">(864) 365-6444</span>
+              <span className="text-sm sm:text-base font-medium">(813) 501-7572</span>
             </a>
           </div>
         </div>
