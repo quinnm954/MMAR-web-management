@@ -124,7 +124,7 @@ const Navigation = () => {
                 Garage Ace
               </a>
               <Button variant="hero" size="lg" asChild className="mt-3 min-h-[48px]">
-                <a href="tel:8643656444" onClick={() => setIsOpen(false)}>
+                <a href="tel:8135017572" onClick={() => setIsOpen(false)}>
                   Get a Quote
                 </a>
               </Button>

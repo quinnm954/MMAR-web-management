@@ -58,9 +58,9 @@ const Hero = () => {
               <MapPin className="w-5 h-5 text-primary shrink-0" />
               <span className="text-sm sm:text-base">Southwest Florida</span>
             </div>
-            <a href="tel:8643656444" onClick={handleContactClick} className="flex items-center gap-2 hover:text-accent transition-colors active:scale-95">
+            <a href="tel:8135017572" onClick={handleContactClick} className="flex items-center gap-2 hover:text-accent transition-colors active:scale-95">
               <Phone className="w-5 h-5 text-accent shrink-0" />
-              <span className="text-sm sm:text-base font-medium">(864) 365-6444</span>
+              <span className="text-sm sm:text-base font-medium">(813) 501-7572</span>
             </a>
           </div>
         </div>
