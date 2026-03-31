@@ -42,7 +42,7 @@ const Hero = () => {
             style={{ animationDelay: "0.2s" }}
           >
             <Button variant="hero" size="lg" className="w-full sm:w-auto min-h-[48px]" asChild>
-              <a href="tel:8643656444" onClick={handleContactClick}>Get a Quote</a>
+              <a href="tel:8135017572" onClick={handleContactClick}>Get a Quote</a>
             </Button>
             <Button variant="heroOutline" size="lg" className="w-full sm:w-auto min-h-[48px]" asChild>
               <a href="#services">View Services</a>
