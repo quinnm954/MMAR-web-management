@@ -69,7 +69,7 @@ const Navigation = () => {
               Garage Ace
             </a>
             <Button variant="hero" size="default" asChild>
-              <a href="tel:8643656444">Get a Quote</a>
+              <a href="tel:8135017572">Get a Quote</a>
             </Button>
           </div>
 
