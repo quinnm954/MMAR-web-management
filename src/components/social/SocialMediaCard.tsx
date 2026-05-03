@@ -73,7 +73,7 @@ const SocialMediaCard = ({ post, embedOnMount = false }: Props) => {
   };
 
   // ----- Invalid URL: clear inline message, no broken embed -----
-  if (!validation.ok) {
+  if (validation.ok === false) {
     return (
       <Card className="group relative overflow-hidden rounded-2xl border-border/60 bg-card/80">
         <div className="relative aspect-[9/16] sm:aspect-[4/5] w-full bg-gradient-to-br from-secondary/40 to-background">
