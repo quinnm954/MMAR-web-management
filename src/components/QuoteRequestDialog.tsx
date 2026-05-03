@@ -66,6 +66,25 @@ const QuoteRequestDialog = ({
   }, [open, serviceName]);
 
   const handleSend = () => {
+    if (year) {
+      const y = Number(year);
+      if (!/^\d{4}$/.test(year) || y < 1900 || y > currentYear + 1) {
+        toast.error("Please enter a valid 4-digit year");
+        return;
+      }
+    }
+    if (mileage) {
+      const m = Number(digitsOnly(mileage));
+      if (!Number.isFinite(m) || m < 0 || m > 1_000_000) {
+        toast.error("Please enter a valid mileage");
+        return;
+      }
+    }
+    if (make.length > 50 || model.length > 50 || location.length > 100 || notes.length > 1000) {
+      toast.error("One of your fields is too long");
+      return;
+    }
+
     const vehicle = [year, make, model].filter(Boolean).join(" ").trim();
     const lines = [
       `Hi, I'd like a quote for: ${serviceName ?? ""}`,
