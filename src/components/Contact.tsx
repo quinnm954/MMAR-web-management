@@ -104,6 +104,17 @@ const Contact = () => {
                 <span className="font-semibold">Photos</span>
               </a>
             </div>
+
+            <div className="mt-6 rounded-2xl overflow-hidden glass-card">
+              <iframe
+                title="Mike's Mobile Auto Repair on Google Maps"
+                src={`https://maps.google.com/maps?cid=${GMB_CID}&output=embed`}
+                className="w-full h-[360px] md:h-[420px] border-0"
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                allowFullScreen
+              />
+            </div>
           </div>
         </div>
       </div>
