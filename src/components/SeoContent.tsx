@@ -12,11 +12,11 @@ const faqs = [
   },
   {
     q: "Are you really mobile? You come to my house?",
-    a: "Yes — every job. Our service truck arrives at your driveway, parking lot, or roadside breakdown with the tools, scanners, and parts to handle most repairs on the spot.",
+    a: "Yes — every job. Our service truck arrives at your driveway or parking lot with the tools, scanners, and parts to handle most repairs on the spot.",
   },
   {
-    q: "Do you offer emergency or same-day service?",
-    a: "Same-day appointments are usually available, and emergency roadside service is offered evenings and weekends across SWFL whenever possible.",
+    q: "Do you offer same-day service?",
+    a: "Same-day appointments are usually available across SWFL, including evenings and weekends whenever possible.",
   },
   {
     q: "How is pricing handled?",
@@ -234,7 +234,6 @@ const SeoContent = () => {
               <li>✅ Up-front, transparent pricing</li>
               <li>✅ Real diagnostics, not guess-and-replace</li>
               <li>✅ Same-day appointments usually available</li>
-              <li>✅ Emergency roadside help across SWFL</li>
               <li>✅ Parts &amp; labor warranty on every job</li>
               <li>✅ 5-star rated on Google, Facebook, Yelp, Nextdoor</li>
               <li>✅ Financing available for larger repairs</li>
