@@ -73,6 +73,7 @@ export const localLandingPages: LocalLandingPage[] = [
       "Mobile Alternator Repair in Fort Myers, FL | Mike's Mobile Auto Repair",
     metaDescription:
       "On-site alternator replacement and charging system repair in Fort Myers, FL. Same-day mobile service. Call or text (813) 501-7572 for a fast quote.",
+    canonical: "https://www.mikesmautorepair.com/alternator-repair-fort-myers",
     intro:
       "Battery light on, dim headlights, or a no-start after a jump? Mike's Mobile Auto Repair provides full mobile alternator repair and charging-system service in Fort Myers, FL — at your home, office, or roadside.",
     paragraphs: [
