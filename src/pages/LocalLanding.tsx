@@ -7,7 +7,7 @@ import FloatingCallButton from "@/components/FloatingCallButton";
 import RequestQuoteCTA from "@/components/RequestQuoteCTA";
 import InlineCallStrip from "@/components/InlineCallStrip";
 import TrustBadges from "@/components/TrustBadges";
-import RoadsideBanner from "@/components/RoadsideBanner";
+
 import { getLandingPageBySlug, localLandingPages } from "@/data/localLandingPages";
 import { cities, getCityBySlug } from "@/data/cities";
 import { getCategoryBySlug } from "@/data/serviceCategories";
