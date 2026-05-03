@@ -78,7 +78,7 @@ const Index = () => {
           ],
           sameAs: [
             "https://www.facebook.com/Mikesmobileautorepairllc/",
-            "https://www.tiktok.com/@mikesmobileautorepair",
+            "https://www.tiktok.com/@mmarllc",
             "https://www.yelp.com/biz/mikes-mobile-auto-repair-lehigh-acres",
             "https://nextdoor.com/page/mikes-mobile-auto-repair-llc-lehigh-acres-fl",
           ],
