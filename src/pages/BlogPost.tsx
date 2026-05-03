@@ -49,7 +49,30 @@ const BlogPost = () => {
 
   if (!post) return <NotFound />;
 
+  const idx = blogPosts.findIndex((p) => p.slug === post.slug);
+  const prev = idx > 0 ? blogPosts[idx - 1] : null;
+  const next = idx < blogPosts.length - 1 ? blogPosts[idx + 1] : null;
   const others = blogPosts.filter((p) => p.slug !== post.slug).slice(0, 3);
+
+  useEffect(() => {
+    const id = "ld-breadcrumb-blog";
+    document.getElementById(id)?.remove();
+    const ld = {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: SITE },
+        { "@type": "ListItem", position: 2, name: "Blog", item: `${SITE}/blog` },
+        { "@type": "ListItem", position: 3, name: post.title, item: `${SITE}/blog/${post.slug}` },
+      ],
+    };
+    const s = document.createElement("script");
+    s.type = "application/ld+json";
+    s.id = id;
+    s.text = JSON.stringify(ld);
+    document.head.appendChild(s);
+    return () => s.remove();
+  }, [post.slug, post.title]);
 
   return (
     <div className="min-h-screen bg-background">
