@@ -152,51 +152,6 @@ export const localLandingPages: LocalLandingPage[] = [
       },
     ],
   },
-  {
-    slug: "emergency-mobile-mechanic-lehigh-acres",
-    service: "Emergency Mobile Mechanic",
-    citySlug: "lehigh-acres",
-    categoryId: "electrical",
-    h1: "Emergency Mobile Mechanic in Lehigh Acres, FL",
-    metaTitle:
-      "Emergency Mobile Mechanic in Lehigh Acres, FL | Mike's Mobile Auto Repair",
-    metaDescription:
-      "Stranded in Lehigh Acres? Emergency mobile mechanic and roadside service for breakdowns, dead batteries, no-starts, and lockouts. Call (813) 501-7572.",
-    intro:
-      "Broken down in Lehigh Acres? Mike's Mobile Auto Repair is your emergency mobile mechanic — on-call for dead batteries, no-starts, overheating, flat tires, lockouts, and roadside repairs across Lehigh Acres, FL.",
-    paragraphs: [
-      "When your car quits in a Publix parking lot, on the side of Lee Boulevard, or in your own driveway at 7pm, the last thing you want is to wait hours for a tow and another full day for a shop to look at it. Our emergency mobile service rolls to you with diagnostic scanners, jump packs, common parts, and the experience to get most vehicles running again on the spot.",
-      "We handle the calls that strand drivers most often: dead batteries, failed alternators, bad starters, blown fuses, fuel-pump no-starts, overheating, flat tires, and accidental lockouts. If a repair can't be finished safely on the roadside, we'll diagnose the issue, give you a transparent quote, and schedule a same-day or next-day mobile follow-up at your home or workplace.",
-      "Service is available across all Lehigh Acres ZIP codes (33936, 33971, 33972, 33973, 33974, 33976), evenings and weekends included whenever possible. If you're stranded right now, call or text (813) 501-7572 — a real technician answers, not a call center.",
-    ],
-    included: [
-      "Roadside dead-battery jump and replacement",
-      "On-site no-start diagnostics",
-      "Alternator and starter replacement",
-      "Overheating and cooling-system triage",
-      "Flat tire repair and spare installation",
-      "Lockout assistance",
-      "Transparent up-front pricing",
-    ],
-    faqs: [
-      {
-        q: "How fast can you reach me in Lehigh Acres?",
-        a: "Most Lehigh Acres emergency calls are reached within 30–90 minutes depending on time of day and current workload.",
-      },
-      {
-        q: "Are you available evenings and weekends?",
-        a: "Yes — emergency mobile service is offered evenings and weekends across Lehigh Acres whenever possible. Call or text (813) 501-7572 to confirm.",
-      },
-      {
-        q: "What if my car can't be fixed roadside?",
-        a: "We'll diagnose the issue on site, give you a transparent quote, and schedule a same-day or next-day mobile repair at your home or workplace.",
-      },
-      {
-        q: "Do you charge a service-call fee?",
-        a: "Any trip or diagnostic fee is disclosed up front before we dispatch — no surprise charges when we arrive.",
-      },
-    ],
-  },
   // ===== Region-wide service-only landing pages =====
   {
     slug: "mobile-brake-repair",
