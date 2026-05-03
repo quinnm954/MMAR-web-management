@@ -40,6 +40,7 @@ const AREAS = [
 ];
 
 const RESOURCES = [
+  { to: "/real-repairs", label: "Real Repairs" },
   { to: "/blog", label: "Blog" },
   { to: "/reviews", label: "Reviews" },
   { to: "/financing-contract", label: "Financing Contract" },
