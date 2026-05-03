@@ -44,7 +44,7 @@ const QuoteRequestDialog = ({
   useEffect(() => {
     if (open) {
       setPreviewText(null);
-      try {
+      setErrors({});
         const saved = localStorage.getItem(STORAGE_KEY);
         if (saved) {
           const v = JSON.parse(saved);
