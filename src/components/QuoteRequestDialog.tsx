@@ -134,9 +134,11 @@ const QuoteRequestDialog = ({
               <Input
                 id="year"
                 inputMode="numeric"
+                pattern="\d*"
+                maxLength={4}
                 placeholder="2018"
                 value={year}
-                onChange={(e) => setYear(e.target.value)}
+                onChange={(e) => setYear(digitsOnly(e.target.value).slice(0, 4))}
               />
             </div>
             <div className="space-y-1.5">
