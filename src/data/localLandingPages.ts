@@ -309,37 +309,6 @@ export const localLandingPages: LocalLandingPage[] = [
     ],
   },
   {
-    slug: "emergency-roadside-mechanic",
-    service: "Emergency Roadside Mechanic",
-    categoryId: "electrical",
-    h1: "Emergency Roadside Mechanic in Southwest Florida",
-    metaTitle:
-      "Emergency Roadside Mechanic in SWFL | Stuck? We Come to You",
-    metaDescription:
-      "Stranded? Emergency mobile mechanic across Lehigh Acres, Fort Myers, Cape Coral, Estero, Bonita Springs and Naples. Dead batteries, no-starts, lockouts. Call (813) 501-7572.",
-    intro:
-      "Broken down? Mike's Mobile Auto Repair is your emergency roadside mechanic — on-call across Southwest Florida for dead batteries, no-starts, overheating, flat tires, lockouts, and roadside repairs.",
-    paragraphs: [
-      "When your car quits in a parking lot, on the side of I-75, or in your own driveway after dark, the last thing you want is a 90-minute tow wait and another full day for a shop to look at it. We roll to you with diagnostic scanners, jump packs, common parts, and the experience to get most vehicles running again on the spot.",
-      "We handle the calls that strand drivers most often: dead batteries, failed alternators, bad starters, blown fuses, fuel-pump no-starts, overheating, flat tires, and accidental lockouts. If a repair can't be finished safely on the roadside, we diagnose it, give you a transparent quote, and schedule a same-day or next-day mobile follow-up.",
-      "Service is available across all of SWFL — every Lehigh Acres, Fort Myers, Cape Coral, Estero, Bonita Springs, and Naples ZIP — including evenings and weekends whenever possible. If you're stuck right now, call or text (813) 501-7572.",
-    ],
-    included: [
-      "Roadside dead-battery jump and replacement",
-      "On-site no-start diagnostics",
-      "Alternator and starter replacement",
-      "Overheating and cooling-system triage",
-      "Flat tire repair and spare installation",
-      "Lockout assistance",
-      "Transparent up-front pricing",
-    ],
-    faqs: [
-      { q: "How fast can you reach me?", a: "Most emergency calls in SWFL are reached in 30–90 minutes depending on time of day." },
-      { q: "Available evenings and weekends?", a: "Yes — emergency mobile service is offered evenings and weekends whenever possible." },
-      { q: "What if my car can't be fixed roadside?", a: "We diagnose on site and schedule a same-day or next-day mobile follow-up at your home or workplace." },
-    ],
-  },
-  {
     slug: "mobile-oil-change",
     service: "Mobile Oil Change",
     categoryId: "oil-fluids",
