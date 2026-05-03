@@ -155,7 +155,6 @@ const LocalLanding = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <RoadsideBanner />
       <Navigation />
 
       <section className="pt-28 md:pt-32 pb-12 md:pb-16">
