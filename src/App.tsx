@@ -12,11 +12,16 @@ import AdminLogin from "./pages/admin/AdminLogin";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import ProtectedRoute from "./components/admin/ProtectedRoute";
 import ServiceCategory from "./pages/ServiceCategory";
+import ServicesIndex from "./pages/ServicesIndex";
 import CityPage from "./pages/CityPage";
+import ServiceAreas from "./pages/ServiceAreas";
 import LocalLanding from "./pages/LocalLanding";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
 import BlogTag from "./pages/BlogTag";
+import AboutPage from "./pages/AboutPage";
+import Reviews from "./pages/Reviews";
+import ContactPage from "./pages/ContactPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,8 +37,13 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/financing-contract" element={<FinancingContract />} />
             <Route path="/warranty-policy" element={<WarrantyPolicy />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/services" element={<ServicesIndex />} />
             <Route path="/services/:slug" element={<ServiceCategory />} />
+            <Route path="/service-areas" element={<ServiceAreas />} />
             <Route path="/areas/:city" element={<CityPage />} />
+            <Route path="/reviews" element={<Reviews />} />
+            <Route path="/contact" element={<ContactPage />} />
             <Route path="/blog" element={<Blog />} />
             <Route path="/blog/tag/:tag" element={<BlogTag />} />
             <Route path="/blog/:slug" element={<BlogPost />} />
