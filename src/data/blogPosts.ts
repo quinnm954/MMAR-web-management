@@ -1,3 +1,5 @@
+export type BlogFAQ = { question: string; answer: string };
+
 export type BlogPost = {
   slug: string;
   title: string;
@@ -7,6 +9,7 @@ export type BlogPost = {
   tags: string[];
   // Body is HTML — kept as a string so we don't need MDX. Internal links are <a href="/...">.
   body: string;
+  faqs?: BlogFAQ[];
 };
 
 export const blogPosts: BlogPost[] = [
