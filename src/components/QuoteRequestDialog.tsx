@@ -45,6 +45,7 @@ const QuoteRequestDialog = ({
     if (open) {
       setPreviewText(null);
       setErrors({});
+      try {
         const saved = localStorage.getItem(STORAGE_KEY);
         if (saved) {
           const v = JSON.parse(saved);
