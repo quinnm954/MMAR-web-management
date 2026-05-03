@@ -145,7 +145,7 @@ const LocalLanding = () => {
     script.text = JSON.stringify(ld);
     document.head.appendChild(script);
     return () => script.remove();
-  }, [page, city]);
+  }, [page, city, category]);
 
   if (!page) return <NotFound />;
 
