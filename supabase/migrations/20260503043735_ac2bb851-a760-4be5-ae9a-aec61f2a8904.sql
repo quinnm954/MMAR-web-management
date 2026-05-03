@@ -1,0 +1,1 @@
+DROP POLICY IF EXISTS "Signatures are publicly accessible" ON storage.objects;
