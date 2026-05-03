@@ -83,7 +83,30 @@ const FinancingContractsTable = ({ data, onRefresh }: FinancingContractsTablePro
   const [selectedContract, setSelectedContract] = useState<FinancingContract | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [signatureUrls, setSignatureUrls] = useState<{ client: string | null; provider: string | null }>({ client: null, provider: null });
   const itemsPerPage = 10;
+
+  useEffect(() => {
+    let cancelled = false;
+    const load = async () => {
+      if (!selectedContract) {
+        setSignatureUrls({ client: null, provider: null });
+        return;
+      }
+      const sign = async (path: string | null) => {
+        if (!path) return null;
+        const { data } = await supabase.storage.from('signatures').createSignedUrl(path, 300);
+        return data?.signedUrl ?? null;
+      };
+      const [client, provider] = await Promise.all([
+        sign(selectedContract.client_signature_url),
+        sign(selectedContract.provider_signature_url),
+      ]);
+      if (!cancelled) setSignatureUrls({ client, provider });
+    };
+    load();
+    return () => { cancelled = true; };
+  }, [selectedContract]);
 
   const filteredData = data.filter((contract) => {
     const search = searchTerm.toLowerCase();
