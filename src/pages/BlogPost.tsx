@@ -31,31 +31,38 @@ const BlogPost = () => {
     document.getElementById(articleId)?.remove();
     document.getElementById(faqId)?.remove();
 
-    const heroImage = `${SITE}/src/assets/hero-banner.jpg`;
+    const heroImage = `${SITE}/blog-hero.jpg`;
+    const logoImage = `${SITE}/mmar-logo.jpeg`;
+    const wordCount = post.body.replace(/<[^>]+>/g, " ").trim().split(/\s+/).length;
     const article = {
       "@context": "https://schema.org",
       "@type": "Article",
-      headline: post.title,
-      name: post.title,
+      headline: post.title.length > 110 ? post.title.slice(0, 107) + "..." : post.title,
       description: post.excerpt,
       image: [heroImage],
       datePublished: post.dateISO,
       dateModified: post.dateISO,
       author: {
-        "@type": "Person",
-        name: "Mike's Mobile Auto Repair Team",
+        "@type": "Organization",
+        name: "Mike's Mobile Auto Repair",
         url: SITE,
       },
       publisher: {
         "@type": "Organization",
         name: "Mike's Mobile Auto Repair",
-        logo: { "@type": "ImageObject", url: `${SITE}/favicon.ico` },
+        logo: {
+          "@type": "ImageObject",
+          url: logoImage,
+          width: 600,
+          height: 600,
+        },
       },
       mainEntityOfPage: { "@type": "WebPage", "@id": `${SITE}/blog/${post.slug}` },
       keywords: post.tags.join(", "),
       articleSection: "Auto Repair",
       inLanguage: "en-US",
       url: `${SITE}/blog/${post.slug}`,
+      wordCount,
     };
     const a = document.createElement("script");
     a.type = "application/ld+json";
