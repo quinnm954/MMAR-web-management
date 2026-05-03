@@ -8,6 +8,8 @@ export type LocalLandingPage = {
   h1: string;
   metaTitle: string;
   metaDescription: string;
+  /** Optional override for the canonical URL (e.g. point a long-slug duplicate at the short slug). */
+  canonical?: string;
   intro: string;
   paragraphs: string[];
   included: string[];

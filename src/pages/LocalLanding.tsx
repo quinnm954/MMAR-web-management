@@ -25,7 +25,7 @@ const LocalLanding = () => {
   useSeo({
     title: page?.metaTitle ?? "Page Not Found",
     description: page?.metaDescription,
-    canonical: page ? `${SITE}/${page.slug}` : undefined,
+    canonical: page ? (page.canonical ?? `${SITE}/${page.slug}`) : undefined,
   });
 
   useEffect(() => {
