@@ -1,77 +1,73 @@
-# SEO expansion plan
+## Goal
 
-Most of what ChatGPT recommended is **already built** in this project. Here is the audit + the small set of additions that will actually move the needle.
+Close the remaining SEO gaps from the recommendation list: ship the missing city+service landing pages, beef up homepage crawlable text, expand structured data (LocalBusiness/Review/Service/Breadcrumb), and add a first batch of high-intent blog posts. Backlinks, real-photo content, and Google Map embed are noted as out-of-code follow-ups.
 
-## What already exists (no work needed)
+## 1. New city+service landing pages
 
-**City pages** — live at `/areas/:slug` for all 6 SWFL cities (Lehigh Acres, Fort Myers, Cape Coral, Estero, Bonita Springs, Naples) with full SEO copy, FAQs, neighborhoods, and ZIPs.
+Add these entries to `src/data/localLandingPages.ts`. Each gets ~800–1,200 words of city-specific copy across `intro` + `paragraphs`, an `included` checklist, 5 FAQs, full `metaTitle` / `metaDescription`. They route automatically through `/:landingSlug` → `LocalLanding.tsx`, which already emits `Service` + `FAQPage` JSON-LD.
 
-**Service pages** — `/services` index plus `/services/:category` (engine, brakes, electrical, cooling, etc.) backed by `serviceCategories.ts`.
+New short-slug city+service combos:
+- `/brake-repair-lehigh-acres`
+- `/alternator-repair-fort-myers`
+- `/battery-replacement-lehigh-acres`
+- `/roadside-mechanic-fort-myers`
+- `/oil-change-lehigh-acres`
+- `/diagnostics-lehigh-acres`
 
-**Repair-specific landing pages** — already in `localLandingPages.ts`:
-- `/mobile-alternator-repair`, `/mobile-battery-replacement`, `/mobile-brake-repair`, `/mobile-vehicle-diagnostics`, `/mobile-no-start-diagnostics`, `/mobile-starter-repair`, `/mobile-oil-change`, `/mobile-engine-diagnostics`, `/emergency-roadside-mechanic`, `/mobile-suspension-steering`
-- City-specific combos: `/mobile-brake-repair-lehigh-acres`, `/mobile-alternator-repair-fort-myers`, `/mobile-battery-replacement-cape-coral`, `/emergency-mobile-mechanic-lehigh-acres`
+Existing long-slug equivalents (e.g. `mobile-brake-repair-lehigh-acres`) get a `canonical` field pointing to the new short slug so equity consolidates — same pattern already used for the service-only short slugs.
 
-**Blog posts** — all 5 articles ChatGPT suggested already exist at `/blog/:slug`:
-- `why-cars-overheat-in-florida`, `signs-of-a-bad-alternator`, `dead-battery-vs-bad-starter`, `why-your-car-wont-start`, `common-car-problems-southwest-florida`
+All 6 new URLs are appended to `public/sitemap.xml`.
 
-**Homepage** — already trimmed to: Hero → TrustBadges → FeaturedServices → ServiceAreasPreview → TestimonialsPreview → FinalCTA. Matches the recommended structure.
+## 2. LocalLanding template upgrades
 
-## What's actually missing
+Update `src/pages/LocalLanding.tsx` JSON-LD graph to also emit:
+- `BreadcrumbList` (Home → City or Service → This page)
+- `LocalBusiness` / `AutoRepair` provider node with full NAP, hours, areaServed (mirrors `index.html`)
+- `AggregateRating` on the Service node (uses real Google Reviews count we already cite — pulled from a single constant in `src/data/reviewsMeta.ts`, new file)
 
-ChatGPT's URL suggestions use **shorter, higher-CTR slugs** than ours. Google does treat `/alternator-repair` as a stronger keyword match than `/mobile-alternator-repair`. The fix is to add short slug aliases pointing at the existing rich pages.
+Add a small "What customers say" block on each landing page that surfaces 2 city-relevant testimonials from `src/components/Testimonials.tsx` data, so the page has visible review content matching the schema.
 
-### 1. Add short-slug city landing pages
+## 3. Homepage content expansion
 
-Three new entries in `localLandingPages.ts`, each a self-contained, keyword-tight page (not a redirect — duplicate-content-safe via unique copy + canonical):
+Goal: ~1,200–1,600 visible words on `/` while keeping it conversion-focused. Add three new lightweight sections between `TestimonialsPreview` and `FinalCTA` in `src/pages/Index.tsx`:
 
-- `/mobile-mechanic-lehigh-acres`
-- `/mobile-mechanic-fort-myers`
-- `/mobile-mechanic-cape-coral`
+- `WhyChooseUs.tsx` — 4–6 trust bullets with short paragraphs (ASE-level work, transparent pricing, 7am–9pm, mobile-first, warranty, locally owned in Lee County).
+- `HomeServicesOverview.tsx` — 4–6 short paragraphs naturally mentioning brake repair, alternator/battery, diagnostics, no-start, roadside, oil change, with inline links to the new landing pages.
+- `HomeFAQ.tsx` — 6 FAQs (cost, response time, warranty, areas served, payment, parts) rendered with the existing `Accordion` component. Emits `FAQPage` JSON-LD via a small effect.
 
-Each page: H1 with exact-match keyword, 2–3 paragraphs of unique copy (different angle than the `/areas/:city` page), "What we fix" list, 4 FAQs, internal links to the matching `/areas/:city` and the top 3 service pages, click-to-call CTA.
+Also add a `BreadcrumbList` + reinforced `LocalBusiness`/`AutoRepair` JSON-LD block on the homepage (the existing `index.html` block stays; the new one adds `aggregateRating` and explicit `service` list).
 
-### 2. Add short-slug service landing pages
+## 4. Blog content batch
 
-Five new entries in `localLandingPages.ts`:
+Add 4 new posts to `src/data/blogPosts.ts` (existing infra already renders Article + FAQ JSON-LD and BreadcrumbList):
+- "Why Your Car Won't Start in Florida Heat"
+- "Signs Your Alternator Is Failing"
+- "Mobile Mechanic vs Shop in Lehigh Acres"
+- "Most Common Chevy Cruze Problems in SWFL"
 
-- `/alternator-repair`
-- `/battery-replacement`
-- `/brake-repair`
-- `/vehicle-diagnostics`
-- `/no-start-diagnostics`
+Each: 700–1,100 words, 4–6 FAQs, internal links to relevant landing pages, tagged for `/blog/tag/...`. Append to `public/sitemap.xml`.
 
-Each is a region-wide (no `citySlug`) page with unique copy, "Cities we serve" links to all 6 city pages, FAQs, and a CTA. Canonical points to itself; the longer `/mobile-*` versions get a canonical pointing back to these new short slugs to consolidate link equity.
+## 5. Performance / mobile polish
 
-### 3. Sitemap + internal linking
+- Add `loading="lazy"` and `decoding="async"` to non-hero `<img>` tags across Hero/Testimonials/Blog cards where missing.
+- Add `fetchpriority="high"` to the hero image and `width`/`height` attributes to prevent CLS.
+- Verify Vite already code-splits routes (it does via React Router) — no change needed.
 
-- Append all 8 new URLs to `public/sitemap.xml` with `priority` 0.9 (city) / 0.85 (service).
-- Add the 3 new city slugs to the Footer "Service Areas" group.
-- Add the 5 new service slugs to the Footer "Services" group and to `FeaturedServices` cross-links.
-- Update `Navigation.tsx` Services dropdown to point top items at the new short slugs.
+## 6. Out of code (noted in response, not implemented)
 
-### 4. JSON-LD on new pages
+Backlinks (Yelp/BBB/Chamber/Nextdoor), real customer before/after photos, embedded Google Map iframe (needs Maps API key — will ask before adding), and weekly blog cadence are owner tasks. Will list these in the final message.
 
-Each new landing page emits:
-- `Service` schema (name, provider, areaServed)
-- `BreadcrumbList` (Home → Services/Areas → Page)
-- `FAQPage` (from the page's FAQs)
+## File changes
 
-## Technical notes
+- edit `src/data/localLandingPages.ts` (6 new entries + canonicals on 4 long-slug pages)
+- edit `src/pages/LocalLanding.tsx` (BreadcrumbList + LocalBusiness + AggregateRating in JSON-LD, testimonials block)
+- create `src/data/reviewsMeta.ts` (single source for review count/rating)
+- create `src/components/home/WhyChooseUs.tsx`
+- create `src/components/home/HomeServicesOverview.tsx`
+- create `src/components/home/HomeFAQ.tsx`
+- edit `src/pages/Index.tsx` (mount new sections + homepage JSON-LD effect)
+- edit `src/data/blogPosts.ts` (4 new posts)
+- edit `public/sitemap.xml` (10 new URLs)
+- minor img attribute tweaks in Hero/Testimonials/blog card components
 
-- **No new routes needed.** `App.tsx` already has `<Route path="/:landingSlug" element={<LocalLanding />} />` as a catch-all that reads from `localLandingPages.ts`. New entries are picked up automatically.
-- **Canonical strategy** to avoid duplicate-content penalties: the longer `mobile-*` slugs get `canonical` updated to point at the new shorter slugs. `LocalLanding.tsx` already supports a per-page canonical via `useSeo`.
-- **Forbidden-terms guard** (already in place) keeps SC/Greenville/Spartanburg out of any new copy automatically.
-
-## Files to change
-
-- `src/data/localLandingPages.ts` — add 8 new entries; update existing `mobile-*` entries to set canonical to the new short slugs
-- `public/sitemap.xml` — append 8 URLs
-- `src/components/Footer.tsx` — surface the new slugs
-- `src/components/Navigation.tsx` — point Services dropdown at short slugs
-- `src/components/home/FeaturedServices.tsx` — link to short service slugs
-
-## What I am intentionally NOT doing
-
-- Not adding more blog posts right now — the requested 5 already exist. I can add a second batch (e.g. "AC not blowing cold in Florida", "Why your serpentine belt squeals", "Mobile vs shop brake repair cost") in a follow-up pass.
-- Not redesigning the homepage — it already matches the recommended structure.
+No new routes needed — `/:landingSlug` and `/blog/:slug` already cover them.
