@@ -105,18 +105,6 @@ const Contact = () => {
               </a>
             </div>
 
-            <div className="mt-6 md:mt-8 rounded-2xl overflow-hidden glass-card">
-              <div className="relative w-full aspect-[4/3] sm:aspect-video lg:aspect-[16/8]">
-                <iframe
-                  title="Mike's Mobile Auto Repair on Google Maps"
-                  src={`https://maps.google.com/maps?cid=${GMB_CID}&output=embed`}
-                  className="absolute inset-0 w-full h-full border-0"
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                  allowFullScreen
-                />
-              </div>
-            </div>
           </div>
         </div>
       </div>
