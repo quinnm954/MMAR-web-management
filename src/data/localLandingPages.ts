@@ -27,6 +27,7 @@ export const localLandingPages: LocalLandingPage[] = [
       "Mobile Brake Repair in Lehigh Acres, FL | Mike's Mobile Auto Repair",
     metaDescription:
       "On-site brake pad, rotor, and caliper replacement in Lehigh Acres, FL. Same-day mobile brake repair at your home or workplace. Call (813) 501-7572.",
+    canonical: "https://www.mikesmautorepair.com/brake-repair-lehigh-acres",
     intro:
       "Squealing, grinding, or a soft pedal? Mike's Mobile Auto Repair handles complete mobile brake repair in Lehigh Acres, FL — pads, rotors, calipers, lines, and ABS diagnostics — right in your driveway.",
     paragraphs: [
