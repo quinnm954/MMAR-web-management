@@ -36,6 +36,7 @@ const QuoteRequestDialog = ({
   const [mileage, setMileage] = useState("");
   const [location, setLocation] = useState("");
   const [notes, setNotes] = useState("");
+  const [previewText, setPreviewText] = useState<string | null>(null);
 
   const STORAGE_KEY = "quoteRequest:vehicleInfo";
 
