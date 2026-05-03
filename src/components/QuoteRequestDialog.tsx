@@ -70,22 +70,27 @@ const QuoteRequestDialog = ({
   }, [open, serviceName]);
 
   const handleReview = () => {
+    const next: Record<string, string> = {};
     if (year) {
       const y = Number(year);
       if (!/^\d{4}$/.test(year) || y < 1900 || y > currentYear + 1) {
-        toast.error("Please enter a valid 4-digit year");
-        return;
+        next.year = `Enter a 4-digit year (1900–${currentYear + 1})`;
       }
     }
     if (mileage) {
       const m = Number(digitsOnly(mileage));
       if (!Number.isFinite(m) || m < 0 || m > 1_000_000) {
-        toast.error("Please enter a valid mileage");
-        return;
+        next.mileage = "Enter a mileage between 0 and 1,000,000";
       }
     }
-    if (make.length > 50 || model.length > 50 || location.length > 100 || notes.length > 1000) {
-      toast.error("One of your fields is too long");
+    if (make.length > 50) next.make = "Make is too long (50 max)";
+    if (model.length > 50) next.model = "Model is too long (50 max)";
+    if (location.length > 100) next.location = "Location is too long (100 max)";
+    if (notes.length > 1000) next.notes = "Notes are too long (1000 max)";
+
+    setErrors(next);
+    if (Object.keys(next).length > 0) {
+      toast.error("Please fix the highlighted fields");
       return;
     }
 
