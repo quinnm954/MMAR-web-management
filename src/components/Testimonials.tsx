@@ -120,19 +120,23 @@ const Testimonials = () => {
             5-STAR RATED
           </h3>
           <p className="text-muted-foreground mb-6 max-w-md">
-            See what our customers are saying about Mike's Mobile Auto Repair. We're proud to maintain a 5-star rating on Google!
+            See what our customers are saying about Mike's Mobile Auto Repair across Google, Facebook, Yelp, and Nextdoor.
           </p>
-          <Button variant="hero" size="lg" className="min-h-[52px]" asChild>
-            <a
-              href="https://share.google/81sCiU8gosp3ZhCJD"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2"
-            >
-              <span>View Our Reviews</span>
-              <ExternalLink className="w-5 h-5" />
-            </a>
-          </Button>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 w-full">
+            {reviewPlatforms.map((p) => (
+              <a
+                key={p.name}
+                href={p.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex flex-col items-center gap-2 p-4 rounded-xl bg-background/40 hover:bg-primary/10 border border-border/30 hover:border-primary/50 text-foreground hover:text-primary transition-all active:scale-[0.98] min-h-[88px]"
+              >
+                <span className="text-primary">{p.icon}</span>
+                <span className="text-sm font-semibold">{p.name}</span>
+                <ExternalLink className="w-3.5 h-3.5 text-muted-foreground" />
+              </a>
+            ))}
+          </div>
         </div>
       </div>
     </section>
