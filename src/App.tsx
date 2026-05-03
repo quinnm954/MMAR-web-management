@@ -14,6 +14,8 @@ import ProtectedRoute from "./components/admin/ProtectedRoute";
 import ServiceCategory from "./pages/ServiceCategory";
 import CityPage from "./pages/CityPage";
 import LocalLanding from "./pages/LocalLanding";
+import Blog from "./pages/Blog";
+import BlogPost from "./pages/BlogPost";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
