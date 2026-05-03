@@ -90,6 +90,13 @@ const Footer = () => {
           </ul>
         </div>
 
+        <div className="border-t border-border pt-6 mb-6 flex flex-wrap gap-x-6 gap-y-2 text-sm">
+          <Link to="/blog" className="text-muted-foreground hover:text-primary">Blog</Link>
+          <Link to="/warranty-policy" className="text-muted-foreground hover:text-primary">Warranty Policy</Link>
+          <a href="tel:8135017572" className="text-muted-foreground hover:text-primary">(813) 501-7572</a>
+          <a href="sms:8135017572" className="text-muted-foreground hover:text-primary">Text Us</a>
+        </div>
+
         <div className="border-t border-border pt-6 flex flex-col md:flex-row items-center justify-between gap-3 text-xs md:text-sm text-muted-foreground">
           <p>
             © {new Date().getFullYear()} Capital Services Management, INC. All rights reserved.
