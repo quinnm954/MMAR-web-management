@@ -1,149 +1,77 @@
-## Full Local SEO + Conversion Overhaul
+# SEO expansion plan
 
-A focused, end-to-end SEO and conversion build that doesn't require rewriting the existing site — it extends what's already there (homepage, service categories, city pages, landing pages) into a complete local-domination structure for mobile-mechanic searches in Southwest Florida.
+Most of what ChatGPT recommended is **already built** in this project. Here is the audit + the small set of additions that will actually move the needle.
 
-### What exists already (keep + extend)
+## What already exists (no work needed)
 
-- Homepage with Hero, Services accordion, SeoContent (~700 words), Testimonials with Google/Facebook/Yelp/Nextdoor links, Contact, FloatingCallButton
-- `/services/:slug` category pages (11 categories) + `/areas/:city` city pages (Lehigh Acres, Fort Myers, Cape Coral)
-- `/:landingSlug` local landing pages (4 starter pages with JSON-LD, FAQs, sitemap entries)
-- `useSeo` hook for title/meta/canonical, RequestQuoteCTA component, sitemap.xml, robots.txt
+**City pages** — live at `/areas/:slug` for all 6 SWFL cities (Lehigh Acres, Fort Myers, Cape Coral, Estero, Bonita Springs, Naples) with full SEO copy, FAQs, neighborhoods, and ZIPs.
 
-### What this plan adds
+**Service pages** — `/services` index plus `/services/:category` (engine, brakes, electrical, cooling, etc.) backed by `serviceCategories.ts`.
 
-#### 1. Homepage rebuild for keyword targeting (1,200–2,000 words)
+**Repair-specific landing pages** — already in `localLandingPages.ts`:
+- `/mobile-alternator-repair`, `/mobile-battery-replacement`, `/mobile-brake-repair`, `/mobile-vehicle-diagnostics`, `/mobile-no-start-diagnostics`, `/mobile-starter-repair`, `/mobile-oil-change`, `/mobile-engine-diagnostics`, `/emergency-roadside-mechanic`, `/mobile-suspension-steering`
+- City-specific combos: `/mobile-brake-repair-lehigh-acres`, `/mobile-alternator-repair-fort-myers`, `/mobile-battery-replacement-cape-coral`, `/emergency-mobile-mechanic-lehigh-acres`
 
-Refactor `src/components/SeoContent.tsx` (and add new sections) so the homepage hits every required H2:
+**Blog posts** — all 5 articles ChatGPT suggested already exist at `/blog/:slug`:
+- `why-cars-overheat-in-florida`, `signs-of-a-bad-alternator`, `dead-battery-vs-bad-starter`, `why-your-car-wont-start`, `common-car-problems-southwest-florida`
 
-- H1 already correct: "Mobile Mechanic in Lehigh Acres & Fort Myers, FL"
-- New H2 sections, each 120–250 words of natural local copy:
-  - Emergency Roadside Repairs
-  - Mobile Brake Repair
-  - Alternator & Starter Repair
-  - Battery Replacement
-  - Vehicle Diagnostics
-  - Why Choose MMAR (trust block)
-  - Areas We Service (links to all 6 cities)
-  - Frequently Asked Questions (8–10 Qs with FAQ schema)
+**Homepage** — already trimmed to: Hero → TrustBadges → FeaturedServices → ServiceAreasPreview → TestimonialsPreview → FinalCTA. Matches the recommended structure.
 
-Each H2 inline-links to the matching service landing page and city pages. Phone/text CTAs sprinkled every ~2 sections.
+## What's actually missing
 
-#### 2. Expand service landing pages (10 total)
+ChatGPT's URL suggestions use **shorter, higher-CTR slugs** than ours. Google does treat `/alternator-repair` as a stronger keyword match than `/mobile-alternator-repair`. The fix is to add short slug aliases pointing at the existing rich pages.
 
-Current data file has 4 entries. Add 6 more to `src/data/localLandingPages.ts` plus a generalized template for service-only pages (no city in slug) so we cover both:
+### 1. Add short-slug city landing pages
 
-- Service-in-city pages (existing pattern, e.g. `/mobile-brake-repair-lehigh-acres`)
-- Service-only pages at clean slugs:
-  - `/mobile-brake-repair`
-  - `/mobile-alternator-repair`
-  - `/mobile-battery-replacement`
-  - `/mobile-starter-repair`
-  - `/mobile-vehicle-diagnostics`
-  - `/emergency-roadside-mechanic`
-  - `/mobile-oil-change`
-  - `/mobile-suspension-steering`
-  - `/mobile-engine-diagnostics`
-  - `/mobile-no-start-diagnostics`
+Three new entries in `localLandingPages.ts`, each a self-contained, keyword-tight page (not a redirect — duplicate-content-safe via unique copy + canonical):
 
-Each: 800–1,200 words of unique copy, FAQs, JSON-LD `Service`+`FAQPage`, "Available across SWFL" city link grid, RequestQuoteCTA, trust block.
+- `/mobile-mechanic-lehigh-acres`
+- `/mobile-mechanic-fort-myers`
+- `/mobile-mechanic-cape-coral`
 
-The existing `LocalLanding` page is generalized to handle both shapes (city optional). When `citySlug` is absent it shows all cities and a wider service-area schema.
+Each page: H1 with exact-match keyword, 2–3 paragraphs of unique copy (different angle than the `/areas/:city` page), "What we fix" list, 4 FAQs, internal links to the matching `/areas/:city` and the top 3 service pages, click-to-call CTA.
 
-#### 3. Add 3 new city pages (6 total)
+### 2. Add short-slug service landing pages
 
-Append to `src/data/cities.ts`:
-- `estero` — 33928, 33967, 33928 — Coconut Point, Estero Park, Miromar
-- `bonita-springs` — 33923, 33928, 33931 — Bonita Beach, Imperial Bonita Estates, Pelican Landing
-- `naples` — 34102, 34103, 34104, 34105, 34108, 34109, 34110, 34112, 34113, 34114, 34116, 34117 — Old Naples, North Naples, Park Shore, Pelican Bay, Golden Gate
+Five new entries in `localLandingPages.ts`:
 
-Each gets ~500–700 words of unique copy mentioning Florida heat, salt air, common local vehicle issues, and roadside availability. Existing `CityPage` template is reused — no new component needed.
+- `/alternator-repair`
+- `/battery-replacement`
+- `/brake-repair`
+- `/vehicle-diagnostics`
+- `/no-start-diagnostics`
 
-#### 4. Blog structure + starter posts
+Each is a region-wide (no `citySlug`) page with unique copy, "Cities we serve" links to all 6 city pages, FAQs, and a CTA. Canonical points to itself; the longer `/mobile-*` versions get a canonical pointing back to these new short slugs to consolidate link equity.
 
-Create a lightweight in-codebase blog (no CMS):
-```text
-src/data/blogPosts.ts        title, slug, excerpt, dateISO, tags, body (string of HTML or MDX-lite)
-src/pages/Blog.tsx           index at /blog — grid of post cards
-src/pages/BlogPost.tsx       /blog/:slug — article layout, JSON-LD Article schema, RequestQuoteCTA at bottom
-```
+### 3. Sitemap + internal linking
 
-Five starter posts (700–1,000 words each, internal links to relevant service/city pages):
-- Why Cars Overheat in Florida
-- 7 Warning Signs of a Bad Alternator
-- Dead Battery vs Bad Starter — How to Tell the Difference
-- Why Your Car Won't Start (and What a Mobile Mechanic Can Do)
-- 6 Common Car Problems in Southwest Florida
+- Append all 8 new URLs to `public/sitemap.xml` with `priority` 0.9 (city) / 0.85 (service).
+- Add the 3 new city slugs to the Footer "Service Areas" group.
+- Add the 5 new service slugs to the Footer "Services" group and to `FeaturedServices` cross-links.
+- Update `Navigation.tsx` Services dropdown to point top items at the new short slugs.
 
-Sitemap and footer link to `/blog` and each post.
+### 4. JSON-LD on new pages
 
-#### 5. Technical SEO upgrades
+Each new landing page emits:
+- `Service` schema (name, provider, areaServed)
+- `BreadcrumbList` (Home → Services/Areas → Page)
+- `FAQPage` (from the page's FAQs)
 
-- **Global LocalBusiness schema** added once in `index.html` `<head>` (AutoRepair type with phone, geo, areaServed array of all 6 cities, openingHours)
-- **Per-page schema**: each landing page already injects Service+FAQ; add Article schema to blog posts
-- **OpenGraph + Twitter meta** added in `useSeo` hook (og:title, og:description, og:url, og:image, twitter:card)
-- **Image optimization**: ensure all `<img>` tags have `loading="lazy"`, `decoding="async"`, descriptive alt text mentioning service + location where appropriate
-- **Sitemap regenerated** programmatically-friendly (script `scripts/build-sitemap.ts` reads data files and writes `public/sitemap.xml`) so future additions auto-include
-- **Internal linking pass**: every service page links to all 6 city pages; every city page links to top 6 services; homepage links to top service+city pages; blog posts link contextually
+## Technical notes
 
-#### 6. Conversion upgrades
+- **No new routes needed.** `App.tsx` already has `<Route path="/:landingSlug" element={<LocalLanding />} />` as a catch-all that reads from `localLandingPages.ts`. New entries are picked up automatically.
+- **Canonical strategy** to avoid duplicate-content penalties: the longer `mobile-*` slugs get `canonical` updated to point at the new shorter slugs. `LocalLanding.tsx` already supports a per-page canonical via `useSeo`.
+- **Forbidden-terms guard** (already in place) keeps SC/Greenville/Spartanburg out of any new copy automatically.
 
-- **Sticky mobile bar**: extend FloatingCallButton into a 2-button bar (Call + Text/Quote) visible on all pages, mobile only, with safe-area padding
-- **Roadside emergency banner**: dismissible top banner on landing pages with red/amber accent, "24/7 Roadside Help — Tap to Call"
-- **Inline CTAs**: add a compact `<InlineCallStrip>` component (phone + text buttons) inserted between long content sections on landing/city/blog pages
-- **Trust block**: reusable `<TrustBadges>` (ASE-style, 5-Star Google, Mobile Service, Up-Front Pricing, Warranty Backed) added to homepage, landing, and city pages
-- **Review section**: existing Testimonials block already shows Google + Facebook + Yelp + Nextdoor — extend with rating count display and a "Leave us a review" link
-- **Before/after gallery**: new optional `src/components/BeforeAfterGallery.tsx` placeholder component on homepage — uses placeholder images until you supply real photos (will ask before wiring real photos)
+## Files to change
 
-#### 7. URL + redirect housekeeping
+- `src/data/localLandingPages.ts` — add 8 new entries; update existing `mobile-*` entries to set canonical to the new short slugs
+- `public/sitemap.xml` — append 8 URLs
+- `src/components/Footer.tsx` — surface the new slugs
+- `src/components/Navigation.tsx` — point Services dropdown at short slugs
+- `src/components/home/FeaturedServices.tsx` — link to short service slugs
 
-- All new service-only and city slugs added to sitemap with priority 0.9
-- robots.txt verified to allow `/blog` and disallow `/admin/`
-- Canonical URLs set per page via `useSeo`
+## What I am intentionally NOT doing
 
-### File map
-
-**Create**
-```text
-src/data/blogPosts.ts
-src/pages/Blog.tsx
-src/pages/BlogPost.tsx
-src/components/InlineCallStrip.tsx
-src/components/TrustBadges.tsx
-src/components/RoadsideBanner.tsx
-src/components/BeforeAfterGallery.tsx
-scripts/build-sitemap.ts            (one-shot, run when data files change)
-```
-
-**Edit**
-```text
-src/components/SeoContent.tsx       expand to ~1,400 words with all H2 sections + FAQ + schema
-src/data/localLandingPages.ts       add 6 service-only entries + 6 more service-in-city entries
-src/data/cities.ts                  add Estero, Bonita Springs, Naples
-src/pages/LocalLanding.tsx          handle service-only pages (no city)
-src/pages/CityPage.tsx              add inline call strip + trust block
-src/pages/ServiceCategory.tsx       add inline call strip + trust block
-src/pages/Index.tsx                 mount RoadsideBanner, TrustBadges, BeforeAfterGallery
-src/lib/useSeo.ts                   add OpenGraph + Twitter meta
-src/components/Footer.tsx           add Blog + new city links
-src/components/FloatingCallButton.tsx  expand to call+text bar on mobile
-src/App.tsx                         add /blog and /blog/:slug routes
-public/sitemap.xml                  regenerated with all new URLs
-index.html                          inject site-wide AutoRepair LocalBusiness JSON-LD
-```
-
-### Out of scope (will ask if you want next)
-
-- Real before/after photos (need uploads from you)
-- Live booking/calendar integration
-- Programmatic page generation for every service × city combo (60+ pages) — current plan covers the highest-intent slugs
-- Google Business Profile updates and citation building (off-site, not code)
-- Schema markup for individual reviews (requires aggregating from review platforms; current setup links out)
-
-### What you'll see after approval
-
-- Homepage that ranks for and clearly targets every keyword in your list
-- 10 service pages + 6 city pages + 4–10 service-in-city pages, all internally linked
-- A working blog with 5 starter articles
-- Site-wide LocalBusiness schema and per-page Service/FAQ/Article schema
-- Stronger mobile CTAs and a roadside-emergency banner
-- A regenerated sitemap covering ~30+ indexable URLs
+- Not adding more blog posts right now — the requested 5 already exist. I can add a second batch (e.g. "AC not blowing cold in Florida", "Why your serpentine belt squeals", "Mobile vs shop brake repair cost") in a follow-up pass.
+- Not redesigning the homepage — it already matches the recommended structure.
