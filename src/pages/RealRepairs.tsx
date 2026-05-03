@@ -117,7 +117,7 @@ const RealRepairs = () => {
         </div>
       </section>
 
-      <RequestQuoteCTA />
+      <RequestQuoteCTA serviceName="Mobile Auto Repair" />
       <Footer />
       <FloatingCallButton />
     </div>
