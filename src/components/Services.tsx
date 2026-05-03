@@ -198,11 +198,12 @@ const categories: Category[] = [
 ];
 
 const Services = () => {
+  const [selectedService, setSelectedService] = useState<string | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+
   const handleServiceClick = (serviceName: string) => {
-    const body = encodeURIComponent(
-      `Hi, I'd like a quote for: ${serviceName}`
-    );
-    window.location.href = `sms:8135017572?body=${body}`;
+    setSelectedService(serviceName);
+    setDialogOpen(true);
   };
 
   return (
