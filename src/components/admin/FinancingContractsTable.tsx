@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { format } from 'date-fns';
 import { Eye, Trash2, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
