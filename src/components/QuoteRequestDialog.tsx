@@ -66,7 +66,7 @@ const QuoteRequestDialog = ({
     }
   }, [open, serviceName]);
 
-  const handleSend = () => {
+  const handleReview = () => {
     if (year) {
       const y = Number(year);
       if (!/^\d{4}$/.test(year) || y < 1900 || y > currentYear + 1) {
@@ -104,8 +104,14 @@ const QuoteRequestDialog = ({
       // ignore
     }
 
-    const body = encodeURIComponent(lines.join("\n"));
+    setPreviewText(lines.join("\n"));
+  };
+
+  const handleSend = () => {
+    if (!previewText) return;
+    const body = encodeURIComponent(previewText);
     window.location.href = `sms:${phone}?body=${body}`;
+    setPreviewText(null);
     onOpenChange(false);
   };
 
