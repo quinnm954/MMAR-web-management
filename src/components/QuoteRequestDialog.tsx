@@ -167,9 +167,11 @@ const QuoteRequestDialog = ({
               <Input
                 id="mileage"
                 inputMode="numeric"
-                placeholder="85,000"
+                pattern="\d*"
+                maxLength={7}
+                placeholder="85000"
                 value={mileage}
-                onChange={(e) => setMileage(e.target.value)}
+                onChange={(e) => setMileage(digitsOnly(e.target.value).slice(0, 7))}
               />
             </div>
             <div className="space-y-1.5">
