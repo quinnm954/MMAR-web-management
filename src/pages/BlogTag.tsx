@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ArrowRight, Calendar, ChevronRight, Clock, Home, Tag } from "lucide-react";
 import Navigation from "@/components/Navigation";
@@ -102,6 +103,27 @@ const BlogTag = () => {
     description: meta.intro.slice(0, 158),
     canonical: matchedLabel ? `${SITE}/blog/tag/${tagSlug}` : undefined,
   });
+
+  useEffect(() => {
+    if (!matchedLabel) return;
+    const id = "ld-blog-tag-breadcrumb";
+    document.getElementById(id)?.remove();
+    const ld = {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: SITE },
+        { "@type": "ListItem", position: 2, name: "Blog", item: `${SITE}/blog` },
+        { "@type": "ListItem", position: 3, name: matchedLabel, item: `${SITE}/blog/tag/${tagSlug}` },
+      ],
+    };
+    const s = document.createElement("script");
+    s.type = "application/ld+json";
+    s.id = id;
+    s.text = JSON.stringify(ld);
+    document.head.appendChild(s);
+    return () => s.remove();
+  }, [matchedLabel, tagSlug]);
 
   if (!matchedLabel) return <NotFound />;
 
