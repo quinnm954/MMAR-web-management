@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
-import { ArrowLeft, Calendar, Clock } from "lucide-react";
+import { ArrowLeft, ArrowRight, Calendar, ChevronRight, Clock, Home } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import FloatingCallButton from "@/components/FloatingCallButton";
@@ -47,21 +47,57 @@ const BlogPost = () => {
     return () => s.remove();
   }, [post]);
 
-  if (!post) return <NotFound />;
 
-  const others = blogPosts.filter((p) => p.slug !== post.slug).slice(0, 3);
+  const idx = post ? blogPosts.findIndex((p) => p.slug === post.slug) : -1;
+  const prev = idx > 0 ? blogPosts[idx - 1] : null;
+  const next = idx >= 0 && idx < blogPosts.length - 1 ? blogPosts[idx + 1] : null;
+  const others = post ? blogPosts.filter((p) => p.slug !== post.slug).slice(0, 3) : [];
+
+  useEffect(() => {
+    if (!post) return;
+    const id = "ld-breadcrumb-blog";
+    document.getElementById(id)?.remove();
+    const ld = {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: SITE },
+        { "@type": "ListItem", position: 2, name: "Blog", item: `${SITE}/blog` },
+        { "@type": "ListItem", position: 3, name: post.title, item: `${SITE}/blog/${post.slug}` },
+      ],
+    };
+    const s = document.createElement("script");
+    s.type = "application/ld+json";
+    s.id = id;
+    s.text = JSON.stringify(ld);
+    document.head.appendChild(s);
+    return () => s.remove();
+  }, [post]);
+
+  if (!post) return <NotFound />;
 
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
       <section className="pt-28 md:pt-32 pb-12 md:pb-16">
         <div className="container mx-auto px-4 max-w-3xl">
-          <Link
-            to="/blog"
-            className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary mb-6 text-sm"
-          >
-            <ArrowLeft className="w-4 h-4" /> All articles
-          </Link>
+          <nav aria-label="Breadcrumb" className="mb-6 text-sm">
+            <ol className="flex flex-wrap items-center gap-1.5 text-muted-foreground">
+              <li>
+                <Link to="/" className="inline-flex items-center gap-1 hover:text-primary">
+                  <Home className="w-3.5 h-3.5" /> Home
+                </Link>
+              </li>
+              <li><ChevronRight className="w-3.5 h-3.5" /></li>
+              <li>
+                <Link to="/blog" className="hover:text-primary">Blog</Link>
+              </li>
+              <li><ChevronRight className="w-3.5 h-3.5" /></li>
+              <li className="text-foreground line-clamp-1" aria-current="page">
+                {post.title}
+              </li>
+            </ol>
+          </nav>
 
           <h1 className="font-display text-3xl sm:text-4xl md:text-5xl tracking-wide mb-4">
             <span className="text-sky">{post.title}</span>
@@ -90,6 +126,38 @@ const BlogPost = () => {
           <div className="my-12">
             <RequestQuoteCTA serviceName={`Blog: ${post.title}`} />
           </div>
+
+          <nav
+            aria-label="Post navigation"
+            className="border-t border-border pt-8 grid sm:grid-cols-2 gap-4 mb-10"
+          >
+            {prev ? (
+              <Link
+                to={`/blog/${prev.slug}`}
+                className="group rounded-lg border border-border p-4 hover:border-primary/60 transition-colors"
+              >
+                <span className="inline-flex items-center gap-1 text-xs uppercase tracking-wider text-muted-foreground">
+                  <ArrowLeft className="w-3.5 h-3.5" /> Previous
+                </span>
+                <span className="block mt-1 font-medium text-foreground group-hover:text-primary">
+                  {prev.title}
+                </span>
+              </Link>
+            ) : <span className="hidden sm:block" />}
+            {next ? (
+              <Link
+                to={`/blog/${next.slug}`}
+                className="group rounded-lg border border-border p-4 hover:border-primary/60 transition-colors sm:text-right"
+              >
+                <span className="inline-flex items-center gap-1 text-xs uppercase tracking-wider text-muted-foreground sm:justify-end sm:w-full">
+                  Next <ArrowRight className="w-3.5 h-3.5" />
+                </span>
+                <span className="block mt-1 font-medium text-foreground group-hover:text-primary">
+                  {next.title}
+                </span>
+              </Link>
+            ) : null}
+          </nav>
 
           <div className="border-t border-border pt-8">
             <h2 className="font-display text-xl md:text-2xl text-sky mb-4">
