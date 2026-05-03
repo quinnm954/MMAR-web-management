@@ -61,7 +61,6 @@ const Index = () => {
               "Car Battery Replacement",
               "Vehicle Diagnostics",
               "No-Start Diagnostics",
-              "Emergency Roadside Mechanic",
               "Mobile Oil Change",
             ].map((s) => ({
               "@type": "Offer",
