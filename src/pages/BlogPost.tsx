@@ -152,6 +152,24 @@ const BlogPost = () => {
             dangerouslySetInnerHTML={{ __html: post.body }}
           />
 
+          {post.faqs && post.faqs.length > 0 && (
+            <section className="mt-12 border-t border-border pt-8" aria-labelledby="post-faq">
+              <h2 id="post-faq" className="font-display text-2xl md:text-3xl text-gold mb-4">
+                Frequently asked questions
+              </h2>
+              <div className="space-y-4">
+                {post.faqs.map((q) => (
+                  <details key={q.question} className="rounded-lg border border-border p-4 group">
+                    <summary className="cursor-pointer font-medium text-foreground group-open:text-primary">
+                      {q.question}
+                    </summary>
+                    <p className="mt-2 text-foreground/80 leading-relaxed">{q.answer}</p>
+                  </details>
+                ))}
+              </div>
+            </section>
+          )}
+
           <InlineCallStrip label="Need help with your car right now?" />
 
           <div className="my-12">
