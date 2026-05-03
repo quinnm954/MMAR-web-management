@@ -199,6 +199,132 @@ export const blogPosts: BlogPost[] = [
       { question: "Does salt air really damage cars in Cape Coral and Naples?", answer: "Yes. Salt corrodes brake lines, exhaust, suspension components, and electrical connectors. An annual undercarriage inspection catches issues early on coastal vehicles." },
     ],
   },
+  {
+    slug: "why-car-wont-start-florida-heat",
+    title: "Why Your Car Won't Start in Florida Heat",
+    excerpt:
+      "Florida summers are brutal on starters, batteries, and fuel systems. Here's what's most likely going on when your car refuses to crank in the heat — and what to do about it.",
+    dateISO: "2026-05-10",
+    readMinutes: 7,
+    tags: ["Electrical", "No-Start", "Local"],
+    body: `
+      <p>It happens every summer in Southwest Florida: 95° outside, you finish a Publix run in <a href="/areas/lehigh-acres">Lehigh Acres</a> or <a href="/areas/fort-myers">Fort Myers</a>, walk back to your car, turn the key — and nothing. Or just a click. Or a long, lazy crank that finally gives up. Florida heat is one of the hardest environments in the country on the systems that get an engine running, and after thousands of mobile service calls, the same culprits show up again and again.</p>
+
+      <h2>1. The battery is heat-dead, even if it tested good in March</h2>
+      <p>The single most common cause of a hot-weather no-start is a battery that's quietly given up. Heat boils off the electrolyte inside the battery and accelerates internal corrosion. Most batteries are rated for 4–5 years; in SWFL, plan on 2–3. The cruel part is that a heat-killed battery often passes a quick parts-store test in the morning and then fails the same afternoon when the car has been baking in a parking lot. If you're seeing slow cranking, dim dome lights, or any clicking, get a real load test — not just a 10-second voltmeter reading. We bring one to you on every <a href="/battery-replacement">battery replacement</a> call.</p>
+
+      <h2>2. The starter is overheating ("hot soak" no-start)</h2>
+      <p>Starters live right next to the engine block, which in Florida summer can hit 200°+ underhood after a drive. Some starters — especially on Hondas, older Toyotas, and a lot of GM trucks — start to fail in a very predictable way: cold-start fine in the morning, but won't crank after the engine has been hot for an hour. This is called a "hot-soak no-start" and it almost always means the starter solenoid contacts are worn down. The fix is a starter replacement. The diagnosis is straightforward and we do it on site.</p>
+
+      <h2>3. Bad alternator killed the battery</h2>
+      <p>If your alternator has been weak for a few weeks (battery light on, dim headlights, odd electrical glitches), it eventually leaves you with a dead battery and a no-start. Jumping it gets you home, but the next morning it won't start again. See our guide on <a href="/blog/signs-of-a-bad-alternator">7 signs of a bad alternator</a> for the warning signs we see most often. We test the entire charging system before condemning a part.</p>
+
+      <h2>4. Fuel pump or relay heat failure</h2>
+      <p>The under-tank fuel pump on most modern cars is cooled by the fuel itself. Run consistently low on gas in summer and the pump runs hot, dry, and fails early. Symptoms: cranks but won't fire, sometimes intermittently, often worse on hot days. The fuel-pump relay (a small plug-in part under the hood) also fails from heat and is a much cheaper repair. We test fuel pressure on site to tell the difference.</p>
+
+      <h2>5. Vapor lock and bad fuel</h2>
+      <p>Less common on modern fuel-injected cars, but worth mentioning: very hot fuel-rail temps can cause hard hot starts. Bad gas — water-contaminated or stale — also shows up after summer storms when filling stations get water in their underground tanks.</p>
+
+      <h2>What to do right now</h2>
+      <p>If you're reading this stranded in a parking lot, call or text <a href="tel:8135017572">(813) 501-7572</a> for emergency <a href="/no-start-diagnostics">no-start diagnostics</a>. We'll bring a battery tester, jump pack, fuel-pressure gauge, and OBD-II scanner — and most no-starts in Lehigh Acres, Fort Myers, and Cape Coral are diagnosed and fixed on the spot without a tow.</p>
+    `,
+    faqs: [
+      { question: "Why does my car only refuse to start when it's hot outside?", answer: "Three usual suspects: a battery that's heat-degraded, a starter solenoid that fails after the engine has heat-soaked, or a fuel-pump issue triggered by hot fuel-system temps. All three are testable on site." },
+      { question: "Can a hot-soak no-start fix itself when the car cools down?", answer: "Yes — that's actually the classic symptom of a failing starter. It cranks fine in the morning, won't crank after a long drive, then cranks again once everything has cooled off. The fix is a starter replacement before it leaves you stranded." },
+      { question: "How long does it take to diagnose a no-start in Southwest Florida?", answer: "Most mobile no-start diagnostics take 30–60 minutes on site, and the majority are repaired the same visit. Diagnostic appointments run $80–$150 and credit toward any repair." },
+      { question: "Should I just buy a new battery and hope?", answer: "Not without testing the charging system first. About 1 in 4 'dead-battery' no-starts is actually a failing alternator. Replacing only the battery means you're stranded again in a few days." },
+    ],
+  },
+  {
+    slug: "mobile-mechanic-vs-shop-lehigh-acres",
+    title: "Mobile Mechanic vs. Shop in Lehigh Acres: Which Is Better?",
+    excerpt:
+      "When does it make sense to use a mobile mechanic in Lehigh Acres instead of dropping your car at a brick-and-mortar shop? Here's an honest breakdown.",
+    dateISO: "2026-05-17",
+    readMinutes: 6,
+    tags: ["Local", "Maintenance"],
+    body: `
+      <p>If you live in <a href="/areas/lehigh-acres">Lehigh Acres</a>, you've probably had to figure out how to get a car fixed without a second vehicle in the driveway. The shop is across town, the rideshare costs more than the oil change, and a tow is always at least $100. The mobile mechanic option is newer for a lot of drivers, so it's worth being honest about when it actually wins — and when a brick-and-mortar shop is still the right call.</p>
+
+      <h2>What a mobile mechanic does well</h2>
+      <ul>
+        <li><strong>Most repairs that don't need a lift.</strong> Brakes, batteries, alternators, starters, oil changes, sensors, fuel-pump relays, water pumps, hoses, thermostats, and full diagnostics are all routinely handled in a Lehigh Acres driveway in 60–120 minutes.</li>
+        <li><strong>Saving you a workday.</strong> No drop-off, no waiting room, no rideshare home and back. We come to you in any Lehigh Acres ZIP (33936, 33971, 33972, 33973, 33974, 33976).</li>
+        <li><strong>Avoiding tow bills.</strong> A no-start that would otherwise cost $150+ to tow becomes a 30-minute on-site fix.</li>
+        <li><strong>Up-front pricing.</strong> No "shop fee," no surprise diagnostic charge stacked on top of the actual repair. You get the quote first.</li>
+      </ul>
+
+      <h2>What a brick-and-mortar shop still does better</h2>
+      <ul>
+        <li><strong>Heavy transmission and engine work.</strong> Pulling a transmission or doing internal engine work needs a lift and a clean shop floor. Mobile is the wrong tool there.</li>
+        <li><strong>Wheel alignments.</strong> Real alignments need a rack and a four-wheel alignment machine.</li>
+        <li><strong>Tire mounting and balancing.</strong> Possible mobile but requires specialized equipment most mobile mechanics don't carry.</li>
+        <li><strong>Long-term storage projects.</strong> If your car will sit for two weeks waiting on a part, a shop is a better holding environment than your driveway.</li>
+      </ul>
+
+      <h2>Where Lehigh Acres specifically benefits</h2>
+      <p>Lehigh Acres is one of the largest planned communities in the country and most residents have to drive 15–25 minutes to reach a real auto repair shop. That round trip plus shop wait time eats half a day. For the kind of repairs we do most often here — <a href="/brake-repair-lehigh-acres">brake jobs</a>, <a href="/battery-replacement-lehigh-acres">batteries</a>, <a href="/diagnostics-lehigh-acres">check-engine-light diagnostics</a>, and <a href="/oil-change-lehigh-acres">oil changes</a> — the math heavily favors mobile.</p>
+
+      <h2>Cost comparison: real-world example</h2>
+      <p>Front pad-and-rotor job on a 2017 Honda Civic in Lehigh Acres:</p>
+      <ul>
+        <li><strong>Brick-and-mortar shop:</strong> $250 parts + labor, plus a $30 rideshare home and back, plus 4–6 hours of waiting or vehicle downtime.</li>
+        <li><strong>Mobile (us):</strong> $250 parts + labor, no rideshare, 75 minutes in your driveway, you keep working from home or watching TV.</li>
+      </ul>
+      <p>Same final price for the work, half the friction.</p>
+
+      <h2>When you should still pick the shop</h2>
+      <p>If your car needs a transmission rebuild, alignment, tire mounting, or major bodywork — go to a shop. If it needs almost anything else, save yourself a day and call <a href="tel:8135017572">(813) 501-7572</a>. We'll tell you honestly if it's a job we shouldn't take.</p>
+    `,
+    faqs: [
+      { question: "Is a mobile mechanic in Lehigh Acres more expensive than a shop?", answer: "Generally no. Most jobs price the same as a brick-and-mortar shop — sometimes less because there's no overhead 'shop fee' added on top. You're saving a tow bill and a day of vehicle downtime on top of that." },
+      { question: "Are mobile mechanics in Lehigh Acres licensed and insured?", answer: "Mike's Mobile Auto Repair LLC is locally owned in Lee County, fully insured, and answered by a real ASE-level technician. Always ask any mobile mechanic for proof before booking." },
+      { question: "What can't a mobile mechanic do in my driveway?", answer: "Transmission rebuilds, internal engine work, four-wheel alignments, and tire mounting/balancing. Most other repairs — brakes, batteries, alternators, starters, sensors, hoses, oil changes, and diagnostics — are routine on site." },
+      { question: "Do you offer warranties like a shop does?", answer: "Yes. Parts and labor on covered repairs are backed by our standard mobile-service warranty in writing." },
+    ],
+  },
+  {
+    slug: "common-chevy-cruze-problems-swfl",
+    title: "Most Common Chevy Cruze Problems We See in SWFL",
+    excerpt:
+      "The Chevy Cruze is one of the most common cars on Lehigh Acres and Fort Myers roads. Here are the issues that bring them to our mobile service truck most often.",
+    dateISO: "2026-05-24",
+    readMinutes: 7,
+    tags: ["Diagnostics", "Maintenance", "Local"],
+    body: `
+      <p>The Chevy Cruze (2011–2019, both gen 1 and gen 2) is everywhere in Southwest Florida. They're cheap to buy used, they get great gas mileage, and they hold up reasonably well — but they have a list of repeat problems that show up over and over on our mobile service calls in <a href="/areas/lehigh-acres">Lehigh Acres</a>, <a href="/areas/fort-myers">Fort Myers</a>, and <a href="/areas/cape-coral">Cape Coral</a>. If you own one or are about to buy one, here's what to expect.</p>
+
+      <h2>1. Coolant leaks (water pump and thermostat housing)</h2>
+      <p>This is the number-one Cruze problem we see. The plastic thermostat housing cracks. The water pump weep hole starts dripping. The coolant reservoir cap goes bad. The result: you keep adding coolant, you eventually overheat, and if you ignore it long enough you crack a head gasket. The fix is preventative — replace the thermostat housing, water pump, and reservoir cap together around 80,000–100,000 miles. We do this entire job on site.</p>
+
+      <h2>2. Valve cover and PCV diaphragm failure (1.4L turbo)</h2>
+      <p>The 1.4L turbo (the most common Cruze engine) has an integrated PCV diaphragm built into the valve cover. When it fails — usually 60,000–100,000 miles — you'll get a check-engine light, rough idle, oil consumption, and sometimes a loud whistling noise. The fix is a new valve cover. Common, well-documented, and affordable if caught early.</p>
+
+      <h2>3. Turbo coolant return line</h2>
+      <p>Another well-known leak point. The line that returns coolant from the turbo back to the engine cracks or leaks at the fittings. Catch it early or you risk turbo damage. We replace these on site as part of any cooling-system service.</p>
+
+      <h2>4. Negative battery cable corrosion</h2>
+      <p>GM issued a recall on this for a reason. The negative battery cable on the 1.4L Cruze corrodes internally and causes random electrical issues — flickering dash lights, no-starts, weird stereo glitches, ABS warnings. If your Cruze has any unexplained electrical gremlins, this is the first thing to check. Easy on-site fix.</p>
+
+      <h2>5. Transmission shudder (6T40 6-speed automatic)</h2>
+      <p>The 6-speed automatic in early Cruzes is known for a torque converter shudder around 40 mph under light load. A transmission fluid flush with the correct GM-spec fluid resolves it in most cases. We can do the flush in your driveway, no shop visit needed.</p>
+
+      <h2>6. AC condenser failure</h2>
+      <p>Florida heat plus a thin OEM condenser equals leaks. If your Cruze AC is blowing warm and a recharge doesn't hold, the condenser is the most likely culprit. We diagnose and quote on site.</p>
+
+      <h2>7. Engine oil consumption</h2>
+      <p>Some 1.4L turbos burn oil between changes — anywhere from a half-quart to a quart per 1,000 miles. Check your dipstick monthly. Catastrophic damage from a low-oil event is the most expensive thing that can happen to one of these engines.</p>
+
+      <h2>Stay ahead of it</h2>
+      <p>If you own a Cruze in SWFL, the best thing you can do is run regular <a href="/oil-change-lehigh-acres">oil changes</a> with a multi-point inspection and address coolant leaks the moment they appear. Want a Cruze-specific health check at your driveway? Call or text <a href="tel:8135017572">(813) 501-7572</a>.</p>
+    `,
+    faqs: [
+      { question: "Are Chevy Cruzes reliable in Florida?", answer: "Reasonably — but they have well-known weak points around the cooling system and turbo on the 1.4L engine. Stay ahead of those and a Cruze can easily run past 150,000 miles." },
+      { question: "What's the most common Chevy Cruze repair?", answer: "Coolant-system work — thermostat housing, water pump, and turbo coolant return line. We do all three on site as a single service most of the time." },
+      { question: "Does the Cruze valve cover really need to be replaced?", answer: "On the 1.4L turbo, yes — the integrated PCV diaphragm fails between 60,000 and 100,000 miles in most cases. It's a defined, expected repair on this engine." },
+      { question: "Can you service my Chevy Cruze in my Lehigh Acres driveway?", answer: "Yes — the most common Cruze repairs (cooling system, valve cover, battery cable, AC) are all routinely done on site. Call (813) 501-7572 to book." },
+    ],
+  },
 ];
 
 export const getBlogPostBySlug = (slug: string) =>
