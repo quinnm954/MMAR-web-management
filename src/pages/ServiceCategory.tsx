@@ -7,7 +7,8 @@ import FloatingCallButton from "@/components/FloatingCallButton";
 import QuoteRequestDialog from "@/components/QuoteRequestDialog";
 import RequestQuoteCTA from "@/components/RequestQuoteCTA";
 import { getCategoryBySlug } from "@/data/serviceCategories";
-import { cities } from "@/data/cities";
+import { cities, getCityBySlug } from "@/data/cities";
+import { localLandingPages } from "@/data/localLandingPages";
 import { useSeo } from "@/lib/useSeo";
 import NotFound from "./NotFound";
 
@@ -106,6 +107,27 @@ const ServiceCategory = () => {
               ))}
             </div>
           </div>
+
+          {localLandingPages.filter((p) => p.categoryId === category.id).length > 0 && (
+            <div className="mt-12">
+              <h2 className="font-display text-2xl md:text-3xl text-gold mb-4">
+                Get This Service in Your City
+              </h2>
+              <div className="flex flex-wrap gap-2">
+                {localLandingPages
+                  .filter((p) => p.categoryId === category.id)
+                  .map((p) => (
+                    <Link
+                      key={p.slug}
+                      to={`/${p.slug}`}
+                      className="px-3 py-2 rounded-full bg-primary/10 hover:bg-primary/20 text-primary text-sm transition-colors"
+                    >
+                      {p.service} — {getCityBySlug(p.citySlug)?.name}
+                    </Link>
+                  ))}
+              </div>
+            </div>
+          )}
         </div>
       </section>
 

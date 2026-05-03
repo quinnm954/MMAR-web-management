@@ -6,6 +6,7 @@ import FloatingCallButton from "@/components/FloatingCallButton";
 import RequestQuoteCTA from "@/components/RequestQuoteCTA";
 import { getCityBySlug } from "@/data/cities";
 import { categories } from "@/data/serviceCategories";
+import { localLandingPages } from "@/data/localLandingPages";
 import { useSeo } from "@/lib/useSeo";
 import NotFound from "./NotFound";
 
@@ -105,6 +106,27 @@ const CityPage = () => {
               </Link>
             ))}
           </div>
+
+          {localLandingPages.filter((p) => p.citySlug === city.slug).length > 0 && (
+            <div className="mt-12">
+              <h2 className="font-display text-2xl md:text-3xl text-sky mb-4">
+                Popular Mobile Services in {city.name}
+              </h2>
+              <div className="flex flex-wrap gap-2">
+                {localLandingPages
+                  .filter((p) => p.citySlug === city.slug)
+                  .map((p) => (
+                    <Link
+                      key={p.slug}
+                      to={`/${p.slug}`}
+                      className="px-3 py-2 rounded-full bg-primary/10 hover:bg-primary/20 text-primary text-sm transition-colors"
+                    >
+                      {p.service}
+                    </Link>
+                  ))}
+              </div>
+            </div>
+          )}
         </div>
       </section>
 

@@ -1,62 +1,82 @@
-## Plan: SEO Section, Service Pages & City Pages
+## Local SEO Landing Pages (service + city URLs)
 
-### 1. Homepage SEO Content Section (~700 words)
-Add a new component `src/components/SeoContent.tsx` and slot it into `src/pages/Index.tsx` between `Services` and `Testimonials`.
+Create dedicated, SEO-optimized landing pages at clean URLs like:
 
-Content sections (H2/H3 with keyword-rich copy):
-- **Mobile Auto Repair Done at Your Location** — what mobile mechanic service means, convenience, ASE-level work
-- **Roadside Help When You're Stuck** — jump starts, lockouts, flat tires, dead batteries
-- **Computer Diagnostics & Check Engine Light** — OBD-II scanning, drivability issues
-- **Emergency Service** — same-day/after-hours response across SWFL
-- **Service Areas** — internal links to Lehigh Acres, Fort Myers, Cape Coral, Naples, Estero, Bonita Springs
+- `/mobile-brake-repair-lehigh-acres`
+- `/mobile-alternator-repair-fort-myers`
+- `/mobile-battery-replacement-cape-coral`
+- `/emergency-mobile-mechanic-lehigh-acres`
 
-Will use existing semantic tokens (`text-sky`, `text-gold`, `bg-secondary/30`) and link out to new city/service pages. Phone CTA `tel:8135017572` included.
+These are the highest-converting URL patterns for local search. The current `/services/:slug` and `/areas/:city` pages stay in place; these new pages are narrower (one service in one city) and target long-tail keywords.
 
-### 2. Individual Service Category Pages
-Create one page per category from `Services.tsx` (11 categories: engine, oil-fluids, brakes, electrical, ac-heating, cooling, transmission, suspension, tires-wheels, fuel-exhaust, inspections).
+### Approach
 
-Approach — single dynamic route to keep it DRY:
-- New file: `src/pages/ServiceCategory.tsx`
-- Route: `/services/:slug` in `App.tsx`
-- Move the `categories` array out of `Services.tsx` into `src/data/serviceCategories.ts` so both the homepage accordion and the new pages share data
-- Each page renders: Navigation, hero (category title + intro paragraph), full list of services as cards (each opens `QuoteRequestDialog`), local SEO blurb mentioning service areas, CTA buttons (Call / Text), Footer, FloatingCallButton
-- Add a per-category `description` field used for the intro/meta description
-
-Update `Services.tsx` accordion items so the category title links to its `/services/:slug` page (keep accordion expand behavior intact — add a small "View details →" link inside each open panel).
-
-### 3. City Landing Pages
-Single dynamic route `/areas/:city` powered by a city data file.
-
-- New file: `src/data/cities.ts` with entries for `lehigh-acres`, `fort-myers`, `cape-coral` (name, neighborhoods, zip codes, intro paragraph, 2–3 unique paragraphs of local copy)
-- New page: `src/pages/CityPage.tsx` rendering: Navigation, H1 like "Mobile Mechanic in Lehigh Acres, FL", local SEO copy (~400–500 words/city), grid of service category links (`/services/:slug`), CTA, Footer, FloatingCallButton
-- Route added in `App.tsx` above the catch-all
-
-### 4. Per-page SEO meta tags
-Add a tiny helper `src/lib/useSeo.ts` that sets `document.title` and the `<meta name="description">` on mount. Use it on the new service and city pages so each has unique title + description (e.g. "Mobile Mechanic in Cape Coral, FL | Mike's Mobile Auto Repair").
-
-### 5. Internal linking
-- Footer: add a "Service Areas" column linking the 3 city pages and a "Services" column linking the 11 category pages
-- Homepage SEO section: inline links to city + key category pages
+A single dynamic route handles all combos, driven by a curated data file. This keeps it DRY and lets us extend to dozens of pages without writing one file each.
 
 ### Files to create
+
 ```text
-src/components/SeoContent.tsx
-src/data/serviceCategories.ts
-src/data/cities.ts
-src/pages/ServiceCategory.tsx
-src/pages/CityPage.tsx
-src/lib/useSeo.ts
+src/data/localLandingPages.ts   curated list of {slug, service, city, h1, intro, paragraphs, faqs, relatedServiceId}
+src/pages/LocalLanding.tsx      renders any landing page from the data file
 ```
+
+The data file ships with these starter pages (we can add more later):
+
+| Slug | Service | City |
+|---|---|---|
+| `mobile-brake-repair-lehigh-acres` | Brake repair | Lehigh Acres |
+| `mobile-alternator-repair-fort-myers` | Alternator repair | Fort Myers |
+| `mobile-battery-replacement-cape-coral` | Battery replacement | Cape Coral |
+| `emergency-mobile-mechanic-lehigh-acres` | Emergency mobile mechanic | Lehigh Acres |
+
+Each entry has unique, locally-written copy (~300–500 words) — never spun/duplicated, so Google rewards it.
 
 ### Files to edit
+
 ```text
-src/App.tsx              add /services/:slug and /areas/:city routes
-src/pages/Index.tsx      mount <SeoContent />
-src/components/Services.tsx   import categories from data file, add detail link
-src/components/Footer.tsx     add Services + Service Areas link columns
+src/App.tsx                      add <Route path="/:landingSlug" element={<LocalLanding />} /> just above the catch-all NotFound
+src/components/Footer.tsx        new "Local Services" column linking these landing pages
+src/components/SeoContent.tsx    inline links to a few landing pages from the homepage SEO copy
+src/pages/CityPage.tsx           add a "Popular services in {city}" section linking landing pages for that city
+src/pages/ServiceCategory.tsx    add a "Get this service in your city" section linking related landing pages
+public/sitemap.xml               add the 4 new URLs
 ```
 
-### Notes
-- All copy will be original, locally-focused, written for humans first (Google penalizes thin/spun content).
-- No new dependencies needed.
-- Cape Coral will be added to the service-area memory after implementation if you want it formally listed as a serviced city.
+### Page layout (each landing page)
+
+```text
+[Nav]
+H1: Mobile Brake Repair in Lehigh Acres, FL
+Sub: One-line value prop with phone number
+[RequestQuoteCTA — pre-filled with service + city]
+~3 paragraphs of unique local copy (why mobile, what we fix, neighborhoods served)
+"What's included" checklist (pulled from related service category)
+ZIP codes + neighborhoods (from city data)
+3–5 FAQs (How much…, How long…, Same-day?, Warranty?, Areas covered?)
+JSON-LD: LocalBusiness + Service schema for richer snippets
+Related links: parent service category page + city page + 2 sibling landing pages
+[Footer + FloatingCallButton]
+```
+
+### Routing detail
+
+The new route is a top-level `/:landingSlug` pattern. To avoid colliding with existing routes (`/services/...`, `/areas/...`, `/admin/...`, `/financing-contract`, `/warranty-policy`), the `LocalLanding` page does a lookup against the data file's slug list and renders `<NotFound />` if there is no match. React Router's specific routes are matched first, so existing pages are unaffected.
+
+### SEO details
+
+- Per-page `<title>`: `Mobile Brake Repair in Lehigh Acres, FL | Mike's Mobile Auto Repair`
+- Per-page meta description from the intro paragraph
+- Canonical URL set via the existing `useSeo` hook
+- JSON-LD `Service` + `LocalBusiness` schema injected per page
+- New entries appended to `public/sitemap.xml` so Google indexes them quickly
+
+### What stays the same
+
+- Existing `/services/:slug` (category hub) and `/areas/:city` (city hub) pages remain — they cross-link to the new landing pages and vice versa for strong internal linking.
+- Phone number, branding, RequestQuoteCTA, and design tokens are reused — no visual drift.
+
+### Out of scope (ask if you want these next)
+
+- Generating the full matrix (every service × every city = ~30+ pages). Easy to add — just append entries to `localLandingPages.ts`.
+- Programmatic FAQ schema beyond the per-page faqs array.
+- A CMS/admin UI to author new landing pages without code.
