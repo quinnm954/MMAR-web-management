@@ -72,6 +72,24 @@ const Footer = () => {
           </div>
         </div>
 
+        <div className="border-t border-border pt-6 mb-6">
+          <h3 className="font-display text-sm uppercase tracking-wider text-gold mb-3">
+            Local Mobile Services
+          </h3>
+          <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-2 text-sm">
+            {localLandingPages.map((p) => (
+              <li key={p.slug}>
+                <Link
+                  to={`/${p.slug}`}
+                  className="text-muted-foreground hover:text-primary"
+                >
+                  {p.h1}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+
         <div className="border-t border-border pt-6 flex flex-col md:flex-row items-center justify-between gap-3 text-xs md:text-sm text-muted-foreground">
           <p>
             © {new Date().getFullYear()} Capital Services Management, INC. All rights reserved.
