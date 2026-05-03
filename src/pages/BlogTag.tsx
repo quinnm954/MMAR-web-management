@@ -85,21 +85,25 @@ const BlogTag = () => {
   const allTags = Array.from(new Set(blogPosts.flatMap((p) => p.tags)));
   const matchedLabel = allTags.find((t) => slugifyTag(t) === tagSlug);
 
-  if (!matchedLabel) return <NotFound />;
+  const meta = matchedLabel
+    ? (TAG_INTROS[tagSlug] ?? {
+        title: `${matchedLabel} Articles`,
+        intro: `Mobile mechanic articles tagged ${matchedLabel} from Mike's Mobile Auto Repair, serving Lehigh Acres, Fort Myers, Cape Coral, and all of Southwest Florida.`,
+        related: [] as { href: string; label: string }[],
+      })
+    : { title: "", intro: "", related: [] as { href: string; label: string }[] };
 
-  const meta = TAG_INTROS[tagSlug] ?? {
-    title: `${matchedLabel} Articles`,
-    intro: `Mobile mechanic articles tagged ${matchedLabel} from Mike's Mobile Auto Repair, serving Lehigh Acres, Fort Myers, Cape Coral, and all of Southwest Florida.`,
-    related: [],
-  };
-
-  const posts = blogPosts.filter((p) => p.tags.includes(matchedLabel));
+  const posts = matchedLabel ? blogPosts.filter((p) => p.tags.includes(matchedLabel)) : [];
 
   useSeo({
-    title: `${meta.title} | Mike's Mobile Auto Repair Blog`,
+    title: matchedLabel
+      ? `${meta.title} | Mike's Mobile Auto Repair Blog`
+      : "Topic not found",
     description: meta.intro.slice(0, 158),
-    canonical: `${SITE}/blog/tag/${tagSlug}`,
+    canonical: matchedLabel ? `${SITE}/blog/tag/${tagSlug}` : undefined,
   });
+
+  if (!matchedLabel) return <NotFound />;
 
   return (
     <div className="min-h-screen bg-background">
