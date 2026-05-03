@@ -1,13 +1,12 @@
 import { Link, useParams } from "react-router-dom";
-import { Phone, MessageSquare, MapPin, ArrowLeft } from "lucide-react";
+import { MapPin, ArrowLeft } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import FloatingCallButton from "@/components/FloatingCallButton";
-import { Button } from "@/components/ui/button";
+import RequestQuoteCTA from "@/components/RequestQuoteCTA";
 import { getCityBySlug } from "@/data/cities";
 import { categories } from "@/data/serviceCategories";
 import { useSeo } from "@/lib/useSeo";
-import { trackConversion } from "@/lib/gtag";
 import NotFound from "./NotFound";
 
 const CityPage = () => {
@@ -56,17 +55,11 @@ const CityPage = () => {
             {city.intro}
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-3 mb-12">
-            <Button variant="hero" size="lg" className="min-h-[48px]" asChild>
-              <a href="tel:8135017572" onClick={() => trackConversion()}>
-                <Phone className="mr-2" /> Call (813) 501-7572
-              </a>
-            </Button>
-            <Button variant="heroOutline" size="lg" className="min-h-[48px]" asChild>
-              <a href="sms:8135017572" onClick={() => trackConversion()}>
-                <MessageSquare className="mr-2" /> Text for Quote
-              </a>
-            </Button>
+          <div className="mb-12">
+            <RequestQuoteCTA
+              serviceName={`Mobile Mechanic in ${city.name}, ${city.state}`}
+              subheading={`Tell us what your vehicle needs in ${city.name} — we'll text you a fast, transparent quote.`}
+            />
           </div>
 
           <article className="space-y-6 text-foreground/90 leading-relaxed mb-12">
