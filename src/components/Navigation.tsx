@@ -60,14 +60,6 @@ const Navigation = () => {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            <a
-              href="https://garage-ace.mikesmautorepair.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-accent font-semibold hover:text-accent/80 transition-colors duration-200"
-            >
-              Garage Ace
-            </a>
             <Button variant="hero" size="default" asChild>
               <a href="tel:8135017572">Get a Quote</a>
             </Button>
@@ -114,15 +106,6 @@ const Navigation = () => {
                   Warranty Policy
                 </Link>
               </div>
-              <a
-                href="https://garage-ace.mikesmautorepair.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => setIsOpen(false)}
-                className="text-accent font-semibold hover:text-accent/80 hover:bg-secondary/50 transition-colors duration-200 py-3 px-2 rounded-lg active:scale-[0.98]"
-              >
-                Garage Ace
-              </a>
               <Button variant="hero" size="lg" asChild className="mt-3 min-h-[48px]">
                 <a href="tel:8135017572" onClick={() => setIsOpen(false)}>
                   Get a Quote
