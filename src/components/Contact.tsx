@@ -1,6 +1,9 @@
-import { Phone, Mail } from "lucide-react";
+import { Phone, Mail, Star, MapPin, Image as ImageIcon } from "lucide-react";
 import mmarLogo from "@/assets/mmar-logo.jpeg";
 import { trackConversion } from "@/lib/gtag";
+
+const GMB_CID = "4273245475534037331";
+const GMB_URL = `https://www.google.com/maps?cid=${GMB_CID}`;
 
 const Contact = () => {
   const handleContactClick = () => {
@@ -56,6 +59,51 @@ const Contact = () => {
                 </p>
               </div>
             </a>
+          </div>
+
+          <div className="mt-6 md:mt-8">
+            <h3 className="font-display text-xl md:text-2xl tracking-wide text-center mb-4">
+              <span className="text-sky">FIND US ON</span>{" "}
+              <span className="text-gold">GOOGLE</span>
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <a
+                href={GMB_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={handleContactClick}
+                className="flex items-center gap-3 p-4 glass-card rounded-xl hover-lift active:scale-[0.98] transition-transform"
+              >
+                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                  <Star className="w-5 h-5 text-primary" />
+                </div>
+                <span className="font-semibold">Reviews</span>
+              </a>
+              <a
+                href={GMB_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={handleContactClick}
+                className="flex items-center gap-3 p-4 glass-card rounded-xl hover-lift active:scale-[0.98] transition-transform"
+              >
+                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                  <MapPin className="w-5 h-5 text-primary" />
+                </div>
+                <span className="font-semibold">Directions</span>
+              </a>
+              <a
+                href={GMB_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={handleContactClick}
+                className="flex items-center gap-3 p-4 glass-card rounded-xl hover-lift active:scale-[0.98] transition-transform"
+              >
+                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                  <ImageIcon className="w-5 h-5 text-primary" />
+                </div>
+                <span className="font-semibold">Photos</span>
+              </a>
+            </div>
           </div>
         </div>
       </div>
