@@ -26,26 +26,57 @@ const BlogPost = () => {
 
   useEffect(() => {
     if (!post) return;
-    const id = "ld-blog-post";
-    document.getElementById(id)?.remove();
-    const ld = {
+    const articleId = "ld-blog-post";
+    const faqId = "ld-blog-faq";
+    document.getElementById(articleId)?.remove();
+    document.getElementById(faqId)?.remove();
+
+    const article = {
       "@context": "https://schema.org",
-      "@type": "BlogPosting",
+      "@type": "Article",
       headline: post.title,
       description: post.excerpt,
       datePublished: post.dateISO,
       dateModified: post.dateISO,
       author: { "@type": "Organization", name: "Mike's Mobile Auto Repair" },
-      publisher: { "@type": "Organization", name: "Mike's Mobile Auto Repair" },
-      mainEntityOfPage: `${SITE}/blog/${post.slug}`,
+      publisher: {
+        "@type": "Organization",
+        name: "Mike's Mobile Auto Repair",
+        logo: { "@type": "ImageObject", url: `${SITE}/favicon.ico` },
+      },
+      mainEntityOfPage: { "@type": "WebPage", "@id": `${SITE}/blog/${post.slug}` },
+      keywords: post.tags.join(", "),
+      articleSection: "Auto Repair",
     };
-    const s = document.createElement("script");
-    s.type = "application/ld+json";
-    s.id = id;
-    s.text = JSON.stringify(ld);
-    document.head.appendChild(s);
-    return () => s.remove();
+    const a = document.createElement("script");
+    a.type = "application/ld+json";
+    a.id = articleId;
+    a.text = JSON.stringify(article);
+    document.head.appendChild(a);
+
+    let f: HTMLScriptElement | null = null;
+    if (post.faqs && post.faqs.length) {
+      const faq = {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: post.faqs.map((q) => ({
+          "@type": "Question",
+          name: q.question,
+          acceptedAnswer: { "@type": "Answer", text: q.answer },
+        })),
+      };
+      f = document.createElement("script");
+      f.type = "application/ld+json";
+      f.id = faqId;
+      f.text = JSON.stringify(faq);
+      document.head.appendChild(f);
+    }
+    return () => {
+      a.remove();
+      f?.remove();
+    };
   }, [post]);
+
 
 
   const idx = post ? blogPosts.findIndex((p) => p.slug === post.slug) : -1;
