@@ -13,6 +13,7 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import ProtectedRoute from "./components/admin/ProtectedRoute";
 import ServiceCategory from "./pages/ServiceCategory";
 import CityPage from "./pages/CityPage";
+import LocalLanding from "./pages/LocalLanding";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
