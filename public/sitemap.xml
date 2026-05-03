@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://www.mikesmautorepair.com/</loc>
-    <lastmod>2026-05-03</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
-  </url>
+  <url><loc>https://www.mikesmautorepair.com/</loc><lastmod>2026-05-03</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>
 
   <!-- Service category pages -->
   <url><loc>https://www.mikesmautorepair.com/services/engine</loc><lastmod>2026-05-03</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
@@ -24,12 +19,35 @@
   <url><loc>https://www.mikesmautorepair.com/areas/lehigh-acres</loc><lastmod>2026-05-03</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
   <url><loc>https://www.mikesmautorepair.com/areas/fort-myers</loc><lastmod>2026-05-03</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
   <url><loc>https://www.mikesmautorepair.com/areas/cape-coral</loc><lastmod>2026-05-03</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://www.mikesmautorepair.com/areas/estero</loc><lastmod>2026-05-03</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://www.mikesmautorepair.com/areas/bonita-springs</loc><lastmod>2026-05-03</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://www.mikesmautorepair.com/areas/naples</loc><lastmod>2026-05-03</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
 
-  <!-- Local SEO landing pages (service + city) -->
+  <!-- Service-only landing pages -->
+  <url><loc>https://www.mikesmautorepair.com/mobile-brake-repair</loc><lastmod>2026-05-03</lastmod><changefreq>monthly</changefreq><priority>0.95</priority></url>
+  <url><loc>https://www.mikesmautorepair.com/mobile-alternator-repair</loc><lastmod>2026-05-03</lastmod><changefreq>monthly</changefreq><priority>0.95</priority></url>
+  <url><loc>https://www.mikesmautorepair.com/mobile-battery-replacement</loc><lastmod>2026-05-03</lastmod><changefreq>monthly</changefreq><priority>0.95</priority></url>
+  <url><loc>https://www.mikesmautorepair.com/mobile-starter-repair</loc><lastmod>2026-05-03</lastmod><changefreq>monthly</changefreq><priority>0.95</priority></url>
+  <url><loc>https://www.mikesmautorepair.com/mobile-vehicle-diagnostics</loc><lastmod>2026-05-03</lastmod><changefreq>monthly</changefreq><priority>0.95</priority></url>
+  <url><loc>https://www.mikesmautorepair.com/emergency-roadside-mechanic</loc><lastmod>2026-05-03</lastmod><changefreq>monthly</changefreq><priority>0.95</priority></url>
+  <url><loc>https://www.mikesmautorepair.com/mobile-oil-change</loc><lastmod>2026-05-03</lastmod><changefreq>monthly</changefreq><priority>0.95</priority></url>
+  <url><loc>https://www.mikesmautorepair.com/mobile-suspension-steering</loc><lastmod>2026-05-03</lastmod><changefreq>monthly</changefreq><priority>0.95</priority></url>
+  <url><loc>https://www.mikesmautorepair.com/mobile-engine-diagnostics</loc><lastmod>2026-05-03</lastmod><changefreq>monthly</changefreq><priority>0.95</priority></url>
+  <url><loc>https://www.mikesmautorepair.com/mobile-no-start-diagnostics</loc><lastmod>2026-05-03</lastmod><changefreq>monthly</changefreq><priority>0.95</priority></url>
+
+  <!-- Service-in-city landing pages -->
   <url><loc>https://www.mikesmautorepair.com/mobile-brake-repair-lehigh-acres</loc><lastmod>2026-05-03</lastmod><changefreq>monthly</changefreq><priority>0.95</priority></url>
   <url><loc>https://www.mikesmautorepair.com/mobile-alternator-repair-fort-myers</loc><lastmod>2026-05-03</lastmod><changefreq>monthly</changefreq><priority>0.95</priority></url>
   <url><loc>https://www.mikesmautorepair.com/mobile-battery-replacement-cape-coral</loc><lastmod>2026-05-03</lastmod><changefreq>monthly</changefreq><priority>0.95</priority></url>
   <url><loc>https://www.mikesmautorepair.com/emergency-mobile-mechanic-lehigh-acres</loc><lastmod>2026-05-03</lastmod><changefreq>monthly</changefreq><priority>0.95</priority></url>
+
+  <!-- Blog -->
+  <url><loc>https://www.mikesmautorepair.com/blog</loc><lastmod>2026-05-03</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.mikesmautorepair.com/blog/why-cars-overheat-in-florida</loc><lastmod>2026-04-15</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.mikesmautorepair.com/blog/signs-of-a-bad-alternator</loc><lastmod>2026-04-22</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.mikesmautorepair.com/blog/dead-battery-vs-bad-starter</loc><lastmod>2026-04-29</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.mikesmautorepair.com/blog/why-your-car-wont-start</loc><lastmod>2026-05-02</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.mikesmautorepair.com/blog/common-car-problems-southwest-florida</loc><lastmod>2026-05-03</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
 
   <!-- Legal -->
   <url><loc>https://www.mikesmautorepair.com/warranty-policy</loc><lastmod>2026-05-03</lastmod><changefreq>yearly</changefreq><priority>0.3</priority></url>
