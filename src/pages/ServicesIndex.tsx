@@ -24,7 +24,7 @@ const ServicesIndex = () => {
     title: "Mobile Mechanic Services | Mike's Mobile Auto Repair",
     description:
       "All mobile mechanic services offered across Lehigh Acres, Fort Myers, Cape Coral and SWFL — diagnostics, brakes, batteries, alternators, no-start.",
-    canonical: "https://www.mikesmautorepair.com/services",
+    canonical: "https://mikesmautorepair.com/services",
   });
 
   return (

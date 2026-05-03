@@ -11,7 +11,7 @@ const AboutPage = () => {
     title: "About MMAR | Mike's Mobile Auto Repair LLC",
     description:
       "Mike's Mobile Auto Repair LLC — honest, on-site mobile mechanic serving Lehigh Acres, Fort Myers, Cape Coral, and all of Southwest Florida.",
-    canonical: "https://www.mikesmautorepair.com/about",
+    canonical: "https://mikesmautorepair.com/about",
   });
 
   return (

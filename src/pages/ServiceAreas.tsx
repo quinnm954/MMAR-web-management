@@ -12,7 +12,7 @@ const ServiceAreas = () => {
     title: "Service Areas | Mike's Mobile Auto Repair",
     description:
       "Mobile mechanic service areas across Southwest Florida — Lehigh Acres, Fort Myers, Cape Coral, Estero, Bonita Springs, and Naples.",
-    canonical: "https://www.mikesmautorepair.com/service-areas",
+    canonical: "https://mikesmautorepair.com/service-areas",
   });
 
   return (

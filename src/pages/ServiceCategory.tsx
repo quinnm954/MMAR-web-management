@@ -23,7 +23,7 @@ const ServiceCategory = () => {
       ? `${category.title} | Mobile Mechanic SWFL | Mike's Mobile Auto Repair`
       : "Service Not Found",
     description: category?.description,
-    canonical: `https://www.mikesmautorepair.com/services/${slug}`,
+    canonical: `https://mikesmautorepair.com/services/${slug}`,
   });
 
   if (!category) return <NotFound />;

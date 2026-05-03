@@ -16,7 +16,7 @@ import FinalCTA from "@/components/home/FinalCTA";
 import { useSeo } from "@/lib/useSeo";
 import { REVIEWS_META } from "@/data/reviewsMeta";
 
-const SITE = "https://www.mikesmautorepair.com";
+const SITE = "https://mikesmautorepair.com";
 
 const Index = () => {
   useSeo({

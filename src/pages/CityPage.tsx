@@ -19,7 +19,7 @@ const CityPage = () => {
       ? `Mobile Mechanic in ${city.name}, ${city.state} | Mike's Mobile Auto Repair`
       : "City Not Found",
     description: city?.intro,
-    canonical: `https://www.mikesmautorepair.com/areas/${slug}`,
+    canonical: `https://mikesmautorepair.com/areas/${slug}`,
   });
 
   if (!city) return <NotFound />;

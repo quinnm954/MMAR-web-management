@@ -9,7 +9,7 @@ import { dirname, resolve } from "node:path";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..");
-const SITE = "https://www.mikesmautorepair.com";
+const SITE = "https://mikesmautorepair.com";
 const today = new Date().toISOString().slice(0, 10);
 
 const read = (p) => readFileSync(resolve(ROOT, p), "utf8");

@@ -8,7 +8,7 @@ import InlineCallStrip from "@/components/InlineCallStrip";
 import { blogPosts } from "@/data/blogPosts";
 import { useSeo } from "@/lib/useSeo";
 
-const SITE = "https://www.mikesmautorepair.com";
+const SITE = "https://mikesmautorepair.com";
 const PAGE_SIZE = 6;
 
 const slugifyTag = (t: string) => t.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
