@@ -10,11 +10,11 @@ import {
 } from "lucide-react";
 
 const featured = [
-  { href: "/mobile-vehicle-diagnostics", icon: Stethoscope, title: "Diagnostics", desc: "On-site scan, code reading, and root-cause testing." },
-  { href: "/mobile-brake-repair", icon: Disc, title: "Brake Repair", desc: "Pads, rotors, calipers, fluid — done in your driveway." },
-  { href: "/mobile-battery-replacement", icon: BatteryCharging, title: "Battery Replacement", desc: "Fresh battery delivered and installed on-site." },
-  { href: "/mobile-alternator-repair", icon: Zap, title: "Alternator Repair", desc: "Charging-system tests and same-day swaps." },
-  { href: "/mobile-no-start-diagnostics", icon: KeyRound, title: "No-Start Diagnosis", desc: "We find why it won't start — and usually fix it on the spot." },
+  { href: "/vehicle-diagnostics", icon: Stethoscope, title: "Diagnostics", desc: "On-site scan, code reading, and root-cause testing." },
+  { href: "/brake-repair", icon: Disc, title: "Brake Repair", desc: "Pads, rotors, calipers, fluid — done in your driveway." },
+  { href: "/battery-replacement", icon: BatteryCharging, title: "Battery Replacement", desc: "Fresh battery delivered and installed on-site." },
+  { href: "/alternator-repair", icon: Zap, title: "Alternator Repair", desc: "Charging-system tests and same-day swaps." },
+  { href: "/no-start-diagnostics", icon: KeyRound, title: "No-Start Diagnosis", desc: "We find why it won't start — and usually fix it on the spot." },
   { href: "/emergency-roadside-mechanic", icon: AlertTriangle, title: "Emergency Roadside", desc: "Roadside repair when you're stranded across SWFL." },
 ];
 
