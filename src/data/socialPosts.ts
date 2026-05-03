@@ -61,3 +61,31 @@ export function tiktokVideoId(url: string): string | null {
   const m = url.match(/\/video\/(\d+)/);
   return m ? m[1] : null;
 }
+
+/** Validate a Facebook post/video/reel URL is embeddable (not just a profile/page root). */
+export function isEmbeddableFacebookUrl(url: string): boolean {
+  try {
+    const u = new URL(url);
+    if (!/(^|\.)facebook\.com$/.test(u.hostname) && u.hostname !== "fb.watch") return false;
+    if (u.hostname === "fb.watch") return u.pathname.length > 1;
+    return /\/(posts|videos|reel|reels|photos|share|story\.php|permalink\.php)\b/i.test(u.pathname + u.search);
+  } catch {
+    return false;
+  }
+}
+
+/** Returns a validation result usable by the card UI. */
+export type PostValidation =
+  | { ok: true }
+  | { ok: false; reason: string };
+
+export function validatePost(post: SocialPost): PostValidation {
+  if (post.platform === "tiktok") {
+    return tiktokVideoId(post.url)
+      ? { ok: true }
+      : { ok: false, reason: "TikTok URL is missing /video/{id} — paste the full video URL." };
+  }
+  return isEmbeddableFacebookUrl(post.url)
+    ? { ok: true }
+    : { ok: false, reason: "Facebook URL must link to a specific post, video, or reel." };
+}
