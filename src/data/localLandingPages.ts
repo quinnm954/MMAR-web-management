@@ -778,41 +778,6 @@ export const localLandingPages: LocalLandingPage[] = [
     ],
   },
   {
-    slug: "roadside-mechanic-fort-myers",
-    service: "Emergency Roadside Mechanic",
-    citySlug: "fort-myers",
-    categoryId: "engine",
-    h1: "Emergency Roadside Mechanic in Fort Myers, FL",
-    metaTitle: "Roadside Mechanic in Fort Myers, FL | Same-Day Mobile Help",
-    metaDescription:
-      "Stranded in Fort Myers? Mike's Mobile Auto Repair offers emergency roadside mechanic service — jump starts, no-starts, batteries, brakes. Call (813) 501-7572.",
-    intro:
-      "Stranded in Fort Myers? Mike's Mobile Auto Repair provides fast emergency roadside mechanic service — jump starts, no-start diagnostics, battery delivery, on-the-spot repairs, and more — anywhere from Downtown to Gateway.",
-    paragraphs: [
-      "When your car dies in Fort Myers traffic, the last thing you want is a 90-minute wait for a tow truck and another half-day at a brick-and-mortar shop. We exist to make that go away. Our roadside mechanic service responds across every Fort Myers ZIP (33901, 33907, 33908, 33912, 33913, 33916, 33919, 33966) and most of the surrounding Lee County area, usually within an hour for true emergency calls.",
-      "We carry the equipment to actually fix most roadside problems on the spot — not just diagnose them and leave. Battery and charging-system testers, jump packs, alternators, batteries, starters, fuel-pressure gauges, brake parts for common vehicles, and full OBD-II diagnostic scanners. Most no-starts are a battery, an alternator, a starter, or a no-spark/no-fuel issue — and we can address all four in a parking lot.",
-      "Common Fort Myers roadside calls: dead batteries in office lots and grocery store parking, no-starts at home in the morning, brakes that suddenly went metal-on-metal during a commute, overheating on US-41 or I-75, and check-engine lights that throw the vehicle into limp mode. We also handle lockouts (with a partner locksmith referral), flat-tire help, and post-accident drivability checks.",
-      "Pricing is up front. No tow truck markup, no shop diagnostic fee on top of the repair. A real technician answers the phone — not a call center reading a script. Stuck right now in Fort Myers? Call or text (813) 501-7572.",
-    ],
-    included: [
-      "Same-day emergency response",
-      "Jump starts and battery testing",
-      "Battery delivery and installation",
-      "Mobile no-start diagnostics",
-      "Alternator and starter replacement on site",
-      "Roadside brake repair where safe",
-      "Cooling-system and overheating help",
-      "OBD-II diagnostics with full code retrieval",
-    ],
-    faqs: [
-      { q: "How fast can you get to me in Fort Myers?", a: "Most emergency roadside calls in Fort Myers are reached within an hour. We'll give you an honest ETA when you call." },
-      { q: "Can you really fix it on the road, or just diagnose it?", a: "Both. Most roadside issues — batteries, alternators, starters, brakes, overheating — are repaired on the spot." },
-      { q: "What if I need a tow?", a: "If a tow is the right call, we'll tell you and coordinate one. We don't push unnecessary repairs." },
-      { q: "What hours do you cover?", a: "Standard hours are 7am to 9pm, plus evening and weekend coverage for genuine roadside emergencies." },
-      { q: "Do you cover the highways?", a: "Yes — I-75, US-41, Daniels Parkway, Colonial Boulevard, and most major Fort Myers corridors are within our regular service area." },
-    ],
-  },
-  {
     slug: "oil-change-lehigh-acres",
     service: "Mobile Oil Change",
     citySlug: "lehigh-acres",
