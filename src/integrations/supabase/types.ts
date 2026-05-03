@@ -131,63 +131,6 @@ export type Database = {
         }
         Relationships: []
       }
-      social_cache: {
-        Row: {
-          fetched_at: string
-          payload: Json
-          source: string
-        }
-        Insert: {
-          fetched_at?: string
-          payload: Json
-          source: string
-        }
-        Update: {
-          fetched_at?: string
-          payload?: Json
-          source?: string
-        }
-        Relationships: []
-      }
-      tiktok_videos: {
-        Row: {
-          caption: string | null
-          created_at: string
-          id: string
-          is_published: boolean
-          posted_at: string
-          sort_order: number
-          thumbnail_url: string | null
-          updated_at: string
-          video_id: string
-          video_url: string
-        }
-        Insert: {
-          caption?: string | null
-          created_at?: string
-          id?: string
-          is_published?: boolean
-          posted_at?: string
-          sort_order?: number
-          thumbnail_url?: string | null
-          updated_at?: string
-          video_id: string
-          video_url: string
-        }
-        Update: {
-          caption?: string | null
-          created_at?: string
-          id?: string
-          is_published?: boolean
-          posted_at?: string
-          sort_order?: number
-          thumbnail_url?: string | null
-          updated_at?: string
-          video_id?: string
-          video_url?: string
-        }
-        Relationships: []
-      }
       user_roles: {
         Row: {
           created_at: string

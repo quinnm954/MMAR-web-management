@@ -7,7 +7,6 @@ import TrustBadges from "@/components/TrustBadges";
 import FeaturedServices from "@/components/home/FeaturedServices";
 import ServiceAreasPreview from "@/components/home/ServiceAreasPreview";
 import TestimonialsPreview from "@/components/home/TestimonialsPreview";
-import LatestRepairsPreview from "@/components/home/LatestRepairsPreview";
 import FinalCTA from "@/components/home/FinalCTA";
 import { useSeo } from "@/lib/useSeo";
 
@@ -30,7 +29,6 @@ const Index = () => {
       <FeaturedServices />
       <ServiceAreasPreview />
       <TestimonialsPreview />
-      <LatestRepairsPreview />
       <FinalCTA />
       <Footer />
       <FloatingCallButton />

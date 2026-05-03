@@ -22,7 +22,6 @@ import BlogTag from "./pages/BlogTag";
 import AboutPage from "./pages/AboutPage";
 import Reviews from "./pages/Reviews";
 import ContactPage from "./pages/ContactPage";
-import RealRepairs from "./pages/RealRepairs";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -45,7 +44,6 @@ const App = () => (
             <Route path="/areas/:city" element={<CityPage />} />
             <Route path="/reviews" element={<Reviews />} />
             <Route path="/contact" element={<ContactPage />} />
-            <Route path="/real-repairs" element={<RealRepairs />} />
             <Route path="/blog" element={<Blog />} />
             <Route path="/blog/tag/:tag" element={<BlogTag />} />
             <Route path="/blog/:slug" element={<BlogPost />} />
