@@ -31,14 +31,21 @@ const BlogPost = () => {
     document.getElementById(articleId)?.remove();
     document.getElementById(faqId)?.remove();
 
+    const heroImage = `${SITE}/src/assets/hero-banner.jpg`;
     const article = {
       "@context": "https://schema.org",
       "@type": "Article",
       headline: post.title,
+      name: post.title,
       description: post.excerpt,
+      image: [heroImage],
       datePublished: post.dateISO,
       dateModified: post.dateISO,
-      author: { "@type": "Organization", name: "Mike's Mobile Auto Repair" },
+      author: {
+        "@type": "Person",
+        name: "Mike's Mobile Auto Repair Team",
+        url: SITE,
+      },
       publisher: {
         "@type": "Organization",
         name: "Mike's Mobile Auto Repair",
@@ -47,6 +54,8 @@ const BlogPost = () => {
       mainEntityOfPage: { "@type": "WebPage", "@id": `${SITE}/blog/${post.slug}` },
       keywords: post.tags.join(", "),
       articleSection: "Auto Repair",
+      inLanguage: "en-US",
+      url: `${SITE}/blog/${post.slug}`,
     };
     const a = document.createElement("script");
     a.type = "application/ld+json";
