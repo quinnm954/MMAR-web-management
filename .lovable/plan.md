@@ -1,41 +1,57 @@
-## Goal
-Make sure every public page on the site is in a Google-readable sitemap, kept in sync automatically, and properly linked so Google can discover and index each one.
+## Diagnosis
 
-## Current state
-- `public/sitemap.xml` exists but is hand-maintained and can drift from the actual routes.
-- `public/robots.txt` already references it.
-- Each page sets its own `<title>`, meta description, and canonical via `useSeo` — good.
-- Routes live in `src/App.tsx`; dynamic page lists live in `src/data/cities.ts`, `src/data/serviceCategories.ts`, `src/data/localLandingPages.ts`, `src/data/blogPosts.ts`.
+I checked the live `robots.txt` and the site headers. **Your robots.txt is not actually blocking indexing.** Here's what I found:
 
-## What I will do
+- `https://mikesmautorepair.com/robots.txt` returns **HTTP 200** with the correct content.
+- It explicitly **allows** Googlebot, Bingbot, and `*` — only `/admin/` is disallowed (which is intentional).
+- No `X-Robots-Tag` header and no `<meta name="robots" content="noindex">` anywhere on the site.
 
-1. **Auto-generate the sitemap from data files.**
-   - Add `scripts/generate-sitemap.mjs` that imports the static route list + dynamic data (cities, service categories, local landing pages, blog posts, blog tags) and writes `public/sitemap.xml`.
-   - Wire it into `package.json` as `prebuild` so every deploy refreshes the sitemap automatically — no more manual edits.
-   - Include `lastmod` (today for static pages, `publishedAt` for blog posts), sensible `changefreq`, and `priority`.
+The file content is exactly what we want:
+```
+User-agent: Googlebot
+Allow: /
+...
+User-agent: *
+Allow: /
+Disallow: /admin/
 
-2. **Add a sitemap index** (`public/sitemap-index.xml`) that points to:
-   - `/sitemap.xml` (pages)
-   - `/sitemap-blog.xml` (blog posts + tags)
-   - `/sitemap-locations.xml` (city + local landing pages)
-   Splitting helps Google process large sections independently. `robots.txt` will list the index.
+Sitemap: https://mikesmautorepair.com/sitemap-index.xml
+```
 
-3. **Verify every route is covered.** Cross-check `App.tsx` routes against the generator output:
-   - `/`, `/about`, `/services`, `/services/:slug` (all categories), `/service-areas`, `/areas/:city` (all cities), `/reviews`, `/contact`, `/blog`, `/blog/:slug` (all posts), `/blog/tag/:tag` (all tags), `/:landingSlug` (all `localLandingPages`), `/warranty-policy`.
-   - Exclude `/admin/*` and `/financing-contract` (private/transactional).
+## Most likely cause of the warning
 
-4. **Per-page SEO sanity pass.**
-   - Confirm every page component calls `useSeo` with a unique title, description, and canonical. Patch any that don't (spot-check `Reviews`, `ContactPage`, `AboutPage`, `ServicesIndex`, `ServiceAreas`, `Blog`, `BlogTag`, `BlogPost`, `WarrantyPolicy`, `LocalLanding`, `CityPage`, `ServiceCategory`).
-   - Add a `<link rel="sitemap" type="application/xml" href="/sitemap.xml">` in `index.html` head for extra discoverability.
+Google Search Console is reporting "blocked" because of a **property/host mismatch**, not the file contents:
 
-5. **Update `robots.txt`** to point at the new sitemap index:
-   ```
-   Sitemap: https://www.mikesmautorepair.com/sitemap-index.xml
-   Sitemap: https://www.mikesmautorepair.com/sitemap.xml
-   ```
+- `https://www.mikesmautorepair.com/robots.txt` returns a **301 redirect** to the non-www version.
+- If your GSC property is the **www** version (or the URL Inspection tool was run against a `www.` URL), Google flags the robots.txt as unreachable/blocked because it can't fetch a 200 directly at that hostname.
+- We already normalized the entire site to the non-www canonical host last round, so the `www` property in GSC is now stale.
 
-6. **Documentation note** in chat after build: how to submit `https://www.mikesmautorepair.com/sitemap-index.xml` in Google Search Console, and how the auto-generation works going forward.
+## Plan
 
-## Out of scope
-- Verifying the domain in Google Search Console (manual step on Google's side).
-- Server-side rendering / prerendering (the app is a SPA; sitemap + canonicals + JSON-LD are still the right SEO levers).
+Two small things to do, then a manual GSC step:
+
+1. **Tighten `public/robots.txt`** to remove redundancy and make it 100% unambiguous for Google's parser:
+   - Drop the per-bot `Allow: /` blocks (they're redundant — `User-agent: *` already allows all).
+   - Keep only the wildcard rule + the sitemap entries.
+   - Result:
+     ```
+     User-agent: *
+     Allow: /
+     Disallow: /admin/
+
+     Sitemap: https://mikesmautorepair.com/sitemap-index.xml
+     ```
+   This eliminates any chance of a parser treating the multiple user-agent blocks oddly.
+
+2. **Verify no stray noindex** — double-check `index.html` and the SEO hook don't emit `noindex` for any route. (Quick scan already shows none, but I'll confirm in build mode.)
+
+3. **Manual step in Google Search Console (you):**
+   - Make sure the **active GSC property is `https://mikesmautorepair.com`** (non-www), not the www version.
+   - If only the www property is verified, add and verify the non-www property, then re-submit `https://mikesmautorepair.com/sitemap-index.xml` there.
+   - Use **URL Inspection** on `https://mikesmautorepair.com/` (no www) to confirm it reads "Allowed" for crawling.
+
+## Files I'll change
+
+- `public/robots.txt` — simplified to a single wildcard block + sitemaps.
+
+No other code changes needed. Approve and I'll apply the robots.txt simplification.
