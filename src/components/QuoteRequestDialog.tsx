@@ -37,12 +37,14 @@ const QuoteRequestDialog = ({
   const [location, setLocation] = useState("");
   const [notes, setNotes] = useState("");
   const [previewText, setPreviewText] = useState<string | null>(null);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const STORAGE_KEY = "quoteRequest:vehicleInfo";
 
   useEffect(() => {
     if (open) {
       setPreviewText(null);
+      setErrors({});
       try {
         const saved = localStorage.getItem(STORAGE_KEY);
         if (saved) {
@@ -68,22 +70,27 @@ const QuoteRequestDialog = ({
   }, [open, serviceName]);
 
   const handleReview = () => {
+    const next: Record<string, string> = {};
     if (year) {
       const y = Number(year);
       if (!/^\d{4}$/.test(year) || y < 1900 || y > currentYear + 1) {
-        toast.error("Please enter a valid 4-digit year");
-        return;
+        next.year = `Enter a 4-digit year (1900–${currentYear + 1})`;
       }
     }
     if (mileage) {
       const m = Number(digitsOnly(mileage));
       if (!Number.isFinite(m) || m < 0 || m > 1_000_000) {
-        toast.error("Please enter a valid mileage");
-        return;
+        next.mileage = "Enter a mileage between 0 and 1,000,000";
       }
     }
-    if (make.length > 50 || model.length > 50 || location.length > 100 || notes.length > 1000) {
-      toast.error("One of your fields is too long");
+    if (make.length > 50) next.make = "Make is too long (50 max)";
+    if (model.length > 50) next.model = "Model is too long (50 max)";
+    if (location.length > 100) next.location = "Location is too long (100 max)";
+    if (notes.length > 1000) next.notes = "Notes are too long (1000 max)";
+
+    setErrors(next);
+    if (Object.keys(next).length > 0) {
+      toast.error("Please fix the highlighted fields");
       return;
     }
 
@@ -148,8 +155,14 @@ const QuoteRequestDialog = ({
                     maxLength={4}
                     placeholder="2018"
                     value={year}
-                    onChange={(e) => setYear(digitsOnly(e.target.value).slice(0, 4))}
+                    aria-invalid={!!errors.year}
+                    className={errors.year ? "border-destructive focus-visible:ring-destructive" : ""}
+                    onChange={(e) => {
+                      setYear(digitsOnly(e.target.value).slice(0, 4));
+                      if (errors.year) setErrors((p) => ({ ...p, year: "" }));
+                    }}
                   />
+                  {errors.year && <p className="text-xs text-destructive">{errors.year}</p>}
                 </div>
                 <div className="space-y-1.5">
                   <Label htmlFor="make">Make</Label>
@@ -157,8 +170,14 @@ const QuoteRequestDialog = ({
                     id="make"
                     placeholder="Toyota"
                     value={make}
-                    onChange={(e) => setMake(e.target.value)}
+                    aria-invalid={!!errors.make}
+                    className={errors.make ? "border-destructive focus-visible:ring-destructive" : ""}
+                    onChange={(e) => {
+                      setMake(e.target.value);
+                      if (errors.make) setErrors((p) => ({ ...p, make: "" }));
+                    }}
                   />
+                  {errors.make && <p className="text-xs text-destructive">{errors.make}</p>}
                 </div>
                 <div className="space-y-1.5">
                   <Label htmlFor="model">Model</Label>
@@ -166,8 +185,14 @@ const QuoteRequestDialog = ({
                     id="model"
                     placeholder="Camry"
                     value={model}
-                    onChange={(e) => setModel(e.target.value)}
+                    aria-invalid={!!errors.model}
+                    className={errors.model ? "border-destructive focus-visible:ring-destructive" : ""}
+                    onChange={(e) => {
+                      setModel(e.target.value);
+                      if (errors.model) setErrors((p) => ({ ...p, model: "" }));
+                    }}
                   />
+                  {errors.model && <p className="text-xs text-destructive">{errors.model}</p>}
                 </div>
               </div>
 
@@ -181,8 +206,14 @@ const QuoteRequestDialog = ({
                     maxLength={7}
                     placeholder="85000"
                     value={mileage}
-                    onChange={(e) => setMileage(digitsOnly(e.target.value).slice(0, 7))}
+                    aria-invalid={!!errors.mileage}
+                    className={errors.mileage ? "border-destructive focus-visible:ring-destructive" : ""}
+                    onChange={(e) => {
+                      setMileage(digitsOnly(e.target.value).slice(0, 7));
+                      if (errors.mileage) setErrors((p) => ({ ...p, mileage: "" }));
+                    }}
                   />
+                  {errors.mileage && <p className="text-xs text-destructive">{errors.mileage}</p>}
                 </div>
                 <div className="space-y-1.5">
                   <Label htmlFor="location">Location (optional)</Label>
@@ -190,8 +221,14 @@ const QuoteRequestDialog = ({
                     id="location"
                     placeholder="Fort Myers, FL"
                     value={location}
-                    onChange={(e) => setLocation(e.target.value)}
+                    aria-invalid={!!errors.location}
+                    className={errors.location ? "border-destructive focus-visible:ring-destructive" : ""}
+                    onChange={(e) => {
+                      setLocation(e.target.value);
+                      if (errors.location) setErrors((p) => ({ ...p, location: "" }));
+                    }}
                   />
+                  {errors.location && <p className="text-xs text-destructive">{errors.location}</p>}
                 </div>
               </div>
 
@@ -202,8 +239,14 @@ const QuoteRequestDialog = ({
                   placeholder="Symptoms, sounds, when it started…"
                   rows={3}
                   value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
+                  aria-invalid={!!errors.notes}
+                  className={errors.notes ? "border-destructive focus-visible:ring-destructive" : ""}
+                  onChange={(e) => {
+                    setNotes(e.target.value);
+                    if (errors.notes) setErrors((p) => ({ ...p, notes: "" }));
+                  }}
                 />
+                {errors.notes && <p className="text-xs text-destructive">{errors.notes}</p>}
               </div>
             </div>
 
