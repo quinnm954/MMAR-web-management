@@ -1,32 +1,5 @@
-import {
-  Gauge,
-  Droplets,
-  Disc,
-  Battery,
-  Zap,
-  Thermometer,
-  Wind,
-  Settings,
-  AlertCircle,
-  Car,
-  Timer,
-  Fuel,
-  Cpu,
-  Search,
-  Truck,
-  ClipboardCheck,
-  Wrench,
-  Snowflake,
-  CircleDot,
-  Lightbulb,
-  Gauge as GaugeIcon,
-  Sparkles,
-  ShieldCheck,
-  Power,
-  Cog,
-  type LucideIcon,
-} from "lucide-react";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import {
   Accordion,
   AccordionContent,
@@ -34,168 +7,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import QuoteRequestDialog from "./QuoteRequestDialog";
-
-type Service = { icon: LucideIcon; name: string };
-type Category = { id: string; title: string; icon: LucideIcon; services: Service[] };
-
-const categories: Category[] = [
-  {
-    id: "engine",
-    title: "Engine & Performance",
-    icon: Gauge,
-    services: [
-      { icon: Gauge, name: "Engine Diagnostics" },
-      { icon: AlertCircle, name: "Check Engine Light Troubleshooting" },
-      { icon: Wrench, name: "Engine Tune-Ups" },
-      { icon: Timer, name: "Timing Belt Replacement" },
-      { icon: Cog, name: "Timing Chain Replacement" },
-      { icon: Sparkles, name: "Spark Plug Replacement" },
-      { icon: Wind, name: "Air Filter Replacement" },
-      { icon: Power, name: "Engine Misfire Repair" },
-      { icon: Wrench, name: "Valve Cover Gasket Replacement" },
-      { icon: Wrench, name: "Serpentine Belt Replacement" },
-    ],
-  },
-  {
-    id: "oil-fluids",
-    title: "Oil & Fluids",
-    icon: Droplets,
-    services: [
-      { icon: Droplets, name: "Conventional Oil Change" },
-      { icon: Droplets, name: "Synthetic Blend Oil Change" },
-      { icon: Droplets, name: "Full Synthetic Oil Change" },
-      { icon: Droplets, name: "Oil Filter Replacement" },
-      { icon: Droplets, name: "Transmission Fluid Service" },
-      { icon: Droplets, name: "Coolant Flush" },
-      { icon: Droplets, name: "Brake Fluid Flush" },
-      { icon: Droplets, name: "Power Steering Fluid Service" },
-      { icon: Droplets, name: "Differential Fluid Service" },
-    ],
-  },
-  {
-    id: "brakes",
-    title: "Brakes",
-    icon: Disc,
-    services: [
-      { icon: Disc, name: "Brake Pad Replacement" },
-      { icon: Disc, name: "Brake Rotor Replacement" },
-      { icon: Disc, name: "Brake Caliper Repair & Replacement" },
-      { icon: Droplets, name: "Brake Fluid Flush" },
-      { icon: Wrench, name: "Brake Line Repair" },
-      { icon: AlertCircle, name: "ABS Diagnostics" },
-      { icon: Disc, name: "Parking Brake Service" },
-    ],
-  },
-  {
-    id: "electrical",
-    title: "Electrical & Battery",
-    icon: Cpu,
-    services: [
-      { icon: Battery, name: "Battery Testing" },
-      { icon: Battery, name: "Battery Replacement" },
-      { icon: Zap, name: "Alternator Replacement" },
-      { icon: Zap, name: "Starter Replacement" },
-      { icon: Cpu, name: "Electrical System Diagnostics" },
-      { icon: Lightbulb, name: "Headlight & Tail Light Replacement" },
-      { icon: Wrench, name: "Wiring Repair" },
-      { icon: Power, name: "Fuse & Relay Replacement" },
-    ],
-  },
-  {
-    id: "ac-heating",
-    title: "AC & Heating",
-    icon: Snowflake,
-    services: [
-      { icon: Snowflake, name: "AC Diagnostics" },
-      { icon: Snowflake, name: "AC Recharge" },
-      { icon: Wrench, name: "AC Compressor Replacement" },
-      { icon: Thermometer, name: "Heater Core Repair" },
-      { icon: Wind, name: "Blower Motor Replacement" },
-      { icon: Thermometer, name: "Cabin Air Filter Replacement" },
-    ],
-  },
-  {
-    id: "cooling",
-    title: "Cooling System",
-    icon: Thermometer,
-    services: [
-      { icon: Thermometer, name: "Radiator Repair & Replacement" },
-      { icon: Droplets, name: "Coolant Flush" },
-      { icon: Wrench, name: "Water Pump Replacement" },
-      { icon: Thermometer, name: "Thermostat Replacement" },
-      { icon: Wrench, name: "Hose Replacement" },
-      { icon: AlertCircle, name: "Overheating Diagnostics" },
-    ],
-  },
-  {
-    id: "transmission",
-    title: "Transmission & Drivetrain",
-    icon: Settings,
-    services: [
-      { icon: Settings, name: "Transmission Diagnostics" },
-      { icon: Droplets, name: "Transmission Fluid Service" },
-      { icon: Settings, name: "Transmission Replacement" },
-      { icon: Cog, name: "Clutch Repair & Replacement" },
-      { icon: Cog, name: "CV Axle Replacement" },
-      { icon: Cog, name: "Driveshaft Repair" },
-      { icon: Wrench, name: "Differential Repair" },
-    ],
-  },
-  {
-    id: "suspension",
-    title: "Suspension & Steering",
-    icon: Car,
-    services: [
-      { icon: Car, name: "Shock & Strut Replacement" },
-      { icon: Wrench, name: "Control Arm Replacement" },
-      { icon: Wrench, name: "Ball Joint Replacement" },
-      { icon: Wrench, name: "Tie Rod Replacement" },
-      { icon: Wrench, name: "Sway Bar Link Replacement" },
-      { icon: Settings, name: "Power Steering Repair" },
-      { icon: Wrench, name: "Wheel Bearing Replacement" },
-    ],
-  },
-  {
-    id: "tires-wheels",
-    title: "Tires & Wheels",
-    icon: CircleDot,
-    services: [
-      { icon: CircleDot, name: "Tire Rotation" },
-      { icon: CircleDot, name: "Flat Tire Repair" },
-      { icon: CircleDot, name: "Tire Pressure (TPMS) Service" },
-      { icon: Wrench, name: "Wheel Hub Replacement" },
-      { icon: GaugeIcon, name: "Tire Tread Inspection" },
-    ],
-  },
-  {
-    id: "fuel-exhaust",
-    title: "Fuel & Exhaust",
-    icon: Fuel,
-    services: [
-      { icon: Fuel, name: "Fuel System Cleaning" },
-      { icon: Fuel, name: "Fuel Pump Replacement" },
-      { icon: Fuel, name: "Fuel Injector Service" },
-      { icon: Fuel, name: "Fuel Filter Replacement" },
-      { icon: Wrench, name: "Exhaust Leak Repair" },
-      { icon: Wrench, name: "Muffler Replacement" },
-      { icon: AlertCircle, name: "Oxygen Sensor Replacement" },
-      { icon: AlertCircle, name: "Catalytic Converter Diagnostics" },
-    ],
-  },
-  {
-    id: "inspections",
-    title: "Inspections & Fleet",
-    icon: ClipboardCheck,
-    services: [
-      { icon: Search, name: "Pre-Purchase Vehicle Inspection" },
-      { icon: ClipboardCheck, name: "Mobile Safety Inspection" },
-      { icon: ShieldCheck, name: "Multi-Point Inspection" },
-      { icon: Truck, name: "Fleet Maintenance" },
-      { icon: Truck, name: "Fleet Diagnostics" },
-      { icon: ClipboardCheck, name: "Scheduled Maintenance Plans" },
-    ],
-  },
-];
+import { categories } from "@/data/serviceCategories";
 
 const Services = () => {
   const [selectedService, setSelectedService] = useState<string | null>(null);
@@ -258,6 +70,14 @@ const Services = () => {
                         </span>
                       </button>
                     ))}
+                  </div>
+                  <div className="mt-3 px-1">
+                    <Link
+                      to={`/services/${category.id}`}
+                      className="text-sm text-primary hover:underline underline-offset-4"
+                    >
+                      View {category.title} details →
+                    </Link>
                   </div>
                 </AccordionContent>
               </AccordionItem>
