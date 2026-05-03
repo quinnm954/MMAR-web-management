@@ -11,6 +11,7 @@ import RoadsideBanner from "@/components/RoadsideBanner";
 import { getLandingPageBySlug, localLandingPages } from "@/data/localLandingPages";
 import { cities, getCityBySlug } from "@/data/cities";
 import { getCategoryBySlug } from "@/data/serviceCategories";
+import { REVIEWS_META } from "@/data/reviewsMeta";
 import { useSeo } from "@/lib/useSeo";
 import NotFound from "./NotFound";
 
