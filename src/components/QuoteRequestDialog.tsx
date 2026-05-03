@@ -37,6 +37,7 @@ const QuoteRequestDialog = ({
   const [location, setLocation] = useState("");
   const [notes, setNotes] = useState("");
   const [previewText, setPreviewText] = useState<string | null>(null);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const STORAGE_KEY = "quoteRequest:vehicleInfo";
 
