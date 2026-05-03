@@ -1,15 +1,14 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { Phone, MessageSquare, ArrowLeft } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import FloatingCallButton from "@/components/FloatingCallButton";
 import QuoteRequestDialog from "@/components/QuoteRequestDialog";
-import { Button } from "@/components/ui/button";
+import RequestQuoteCTA from "@/components/RequestQuoteCTA";
 import { getCategoryBySlug } from "@/data/serviceCategories";
 import { cities } from "@/data/cities";
 import { useSeo } from "@/lib/useSeo";
-import { trackConversion } from "@/lib/gtag";
 import NotFound from "./NotFound";
 
 const ServiceCategory = () => {
