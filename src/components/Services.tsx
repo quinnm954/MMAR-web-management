@@ -26,12 +26,14 @@ import {
   Cog,
   type LucideIcon,
 } from "lucide-react";
+import { useState } from "react";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import QuoteRequestDialog from "./QuoteRequestDialog";
 
 type Service = { icon: LucideIcon; name: string };
 type Category = { id: string; title: string; icon: LucideIcon; services: Service[] };
@@ -196,11 +198,12 @@ const categories: Category[] = [
 ];
 
 const Services = () => {
+  const [selectedService, setSelectedService] = useState<string | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+
   const handleServiceClick = (serviceName: string) => {
-    const body = encodeURIComponent(
-      `Hi, I'd like a quote for: ${serviceName}`
-    );
-    window.location.href = `sms:8135017572?body=${body}`;
+    setSelectedService(serviceName);
+    setDialogOpen(true);
   };
 
   return (
@@ -262,6 +265,12 @@ const Services = () => {
           </Accordion>
         </div>
       </div>
+
+      <QuoteRequestDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        serviceName={selectedService}
+      />
     </section>
   );
 };
