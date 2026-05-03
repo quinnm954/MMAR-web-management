@@ -335,26 +335,26 @@ const FinancingContractsTable = ({ data, onRefresh }: FinancingContractsTablePro
               </div>
 
               {/* Signatures */}
-              {(selectedContract.client_signature_url || selectedContract.provider_signature_url) && (
+              {(signatureUrls.client || signatureUrls.provider) && (
                 <div className="border-t pt-4">
                   <h4 className="font-semibold mb-3">Signatures</h4>
                   <div className="grid grid-cols-2 gap-4">
-                    {selectedContract.client_signature_url && (
+                    {signatureUrls.client && (
                       <div>
                         <p className="text-sm text-muted-foreground mb-2">Client Signature</p>
-                        <img 
-                          src={selectedContract.client_signature_url} 
-                          alt="Client signature" 
+                        <img
+                          src={signatureUrls.client}
+                          alt="Client signature"
                           className="border rounded p-2 bg-white max-h-24"
                         />
                       </div>
                     )}
-                    {selectedContract.provider_signature_url && (
+                    {signatureUrls.provider && (
                       <div>
                         <p className="text-sm text-muted-foreground mb-2">Provider Signature</p>
-                        <img 
-                          src={selectedContract.provider_signature_url} 
-                          alt="Provider signature" 
+                        <img
+                          src={signatureUrls.provider}
+                          alt="Provider signature"
                           className="border rounded p-2 bg-white max-h-24"
                         />
                       </div>
