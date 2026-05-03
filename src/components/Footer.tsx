@@ -92,6 +92,7 @@ const Footer = () => {
 
         <div className="border-t border-border pt-6 mb-6 flex flex-wrap gap-x-6 gap-y-2 text-sm">
           <Link to="/blog" className="text-muted-foreground hover:text-primary">Blog</Link>
+          <Link to="/real-repairs" className="text-muted-foreground hover:text-primary">Real Repairs</Link>
           <Link to="/warranty-policy" className="text-muted-foreground hover:text-primary">Warranty Policy</Link>
           <a href="tel:8135017572" className="text-muted-foreground hover:text-primary">(813) 501-7572</a>
           <a href="sms:8135017572" className="text-muted-foreground hover:text-primary">Text Us</a>
