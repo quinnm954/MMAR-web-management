@@ -3,7 +3,7 @@ import Navigation from "@/components/Navigation";
 import Hero from "@/components/Hero";
 import Footer from "@/components/Footer";
 import FloatingCallButton from "@/components/FloatingCallButton";
-import RoadsideBanner from "@/components/RoadsideBanner";
+
 import TrustBadges from "@/components/TrustBadges";
 import FeaturedServices from "@/components/home/FeaturedServices";
 import ServiceAreasPreview from "@/components/home/ServiceAreasPreview";
