@@ -12,6 +12,10 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { MessageSquare } from "lucide-react";
+import { toast } from "sonner";
+
+const currentYear = new Date().getFullYear();
+const digitsOnly = (v: string) => v.replace(/\D/g, "");
 
 interface QuoteRequestDialogProps {
   open: boolean;
@@ -62,6 +66,25 @@ const QuoteRequestDialog = ({
   }, [open, serviceName]);
 
   const handleSend = () => {
+    if (year) {
+      const y = Number(year);
+      if (!/^\d{4}$/.test(year) || y < 1900 || y > currentYear + 1) {
+        toast.error("Please enter a valid 4-digit year");
+        return;
+      }
+    }
+    if (mileage) {
+      const m = Number(digitsOnly(mileage));
+      if (!Number.isFinite(m) || m < 0 || m > 1_000_000) {
+        toast.error("Please enter a valid mileage");
+        return;
+      }
+    }
+    if (make.length > 50 || model.length > 50 || location.length > 100 || notes.length > 1000) {
+      toast.error("One of your fields is too long");
+      return;
+    }
+
     const vehicle = [year, make, model].filter(Boolean).join(" ").trim();
     const lines = [
       `Hi, I'd like a quote for: ${serviceName ?? ""}`,
@@ -111,9 +134,11 @@ const QuoteRequestDialog = ({
               <Input
                 id="year"
                 inputMode="numeric"
+                pattern="\d*"
+                maxLength={4}
                 placeholder="2018"
                 value={year}
-                onChange={(e) => setYear(e.target.value)}
+                onChange={(e) => setYear(digitsOnly(e.target.value).slice(0, 4))}
               />
             </div>
             <div className="space-y-1.5">
@@ -142,9 +167,11 @@ const QuoteRequestDialog = ({
               <Input
                 id="mileage"
                 inputMode="numeric"
-                placeholder="85,000"
+                pattern="\d*"
+                maxLength={7}
+                placeholder="85000"
                 value={mileage}
-                onChange={(e) => setMileage(e.target.value)}
+                onChange={(e) => setMileage(digitsOnly(e.target.value).slice(0, 7))}
               />
             </div>
             <div className="space-y-1.5">
