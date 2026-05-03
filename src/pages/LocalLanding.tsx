@@ -38,21 +38,95 @@ const LocalLanding = () => {
       ? { "@type": "City", name: `${city.name}, ${city.state}` }
       : cities.map((c) => ({ "@type": "City", name: `${c.name}, ${c.state}` }));
 
+    const canonicalUrl = page.canonical ?? `${SITE}/${page.slug}`;
+
+    const breadcrumbItems: Array<{ name: string; item: string }> = [
+      { name: "Home", item: `${SITE}/` },
+    ];
+    if (category) {
+      breadcrumbItems.push({
+        name: category.title,
+        item: `${SITE}/services/${category.id}`,
+      });
+    }
+    if (city) {
+      breadcrumbItems.push({
+        name: `${city.name}, ${city.state}`,
+        item: `${SITE}/areas/${city.slug}`,
+      });
+    }
+    breadcrumbItems.push({ name: page.h1, item: canonicalUrl });
+
     const ld = {
       "@context": "https://schema.org",
       "@graph": [
         {
+          "@type": "AutoRepair",
+          "@id": `${SITE}/#business`,
+          name: "Mike's Mobile Auto Repair LLC",
+          url: SITE,
+          telephone: "+18135017572",
+          priceRange: "$$",
+          image: "https://iili.io/3QividB.jpg",
+          address: {
+            "@type": "PostalAddress",
+            addressLocality: "Lehigh Acres",
+            addressRegion: "FL",
+            postalCode: "33936",
+            addressCountry: "US",
+          },
+          areaServed: cities.map((c) => ({
+            "@type": "City",
+            name: `${c.name}, ${c.state}`,
+          })),
+          openingHoursSpecification: [
+            {
+              "@type": "OpeningHoursSpecification",
+              dayOfWeek: [
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday",
+                "Friday",
+                "Saturday",
+                "Sunday",
+              ],
+              opens: "07:00",
+              closes: "21:00",
+            },
+          ],
+          aggregateRating: {
+            "@type": "AggregateRating",
+            ratingValue: REVIEWS_META.ratingValue,
+            reviewCount: REVIEWS_META.reviewCount,
+            bestRating: REVIEWS_META.bestRating,
+            worstRating: REVIEWS_META.worstRating,
+          },
+        },
+        {
           "@type": "Service",
           name: page.service,
+          serviceType: page.service,
           areaServed,
-          provider: {
-            "@type": "AutoRepair",
-            name: "Mike's Mobile Auto Repair",
-            telephone: "+18135017572",
-            url: SITE,
-          },
-          url: `${SITE}/${page.slug}`,
+          provider: { "@id": `${SITE}/#business` },
+          url: canonicalUrl,
           description: page.metaDescription,
+          aggregateRating: {
+            "@type": "AggregateRating",
+            ratingValue: REVIEWS_META.ratingValue,
+            reviewCount: REVIEWS_META.reviewCount,
+            bestRating: REVIEWS_META.bestRating,
+            worstRating: REVIEWS_META.worstRating,
+          },
+        },
+        {
+          "@type": "BreadcrumbList",
+          itemListElement: breadcrumbItems.map((b, i) => ({
+            "@type": "ListItem",
+            position: i + 1,
+            name: b.name,
+            item: b.item,
+          })),
         },
         {
           "@type": "FAQPage",
