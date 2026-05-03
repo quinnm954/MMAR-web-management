@@ -146,7 +146,7 @@ const WarrantyPolicy = () => {
               5A. DISCLAIMER OF IMPLIED WARRANTIES
             </h2>
             <div className="text-sm text-muted-foreground space-y-2 leading-relaxed">
-              <p>5A.1. <strong>DISCLAIMER:</strong> TO THE FULLEST EXTENT PERMITTED BY SOUTH CAROLINA LAW, MMAR EXPRESSLY DISCLAIMS ALL IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.</p>
+              <p>5A.1. <strong>DISCLAIMER:</strong> TO THE FULLEST EXTENT PERMITTED BY FLORIDA LAW, MMAR EXPRESSLY DISCLAIMS ALL IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.</p>
               <p>5A.2. THE LIMITED WARRANTY SET FORTH IN SECTION 2 OF THIS POLICY IS THE SOLE AND EXCLUSIVE WARRANTY PROVIDED BY MMAR. NO OTHER WARRANTIES, WHETHER EXPRESS OR IMPLIED, ARE MADE WITH RESPECT TO ANY SERVICES, PARTS, OR REPAIRS PROVIDED BY MMAR.</p>
               <p>5A.3. Some jurisdictions do not allow limitations on implied warranties, so the above limitations may not apply to you. In such jurisdictions, MMAR's liability shall be limited to the maximum extent permitted by law.</p>
               <p>5A.4. Customer acknowledges that the services provided by MMAR are provided "AS IS" except as expressly set forth in the Limited Warranty Coverage section of this policy.</p>
@@ -221,7 +221,7 @@ const WarrantyPolicy = () => {
             <div className="text-sm text-muted-foreground space-y-2 leading-relaxed">
               <p>9.1. <strong>Storage Fees:</strong> Vehicles not picked up within seven (7) calendar days of completion notification are subject to storage fees of Twenty-Five Dollars ($25.00) per day.</p>
               <p>9.2. <strong>Abandoned Vehicles:</strong> Vehicles not picked up within thirty (30) calendar days of completion notification may be considered abandoned.</p>
-              <p>9.3. <strong>Mechanic's Lien:</strong> MMAR reserves all rights under South Carolina law (S.C. Code § 29-15-10 et seq.) to pursue a mechanic's lien on abandoned vehicles to recover unpaid charges.</p>
+              <p>9.3. <strong>Mechanic's Lien:</strong> MMAR reserves all rights under Florida law (Fla. Stat. §§ 713.58 and 713.585) to pursue a mechanic's lien on abandoned vehicles to recover unpaid charges.</p>
               <p>9.4. Customer agrees to pay all storage fees, lien filing fees, and legal costs associated with abandoned vehicle recovery.</p>
             </div>
           </section>
