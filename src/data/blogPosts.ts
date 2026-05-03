@@ -1,3 +1,5 @@
+export type BlogFAQ = { question: string; answer: string };
+
 export type BlogPost = {
   slug: string;
   title: string;
@@ -7,6 +9,7 @@ export type BlogPost = {
   tags: string[];
   // Body is HTML — kept as a string so we don't need MDX. Internal links are <a href="/...">.
   body: string;
+  faqs?: BlogFAQ[];
 };
 
 export const blogPosts: BlogPost[] = [
@@ -37,6 +40,11 @@ export const blogPosts: BlogPost[] = [
       <h2>Mobile cooling-system service</h2>
       <p>A mobile mechanic is genuinely the right call for overheating issues — most diagnostics, hose replacements, thermostat swaps, and even some water pump and radiator jobs can be done in your driveway with no tow bill. Get a quote any time at <a href="tel:8135017572">(813) 501-7572</a> or learn more about our <a href="/services/cooling">cooling-system service</a>.</p>
     `,
+    faqs: [
+      { question: "Is it safe to drive a car that's overheating?", answer: "No. Driving even a few miles with the temperature gauge in the red can warp the cylinder head, blow the head gasket, or destroy the engine. Pull over, shut it down, and call a mobile mechanic." },
+      { question: "How much does it cost to fix an overheating car in Florida?", answer: "A thermostat or hose replacement is usually $150–$350 mobile. Water pumps run $300–$700. Radiator replacement is typically $400–$900. Most jobs are done on site without a tow bill." },
+      { question: "Can a mobile mechanic fix a cooling system in my driveway?", answer: "Yes. Coolant flushes, thermostat replacement, hose and water pump jobs, and even most radiator swaps are routinely done at your home or workplace across Lehigh Acres, Fort Myers, and Cape Coral." },
+    ],
   },
   {
     slug: "signs-of-a-bad-alternator",
@@ -65,6 +73,11 @@ export const blogPosts: BlogPost[] = [
 
       <p>Stuck right now? Call <a href="tel:8135017572">(813) 501-7572</a> — same-day mobile service is usually available.</p>
     `,
+    faqs: [
+      { question: "Can a bad alternator drain a brand new battery?", answer: "Yes. A failing alternator can either undercharge (slowly draining the battery while you drive) or overcharge (boiling and ruining a new battery in days). Always test the alternator before replacing the battery." },
+      { question: "How long can I drive with a bad alternator?", answer: "Usually 20–60 minutes once the warning light comes on, depending on accessories running. Once the battery is depleted, the engine stalls. Don't risk it — get tested same day." },
+      { question: "How much does mobile alternator replacement cost in Fort Myers?", answer: "Most alternator jobs in SWFL run $350–$750 fully installed mobile, depending on vehicle. We provide upfront quotes after a free on-site charging-system test." },
+    ],
   },
   {
     slug: "dead-battery-vs-bad-starter",
@@ -101,6 +114,11 @@ export const blogPosts: BlogPost[] = [
       <h2>Don't guess — test</h2>
       <p>A real charging-system test takes 5 minutes and saves you from buying the wrong part. Our mobile mechanics test the battery, alternator, and starter circuit on site before recommending any repair. Get help anywhere in SWFL at <a href="tel:8135017572">(813) 501-7572</a> or learn more about <a href="/mobile-battery-replacement-cape-coral">mobile battery replacement</a>.</p>
     `,
+    faqs: [
+      { question: "How can I tell if it's the battery or the starter?", answer: "Dim dash lights and slow cranking point to the battery. Bright dash lights with a single loud click and no crank point to the starter. A 5-minute on-site test confirms which one it is." },
+      { question: "Will jump-starting damage my car if it's actually the starter?", answer: "No, but it won't help either. If your battery tests good, no amount of jumping will fix a bad starter — you need the starter replaced." },
+      { question: "Can a mobile mechanic replace a starter in my driveway?", answer: "Yes. Starter replacement is one of the most common mobile repairs we perform across Lehigh Acres, Fort Myers, and Cape Coral. Most jobs take under 2 hours." },
+    ],
   },
   {
     slug: "why-your-car-wont-start",
@@ -137,6 +155,11 @@ export const blogPosts: BlogPost[] = [
 
       <p>Stuck right now in <a href="/areas/lehigh-acres">Lehigh Acres</a>, <a href="/areas/fort-myers">Fort Myers</a>, or anywhere in SWFL? Call <a href="tel:8135017572">(813) 501-7572</a>.</p>
     `,
+    faqs: [
+      { question: "Can a mobile mechanic fix a no-start in a parking lot?", answer: "Yes. Most no-starts — dead battery, bad starter, fuel pump, sensor faults — are diagnosed and repaired right where the car sits, including parking lots, driveways, and roadside." },
+      { question: "How fast can you get to me for a no-start?", answer: "Typical response time across Lehigh Acres, Fort Myers, and Cape Coral is 60–120 minutes for emergency no-start calls. Call (813) 501-7572 for current ETA." },
+      { question: "Is mobile no-start service cheaper than a tow plus shop?", answer: "Almost always. A tow alone is $100–$250 in SWFL, plus shop diagnostic fees and waiting. Mobile diagnosis is typically $89–$129 with no tow needed." },
+    ],
   },
   {
     slug: "common-car-problems-southwest-florida",
@@ -170,6 +193,11 @@ export const blogPosts: BlogPost[] = [
       <h2>The fix: stay ahead of it with mobile service</h2>
       <p>Skip the shop visits — we come to you for inspections, fluid services, and repairs on your schedule. Call or text <a href="tel:8135017572">(813) 501-7572</a> to book.</p>
     `,
+    faqs: [
+      { question: "Why do car batteries die so fast in Florida?", answer: "Year-round heat boils off battery electrolyte and accelerates internal corrosion. Most SWFL batteries last 2–3 years instead of the 4–5 years rated by the manufacturer." },
+      { question: "How often should I service my AC in Southwest Florida?", answer: "AC performance check every 1–2 years, refrigerant level check annually. Florida AC systems run nearly year-round and develop leaks faster than in cooler climates." },
+      { question: "Does salt air really damage cars in Cape Coral and Naples?", answer: "Yes. Salt corrodes brake lines, exhaust, suspension components, and electrical connectors. An annual undercarriage inspection catches issues early on coastal vehicles." },
+    ],
   },
 ];
 

@@ -26,26 +26,57 @@ const BlogPost = () => {
 
   useEffect(() => {
     if (!post) return;
-    const id = "ld-blog-post";
-    document.getElementById(id)?.remove();
-    const ld = {
+    const articleId = "ld-blog-post";
+    const faqId = "ld-blog-faq";
+    document.getElementById(articleId)?.remove();
+    document.getElementById(faqId)?.remove();
+
+    const article = {
       "@context": "https://schema.org",
-      "@type": "BlogPosting",
+      "@type": "Article",
       headline: post.title,
       description: post.excerpt,
       datePublished: post.dateISO,
       dateModified: post.dateISO,
       author: { "@type": "Organization", name: "Mike's Mobile Auto Repair" },
-      publisher: { "@type": "Organization", name: "Mike's Mobile Auto Repair" },
-      mainEntityOfPage: `${SITE}/blog/${post.slug}`,
+      publisher: {
+        "@type": "Organization",
+        name: "Mike's Mobile Auto Repair",
+        logo: { "@type": "ImageObject", url: `${SITE}/favicon.ico` },
+      },
+      mainEntityOfPage: { "@type": "WebPage", "@id": `${SITE}/blog/${post.slug}` },
+      keywords: post.tags.join(", "),
+      articleSection: "Auto Repair",
     };
-    const s = document.createElement("script");
-    s.type = "application/ld+json";
-    s.id = id;
-    s.text = JSON.stringify(ld);
-    document.head.appendChild(s);
-    return () => s.remove();
+    const a = document.createElement("script");
+    a.type = "application/ld+json";
+    a.id = articleId;
+    a.text = JSON.stringify(article);
+    document.head.appendChild(a);
+
+    let f: HTMLScriptElement | null = null;
+    if (post.faqs && post.faqs.length) {
+      const faq = {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: post.faqs.map((q) => ({
+          "@type": "Question",
+          name: q.question,
+          acceptedAnswer: { "@type": "Answer", text: q.answer },
+        })),
+      };
+      f = document.createElement("script");
+      f.type = "application/ld+json";
+      f.id = faqId;
+      f.text = JSON.stringify(faq);
+      document.head.appendChild(f);
+    }
+    return () => {
+      a.remove();
+      f?.remove();
+    };
   }, [post]);
+
 
 
   const idx = post ? blogPosts.findIndex((p) => p.slug === post.slug) : -1;
@@ -120,6 +151,24 @@ const BlogPost = () => {
             className="prose prose-invert max-w-none text-foreground/90 leading-relaxed [&_h2]:font-display [&_h2]:text-2xl [&_h2]:md:text-3xl [&_h2]:text-gold [&_h2]:mt-8 [&_h2]:mb-3 [&_a]:text-primary [&_a:hover]:underline [&_ul]:list-disc [&_ul]:ml-6 [&_ol]:list-decimal [&_ol]:ml-6 [&_li]:mb-1 [&_p]:mb-4"
             dangerouslySetInnerHTML={{ __html: post.body }}
           />
+
+          {post.faqs && post.faqs.length > 0 && (
+            <section className="mt-12 border-t border-border pt-8" aria-labelledby="post-faq">
+              <h2 id="post-faq" className="font-display text-2xl md:text-3xl text-gold mb-4">
+                Frequently asked questions
+              </h2>
+              <div className="space-y-4">
+                {post.faqs.map((q) => (
+                  <details key={q.question} className="rounded-lg border border-border p-4 group">
+                    <summary className="cursor-pointer font-medium text-foreground group-open:text-primary">
+                      {q.question}
+                    </summary>
+                    <p className="mt-2 text-foreground/80 leading-relaxed">{q.answer}</p>
+                  </details>
+                ))}
+              </div>
+            </section>
+          )}
 
           <InlineCallStrip label="Need help with your car right now?" />
 
