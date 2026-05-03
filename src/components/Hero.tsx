@@ -23,10 +23,10 @@ const Hero = () => {
       {/* Content */}
       <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-4xl mx-auto text-center">
-          <h1 className="font-display text-4xl sm:text-5xl md:text-7xl lg:text-8xl tracking-wide mb-4 md:mb-6 animate-slide-up">
-            <span className="text-sky">MIKES MOBILE</span>
+          <h1 className="font-display text-3xl sm:text-4xl md:text-6xl lg:text-7xl tracking-wide mb-4 md:mb-6 animate-slide-up">
+            <span className="text-sky">MOBILE MECHANIC</span>
             <br />
-            <span className="text-gold">AUTO REPAIR</span>
+            <span className="text-gold">IN LEHIGH ACRES &amp; FORT MYERS, FL</span>
           </h1>
 
           <p
