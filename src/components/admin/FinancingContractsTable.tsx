@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { format } from 'date-fns';
 import { Eye, Trash2, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -83,7 +83,30 @@ const FinancingContractsTable = ({ data, onRefresh }: FinancingContractsTablePro
   const [selectedContract, setSelectedContract] = useState<FinancingContract | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [signatureUrls, setSignatureUrls] = useState<{ client: string | null; provider: string | null }>({ client: null, provider: null });
   const itemsPerPage = 10;
+
+  useEffect(() => {
+    let cancelled = false;
+    const load = async () => {
+      if (!selectedContract) {
+        setSignatureUrls({ client: null, provider: null });
+        return;
+      }
+      const sign = async (path: string | null) => {
+        if (!path) return null;
+        const { data } = await supabase.storage.from('signatures').createSignedUrl(path, 300);
+        return data?.signedUrl ?? null;
+      };
+      const [client, provider] = await Promise.all([
+        sign(selectedContract.client_signature_url),
+        sign(selectedContract.provider_signature_url),
+      ]);
+      if (!cancelled) setSignatureUrls({ client, provider });
+    };
+    load();
+    return () => { cancelled = true; };
+  }, [selectedContract]);
 
   const filteredData = data.filter((contract) => {
     const search = searchTerm.toLowerCase();
@@ -312,26 +335,26 @@ const FinancingContractsTable = ({ data, onRefresh }: FinancingContractsTablePro
               </div>
 
               {/* Signatures */}
-              {(selectedContract.client_signature_url || selectedContract.provider_signature_url) && (
+              {(signatureUrls.client || signatureUrls.provider) && (
                 <div className="border-t pt-4">
                   <h4 className="font-semibold mb-3">Signatures</h4>
                   <div className="grid grid-cols-2 gap-4">
-                    {selectedContract.client_signature_url && (
+                    {signatureUrls.client && (
                       <div>
                         <p className="text-sm text-muted-foreground mb-2">Client Signature</p>
-                        <img 
-                          src={selectedContract.client_signature_url} 
-                          alt="Client signature" 
+                        <img
+                          src={signatureUrls.client}
+                          alt="Client signature"
                           className="border rounded p-2 bg-white max-h-24"
                         />
                       </div>
                     )}
-                    {selectedContract.provider_signature_url && (
+                    {signatureUrls.provider && (
                       <div>
                         <p className="text-sm text-muted-foreground mb-2">Provider Signature</p>
-                        <img 
-                          src={selectedContract.provider_signature_url} 
-                          alt="Provider signature" 
+                        <img
+                          src={signatureUrls.provider}
+                          alt="Provider signature"
                           className="border rounded p-2 bg-white max-h-24"
                         />
                       </div>
