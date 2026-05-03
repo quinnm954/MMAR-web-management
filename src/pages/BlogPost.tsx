@@ -47,7 +47,6 @@ const BlogPost = () => {
     return () => s.remove();
   }, [post]);
 
-  if (!post) return <NotFound />;
 
   const idx = post ? blogPosts.findIndex((p) => p.slug === post.slug) : -1;
   const prev = idx > 0 ? blogPosts[idx - 1] : null;
