@@ -5,8 +5,11 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import FloatingCallButton from "@/components/FloatingCallButton";
 import RequestQuoteCTA from "@/components/RequestQuoteCTA";
+import InlineCallStrip from "@/components/InlineCallStrip";
+import TrustBadges from "@/components/TrustBadges";
+import RoadsideBanner from "@/components/RoadsideBanner";
 import { getLandingPageBySlug, localLandingPages } from "@/data/localLandingPages";
-import { getCityBySlug } from "@/data/cities";
+import { cities, getCityBySlug } from "@/data/cities";
 import { getCategoryBySlug } from "@/data/serviceCategories";
 import { useSeo } from "@/lib/useSeo";
 import NotFound from "./NotFound";
@@ -16,7 +19,7 @@ const SITE = "https://www.mikesmautorepair.com";
 const LocalLanding = () => {
   const { landingSlug = "" } = useParams();
   const page = getLandingPageBySlug(landingSlug);
-  const city = page ? getCityBySlug(page.citySlug) : undefined;
+  const city = page?.citySlug ? getCityBySlug(page.citySlug) : undefined;
   const category = page ? getCategoryBySlug(page.categoryId) : undefined;
 
   useSeo({
@@ -25,12 +28,14 @@ const LocalLanding = () => {
     canonical: page ? `${SITE}/${page.slug}` : undefined,
   });
 
-  // JSON-LD structured data
   useEffect(() => {
-    if (!page || !city) return;
+    if (!page) return;
     const id = "ld-local-landing";
-    const existing = document.getElementById(id);
-    if (existing) existing.remove();
+    document.getElementById(id)?.remove();
+
+    const areaServed = city
+      ? { "@type": "City", name: `${city.name}, ${city.state}` }
+      : cities.map((c) => ({ "@type": "City", name: `${c.name}, ${c.state}` }));
 
     const ld = {
       "@context": "https://schema.org",
@@ -38,16 +43,12 @@ const LocalLanding = () => {
         {
           "@type": "Service",
           name: page.service,
-          areaServed: {
-            "@type": "City",
-            name: `${city.name}, ${city.state}`,
-          },
+          areaServed,
           provider: {
             "@type": "AutoRepair",
             name: "Mike's Mobile Auto Repair",
             telephone: "+18135017572",
             url: SITE,
-            areaServed: city.name,
           },
           url: `${SITE}/${page.slug}`,
           description: page.metaDescription,
@@ -71,14 +72,15 @@ const LocalLanding = () => {
     return () => script.remove();
   }, [page, city]);
 
-  if (!page || !city) return <NotFound />;
+  if (!page) return <NotFound />;
 
   const siblings = localLandingPages
-    .filter((p) => p.slug !== page.slug)
-    .slice(0, 3);
+    .filter((p) => p.slug !== page.slug && p.categoryId === page.categoryId)
+    .slice(0, 4);
 
   return (
     <div className="min-h-screen bg-background">
+      <RoadsideBanner />
       <Navigation />
 
       <section className="pt-28 md:pt-32 pb-12 md:pb-16">
@@ -90,12 +92,14 @@ const LocalLanding = () => {
             <ArrowLeft className="w-4 h-4" /> Home
           </Link>
 
-          <div className="flex items-center gap-3 text-primary mb-3">
-            <MapPin className="w-5 h-5" />
-            <span className="text-sm uppercase tracking-wider">
-              {city.name}, {city.state}
-            </span>
-          </div>
+          {city && (
+            <div className="flex items-center gap-3 text-primary mb-3">
+              <MapPin className="w-5 h-5" />
+              <span className="text-sm uppercase tracking-wider">
+                {city.name}, {city.state}
+              </span>
+            </div>
+          )}
 
           <h1 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl tracking-wide mb-6">
             <span className="text-sky">{page.h1.toUpperCase()}</span>
@@ -112,10 +116,12 @@ const LocalLanding = () => {
             <Phone className="w-4 h-4" /> (813) 501-7572
           </a>
 
+          <TrustBadges />
+
           <div className="mb-12">
             <RequestQuoteCTA
-              serviceName={`${page.service} — ${city.name}, ${city.state}`}
-              subheading={`Need ${page.service.toLowerCase()} in ${city.name}? Tell us your vehicle and we'll text a fast, transparent quote.`}
+              serviceName={`${page.service}${city ? ` — ${city.name}, ${city.state}` : ""}`}
+              subheading={`Tell us about your vehicle — we'll text a fast, transparent quote.`}
             />
           </div>
 
@@ -124,6 +130,8 @@ const LocalLanding = () => {
               <p key={i}>{p}</p>
             ))}
           </article>
+
+          <InlineCallStrip />
 
           <div className="glass-card rounded-xl p-6 md:p-8 border border-border/50 mb-12">
             <h2 className="font-display text-2xl md:text-3xl text-gold mb-4">
@@ -139,24 +147,41 @@ const LocalLanding = () => {
             </ul>
           </div>
 
-          <div className="glass-card rounded-xl p-6 md:p-8 border border-border/50 mb-12">
-            <h2 className="font-display text-xl md:text-2xl text-sky mb-3">
-              Neighborhoods We Serve in {city.name}
-            </h2>
-            <div className="flex flex-wrap gap-2 mb-4">
-              {city.neighborhoods.map((n) => (
-                <span
-                  key={n}
-                  className="px-3 py-1.5 rounded-full bg-primary/10 text-primary text-sm"
-                >
-                  {n}
-                </span>
-              ))}
+          {city ? (
+            <div className="glass-card rounded-xl p-6 md:p-8 border border-border/50 mb-12">
+              <h2 className="font-display text-xl md:text-2xl text-sky mb-3">
+                Neighborhoods We Serve in {city.name}
+              </h2>
+              <div className="flex flex-wrap gap-2 mb-4">
+                {city.neighborhoods.map((n) => (
+                  <span key={n} className="px-3 py-1.5 rounded-full bg-primary/10 text-primary text-sm">
+                    {n}
+                  </span>
+                ))}
+              </div>
+              <p className="text-muted-foreground text-sm">ZIP codes: {city.zips.join(" · ")}</p>
             </div>
-            <p className="text-muted-foreground text-sm">
-              ZIP codes: {city.zips.join(" · ")}
-            </p>
-          </div>
+          ) : (
+            <div className="glass-card rounded-xl p-6 md:p-8 border border-border/50 mb-12">
+              <h2 className="font-display text-xl md:text-2xl text-sky mb-3">
+                Available Across Southwest Florida
+              </h2>
+              <p className="text-muted-foreground mb-4">
+                {page.service} is available in all our service cities. Tap your city for full local details.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {cities.map((c) => (
+                  <Link
+                    key={c.slug}
+                    to={`/areas/${c.slug}`}
+                    className="px-3 py-1.5 rounded-full bg-primary/10 hover:bg-primary/20 text-primary text-sm transition-colors"
+                  >
+                    {c.name}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div className="mb-12">
             <h2 className="font-display text-2xl md:text-3xl text-gold mb-4">
@@ -164,14 +189,9 @@ const LocalLanding = () => {
             </h2>
             <div className="space-y-4">
               {page.faqs.map((faq) => (
-                <div
-                  key={faq.q}
-                  className="glass-card rounded-xl p-5 border border-border/40"
-                >
+                <div key={faq.q} className="glass-card rounded-xl p-5 border border-border/40">
                   <h3 className="font-semibold text-foreground mb-2">{faq.q}</h3>
-                  <p className="text-muted-foreground text-sm md:text-base">
-                    {faq.a}
-                  </p>
+                  <p className="text-muted-foreground text-sm md:text-base">{faq.a}</p>
                 </div>
               ))}
             </div>
@@ -183,26 +203,18 @@ const LocalLanding = () => {
             </h2>
             <div className="flex flex-wrap gap-2">
               {category && (
-                <Link
-                  to={`/services/${category.id}`}
-                  className="px-3 py-1.5 rounded-full bg-primary/10 hover:bg-primary/20 text-primary text-sm transition-colors"
-                >
+                <Link to={`/services/${category.id}`} className="px-3 py-1.5 rounded-full bg-primary/10 hover:bg-primary/20 text-primary text-sm transition-colors">
                   {category.title}
                 </Link>
               )}
-              <Link
-                to={`/areas/${city.slug}`}
-                className="px-3 py-1.5 rounded-full bg-primary/10 hover:bg-primary/20 text-primary text-sm transition-colors"
-              >
-                Mobile Mechanic in {city.name}
-              </Link>
+              {city && (
+                <Link to={`/areas/${city.slug}`} className="px-3 py-1.5 rounded-full bg-primary/10 hover:bg-primary/20 text-primary text-sm transition-colors">
+                  Mobile Mechanic in {city.name}
+                </Link>
+              )}
               {siblings.map((s) => (
-                <Link
-                  key={s.slug}
-                  to={`/${s.slug}`}
-                  className="px-3 py-1.5 rounded-full bg-primary/10 hover:bg-primary/20 text-primary text-sm transition-colors"
-                >
-                  {s.service} — {getCityBySlug(s.citySlug)?.name}
+                <Link key={s.slug} to={`/${s.slug}`} className="px-3 py-1.5 rounded-full bg-primary/10 hover:bg-primary/20 text-primary text-sm transition-colors">
+                  {s.service}{s.citySlug ? ` — ${getCityBySlug(s.citySlug)?.name}` : ""}
                 </Link>
               ))}
             </div>

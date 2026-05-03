@@ -3,7 +3,7 @@ export type FAQ = { q: string; a: string };
 export type LocalLandingPage = {
   slug: string;
   service: string; // human readable service name
-  citySlug: string; // matches cities.ts slug
+  citySlug?: string; // matches cities.ts slug — omit for service-only (region-wide) pages
   categoryId: string; // matches serviceCategories.ts id
   h1: string;
   metaTitle: string;
@@ -191,6 +191,306 @@ export const localLandingPages: LocalLandingPage[] = [
         q: "Do you charge a service-call fee?",
         a: "Any trip or diagnostic fee is disclosed up front before we dispatch — no surprise charges when we arrive.",
       },
+    ],
+  },
+  // ===== Region-wide service-only landing pages =====
+  {
+    slug: "mobile-brake-repair",
+    service: "Mobile Brake Repair",
+    categoryId: "brakes",
+    h1: "Mobile Brake Repair in Southwest Florida",
+    metaTitle:
+      "Mobile Brake Repair in SWFL | Pads, Rotors & Calipers At Your Driveway",
+    metaDescription:
+      "On-site mobile brake repair across Lehigh Acres, Fort Myers, Cape Coral, Estero, Bonita Springs and Naples. Pads, rotors, calipers, fluid. Call (813) 501-7572.",
+    intro:
+      "Squealing, grinding, or a soft pedal? Mike's Mobile Auto Repair brings full mobile brake service — pads, rotors, calipers, lines, fluid, and ABS diagnostics — to driveways and workplaces across Southwest Florida.",
+    paragraphs: [
+      "Brake jobs are the single most common reason SWFL drivers end up dealing with a tow truck and a long shop wait. We cut both out of the equation. Our mobile service truck arrives with quality pads and rotors for most makes and models, fresh DOT brake fluid, and the tools to handle the repair on the spot — usually in 60 to 90 minutes per axle.",
+      "Florida driving is hard on brakes. Stop-and-go season traffic, daily red-light commuting, and the weight of larger trucks and SUVs all wear pads down faster than highway driving. If you're hearing squeal, feeling pulsation in the pedal, or noticing the brake warning light, it's time. Waiting turns a $200 pad job into a $500+ pad-and-rotor job, or worse.",
+      "We service the whole region — every Lehigh Acres, Fort Myers, Cape Coral, Estero, Bonita Springs, and Naples ZIP code. Quotes are always up front and your wheels are torqued to manufacturer spec on every job. Call or text (813) 501-7572 to book.",
+    ],
+    included: [
+      "Front and rear brake pad replacement",
+      "Brake rotor replacement or resurfacing",
+      "Caliper inspection, repair, and replacement",
+      "Brake fluid flush and bleed",
+      "ABS warning light diagnostics",
+      "Parking brake adjustment",
+      "Free brake inspection with any service",
+    ],
+    faqs: [
+      { q: "How much does mobile brake repair cost?", a: "Most pad-and-rotor jobs run $180–$350 per axle depending on the vehicle and parts chosen. Quoted up front before any work." },
+      { q: "How long does it take?", a: "60–90 minutes per axle on site. Most customers are back on the road the same day." },
+      { q: "Do you bring the parts?", a: "Yes — quality pads, rotors, and brake fluid for most makes and models come with us." },
+      { q: "Is the work warrantied?", a: "Yes. Parts and labor on brake repairs are backed by our standard mobile-service warranty." },
+    ],
+  },
+  {
+    slug: "mobile-alternator-repair",
+    service: "Mobile Alternator Repair",
+    categoryId: "electrical",
+    h1: "Mobile Alternator Repair in Southwest Florida",
+    metaTitle:
+      "Mobile Alternator Repair in SWFL | On-Site Charging System Service",
+    metaDescription:
+      "Mobile alternator replacement and full charging-system service across Lehigh Acres, Fort Myers, Cape Coral, Estero, Bonita Springs and Naples. Call (813) 501-7572.",
+    intro:
+      "Battery light on, dim headlights, or a no-start after a jump? Mike's Mobile Auto Repair handles full mobile alternator repair and charging-system testing across Southwest Florida — at your home, office, or roadside.",
+    paragraphs: [
+      "Alternator failures rarely happen at a convenient time. The good news: you don't need a tow. We arrive with professional charging-system testers, replacement alternators for most makes and models, and the tools to swap one out in your driveway or a parking lot — usually in 60 to 120 minutes.",
+      "We always test the entire charging system before condemning a part — battery, alternator output under load, voltage drop on the main cables, and the serpentine belt and tensioner. That way you only pay for what's actually wrong. If the alternator is the issue, we install a quality replacement and verify a clean 13.8–14.7-volt charge before we leave.",
+      "Service is available across every Lehigh Acres, Fort Myers, Cape Coral, Estero, Bonita Springs, and Naples ZIP. Stuck right now? Call or text (813) 501-7572 — same-day service is usually available.",
+    ],
+    included: [
+      "Full charging-system test (battery, alternator, belt)",
+      "Alternator replacement on most makes and models",
+      "Battery testing and replacement if needed",
+      "Serpentine belt and tensioner inspection",
+      "Voltage drop and ground cable testing",
+      "Post-install charging verification",
+    ],
+    faqs: [
+      { q: "How much does it cost?", a: "Typical alternator replacements run $350–$650 installed depending on vehicle and amperage." },
+      { q: "How fast can you get to me?", a: "Same-day mobile service is usually available across SWFL." },
+      { q: "How do I know it's the alternator and not the battery?", a: "We test both before recommending parts. A weak battery and a failing alternator can look very similar." },
+    ],
+  },
+  {
+    slug: "mobile-battery-replacement",
+    service: "Mobile Battery Replacement",
+    categoryId: "electrical",
+    h1: "Mobile Car Battery Replacement in Southwest Florida",
+    metaTitle:
+      "Mobile Battery Replacement in SWFL | Same-Day Delivery & Install",
+    metaDescription:
+      "We deliver and install quality car batteries at your home, office, or roadside across SWFL. Free charging-system test included. Call (813) 501-7572.",
+    intro:
+      "Dead battery? Skip the tow and the parts-store parking lot. We deliver and install quality car batteries anywhere in Southwest Florida — usually the same day.",
+    paragraphs: [
+      "Florida heat is brutal on batteries. Most last only 2–3 years here before they start failing. When yours finally gives up, we bring the new battery to you, test the charging system to make sure it's not actually an alternator issue, and install everything cleanly — terminals cleaned, hold-down secured, charge verified.",
+      "We carry batteries for cars, trucks, SUVs, and most light commercial vehicles, and we'll match the right group size, cold-cranking amps, and warranty for your specific vehicle. AGM and standard flooded options available.",
+      "We cover all of Lehigh Acres, Fort Myers, Cape Coral, Estero, Bonita Springs, and Naples. Need a battery now? Call or text (813) 501-7572.",
+    ],
+    included: [
+      "Free battery and charging-system test",
+      "Quality replacement battery delivered to you",
+      "Professional installation with terminal cleaning",
+      "Old battery hauled away for recycling",
+      "Post-install charging verification",
+      "Battery warranty options up to 36 months",
+    ],
+    faqs: [
+      { q: "How much does mobile battery replacement cost?", a: "Most installed batteries run $180–$320 depending on group size and warranty. AGM batteries cost more." },
+      { q: "How fast can you get to me?", a: "Same-day service is the norm; emergency calls get prioritized." },
+      { q: "Do you take the old battery?", a: "Yes — we haul it away and properly recycle it at no extra charge." },
+    ],
+  },
+  {
+    slug: "mobile-starter-repair",
+    service: "Mobile Starter Repair",
+    categoryId: "electrical",
+    h1: "Mobile Starter Repair & Replacement in Southwest Florida",
+    metaTitle:
+      "Mobile Starter Repair in SWFL | On-Site Starter Replacement",
+    metaDescription:
+      "Single click and no crank? We replace failed starters at your home or roadside across SWFL. Call (813) 501-7572 for same-day mobile service.",
+    intro:
+      "If you turn the key and just hear a click — or nothing at all — your starter has likely failed. Mike's Mobile Auto Repair replaces starters on site across Southwest Florida, no tow required.",
+    paragraphs: [
+      "A failing starter usually announces itself: single loud click with full dash lights, intermittent no-start that gets worse over a couple of weeks, or grinding noises during cranking. We test the starter circuit and battery before condemning the part, then install a quality replacement on site.",
+      "Most starter replacements take 60 to 120 minutes depending on the vehicle. We carry starters for many common models and source same-day for most others. Service is available across all SWFL — Lehigh Acres, Fort Myers, Cape Coral, Estero, Bonita Springs, Naples.",
+      "Stuck and can't get the car going? Call or text (813) 501-7572. Real technician answers, not a call center.",
+    ],
+    included: [
+      "Starter circuit and battery testing",
+      "Starter motor and solenoid replacement",
+      "Battery cable and ground inspection",
+      "Post-install crank and verify",
+      "Up-front pricing — no surprises",
+    ],
+    faqs: [
+      { q: "How much does a starter replacement cost?", a: "Typical mobile starter jobs run $400–$750 installed depending on the vehicle and labor access." },
+      { q: "Could it be the battery instead?", a: "Yes — we always test the battery first. Both can produce similar 'no-crank' symptoms." },
+      { q: "Same day?", a: "Usually yes for common vehicles. Special-order parts may push to next day." },
+    ],
+  },
+  {
+    slug: "mobile-vehicle-diagnostics",
+    service: "Mobile Vehicle Diagnostics",
+    categoryId: "engine",
+    h1: "Mobile Vehicle Diagnostics in Southwest Florida",
+    metaTitle:
+      "Mobile Car Diagnostics in SWFL | OBD-II Scan & Drivability Testing",
+    metaDescription:
+      "Professional mobile vehicle diagnostics with real OBD-II scanners and live data. Check engine lights, drivability, electrical. Call (813) 501-7572.",
+    intro:
+      "Modern vehicles speak in trouble codes — and we speak the language. Mike's Mobile Auto Repair brings professional OBD-II scanners, live data analysis, and real drivability testing to your driveway anywhere in Southwest Florida.",
+    paragraphs: [
+      "Most parts-store 'free scans' just read codes and clear them. That's not diagnostics — that's a starting point. Real diagnostics means reading freeze-frame data, live sensor values, fuel trims, misfire counts, and sometimes wiring tests with a multimeter. We do the real work, find the actual cause, and quote the repair before any wrench turns.",
+      "We diagnose check-engine lights, hard shifts, intermittent stalls, no-starts, electrical gremlins, AC faults, and ABS / traction-control warnings. If we can fix it on the spot we will; if it needs follow-up parts we'll quote it transparently.",
+      "Available across Lehigh Acres, Fort Myers, Cape Coral, Estero, Bonita Springs, and Naples. Call or text (813) 501-7572 to book a diagnostic appointment.",
+    ],
+    included: [
+      "OBD-II scan with full code retrieval",
+      "Freeze-frame and live data analysis",
+      "Drivability testing and road test",
+      "Electrical and wiring checks",
+      "Honest, written diagnostic findings",
+      "Repair quote up front",
+    ],
+    faqs: [
+      { q: "How much does a mobile diagnostic cost?", a: "Standard diagnostic appointments run $80–$150 and are credited toward any repair we perform." },
+      { q: "Can you reset my check engine light?", a: "Yes, but only after we identify and address the cause — clearing a code without fixing the issue just delays the problem." },
+      { q: "Do you handle electrical and ABS issues?", a: "Yes — chassis-wide diagnostics including ABS, SRS warnings, and electrical faults." },
+    ],
+  },
+  {
+    slug: "emergency-roadside-mechanic",
+    service: "Emergency Roadside Mechanic",
+    categoryId: "electrical",
+    h1: "Emergency Roadside Mechanic in Southwest Florida",
+    metaTitle:
+      "Emergency Roadside Mechanic in SWFL | Stuck? We Come to You",
+    metaDescription:
+      "Stranded? Emergency mobile mechanic across Lehigh Acres, Fort Myers, Cape Coral, Estero, Bonita Springs and Naples. Dead batteries, no-starts, lockouts. Call (813) 501-7572.",
+    intro:
+      "Broken down? Mike's Mobile Auto Repair is your emergency roadside mechanic — on-call across Southwest Florida for dead batteries, no-starts, overheating, flat tires, lockouts, and roadside repairs.",
+    paragraphs: [
+      "When your car quits in a parking lot, on the side of I-75, or in your own driveway after dark, the last thing you want is a 90-minute tow wait and another full day for a shop to look at it. We roll to you with diagnostic scanners, jump packs, common parts, and the experience to get most vehicles running again on the spot.",
+      "We handle the calls that strand drivers most often: dead batteries, failed alternators, bad starters, blown fuses, fuel-pump no-starts, overheating, flat tires, and accidental lockouts. If a repair can't be finished safely on the roadside, we diagnose it, give you a transparent quote, and schedule a same-day or next-day mobile follow-up.",
+      "Service is available across all of SWFL — every Lehigh Acres, Fort Myers, Cape Coral, Estero, Bonita Springs, and Naples ZIP — including evenings and weekends whenever possible. If you're stuck right now, call or text (813) 501-7572.",
+    ],
+    included: [
+      "Roadside dead-battery jump and replacement",
+      "On-site no-start diagnostics",
+      "Alternator and starter replacement",
+      "Overheating and cooling-system triage",
+      "Flat tire repair and spare installation",
+      "Lockout assistance",
+      "Transparent up-front pricing",
+    ],
+    faqs: [
+      { q: "How fast can you reach me?", a: "Most emergency calls in SWFL are reached in 30–90 minutes depending on time of day." },
+      { q: "Available evenings and weekends?", a: "Yes — emergency mobile service is offered evenings and weekends whenever possible." },
+      { q: "What if my car can't be fixed roadside?", a: "We diagnose on site and schedule a same-day or next-day mobile follow-up at your home or workplace." },
+    ],
+  },
+  {
+    slug: "mobile-oil-change",
+    service: "Mobile Oil Change",
+    categoryId: "oil-fluids",
+    h1: "Mobile Oil Change Service in Southwest Florida",
+    metaTitle:
+      "Mobile Oil Change in SWFL | At Your Home or Office",
+    metaDescription:
+      "Conventional, blend, and full synthetic mobile oil changes across SWFL. We come to your driveway or office. Call (813) 501-7572.",
+    intro:
+      "Skip the oil-change shop wait. Mike's Mobile Auto Repair brings conventional, synthetic blend, and full synthetic oil changes to your home or workplace anywhere in Southwest Florida.",
+    paragraphs: [
+      "A typical oil change at a quick-lube shop eats up an hour of your day with the wait and the upsell pitch. Ours takes about 25 minutes in your driveway with no waiting room and no surprises. We use quality oil and a name-brand filter matched to your vehicle's spec.",
+      "Florida heat is hard on engine oil. The hotter it runs, the faster it breaks down. We recommend interval checks every 3,000 miles for conventional, 5,000 for blends, and 7,500–10,000 for full synthetic — and we'll inspect belts, fluids, and tire pressure at every visit.",
+      "Service available across Lehigh Acres, Fort Myers, Cape Coral, Estero, Bonita Springs, and Naples. Book at (813) 501-7572.",
+    ],
+    included: [
+      "Up to 5 quarts of oil (extra by quart)",
+      "Quality oil filter installed",
+      "Top-off all under-hood fluids",
+      "Tire pressure check and adjust",
+      "Multi-point visual inspection",
+      "Old oil and filter recycled responsibly",
+    ],
+    faqs: [
+      { q: "How much does a mobile oil change cost?", a: "Conventional from $65, blend from $80, full synthetic from $100 (most vehicles). European and large trucks priced individually." },
+      { q: "How long does it take?", a: "About 20–30 minutes per vehicle in your driveway." },
+      { q: "Do you do fleet vehicles?", a: "Yes — multi-vehicle and recurring fleet service is available." },
+    ],
+  },
+  {
+    slug: "mobile-suspension-steering",
+    service: "Mobile Suspension & Steering Repair",
+    categoryId: "suspension",
+    h1: "Mobile Suspension & Steering Repair in Southwest Florida",
+    metaTitle:
+      "Mobile Suspension & Steering Repair in SWFL | On-Site Service",
+    metaDescription:
+      "Shocks, struts, control arms, ball joints, tie rods, wheel bearings — mobile suspension and steering repair across SWFL. Call (813) 501-7572.",
+    intro:
+      "Clunks over bumps, vague steering, or pulling to one side? Mike's Mobile Auto Repair handles mobile suspension and steering repairs at your home or workplace across Southwest Florida.",
+    paragraphs: [
+      "Florida roads — and especially the patched-up surfaces around Lehigh Acres and east Lee County — are hard on suspension. Worn shocks and struts hurt ride quality and increase stopping distance; loose ball joints and tie rods are a safety issue.",
+      "We replace shocks, struts, control arms, ball joints, sway bar links, tie rods, and wheel bearings on most vehicles right in your driveway. We also handle power-steering pump and rack diagnostics.",
+      "Service available across SWFL. Call or text (813) 501-7572 for an on-site quote.",
+    ],
+    included: [
+      "Shock and strut replacement",
+      "Control arm and ball joint replacement",
+      "Tie rod and sway bar link replacement",
+      "Wheel bearing replacement",
+      "Power steering diagnostics",
+      "Pre-repair suspension inspection",
+    ],
+    faqs: [
+      { q: "Do I need an alignment afterward?", a: "Many suspension and steering repairs require an alignment after — we'll let you know up front." },
+      { q: "Can you handle it on site?", a: "Most replacements yes. Heavy frame work or full ride-height changes may need a shop visit." },
+    ],
+  },
+  {
+    slug: "mobile-engine-diagnostics",
+    service: "Mobile Engine Diagnostics",
+    categoryId: "engine",
+    h1: "Mobile Engine Diagnostics in Southwest Florida",
+    metaTitle:
+      "Mobile Engine Diagnostics in SWFL | Check Engine Light & Drivability",
+    metaDescription:
+      "On-site engine diagnostics for check engine lights, misfires, rough idle, and drivability problems across SWFL. Call (813) 501-7572.",
+    intro:
+      "Check engine light on, misfiring, or running rough? Mike's Mobile Auto Repair brings full engine diagnostic capability to your driveway across Southwest Florida.",
+    paragraphs: [
+      "Engine drivability problems are usually a chain of small clues — a single misfire code, slightly off fuel trims, a vacuum leak, an ignition coil getting weak. Real diagnostics means looking at all of it, not just slapping in a part and hoping.",
+      "We diagnose misfires, rough idle, hesitation, lack of power, knocking, oil leaks, coolant leaks, and emissions failures. Repairs we commonly handle on site include spark plugs, coils, sensors, valve cover gaskets, and serpentine belts.",
+      "Available across SWFL. Book at (813) 501-7572.",
+    ],
+    included: [
+      "Full OBD-II scan and live data",
+      "Misfire and ignition system testing",
+      "Vacuum and fuel trim analysis",
+      "Spark plug and coil replacement",
+      "Sensor replacement (O2, MAF, MAP, crank/cam)",
+      "Honest written findings",
+    ],
+    faqs: [
+      { q: "How much does engine diagnostics cost?", a: "Diagnostic appointments run $80–$150 and credit toward any repair." },
+      { q: "Can you fix the issue on the same visit?", a: "Often yes for common parts; complex repairs may need a follow-up visit." },
+    ],
+  },
+  {
+    slug: "mobile-no-start-diagnostics",
+    service: "Mobile No-Start Diagnostics",
+    categoryId: "electrical",
+    h1: "Mobile No-Start Diagnostics in Southwest Florida",
+    metaTitle:
+      "Mobile No-Start Diagnostics in SWFL | Won't Crank or Won't Fire",
+    metaDescription:
+      "Car won't start? Mobile no-start diagnostics across SWFL — battery, starter, fuel, ignition, and security. Call (813) 501-7572.",
+    intro:
+      "Won't crank? Cranks but won't fire? Mike's Mobile Auto Repair specializes in mobile no-start diagnostics across Southwest Florida — at your driveway, parking lot, or roadside.",
+    paragraphs: [
+      "A no-start is the worst possible time to need a tow. Our mobile service truck arrives with battery testers, jump packs, fuel-pressure gauges, OBD-II scanners, and the experience to walk through every common cause systematically: battery, starter, fuel pressure, spark, security/immobilizer, and key sensors.",
+      "Most no-starts get diagnosed and often repaired on the same visit. Common fixes we complete on site: battery replacement, starter replacement, alternator replacement, fuel-pump relay, crank sensor, and ignition switch.",
+      "Available across all of SWFL. Stuck right now? Call or text (813) 501-7572 — a real tech answers.",
+    ],
+    included: [
+      "Full battery and charging-system test",
+      "Starter circuit testing",
+      "Fuel pressure check",
+      "Spark and ignition testing",
+      "Security/immobilizer diagnosis",
+      "On-site repair where possible",
+    ],
+    faqs: [
+      { q: "Can you really diagnose this in my driveway?", a: "Yes — almost every no-start can be narrowed down on site with proper tools." },
+      { q: "How fast can you come?", a: "Same-day mobile service is usually available. Emergency calls get prioritized." },
     ],
   },
 ];
