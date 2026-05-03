@@ -49,12 +49,13 @@ const BlogPost = () => {
 
   if (!post) return <NotFound />;
 
-  const idx = blogPosts.findIndex((p) => p.slug === post.slug);
+  const idx = post ? blogPosts.findIndex((p) => p.slug === post.slug) : -1;
   const prev = idx > 0 ? blogPosts[idx - 1] : null;
-  const next = idx < blogPosts.length - 1 ? blogPosts[idx + 1] : null;
-  const others = blogPosts.filter((p) => p.slug !== post.slug).slice(0, 3);
+  const next = idx >= 0 && idx < blogPosts.length - 1 ? blogPosts[idx + 1] : null;
+  const others = post ? blogPosts.filter((p) => p.slug !== post.slug).slice(0, 3) : [];
 
   useEffect(() => {
+    if (!post) return;
     const id = "ld-breadcrumb-blog";
     document.getElementById(id)?.remove();
     const ld = {
@@ -72,7 +73,9 @@ const BlogPost = () => {
     s.text = JSON.stringify(ld);
     document.head.appendChild(s);
     return () => s.remove();
-  }, [post.slug, post.title]);
+  }, [post]);
+
+  if (!post) return <NotFound />;
 
   return (
     <div className="min-h-screen bg-background">
