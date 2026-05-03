@@ -59,17 +59,11 @@ const ServiceCategory = () => {
             {category.description}
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-3 mb-12">
-            <Button variant="hero" size="lg" className="min-h-[48px]" asChild>
-              <a href="tel:8135017572" onClick={() => trackConversion()}>
-                <Phone className="mr-2" /> Call (813) 501-7572
-              </a>
-            </Button>
-            <Button variant="heroOutline" size="lg" className="min-h-[48px]" asChild>
-              <a href="sms:8135017572" onClick={() => trackConversion()}>
-                <MessageSquare className="mr-2" /> Text for Quote
-              </a>
-            </Button>
+          <div className="mb-12">
+            <RequestQuoteCTA
+              serviceName={category.title}
+              subheading={`Get a fast, transparent quote for ${category.title.toLowerCase()} — sent right to your phone.`}
+            />
           </div>
 
           <h2 className="font-display text-2xl md:text-3xl text-gold mb-4">
