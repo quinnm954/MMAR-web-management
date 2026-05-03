@@ -64,16 +64,11 @@ const Index = () => {
                 "Thursday",
                 "Friday",
                 "Saturday",
+                "Sunday",
               ],
-              opens: "07:00",
-              closes: "21:00",
-            },
-            {
-              "@type": "OpeningHoursSpecification",
-              dayOfWeek: ["Sunday"],
               opens: "09:00",
               closes: "17:00",
-              description: "By appointment",
+              description: "By appointment only",
             },
           ],
           sameAs: [
