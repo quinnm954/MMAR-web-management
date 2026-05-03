@@ -5,10 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "node scripts/check-forbidden-terms.mjs && vite build",
-    "build:dev": "node scripts/check-forbidden-terms.mjs && vite build --mode development",
+    "build": "node scripts/check-forbidden-terms.mjs && node scripts/generate-sitemap.mjs && vite build",
+    "build:dev": "node scripts/check-forbidden-terms.mjs && node scripts/generate-sitemap.mjs && vite build --mode development",
     "lint": "eslint .",
     "check:forbidden": "node scripts/check-forbidden-terms.mjs",
+    "generate:sitemap": "node scripts/generate-sitemap.mjs",
     "preview": "vite preview"
   },
   "dependencies": {

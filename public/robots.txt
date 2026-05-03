@@ -14,4 +14,7 @@ User-agent: *
 Allow: /
 Disallow: /admin/
 
+Sitemap: https://www.mikesmautorepair.com/sitemap-index.xml
 Sitemap: https://www.mikesmautorepair.com/sitemap.xml
+Sitemap: https://www.mikesmautorepair.com/sitemap-locations.xml
+Sitemap: https://www.mikesmautorepair.com/sitemap-blog.xml
