@@ -265,6 +265,12 @@ const Services = () => {
           </Accordion>
         </div>
       </div>
+
+      <QuoteRequestDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        serviceName={selectedService}
+      />
     </section>
   );
 };
