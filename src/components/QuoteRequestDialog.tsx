@@ -33,8 +33,25 @@ const QuoteRequestDialog = ({
   const [location, setLocation] = useState("");
   const [notes, setNotes] = useState("");
 
+  const STORAGE_KEY = "quoteRequest:vehicleInfo";
+
   useEffect(() => {
     if (open) {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          const v = JSON.parse(saved);
+          setYear(v.year ?? "");
+          setMake(v.make ?? "");
+          setModel(v.model ?? "");
+          setMileage(v.mileage ?? "");
+          setLocation(v.location ?? "");
+          setNotes(v.notes ?? "");
+          return;
+        }
+      } catch {
+        // ignore
+      }
       setYear("");
       setMake("");
       setModel("");
@@ -53,6 +70,15 @@ const QuoteRequestDialog = ({
       location ? `Location: ${location}` : "",
       notes ? `Notes: ${notes}` : "",
     ].filter(Boolean);
+
+    try {
+      localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify({ year, make, model, mileage, location, notes }),
+      );
+    } catch {
+      // ignore
+    }
 
     const body = encodeURIComponent(lines.join("\n"));
     window.location.href = `sms:${phone}?body=${body}`;
