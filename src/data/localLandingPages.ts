@@ -3,7 +3,7 @@ export type FAQ = { q: string; a: string };
 export type LocalLandingPage = {
   slug: string;
   service: string; // human readable service name
-  citySlug: string; // matches cities.ts slug
+  citySlug?: string; // matches cities.ts slug — omit for service-only (region-wide) pages
   categoryId: string; // matches serviceCategories.ts id
   h1: string;
   metaTitle: string;
