@@ -93,29 +93,6 @@ const SeoContent = () => {
             </p>
           </div>
 
-          {/* H2: Emergency Roadside Repairs */}
-          <div>
-            <h3 className="font-display text-2xl md:text-3xl text-sky mb-3">
-              Emergency Roadside Repairs
-            </h3>
-            <p>
-              A dead battery in a Publix parking lot. A flat tire on the
-              shoulder of I-75. A no-start in your own driveway after dark.
-              Vehicle problems don't wait for business hours, and neither do
-              we. Our{" "}
-              <Link to="/emergency-roadside-mechanic" className="text-primary underline-offset-4 hover:underline">
-                emergency roadside mechanic
-              </Link>{" "}
-              service rolls out across SWFL with jump packs, replacement
-              batteries, fuel-pressure testers, and the experience to get most
-              vehicles running again on the spot. We handle dead batteries,
-              failed starters and alternators, no-starts, overheating, lockouts,
-              and flat tires — usually within 30–90 minutes of your call.
-              Stranded right now? Call <a href="tel:8135017572" className="text-primary underline-offset-4 hover:underline">(813) 501-7572</a> — a real
-              technician answers, not a call center.
-            </p>
-          </div>
-
           {/* H2: Mobile Brake Repair */}
           <div>
             <h3 className="font-display text-2xl md:text-3xl text-sky mb-3">
