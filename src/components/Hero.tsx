@@ -28,8 +28,7 @@ const Hero = () => {
             className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-7 md:mb-9 px-2 animate-slide-up"
             style={{ animationDelay: "0.1s" }}
           >
-            On-site auto repair, full diagnostics, and emergency roadside mechanic
-            service across Southwest Florida — we come to you.
+            On-site auto repair and full diagnostics across Southwest Florida — we come to you.
           </p>
 
           <div

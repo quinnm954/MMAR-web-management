@@ -12,11 +12,11 @@ const faqs = [
   },
   {
     q: "Are you really mobile? You come to my house?",
-    a: "Yes — every job. Our service truck arrives at your driveway, parking lot, or roadside breakdown with the tools, scanners, and parts to handle most repairs on the spot.",
+    a: "Yes — every job. Our service truck arrives at your driveway or parking lot with the tools, scanners, and parts to handle most repairs on the spot.",
   },
   {
-    q: "Do you offer emergency or same-day service?",
-    a: "Same-day appointments are usually available, and emergency roadside service is offered evenings and weekends across SWFL whenever possible.",
+    q: "Do you offer same-day service?",
+    a: "Same-day appointments are usually available across SWFL, including evenings and weekends whenever possible.",
   },
   {
     q: "How is pricing handled?",
@@ -90,29 +90,6 @@ const SeoContent = () => {
               dealerships — so the vast majority of repairs get done in a
               single on-site visit. Skip the tow bill, the rental car, and the
               wasted afternoon in a waiting room.
-            </p>
-          </div>
-
-          {/* H2: Emergency Roadside Repairs */}
-          <div>
-            <h3 className="font-display text-2xl md:text-3xl text-sky mb-3">
-              Emergency Roadside Repairs
-            </h3>
-            <p>
-              A dead battery in a Publix parking lot. A flat tire on the
-              shoulder of I-75. A no-start in your own driveway after dark.
-              Vehicle problems don't wait for business hours, and neither do
-              we. Our{" "}
-              <Link to="/emergency-roadside-mechanic" className="text-primary underline-offset-4 hover:underline">
-                emergency roadside mechanic
-              </Link>{" "}
-              service rolls out across SWFL with jump packs, replacement
-              batteries, fuel-pressure testers, and the experience to get most
-              vehicles running again on the spot. We handle dead batteries,
-              failed starters and alternators, no-starts, overheating, lockouts,
-              and flat tires — usually within 30–90 minutes of your call.
-              Stranded right now? Call <a href="tel:8135017572" className="text-primary underline-offset-4 hover:underline">(813) 501-7572</a> — a real
-              technician answers, not a call center.
             </p>
           </div>
 
@@ -234,7 +211,6 @@ const SeoContent = () => {
               <li>✅ Up-front, transparent pricing</li>
               <li>✅ Real diagnostics, not guess-and-replace</li>
               <li>✅ Same-day appointments usually available</li>
-              <li>✅ Emergency roadside help across SWFL</li>
               <li>✅ Parts &amp; labor warranty on every job</li>
               <li>✅ 5-star rated on Google, Facebook, Yelp, Nextdoor</li>
               <li>✅ Financing available for larger repairs</li>

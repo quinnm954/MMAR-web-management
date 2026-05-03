@@ -20,7 +20,6 @@ const SERVICE_LINKS = [
   { href: "/mobile-battery-replacement", label: "Mobile Battery Replacement" },
   { href: "/mobile-starter-repair", label: "Mobile Starter Repair" },
   { href: "/mobile-oil-change", label: "Mobile Oil Change" },
-  { href: "/emergency-roadside-mechanic", label: "Emergency Roadside Mechanic" },
 ];
 
 const Blog = () => {
@@ -135,8 +134,7 @@ const Blog = () => {
             Need help right now instead of reading? See our{" "}
             <Link to="/mobile-vehicle-diagnostics" className="text-primary hover:underline">mobile diagnostics</Link>,{" "}
             <Link to="/mobile-brake-repair" className="text-primary hover:underline">mobile brake repair</Link>, or{" "}
-            <Link to="/emergency-roadside-mechanic" className="text-primary hover:underline">emergency roadside mechanic</Link>{" "}
-            services — or just call <a href="tel:8135017572" className="text-primary hover:underline">(813) 501-7572</a>.
+            mobile mechanic services — or just call <a href="tel:8135017572" className="text-primary hover:underline">(813) 501-7572</a>.
           </p>
 
           {/* Tag cloud */}

@@ -17,7 +17,7 @@ const HomeServicesOverview = () => {
 
           <article className="space-y-5 text-foreground/90 leading-relaxed text-base md:text-lg">
             <p>
-              Mike's Mobile Auto Repair brings ASE-level service straight to your driveway, office, or roadside breakdown anywhere in Southwest Florida. Instead of waiting half a day at a brick-and-mortar shop in Fort Myers or paying for a tow out of Lehigh Acres, we roll up with the diagnostic tools, quality parts, and experience to handle most repairs in a single visit. A real technician answers the phone — never a call center.
+              Mike's Mobile Auto Repair brings ASE-level service straight to your driveway or office anywhere in Southwest Florida. Instead of waiting half a day at a brick-and-mortar shop in Fort Myers or paying for a tow out of Lehigh Acres, we roll up with the diagnostic tools, quality parts, and experience to handle most repairs in a single visit. A real technician answers the phone — never a call center.
             </p>
             <p>
               Our most-called services include{" "}
@@ -34,9 +34,7 @@ const HomeServicesOverview = () => {
               like mobile oil changes, fluid flushes, and multi-point inspections is the cheapest insurance against the kind of breakdown that strands you in 95° heat.
             </p>
             <p>
-              When something does go wrong, our{" "}
-              <Link to="/emergency-roadside-mechanic" className="text-primary hover:underline">emergency roadside mechanic</Link>{" "}
-              service responds across Lee County — usually within an hour. Dead battery in an office lot in Fort Myers? On-site replacement in 30 minutes. Brakes went metal-on-metal on the way home in Cape Coral? We bring the parts and fix it in your driveway. No-start in a Lehigh Acres garage? We diagnose, replace the failed component, and verify the repair before we leave.
+              When something does go wrong, our mobile service responds across Lee County — usually within an hour. Dead battery in an office lot in Fort Myers? On-site replacement in 30 minutes. Brakes went metal-on-metal on the way home in Cape Coral? We bring the parts and fix it in your driveway. No-start in a Lehigh Acres garage? We diagnose, replace the failed component, and verify the repair before we leave.
             </p>
             <p>
               We service vehicles in every Lehigh Acres ZIP (33936, 33971, 33972, 33973, 33974, 33976), every Fort Myers ZIP (33901, 33907, 33908, 33912, 33913, 33916, 33919, 33966), every Cape Coral ZIP, plus Estero, Bonita Springs, and Naples. Local fleets and multi-vehicle households get on-site maintenance with no shop downtime — see our{" "}

@@ -174,7 +174,7 @@ export const categories: Category[] = [
     title: "Tires & Wheels",
     icon: CircleDot,
     description:
-      "Flat tire, TPMS warning, or wheel hub issue? Mobile tire service brings the shop to your driveway or roadside.",
+      "Flat tire, TPMS warning, or wheel hub issue? Mobile tire service brings the shop to your driveway.",
     services: [
       { icon: CircleDot, name: "Tire Rotation" },
       { icon: CircleDot, name: "Flat Tire Repair" },

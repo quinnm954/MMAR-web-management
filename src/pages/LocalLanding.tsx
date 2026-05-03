@@ -7,7 +7,7 @@ import FloatingCallButton from "@/components/FloatingCallButton";
 import RequestQuoteCTA from "@/components/RequestQuoteCTA";
 import InlineCallStrip from "@/components/InlineCallStrip";
 import TrustBadges from "@/components/TrustBadges";
-import RoadsideBanner from "@/components/RoadsideBanner";
+
 import { getLandingPageBySlug, localLandingPages } from "@/data/localLandingPages";
 import { cities, getCityBySlug } from "@/data/cities";
 import { getCategoryBySlug } from "@/data/serviceCategories";
@@ -155,7 +155,6 @@ const LocalLanding = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <RoadsideBanner />
       <Navigation />
 
       <section className="pt-28 md:pt-32 pb-12 md:pb-16">

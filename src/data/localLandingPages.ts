@@ -75,7 +75,7 @@ export const localLandingPages: LocalLandingPage[] = [
       "On-site alternator replacement and charging system repair in Fort Myers, FL. Same-day mobile service. Call or text (813) 501-7572 for a fast quote.",
     canonical: "https://www.mikesmautorepair.com/alternator-repair-fort-myers",
     intro:
-      "Battery light on, dim headlights, or a no-start after a jump? Mike's Mobile Auto Repair provides full mobile alternator repair and charging-system service in Fort Myers, FL — at your home, office, or roadside.",
+      "Battery light on, dim headlights, or a no-start after a jump? Mike's Mobile Auto Repair provides full mobile alternator repair and charging-system service in Fort Myers, FL — at your home or office.",
     paragraphs: [
       "An alternator failure rarely happens at a convenient time. The good news: you don't need a tow. Our Fort Myers mobile mechanic service arrives with professional charging-system testers, replacement alternators for most makes and models, and the tools to swap one out quickly in a parking lot or driveway.",
       "We test the entire charging system before condemning a part — battery, alternator output under load, voltage drop on key cables, and the serpentine belt and tensioner. That way you only pay for what you actually need. If the alternator is the problem, we install a quality replacement and verify a clean 13.8–14.7-volt charge before we leave.",
@@ -117,7 +117,7 @@ export const localLandingPages: LocalLandingPage[] = [
     metaTitle:
       "Mobile Battery Replacement in Cape Coral, FL | Mike's Mobile Auto Repair",
     metaDescription:
-      "Same-day mobile car battery replacement in Cape Coral, FL. We test, deliver, and install — at your home, office, or roadside. Call (813) 501-7572.",
+      "Same-day mobile car battery replacement in Cape Coral, FL. We test, deliver, and install — at your home or office. Call (813) 501-7572.",
     intro:
       "Dead battery in Cape Coral? Skip the tow and the parts-store parking lot. Mike's Mobile Auto Repair delivers and installs fresh, quality car batteries anywhere in Cape Coral, FL — usually the same day.",
     paragraphs: [
@@ -149,51 +149,6 @@ export const localLandingPages: LocalLandingPage[] = [
       {
         q: "Do you take the old battery?",
         a: "Yes — we haul away and properly recycle your old battery at no extra charge.",
-      },
-    ],
-  },
-  {
-    slug: "emergency-mobile-mechanic-lehigh-acres",
-    service: "Emergency Mobile Mechanic",
-    citySlug: "lehigh-acres",
-    categoryId: "electrical",
-    h1: "Emergency Mobile Mechanic in Lehigh Acres, FL",
-    metaTitle:
-      "Emergency Mobile Mechanic in Lehigh Acres, FL | Mike's Mobile Auto Repair",
-    metaDescription:
-      "Stranded in Lehigh Acres? Emergency mobile mechanic and roadside service for breakdowns, dead batteries, no-starts, and lockouts. Call (813) 501-7572.",
-    intro:
-      "Broken down in Lehigh Acres? Mike's Mobile Auto Repair is your emergency mobile mechanic — on-call for dead batteries, no-starts, overheating, flat tires, lockouts, and roadside repairs across Lehigh Acres, FL.",
-    paragraphs: [
-      "When your car quits in a Publix parking lot, on the side of Lee Boulevard, or in your own driveway at 7pm, the last thing you want is to wait hours for a tow and another full day for a shop to look at it. Our emergency mobile service rolls to you with diagnostic scanners, jump packs, common parts, and the experience to get most vehicles running again on the spot.",
-      "We handle the calls that strand drivers most often: dead batteries, failed alternators, bad starters, blown fuses, fuel-pump no-starts, overheating, flat tires, and accidental lockouts. If a repair can't be finished safely on the roadside, we'll diagnose the issue, give you a transparent quote, and schedule a same-day or next-day mobile follow-up at your home or workplace.",
-      "Service is available across all Lehigh Acres ZIP codes (33936, 33971, 33972, 33973, 33974, 33976), evenings and weekends included whenever possible. If you're stranded right now, call or text (813) 501-7572 — a real technician answers, not a call center.",
-    ],
-    included: [
-      "Roadside dead-battery jump and replacement",
-      "On-site no-start diagnostics",
-      "Alternator and starter replacement",
-      "Overheating and cooling-system triage",
-      "Flat tire repair and spare installation",
-      "Lockout assistance",
-      "Transparent up-front pricing",
-    ],
-    faqs: [
-      {
-        q: "How fast can you reach me in Lehigh Acres?",
-        a: "Most Lehigh Acres emergency calls are reached within 30–90 minutes depending on time of day and current workload.",
-      },
-      {
-        q: "Are you available evenings and weekends?",
-        a: "Yes — emergency mobile service is offered evenings and weekends across Lehigh Acres whenever possible. Call or text (813) 501-7572 to confirm.",
-      },
-      {
-        q: "What if my car can't be fixed roadside?",
-        a: "We'll diagnose the issue on site, give you a transparent quote, and schedule a same-day or next-day mobile repair at your home or workplace.",
-      },
-      {
-        q: "Do you charge a service-call fee?",
-        a: "Any trip or diagnostic fee is disclosed up front before we dispatch — no surprise charges when we arrive.",
       },
     ],
   },
@@ -242,7 +197,7 @@ export const localLandingPages: LocalLandingPage[] = [
       "Mobile alternator replacement and full charging-system service across Lehigh Acres, Fort Myers, Cape Coral, Estero, Bonita Springs and Naples. Call (813) 501-7572.",
     canonical: "https://www.mikesmautorepair.com/alternator-repair",
     intro:
-      "Battery light on, dim headlights, or a no-start after a jump? Mike's Mobile Auto Repair handles full mobile alternator repair and charging-system testing across Southwest Florida — at your home, office, or roadside.",
+      "Battery light on, dim headlights, or a no-start after a jump? Mike's Mobile Auto Repair handles full mobile alternator repair and charging-system testing across Southwest Florida — at your home or office.",
     paragraphs: [
       "Alternator failures rarely happen at a convenient time. The good news: you don't need a tow. We arrive with professional charging-system testers, replacement alternators for most makes and models, and the tools to swap one out in your driveway or a parking lot — usually in 60 to 120 minutes.",
       "We always test the entire charging system before condemning a part — battery, alternator output under load, voltage drop on the main cables, and the serpentine belt and tensioner. That way you only pay for what's actually wrong. If the alternator is the issue, we install a quality replacement and verify a clean 13.8–14.7-volt charge before we leave.",
@@ -270,7 +225,7 @@ export const localLandingPages: LocalLandingPage[] = [
     metaTitle:
       "Mobile Battery Replacement in SWFL | Same-Day Delivery & Install",
     metaDescription:
-      "We deliver and install quality car batteries at your home, office, or roadside across SWFL. Free charging-system test included. Call (813) 501-7572.",
+      "We deliver and install quality car batteries at your home or office across SWFL. Free charging-system test included. Call (813) 501-7572.",
     canonical: "https://www.mikesmautorepair.com/battery-replacement",
     intro:
       "Dead battery? Skip the tow and the parts-store parking lot. We deliver and install quality car batteries anywhere in Southwest Florida — usually the same day.",
@@ -289,7 +244,7 @@ export const localLandingPages: LocalLandingPage[] = [
     ],
     faqs: [
       { q: "How much does mobile battery replacement cost?", a: "Most installed batteries run $180–$320 depending on group size and warranty. AGM batteries cost more." },
-      { q: "How fast can you get to me?", a: "Same-day service is the norm; emergency calls get prioritized." },
+      { q: "How fast can you get to me?", a: "Same-day service is the norm." },
       { q: "Do you take the old battery?", a: "Yes — we haul it away and properly recycle it at no extra charge." },
     ],
   },
@@ -301,7 +256,7 @@ export const localLandingPages: LocalLandingPage[] = [
     metaTitle:
       "Mobile Starter Repair in SWFL | On-Site Starter Replacement",
     metaDescription:
-      "Single click and no crank? We replace failed starters at your home or roadside across SWFL. Call (813) 501-7572 for same-day mobile service.",
+      "Single click and no crank? We replace failed starters at your home across SWFL. Call (813) 501-7572 for same-day mobile service.",
     intro:
       "If you turn the key and just hear a click — or nothing at all — your starter has likely failed. Mike's Mobile Auto Repair replaces starters on site across Southwest Florida, no tow required.",
     paragraphs: [
@@ -351,37 +306,6 @@ export const localLandingPages: LocalLandingPage[] = [
       { q: "How much does a mobile diagnostic cost?", a: "Standard diagnostic appointments run $80–$150 and are credited toward any repair we perform." },
       { q: "Can you reset my check engine light?", a: "Yes, but only after we identify and address the cause — clearing a code without fixing the issue just delays the problem." },
       { q: "Do you handle electrical and ABS issues?", a: "Yes — chassis-wide diagnostics including ABS, SRS warnings, and electrical faults." },
-    ],
-  },
-  {
-    slug: "emergency-roadside-mechanic",
-    service: "Emergency Roadside Mechanic",
-    categoryId: "electrical",
-    h1: "Emergency Roadside Mechanic in Southwest Florida",
-    metaTitle:
-      "Emergency Roadside Mechanic in SWFL | Stuck? We Come to You",
-    metaDescription:
-      "Stranded? Emergency mobile mechanic across Lehigh Acres, Fort Myers, Cape Coral, Estero, Bonita Springs and Naples. Dead batteries, no-starts, lockouts. Call (813) 501-7572.",
-    intro:
-      "Broken down? Mike's Mobile Auto Repair is your emergency roadside mechanic — on-call across Southwest Florida for dead batteries, no-starts, overheating, flat tires, lockouts, and roadside repairs.",
-    paragraphs: [
-      "When your car quits in a parking lot, on the side of I-75, or in your own driveway after dark, the last thing you want is a 90-minute tow wait and another full day for a shop to look at it. We roll to you with diagnostic scanners, jump packs, common parts, and the experience to get most vehicles running again on the spot.",
-      "We handle the calls that strand drivers most often: dead batteries, failed alternators, bad starters, blown fuses, fuel-pump no-starts, overheating, flat tires, and accidental lockouts. If a repair can't be finished safely on the roadside, we diagnose it, give you a transparent quote, and schedule a same-day or next-day mobile follow-up.",
-      "Service is available across all of SWFL — every Lehigh Acres, Fort Myers, Cape Coral, Estero, Bonita Springs, and Naples ZIP — including evenings and weekends whenever possible. If you're stuck right now, call or text (813) 501-7572.",
-    ],
-    included: [
-      "Roadside dead-battery jump and replacement",
-      "On-site no-start diagnostics",
-      "Alternator and starter replacement",
-      "Overheating and cooling-system triage",
-      "Flat tire repair and spare installation",
-      "Lockout assistance",
-      "Transparent up-front pricing",
-    ],
-    faqs: [
-      { q: "How fast can you reach me?", a: "Most emergency calls in SWFL are reached in 30–90 minutes depending on time of day." },
-      { q: "Available evenings and weekends?", a: "Yes — emergency mobile service is offered evenings and weekends whenever possible." },
-      { q: "What if my car can't be fixed roadside?", a: "We diagnose on site and schedule a same-day or next-day mobile follow-up at your home or workplace." },
     ],
   },
   {
@@ -483,7 +407,7 @@ export const localLandingPages: LocalLandingPage[] = [
       "Car won't start? Mobile no-start diagnostics across SWFL — battery, starter, fuel, ignition, and security. Call (813) 501-7572.",
     canonical: "https://www.mikesmautorepair.com/no-start-diagnostics",
     intro:
-      "Won't crank? Cranks but won't fire? Mike's Mobile Auto Repair specializes in mobile no-start diagnostics across Southwest Florida — at your driveway, parking lot, or roadside.",
+      "Won't crank? Cranks but won't fire? Mike's Mobile Auto Repair specializes in mobile no-start diagnostics across Southwest Florida — at your driveway or parking lot.",
     paragraphs: [
       "A no-start is the worst possible time to need a tow. Our mobile service truck arrives with battery testers, jump packs, fuel-pressure gauges, OBD-II scanners, and the experience to walk through every common cause systematically: battery, starter, fuel pressure, spark, security/immobilizer, and key sensors.",
       "Most no-starts get diagnosed and often repaired on the same visit. Common fixes we complete on site: battery replacement, starter replacement, alternator replacement, fuel-pump relay, crank sensor, and ignition switch.",
@@ -499,7 +423,7 @@ export const localLandingPages: LocalLandingPage[] = [
     ],
     faqs: [
       { q: "Can you really diagnose this in my driveway?", a: "Yes — almost every no-start can be narrowed down on site with proper tools." },
-      { q: "How fast can you come?", a: "Same-day mobile service is usually available. Emergency calls get prioritized." },
+      { q: "How fast can you come?", a: "Same-day mobile service is usually available." },
     ],
   },
   // ===== Short-slug SEO landing pages (city) =====
@@ -511,13 +435,13 @@ export const localLandingPages: LocalLandingPage[] = [
     h1: "Mobile Mechanic in Lehigh Acres, FL",
     metaTitle: "Mobile Mechanic in Lehigh Acres, FL | Mike's Mobile Auto Repair",
     metaDescription:
-      "Top-rated mobile mechanic in Lehigh Acres, FL. On-site diagnostics, brakes, batteries, alternators, and roadside repair. Same-day service. Call (813) 501-7572.",
+      "Top-rated mobile mechanic in Lehigh Acres, FL. On-site diagnostics, brakes, batteries, and alternators. Same-day service. Call (813) 501-7572.",
     intro:
-      "Looking for a trusted mobile mechanic in Lehigh Acres, FL? Mike's Mobile Auto Repair brings ASE-level service to your driveway, workplace, or roadside breakdown — no tow, no shop wait.",
+      "Looking for a trusted mobile mechanic in Lehigh Acres, FL? Mike's Mobile Auto Repair brings ASE-level service to your driveway or workplace — no tow, no shop wait.",
     paragraphs: [
       "Lehigh Acres is one of the largest planned communities in the country and getting a stalled vehicle to a brick-and-mortar shop can swallow an entire day. We exist to take that pain away. Our mobile service truck rolls into your driveway with diagnostic scanners, quality parts, and the experience to handle most repairs in a single visit.",
       "We service every Lehigh Acres ZIP — 33936, 33971, 33972, 33973, 33974, and 33976 — and handle batteries, alternators, starters, brakes, AC recharges, oil changes, and full check-engine-light diagnostics. Up-front quotes, no surprises, and a real technician answers the phone.",
-      "Need help right now? Call or text (813) 501-7572. Same-day appointments are usually available, plus evening and weekend coverage for genuine roadside emergencies anywhere in Lehigh Acres.",
+      "Need help right now? Call or text (813) 501-7572. Same-day appointments are usually available, plus evening and weekend coverage anywhere in Lehigh Acres.",
     ],
     included: [
       "On-site diagnostics with real OBD-II scanners",
@@ -526,12 +450,11 @@ export const localLandingPages: LocalLandingPage[] = [
       "Starter and no-start diagnostics",
       "AC recharge and cooling repairs",
       "Mobile oil changes and routine maintenance",
-      "Emergency roadside service",
-    ],
+          ],
     faqs: [
       { q: "Are you really a mobile mechanic in Lehigh Acres?", a: "Yes — we live and work right here in SWFL. Service covers every Lehigh Acres ZIP code." },
       { q: "What do you charge for a service call?", a: "There's no separate trip fee inside our regular service area — you only pay for the diagnostic and the work performed, quoted up front." },
-      { q: "How fast can you come out?", a: "Same-day appointments are usually available; emergency calls get prioritized." },
+      { q: "How fast can you come out?", a: "Same-day appointments are usually available." },
       { q: "Do you do brakes and batteries on site?", a: "Yes — both are among our most common Lehigh Acres jobs and almost always completed in a single visit." },
     ],
   },
@@ -543,7 +466,7 @@ export const localLandingPages: LocalLandingPage[] = [
     h1: "Mobile Mechanic in Fort Myers, FL",
     metaTitle: "Mobile Mechanic in Fort Myers, FL | Mike's Mobile Auto Repair",
     metaDescription:
-      "Trusted mobile mechanic in Fort Myers, FL. Diagnostics, brakes, batteries, AC, and emergency roadside service at your home or office. Call (813) 501-7572.",
+      "Trusted mobile mechanic in Fort Myers, FL. Diagnostics, brakes, batteries, and AC at your home or office. Call (813) 501-7572.",
     intro:
       "Mike's Mobile Auto Repair is the on-call mobile mechanic in Fort Myers, FL. ASE-level repairs, transparent pricing, and we come to you — anywhere from Downtown to Gateway, McGregor to Iona.",
     paragraphs: [
@@ -575,13 +498,13 @@ export const localLandingPages: LocalLandingPage[] = [
     h1: "Mobile Mechanic in Cape Coral, FL",
     metaTitle: "Mobile Mechanic in Cape Coral, FL | Mike's Mobile Auto Repair",
     metaDescription:
-      "On-call mobile mechanic in Cape Coral, FL. Diagnostics, brakes, batteries, alternators, AC, and roadside repair — at your home. Call (813) 501-7572.",
+      "On-call mobile mechanic in Cape Coral, FL. Diagnostics, brakes, batteries, alternators, and AC — at your home. Call (813) 501-7572.",
     intro:
       "Mike's Mobile Auto Repair is your trusted mobile mechanic in Cape Coral, FL — bringing professional diagnostics, quality parts, and honest pricing right to your driveway anywhere from South Cape to Burnt Store.",
     paragraphs: [
       "Cape Coral's sprawling layout means a simple shop visit can chew up half a day in traffic. We solve that. Skip the tow truck and the rideshare and let our mobile service truck come to you.",
       "We cover every Cape Coral ZIP including 33904, 33909, 33914, 33990, 33991, and 33993. Common jobs: brakes, batteries, alternators, starters, AC, and full computer diagnostics.",
-      "Stranded on a Cape Coral road? Roadside help — jump starts, lockouts, flat repairs, dead-battery rescues — is just a call away. Call or text (813) 501-7572.",
+      "Need a mobile mechanic in Cape Coral? Call or text (813) 501-7572.",
     ],
     included: [
       "Mobile diagnostics with full code retrieval",
@@ -589,13 +512,12 @@ export const localLandingPages: LocalLandingPage[] = [
       "Battery delivery and installation",
       "Alternator and starter replacement",
       "AC recharge and electrical work",
-      "Emergency roadside assistance",
-    ],
+          ],
     faqs: [
       { q: "Do you serve all of Cape Coral?", a: "Yes — every Cape Coral ZIP and the surrounding Lee County area." },
       { q: "How long does a brake job take?", a: "Typically 60–90 minutes per axle on site." },
       { q: "Can you replace a battery in my driveway?", a: "Absolutely — usually under 30 minutes including a free charging-system test." },
-      { q: "What hours do you work?", a: "Standard hours 7am–9pm, plus evening and weekend roadside emergencies." },
+      { q: "What hours do you work?", a: "Standard hours 7am–9pm, plus evening and weekend coverage." },
     ],
   },
   // ===== Short-slug SEO landing pages (region-wide service) =====
@@ -608,7 +530,7 @@ export const localLandingPages: LocalLandingPage[] = [
     metaDescription:
       "Mobile alternator repair and replacement across Lehigh Acres, Fort Myers, Cape Coral, Estero, Bonita Springs and Naples. Call (813) 501-7572.",
     intro:
-      "Battery light on, dim headlights, dying after a jump? We diagnose and replace failed alternators at your home, office, or roadside anywhere in Southwest Florida.",
+      "Battery light on, dim headlights, dying after a jump? We diagnose and replace failed alternators at your home or office anywhere in Southwest Florida.",
     paragraphs: [
       "Alternator failure rarely happens at a convenient time. We arrive with professional charging-system testers and quality replacement alternators for most makes and models, then verify a clean 13.8–14.7-volt charge before we leave.",
       "We always test the entire charging system — battery, alternator output under load, voltage drops, and the serpentine belt — before condemning a part. You only pay for what's actually wrong.",
@@ -728,7 +650,7 @@ export const localLandingPages: LocalLandingPage[] = [
     metaDescription:
       "Car won't start? Mobile no-start diagnostics across SWFL — battery, starter, fuel, ignition, security. Same-day. Call (813) 501-7572.",
     intro:
-      "Won't crank? Cranks but won't fire? We specialize in mobile no-start diagnostics across Southwest Florida — at your driveway, parking lot, or roadside.",
+      "Won't crank? Cranks but won't fire? We specialize in mobile no-start diagnostics across Southwest Florida — at your driveway or parking lot.",
     paragraphs: [
       "A no-start is the worst possible time to need a tow. Our mobile truck arrives with battery testers, jump packs, fuel-pressure gauges, and OBD-II scanners to systematically work every common cause: battery, starter, fuel pressure, spark, security/immobilizer, and key sensors.",
       "Most no-starts get diagnosed and often repaired on the same visit. Frequent on-site fixes: battery, starter, alternator, fuel-pump relay, crank sensor, ignition switch.",
@@ -744,7 +666,7 @@ export const localLandingPages: LocalLandingPage[] = [
     ],
     faqs: [
       { q: "Can you really diagnose this in my driveway?", a: "Yes — almost every no-start can be narrowed down on site." },
-      { q: "How fast can you come?", a: "Same-day mobile service is usually available; emergency calls prioritized." },
+      { q: "How fast can you come?", a: "Same-day mobile service is usually available." },
       { q: "Will you tow it if you can't fix it?", a: "We coordinate towing if needed, but most no-starts are repaired on the spot." },
       { q: "How much does it cost?", a: "Diagnostic appointments run $80–$150 and credit toward any repair." },
     ],
@@ -795,10 +717,10 @@ export const localLandingPages: LocalLandingPage[] = [
     metaDescription:
       "Mobile alternator repair and replacement in Fort Myers, FL. On-site charging-system testing and same-day install. Call (813) 501-7572.",
     intro:
-      "Battery light on, dim headlights, or a no-start after a jump in Fort Myers? Mike's Mobile Auto Repair handles complete alternator and charging-system service at your home, office, or roadside — no tow required.",
+      "Battery light on, dim headlights, or a no-start after a jump in Fort Myers? Mike's Mobile Auto Repair handles complete alternator and charging-system service at your home or office — no tow required.",
     paragraphs: [
       "Alternator failure is one of the most common electrical breakdowns we see across Fort Myers. Florida heat is brutal on alternator diodes, voltage regulators, and the battery itself, and the symptoms can be confusing — sometimes it looks like a dead battery, sometimes like a starter problem, sometimes the car runs fine for a few days then dies in the McGregor Costco parking lot.",
-      "Our Fort Myers mobile mechanic service arrives with professional charging-system testers, a full inventory of replacement alternators for most makes and models, and the tools to swap one out in 60 to 120 minutes — right in your driveway, office lot, or roadside. We test the entire charging system before condemning a part: battery condition, alternator output under load, voltage drop on the main cables, and the serpentine belt and tensioner. If the battery is the actual problem, we tell you. If it's the alternator, we install a quality replacement and verify a clean 13.8–14.7-volt charge before we leave.",
+      "Our Fort Myers mobile mechanic service arrives with professional charging-system testers, a full inventory of replacement alternators for most makes and models, and the tools to swap one out in 60 to 120 minutes — right in your driveway or office lot. We test the entire charging system before condemning a part: battery condition, alternator output under load, voltage drop on the main cables, and the serpentine belt and tensioner. If the battery is the actual problem, we tell you. If it's the alternator, we install a quality replacement and verify a clean 13.8–14.7-volt charge before we leave.",
       "We service every Fort Myers ZIP including 33901, 33907, 33908, 33912, 33913, 33916, 33919, and 33966 — Downtown, McGregor, Gateway, Whiskey Creek, Iona, San Carlos Park, and beyond. Local fleets and work vans get the same on-site treatment so you never lose a vehicle for a half-day shop visit.",
       "Pricing is up front, work is warrantied, and a real technician answers the phone. Stuck right now in Fort Myers? Call or text (813) 501-7572 for same-day mobile alternator repair.",
     ],
@@ -847,45 +769,10 @@ export const localLandingPages: LocalLandingPage[] = [
     ],
     faqs: [
       { q: "How much does a mobile battery replacement cost in Lehigh Acres?", a: "Most installed batteries run $180–$320 in Lehigh Acres depending on group size and warranty. AGM batteries cost more but last longer in Florida heat." },
-      { q: "How fast can you get to me?", a: "Same-day mobile battery delivery is the norm across Lehigh Acres. Emergency calls get prioritized." },
+      { q: "How fast can you get to me?", a: "Same-day mobile battery delivery is the norm across Lehigh Acres." },
       { q: "Do you take the old battery?", a: "Yes — we haul it away and recycle it properly at no extra charge." },
       { q: "What if it's actually the alternator?", a: "Every install includes a free charging-system test. If the alternator is the real culprit, we'll tell you up front and quote that repair separately." },
       { q: "Do you cover all of Lehigh Acres?", a: "Yes — every Lehigh Acres ZIP code plus the surrounding Lee County area." },
-    ],
-  },
-  {
-    slug: "roadside-mechanic-fort-myers",
-    service: "Emergency Roadside Mechanic",
-    citySlug: "fort-myers",
-    categoryId: "engine",
-    h1: "Emergency Roadside Mechanic in Fort Myers, FL",
-    metaTitle: "Roadside Mechanic in Fort Myers, FL | Same-Day Mobile Help",
-    metaDescription:
-      "Stranded in Fort Myers? Mike's Mobile Auto Repair offers emergency roadside mechanic service — jump starts, no-starts, batteries, brakes. Call (813) 501-7572.",
-    intro:
-      "Stranded in Fort Myers? Mike's Mobile Auto Repair provides fast emergency roadside mechanic service — jump starts, no-start diagnostics, battery delivery, on-the-spot repairs, and more — anywhere from Downtown to Gateway.",
-    paragraphs: [
-      "When your car dies in Fort Myers traffic, the last thing you want is a 90-minute wait for a tow truck and another half-day at a brick-and-mortar shop. We exist to make that go away. Our roadside mechanic service responds across every Fort Myers ZIP (33901, 33907, 33908, 33912, 33913, 33916, 33919, 33966) and most of the surrounding Lee County area, usually within an hour for true emergency calls.",
-      "We carry the equipment to actually fix most roadside problems on the spot — not just diagnose them and leave. Battery and charging-system testers, jump packs, alternators, batteries, starters, fuel-pressure gauges, brake parts for common vehicles, and full OBD-II diagnostic scanners. Most no-starts are a battery, an alternator, a starter, or a no-spark/no-fuel issue — and we can address all four in a parking lot.",
-      "Common Fort Myers roadside calls: dead batteries in office lots and grocery store parking, no-starts at home in the morning, brakes that suddenly went metal-on-metal during a commute, overheating on US-41 or I-75, and check-engine lights that throw the vehicle into limp mode. We also handle lockouts (with a partner locksmith referral), flat-tire help, and post-accident drivability checks.",
-      "Pricing is up front. No tow truck markup, no shop diagnostic fee on top of the repair. A real technician answers the phone — not a call center reading a script. Stuck right now in Fort Myers? Call or text (813) 501-7572.",
-    ],
-    included: [
-      "Same-day emergency response",
-      "Jump starts and battery testing",
-      "Battery delivery and installation",
-      "Mobile no-start diagnostics",
-      "Alternator and starter replacement on site",
-      "Roadside brake repair where safe",
-      "Cooling-system and overheating help",
-      "OBD-II diagnostics with full code retrieval",
-    ],
-    faqs: [
-      { q: "How fast can you get to me in Fort Myers?", a: "Most emergency roadside calls in Fort Myers are reached within an hour. We'll give you an honest ETA when you call." },
-      { q: "Can you really fix it on the road, or just diagnose it?", a: "Both. Most roadside issues — batteries, alternators, starters, brakes, overheating — are repaired on the spot." },
-      { q: "What if I need a tow?", a: "If a tow is the right call, we'll tell you and coordinate one. We don't push unnecessary repairs." },
-      { q: "What hours do you cover?", a: "Standard hours are 7am to 9pm, plus evening and weekend coverage for genuine roadside emergencies." },
-      { q: "Do you cover the highways?", a: "Yes — I-75, US-41, Daniels Parkway, Colonial Boulevard, and most major Fort Myers corridors are within our regular service area." },
     ],
   },
   {

@@ -23,11 +23,11 @@ export const cities: City[] = [
       "Alabama Road",
     ],
     intro:
-      "Mike's Mobile Auto Repair is the trusted mobile mechanic in Lehigh Acres, FL. We bring full-service auto repair, diagnostics, and roadside help to homes, workplaces, and roadside breakdowns across Lehigh — no tow truck and no waiting room required.",
+      "Mike's Mobile Auto Repair is the trusted mobile mechanic in Lehigh Acres, FL. We bring full-service auto repair, diagnostics, and on-site repair to homes and workplaces across Lehigh — no tow truck and no waiting room required.",
     paragraphs: [
       "Lehigh Acres covers a huge area, and getting a stalled vehicle to a brick-and-mortar shop can be a real headache. That's where we come in. Whether you're stuck in a driveway off Lee Boulevard, parked at a workplace near Sunshine, or broken down on Gunnery Road, our fully-equipped mobile service truck rolls to you with the tools, diagnostic scanners, and parts to get the job done right the first time.",
       "We service every Lehigh Acres ZIP code — 33936, 33971, 33972, 33973, 33974, and 33976 — and handle everything from oil changes and brake jobs to alternator replacements, AC recharges, and check-engine-light diagnostics. Many repairs we complete in a single visit, and we always quote you up front before any work begins.",
-      "Need help right now? Call or text (813) 501-7572 and a real technician will respond — no call-center runaround. Same-day appointments are usually available, and emergency roadside service is offered evenings and weekends throughout Lehigh Acres.",
+      "Need help right now? Call or text (813) 501-7572 and a real technician will respond — no call-center runaround. Same-day appointments are usually available, with evening and weekend coverage throughout Lehigh Acres.",
     ],
   },
   {
@@ -45,7 +45,7 @@ export const cities: City[] = [
       "Fort Myers Beach",
     ],
     intro:
-      "Looking for a reliable mobile mechanic in Fort Myers, FL? Mike's Mobile Auto Repair brings ASE-level service straight to your home, workplace, or roadside breakdown anywhere in greater Fort Myers.",
+      "Looking for a reliable mobile mechanic in Fort Myers, FL? Mike's Mobile Auto Repair brings ASE-level service straight to your home or workplace anywhere in greater Fort Myers.",
     paragraphs: [
       "From Downtown to Gateway, McGregor to Iona, our Fort Myers customers get the same professional repairs they'd find in a traditional shop — without the tow bill, the rental car, or the wasted afternoon in a waiting room. Our mobile service truck carries the diagnostic equipment and common parts needed to handle most repairs on the spot.",
       "We cover every major Fort Myers ZIP code including 33901, 33907, 33908, 33912, 33913, 33916, 33919, and 33966. Common Fort Myers calls include AC recharges (Florida heat is brutal), brake jobs, battery and alternator replacements, oil changes, and computer diagnostics for stubborn check-engine lights.",
@@ -70,7 +70,7 @@ export const cities: City[] = [
     paragraphs: [
       "Cape Coral's sprawling layout means a simple shop visit can eat up half a day. Skip the tow truck and the rideshare — our mobile service truck handles brake jobs, AC repairs, batteries, alternators, starters, oil changes, and full computer diagnostics right in your driveway.",
       "We cover every Cape Coral ZIP code including 33904, 33909, 33914, 33990, 33991, and 33993. Whether you're near Cape Harbour, Sandoval, Pelican, or up by Burnt Store Road, we'll roll to your location with the right tools to fix it the first time.",
-      "Stranded on a Cape Coral road? Roadside help — jump starts, lockouts, flat tire repairs, and dead-battery rescues — is just a phone call away. Call or text (813) 501-7572 to book or get a quote.",
+      "Need a mobile mechanic in Cape Coral? Call or text (813) 501-7572 to book or get a quote.",
     ],
   },
   {
@@ -87,9 +87,9 @@ export const cities: City[] = [
       "Stoneybrook",
     ],
     intro:
-      "Mike's Mobile Auto Repair is the on-call mobile mechanic in Estero, FL. We bring full-service auto repair, diagnostics, and roadside help to homes, businesses, and stranded drivers across the Estero area — from Coconut Point to Miromar Lakes.",
+      "Mike's Mobile Auto Repair is the on-call mobile mechanic in Estero, FL. We bring full-service auto repair, diagnostics, and on-site repair to homes and businesses across the Estero area — from Coconut Point to Miromar Lakes.",
     paragraphs: [
-      "Estero sits right between Fort Myers and Bonita Springs, and the daily commute on US-41 and I-75 is hard on cars — especially in summer heat. We come to your home, workplace, or roadside breakdown with diagnostic scanners, quality parts, and the experience to handle most repairs in a single visit. No tow, no lost afternoon, no shop waiting room.",
+      "Estero sits right between Fort Myers and Bonita Springs, and the daily commute on US-41 and I-75 is hard on cars — especially in summer heat. We come to your home or workplace with diagnostic scanners, quality parts, and the experience to handle most repairs in a single visit. No tow, no lost afternoon, no shop waiting room.",
       "We service every Estero ZIP code (33928, 33967, 34134, 34135) and handle batteries, alternators, brakes, AC recharges, oil changes, no-start diagnostics, and check-engine-light troubleshooting. Florida heat is brutal on batteries and AC systems — the two calls we get most often from Estero customers — and we keep both in our truck.",
       "If you're stranded near Coconut Point, Miromar, or anywhere along Corkscrew Road, call or text (813) 501-7572. A real technician answers and same-day mobile service is usually available.",
     ],
@@ -112,7 +112,7 @@ export const cities: City[] = [
     paragraphs: [
       "From Bonita Beach to Pelican Landing and Bonita National, our mobile service truck rolls to you with the tools and parts to handle most repairs on site. Brake jobs, battery and alternator replacements, AC service, oil changes, and computer diagnostics — all done at your home or workplace with up-front, transparent pricing.",
       "We service Bonita Springs ZIP codes 34134 and 34135 and the surrounding communities. The two most common calls here are AC recharges (Florida humidity is no joke) and battery replacements (heat kills batteries fast in coastal SWFL). Both are usually completed in under an hour.",
-      "Need help right now? Call or text (813) 501-7572 — same-day appointments are usually available across Bonita Springs, including evenings and weekends for genuine roadside emergencies.",
+      "Need help right now? Call or text (813) 501-7572 — same-day appointments are usually available across Bonita Springs, including evenings and weekends.",
     ],
   },
   {
