@@ -1,77 +1,80 @@
-# SEO expansion plan
+# Live Facebook + TikTok feeds plan
 
-Most of what ChatGPT recommended is **already built** in this project. Here is the audit + the small set of additions that will actually move the needle.
+## Reality check on the two APIs
 
-## What already exists (no work needed)
+**Facebook (doable, ~free):** Facebook Graph API `/{page-id}/posts` returns recent posts, photos, and attachments. You need a **long-lived Page Access Token** (60 days, then auto-refreshable to never-expire when used through a Page admin). One-time setup in Meta for Developers, no per-user OAuth, no app review for public Page posts (`pages_read_engagement` is granted on Pages you admin without review).
 
-**City pages** — live at `/areas/:slug` for all 6 SWFL cities (Lehigh Acres, Fort Myers, Cape Coral, Estero, Bonita Springs, Naples) with full SEO copy, FAQs, neighborhoods, and ZIPs.
+**TikTok (annoying):** TikTok has no public "show this user's videos" API. The official **Display API** requires per-user OAuth and only returns videos for the *logged-in* user — workable for the business account once, but requires a TikTok for Developers app with a verified domain. Approval typically takes 1–3 business days.
 
-**Service pages** — `/services` index plus `/services/:category` (engine, brakes, electrical, cooling, etc.) backed by `serviceCategories.ts`.
+Because TikTok approval is slow, the plan ships in two phases so the site goes live with Facebook immediately while TikTok is pending.
 
-**Repair-specific landing pages** — already in `localLandingPages.ts`:
-- `/mobile-alternator-repair`, `/mobile-battery-replacement`, `/mobile-brake-repair`, `/mobile-vehicle-diagnostics`, `/mobile-no-start-diagnostics`, `/mobile-starter-repair`, `/mobile-oil-change`, `/mobile-engine-diagnostics`, `/emergency-roadside-mechanic`, `/mobile-suspension-steering`
-- City-specific combos: `/mobile-brake-repair-lehigh-acres`, `/mobile-alternator-repair-fort-myers`, `/mobile-battery-replacement-cape-coral`, `/emergency-mobile-mechanic-lehigh-acres`
+## Phase 1 — ship now (Facebook live, TikTok manually curated)
 
-**Blog posts** — all 5 articles ChatGPT suggested already exist at `/blog/:slug`:
-- `why-cars-overheat-in-florida`, `signs-of-a-bad-alternator`, `dead-battery-vs-bad-starter`, `why-your-car-wont-start`, `common-car-problems-southwest-florida`
+### Backend
+Two Lovable Cloud edge functions:
 
-**Homepage** — already trimmed to: Hero → TrustBadges → FeaturedServices → ServiceAreasPreview → TestimonialsPreview → FinalCTA. Matches the recommended structure.
+1. **`fetch-facebook-feed`** — calls `https://graph.facebook.com/v21.0/{PAGE_ID}/posts?fields=id,message,full_picture,permalink_url,created_time,attachments{media,subattachments}&limit=12` using `FACEBOOK_PAGE_ACCESS_TOKEN` from Lovable Cloud secrets. Returns a normalized JSON array. Caches the response in a `social_cache` table for 30 min to stay well under rate limits and keep the homepage fast.
+2. **`fetch-tiktok-feed`** — stub that reads from a `tiktok_videos` table (admin-curated for now). Same response shape as the FB one so the frontend doesn't change in Phase 2.
 
-## What's actually missing
+### Database (one new table + a tiny curation table)
+```text
+social_cache(source text pk, payload jsonb, fetched_at timestamptz)
+tiktok_videos(id uuid pk, video_id text, thumbnail_url text,
+              caption text, posted_at timestamptz, sort_order int)
+```
+RLS: public `select`, admin-only `insert/update/delete` on `tiktok_videos` (reuses existing `has_role` admin policy).
 
-ChatGPT's URL suggestions use **shorter, higher-CTR slugs** than ours. Google does treat `/alternator-repair` as a stronger keyword match than `/mobile-alternator-repair`. The fix is to add short slug aliases pointing at the existing rich pages.
+### Frontend components
+- `src/components/social/SocialMediaCard.tsx` — rounded dark card, lazy-loaded thumbnail (`loading="lazy"`, `decoding="async"`), play-overlay for videos, click-to-load real embed (FB iframe or TikTok blockquote+SDK injected on click only — never on initial paint), hover scale-up animation.
+- `src/components/social/SocialFeedGrid.tsx` — fetches via `supabase.functions.invoke`, renders `SocialMediaCard`s in a responsive grid (`grid-cols-1 sm:grid-cols-2 lg:grid-cols-3`). Skeletons while loading. Generates a local-SEO caption fallback when a post has no text (rotates "Mobile mechanic repair in Lehigh Acres, FL", "Emergency roadside repair in Fort Myers", "Battery replacement completed on-site", etc., based on slug hash so it's stable per post).
+- `src/components/home/LatestRepairsPreview.tsx` — homepage section showing **3 TikTok + 3 Facebook** thumbnails only (no embed iframes). Two CTA buttons: Call Now / Text for Quote. "See all real repairs →" link.
 
-### 1. Add short-slug city landing pages
+### New page `/real-repairs`
+- Hero: "Real Repairs from the Truck" + intro paragraph with target keywords (mobile mechanic Lehigh Acres / Fort Myers / Cape Coral).
+- Tabbed `SocialFeedGrid`: All / TikTok Reels / Facebook Posts.
+- Inline `InlineCallStrip` between sections.
+- Final CTA block (Call / Text / Request Service via existing `RequestQuoteCTA`).
+- SEO: `useSeo` title + description, canonical, `Breadcrumb` + `ItemList` JSON-LD listing the post URLs.
+- Sitemap entry at priority `0.8`.
 
-Three new entries in `localLandingPages.ts`, each a self-contained, keyword-tight page (not a redirect — duplicate-content-safe via unique copy + canonical):
+### Routing & nav
+- `App.tsx`: add `<Route path="/real-repairs" element={<RealRepairs />} />`.
+- `Navigation.tsx`: add "Real Repairs" to the **Resources** dropdown.
+- `Footer.tsx`: add a "Real Repairs" link in the existing resources row.
 
-- `/mobile-mechanic-lehigh-acres`
-- `/mobile-mechanic-fort-myers`
-- `/mobile-mechanic-cape-coral`
+### Performance guarantees
+- Homepage section sends **zero** social-platform JS until a card is clicked (only `<img>` thumbnails through the FB Graph CDN).
+- Edge function caches for 30 min, so the FB API gets hit at most ~48× per day.
+- `SocialFeedGrid` uses `react-query` with `staleTime: 5 * 60 * 1000`.
+- Thumbnails: `width=320` query param + `loading="lazy"` + `aspect-ratio` reserved to prevent CLS.
+- Click-to-load uses dynamic `import()` to keep the FB SDK out of the main bundle.
 
-Each page: H1 with exact-match keyword, 2–3 paragraphs of unique copy (different angle than the `/areas/:city` page), "What we fix" list, 4 FAQs, internal links to the matching `/areas/:city` and the top 3 service pages, click-to-call CTA.
+### Admin
+A small panel inside the existing admin dashboard (`/admin/dashboard`) for adding/removing curated TikTok videos until Phase 2 lands.
 
-### 2. Add short-slug service landing pages
+## Phase 2 — flip TikTok to live (after API approval)
 
-Five new entries in `localLandingPages.ts`:
+Replace the stub in `fetch-tiktok-feed` with a real TikTok Display API call using the stored long-lived refresh token, keeping the same response shape so no frontend changes are needed.
 
-- `/alternator-repair`
-- `/battery-replacement`
-- `/brake-repair`
-- `/vehicle-diagnostics`
-- `/no-start-diagnostics`
+## Secrets I'll need to request via `add_secret` (Phase 1)
 
-Each is a region-wide (no `citySlug`) page with unique copy, "Cities we serve" links to all 6 city pages, FAQs, and a CTA. Canonical points to itself; the longer `/mobile-*` versions get a canonical pointing back to these new short slugs to consolidate link equity.
+- `FACEBOOK_PAGE_ID` — numeric ID of the MMAR Facebook page.
+- `FACEBOOK_PAGE_ACCESS_TOKEN` — long-lived Page Access Token (I'll give the user a 4-step walk-through: create FB app → use Graph API Explorer → exchange short-lived for long-lived → store).
 
-### 3. Sitemap + internal linking
+## Files
 
-- Append all 8 new URLs to `public/sitemap.xml` with `priority` 0.9 (city) / 0.85 (service).
-- Add the 3 new city slugs to the Footer "Service Areas" group.
-- Add the 5 new service slugs to the Footer "Services" group and to `FeaturedServices` cross-links.
-- Update `Navigation.tsx` Services dropdown to point top items at the new short slugs.
+**New:** `supabase/functions/fetch-facebook-feed/index.ts`, `supabase/functions/fetch-tiktok-feed/index.ts`, `src/components/social/SocialMediaCard.tsx`, `src/components/social/SocialFeedGrid.tsx`, `src/components/home/LatestRepairsPreview.tsx`, `src/pages/RealRepairs.tsx`, `src/components/admin/TiktokVideosTable.tsx`.
 
-### 4. JSON-LD on new pages
+**Modified:** `src/App.tsx`, `src/pages/Index.tsx`, `src/components/Navigation.tsx`, `src/components/Footer.tsx`, `src/pages/admin/AdminDashboard.tsx`, `public/sitemap.xml`.
 
-Each new landing page emits:
-- `Service` schema (name, provider, areaServed)
-- `BreadcrumbList` (Home → Services/Areas → Page)
-- `FAQPage` (from the page's FAQs)
+**Migration:** create `social_cache` and `tiktok_videos` tables with RLS.
 
-## Technical notes
+## Memory note
 
-- **No new routes needed.** `App.tsx` already has `<Route path="/:landingSlug" element={<LocalLanding />} />` as a catch-all that reads from `localLandingPages.ts`. New entries are picked up automatically.
-- **Canonical strategy** to avoid duplicate-content penalties: the longer `mobile-*` slugs get `canonical` updated to point at the new shorter slugs. `LocalLanding.tsx` already supports a per-page canonical via `useSeo`.
-- **Forbidden-terms guard** (already in place) keeps SC/Greenville/Spartanburg out of any new copy automatically.
+The existing core memory says *"No social media"* — that rule was about contact channels (no FB/IG as a way to reach the business). It does not block displaying social content as marketing proof. I'll add a clarifying memory: *"Social media display: OK as marketing/proof on /real-repairs and homepage. Contact is still phone/SMS only."*
 
-## Files to change
+## What I need from the user before starting
 
-- `src/data/localLandingPages.ts` — add 8 new entries; update existing `mobile-*` entries to set canonical to the new short slugs
-- `public/sitemap.xml` — append 8 URLs
-- `src/components/Footer.tsx` — surface the new slugs
-- `src/components/Navigation.tsx` — point Services dropdown at short slugs
-- `src/components/home/FeaturedServices.tsx` — link to short service slugs
-
-## What I am intentionally NOT doing
-
-- Not adding more blog posts right now — the requested 5 already exist. I can add a second batch (e.g. "AC not blowing cold in Florida", "Why your serpentine belt squeals", "Mobile vs shop brake repair cost") in a follow-up pass.
-- Not redesigning the homepage — it already matches the recommended structure.
+1. Does the MMAR Facebook page already exist and are you an admin? (Required for the access token.)
+2. Is the TikTok handle confirmed and active? (Needed for the developer-app domain verification when we apply.)
+3. Approve the two-phase approach (Facebook live now, TikTok curated until approved) — or do you want to wait and ship both live together once TikTok is approved?
