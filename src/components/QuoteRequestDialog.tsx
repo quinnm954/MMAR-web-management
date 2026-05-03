@@ -36,11 +36,13 @@ const QuoteRequestDialog = ({
   const [mileage, setMileage] = useState("");
   const [location, setLocation] = useState("");
   const [notes, setNotes] = useState("");
+  const [previewText, setPreviewText] = useState<string | null>(null);
 
   const STORAGE_KEY = "quoteRequest:vehicleInfo";
 
   useEffect(() => {
     if (open) {
+      setPreviewText(null);
       try {
         const saved = localStorage.getItem(STORAGE_KEY);
         if (saved) {
@@ -65,7 +67,7 @@ const QuoteRequestDialog = ({
     }
   }, [open, serviceName]);
 
-  const handleSend = () => {
+  const handleReview = () => {
     if (year) {
       const y = Number(year);
       if (!/^\d{4}$/.test(year) || y < 1900 || y > currentYear + 1) {
@@ -103,8 +105,14 @@ const QuoteRequestDialog = ({
       // ignore
     }
 
-    const body = encodeURIComponent(lines.join("\n"));
+    setPreviewText(lines.join("\n"));
+  };
+
+  const handleSend = () => {
+    if (!previewText) return;
+    const body = encodeURIComponent(previewText);
     window.location.href = `sms:${phone}?body=${body}`;
+    setPreviewText(null);
     onOpenChange(false);
   };
 
@@ -127,85 +135,115 @@ const QuoteRequestDialog = ({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4">
-          <div className="grid grid-cols-3 gap-3">
-            <div className="space-y-1.5">
-              <Label htmlFor="year">Year</Label>
-              <Input
-                id="year"
-                inputMode="numeric"
-                pattern="\d*"
-                maxLength={4}
-                placeholder="2018"
-                value={year}
-                onChange={(e) => setYear(digitsOnly(e.target.value).slice(0, 4))}
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="make">Make</Label>
-              <Input
-                id="make"
-                placeholder="Toyota"
-                value={make}
-                onChange={(e) => setMake(e.target.value)}
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="model">Model</Label>
-              <Input
-                id="model"
-                placeholder="Camry"
-                value={model}
-                onChange={(e) => setModel(e.target.value)}
-              />
-            </div>
-          </div>
+        {previewText === null ? (
+          <>
+            <div className="space-y-4">
+              <div className="grid grid-cols-3 gap-3">
+                <div className="space-y-1.5">
+                  <Label htmlFor="year">Year</Label>
+                  <Input
+                    id="year"
+                    inputMode="numeric"
+                    pattern="\d*"
+                    maxLength={4}
+                    placeholder="2018"
+                    value={year}
+                    onChange={(e) => setYear(digitsOnly(e.target.value).slice(0, 4))}
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="make">Make</Label>
+                  <Input
+                    id="make"
+                    placeholder="Toyota"
+                    value={make}
+                    onChange={(e) => setMake(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="model">Model</Label>
+                  <Input
+                    id="model"
+                    placeholder="Camry"
+                    value={model}
+                    onChange={(e) => setModel(e.target.value)}
+                  />
+                </div>
+              </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div className="space-y-1.5">
-              <Label htmlFor="mileage">Mileage (optional)</Label>
-              <Input
-                id="mileage"
-                inputMode="numeric"
-                pattern="\d*"
-                maxLength={7}
-                placeholder="85000"
-                value={mileage}
-                onChange={(e) => setMileage(digitsOnly(e.target.value).slice(0, 7))}
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="location">Location (optional)</Label>
-              <Input
-                id="location"
-                placeholder="Fort Myers, FL"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-              />
-            </div>
-          </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label htmlFor="mileage">Mileage (optional)</Label>
+                  <Input
+                    id="mileage"
+                    inputMode="numeric"
+                    pattern="\d*"
+                    maxLength={7}
+                    placeholder="85000"
+                    value={mileage}
+                    onChange={(e) => setMileage(digitsOnly(e.target.value).slice(0, 7))}
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="location">Location (optional)</Label>
+                  <Input
+                    id="location"
+                    placeholder="Fort Myers, FL"
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                  />
+                </div>
+              </div>
 
-          <div className="space-y-1.5">
-            <Label htmlFor="notes">Notes (optional)</Label>
-            <Textarea
-              id="notes"
-              placeholder="Symptoms, sounds, when it started…"
-              rows={3}
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-            />
-          </div>
-        </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="notes">Notes (optional)</Label>
+                <Textarea
+                  id="notes"
+                  placeholder="Symptoms, sounds, when it started…"
+                  rows={3}
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                />
+              </div>
+            </div>
 
-        <DialogFooter className="gap-2 sm:gap-2">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
-          </Button>
-          <Button variant="hero" onClick={handleSend} className="gap-2">
-            <MessageSquare className="w-4 h-4" />
-            Send Text
-          </Button>
-        </DialogFooter>
+            <DialogFooter className="gap-2 sm:gap-2">
+              <Button variant="outline" onClick={() => onOpenChange(false)}>
+                Cancel
+              </Button>
+              <Button variant="hero" onClick={handleReview} className="gap-2">
+                <MessageSquare className="w-4 h-4" />
+                Review Text
+              </Button>
+            </DialogFooter>
+          </>
+        ) : (
+          <>
+            <div className="space-y-2">
+              <Label htmlFor="preview">Preview & edit your message</Label>
+              <Textarea
+                id="preview"
+                rows={8}
+                value={previewText}
+                onChange={(e) => setPreviewText(e.target.value)}
+                maxLength={1500}
+              />
+              <p className="text-xs text-muted-foreground">
+                Sending to {phone}. Your messaging app will open next.
+              </p>
+            </div>
+
+            <DialogFooter className="gap-2 sm:gap-2">
+              <Button variant="outline" onClick={() => setPreviewText(null)}>
+                Back
+              </Button>
+              <Button variant="hero" onClick={handleSend} className="gap-2">
+                <MessageSquare className="w-4 h-4" />
+                Send Text
+              </Button>
+            </DialogFooter>
+          </>
+        )}
       </DialogContent>
     </Dialog>
   );
