@@ -54,11 +54,14 @@ const Blog = () => {
     canonical,
   });
 
-  // Blog ItemList schema
+  // Blog + BreadcrumbList schema
   useEffect(() => {
-    const id = "ld-blog-list";
-    document.getElementById(id)?.remove();
-    const ld = {
+    const blogId = "ld-blog-list";
+    const crumbId = "ld-blog-breadcrumb";
+    document.getElementById(blogId)?.remove();
+    document.getElementById(crumbId)?.remove();
+
+    const blogLd = {
       "@context": "https://schema.org",
       "@type": "Blog",
       name: "Mike's Mobile Auto Repair Blog",
@@ -70,12 +73,31 @@ const Blog = () => {
         datePublished: p.dateISO,
       })),
     };
-    const s = document.createElement("script");
-    s.type = "application/ld+json";
-    s.id = id;
-    s.text = JSON.stringify(ld);
-    document.head.appendChild(s);
-    return () => s.remove();
+    const breadcrumbLd = {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: SITE },
+        { "@type": "ListItem", position: 2, name: "Blog", item: `${SITE}/blog` },
+      ],
+    };
+
+    const a = document.createElement("script");
+    a.type = "application/ld+json";
+    a.id = blogId;
+    a.text = JSON.stringify(blogLd);
+    document.head.appendChild(a);
+
+    const b = document.createElement("script");
+    b.type = "application/ld+json";
+    b.id = crumbId;
+    b.text = JSON.stringify(breadcrumbLd);
+    document.head.appendChild(b);
+
+    return () => {
+      a.remove();
+      b.remove();
+    };
   }, [sorted]);
 
   const goTo = (n: number) => {
