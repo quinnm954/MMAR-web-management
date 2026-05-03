@@ -16,7 +16,7 @@ import { REVIEWS_META } from "@/data/reviewsMeta";
 import { useSeo } from "@/lib/useSeo";
 import NotFound from "./NotFound";
 
-const SITE = "https://www.mikesmautorepair.com";
+const SITE = "https://mikesmautorepair.com";
 
 const LocalLanding = () => {
   const { landingSlug = "" } = useParams();

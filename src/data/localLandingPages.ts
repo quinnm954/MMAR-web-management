@@ -27,7 +27,7 @@ export const localLandingPages: LocalLandingPage[] = [
       "Mobile Brake Repair in Lehigh Acres, FL | Mike's Mobile Auto Repair",
     metaDescription:
       "On-site brake pad, rotor, and caliper replacement in Lehigh Acres, FL. Same-day mobile brake repair at your home or workplace. Call (813) 501-7572.",
-    canonical: "https://www.mikesmautorepair.com/brake-repair-lehigh-acres",
+    canonical: "https://mikesmautorepair.com/brake-repair-lehigh-acres",
     intro:
       "Squealing, grinding, or a soft pedal? Mike's Mobile Auto Repair handles complete mobile brake repair in Lehigh Acres, FL — pads, rotors, calipers, lines, and ABS diagnostics — right in your driveway.",
     paragraphs: [
@@ -73,7 +73,7 @@ export const localLandingPages: LocalLandingPage[] = [
       "Mobile Alternator Repair in Fort Myers, FL | Mike's Mobile Auto Repair",
     metaDescription:
       "On-site alternator replacement and charging system repair in Fort Myers, FL. Same-day mobile service. Call or text (813) 501-7572 for a fast quote.",
-    canonical: "https://www.mikesmautorepair.com/alternator-repair-fort-myers",
+    canonical: "https://mikesmautorepair.com/alternator-repair-fort-myers",
     intro:
       "Battery light on, dim headlights, or a no-start after a jump? Mike's Mobile Auto Repair provides full mobile alternator repair and charging-system service in Fort Myers, FL — at your home or office.",
     paragraphs: [
@@ -162,7 +162,7 @@ export const localLandingPages: LocalLandingPage[] = [
       "Mobile Brake Repair in SWFL | Pads, Rotors & Calipers At Your Driveway",
     metaDescription:
       "On-site mobile brake repair across Lehigh Acres, Fort Myers, Cape Coral, Estero, Bonita Springs and Naples. Pads, rotors, calipers, fluid. Call (813) 501-7572.",
-    canonical: "https://www.mikesmautorepair.com/brake-repair",
+    canonical: "https://mikesmautorepair.com/brake-repair",
     intro:
       "Squealing, grinding, or a soft pedal? Mike's Mobile Auto Repair brings full mobile brake service — pads, rotors, calipers, lines, fluid, and ABS diagnostics — to driveways and workplaces across Southwest Florida.",
     paragraphs: [
@@ -195,7 +195,7 @@ export const localLandingPages: LocalLandingPage[] = [
       "Mobile Alternator Repair in SWFL | On-Site Charging System Service",
     metaDescription:
       "Mobile alternator replacement and full charging-system service across Lehigh Acres, Fort Myers, Cape Coral, Estero, Bonita Springs and Naples. Call (813) 501-7572.",
-    canonical: "https://www.mikesmautorepair.com/alternator-repair",
+    canonical: "https://mikesmautorepair.com/alternator-repair",
     intro:
       "Battery light on, dim headlights, or a no-start after a jump? Mike's Mobile Auto Repair handles full mobile alternator repair and charging-system testing across Southwest Florida — at your home or office.",
     paragraphs: [
@@ -226,7 +226,7 @@ export const localLandingPages: LocalLandingPage[] = [
       "Mobile Battery Replacement in SWFL | Same-Day Delivery & Install",
     metaDescription:
       "We deliver and install quality car batteries at your home or office across SWFL. Free charging-system test included. Call (813) 501-7572.",
-    canonical: "https://www.mikesmautorepair.com/battery-replacement",
+    canonical: "https://mikesmautorepair.com/battery-replacement",
     intro:
       "Dead battery? Skip the tow and the parts-store parking lot. We deliver and install quality car batteries anywhere in Southwest Florida — usually the same day.",
     paragraphs: [
@@ -286,7 +286,7 @@ export const localLandingPages: LocalLandingPage[] = [
       "Mobile Car Diagnostics in SWFL | OBD-II Scan & Drivability Testing",
     metaDescription:
       "Professional mobile vehicle diagnostics with real OBD-II scanners and live data. Check engine lights, drivability, electrical. Call (813) 501-7572.",
-    canonical: "https://www.mikesmautorepair.com/vehicle-diagnostics",
+    canonical: "https://mikesmautorepair.com/vehicle-diagnostics",
     intro:
       "Modern vehicles speak in trouble codes — and we speak the language. Mike's Mobile Auto Repair brings professional OBD-II scanners, live data analysis, and real drivability testing to your driveway anywhere in Southwest Florida.",
     paragraphs: [
@@ -405,7 +405,7 @@ export const localLandingPages: LocalLandingPage[] = [
       "Mobile No-Start Diagnostics in SWFL | Won't Crank or Won't Fire",
     metaDescription:
       "Car won't start? Mobile no-start diagnostics across SWFL — battery, starter, fuel, ignition, and security. Call (813) 501-7572.",
-    canonical: "https://www.mikesmautorepair.com/no-start-diagnostics",
+    canonical: "https://mikesmautorepair.com/no-start-diagnostics",
     intro:
       "Won't crank? Cranks but won't fire? Mike's Mobile Auto Repair specializes in mobile no-start diagnostics across Southwest Florida — at your driveway or parking lot.",
     paragraphs: [
@@ -884,7 +884,7 @@ export const localLandingPages: LocalLandingPage[] = [
     metaTitle: "Mobile Oil Change in SWFL | At Your Home or Office",
     metaDescription:
       "Full-service mobile oil change at your driveway across Lehigh Acres, Fort Myers, Cape Coral, Estero, Bonita Springs and Naples. Call (813) 501-7572.",
-    canonical: "https://www.mikesmautorepair.com/oil-change",
+    canonical: "https://mikesmautorepair.com/oil-change",
     intro:
       "Skip the quick-lube line. Mike's Mobile Auto Repair performs full-service oil changes — conventional, blend, or full synthetic — right in your driveway anywhere in Southwest Florida.",
     paragraphs: [
@@ -916,7 +916,7 @@ export const localLandingPages: LocalLandingPage[] = [
     metaTitle: "Mobile Vehicle Diagnostics in SWFL | Real OBD-II Testing",
     metaDescription:
       "Real mobile diagnostics across Lehigh Acres, Fort Myers, Cape Coral, Estero, Bonita Springs and Naples — OBD-II, live data, electrical. Call (813) 501-7572.",
-    canonical: "https://www.mikesmautorepair.com/diagnostics",
+    canonical: "https://mikesmautorepair.com/diagnostics",
     intro:
       "Check engine light on? Strange shifting, intermittent stalls, or an electrical gremlin? Mike's Mobile Auto Repair brings real vehicle diagnostics — OBD-II, live data, drivability, and electrical testing — to your driveway anywhere in Southwest Florida.",
     paragraphs: [
@@ -949,7 +949,7 @@ export const localLandingPages: LocalLandingPage[] = [
       "Mobile Battery, Alternator & Starter Repair | SWFL | (813) 501-7572",
     metaDescription:
       "On-site battery, alternator, and starter testing and replacement across Lehigh Acres, Fort Myers, Cape Coral, Estero, Bonita Springs and Naples. Call (813) 501-7572.",
-    canonical: "https://www.mikesmautorepair.com/battery-alternator-starter",
+    canonical: "https://mikesmautorepair.com/battery-alternator-starter",
     intro:
       "No-crank, single click, dim lights, or battery warning light? Mike's Mobile Auto Repair tests and replaces the entire starting and charging system — battery, alternator, and starter — at your home or office across Southwest Florida.",
     paragraphs: [

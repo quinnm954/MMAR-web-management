@@ -10,7 +10,7 @@ import { getBlogPostBySlug, blogPosts } from "@/data/blogPosts";
 import { useSeo } from "@/lib/useSeo";
 import NotFound from "./NotFound";
 
-const SITE = "https://www.mikesmautorepair.com";
+const SITE = "https://mikesmautorepair.com";
 
 const BlogPost = () => {
   const { slug = "" } = useParams();

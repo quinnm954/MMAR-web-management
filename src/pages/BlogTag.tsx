@@ -9,7 +9,7 @@ import { blogPosts } from "@/data/blogPosts";
 import { useSeo } from "@/lib/useSeo";
 import NotFound from "./NotFound";
 
-const SITE = "https://www.mikesmautorepair.com";
+const SITE = "https://mikesmautorepair.com";
 
 const slugifyTag = (t: string) => t.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 
