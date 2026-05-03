@@ -20,20 +20,20 @@ import {
 
 const SERVICES = [
   { to: "/services", label: "All Services" },
-  { to: "/mobile-vehicle-diagnostics", label: "Diagnostics" },
-  { to: "/mobile-brake-repair", label: "Brake Repair" },
-  { to: "/mobile-battery-replacement", label: "Battery Replacement" },
-  { to: "/mobile-alternator-repair", label: "Alternator Repair" },
+  { to: "/vehicle-diagnostics", label: "Diagnostics" },
+  { to: "/brake-repair", label: "Brake Repair" },
+  { to: "/battery-replacement", label: "Battery Replacement" },
+  { to: "/alternator-repair", label: "Alternator Repair" },
   { to: "/mobile-starter-repair", label: "Starter Repair" },
-  { to: "/mobile-no-start-diagnostics", label: "No-Start Diagnostics" },
+  { to: "/no-start-diagnostics", label: "No-Start Diagnostics" },
   { to: "/emergency-roadside-mechanic", label: "Emergency Roadside Mechanic" },
 ];
 
 const AREAS = [
   { to: "/service-areas", label: "All Service Areas" },
-  { to: "/areas/lehigh-acres", label: "Lehigh Acres" },
-  { to: "/areas/fort-myers", label: "Fort Myers" },
-  { to: "/areas/cape-coral", label: "Cape Coral" },
+  { to: "/mobile-mechanic-lehigh-acres", label: "Lehigh Acres" },
+  { to: "/mobile-mechanic-fort-myers", label: "Fort Myers" },
+  { to: "/mobile-mechanic-cape-coral", label: "Cape Coral" },
   { to: "/areas/estero", label: "Estero" },
   { to: "/areas/bonita-springs", label: "Bonita Springs" },
   { to: "/areas/naples", label: "Naples" },
