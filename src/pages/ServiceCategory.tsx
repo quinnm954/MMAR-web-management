@@ -7,7 +7,8 @@ import FloatingCallButton from "@/components/FloatingCallButton";
 import QuoteRequestDialog from "@/components/QuoteRequestDialog";
 import RequestQuoteCTA from "@/components/RequestQuoteCTA";
 import { getCategoryBySlug } from "@/data/serviceCategories";
-import { cities } from "@/data/cities";
+import { cities, getCityBySlug } from "@/data/cities";
+import { localLandingPages } from "@/data/localLandingPages";
 import { useSeo } from "@/lib/useSeo";
 import NotFound from "./NotFound";
 
