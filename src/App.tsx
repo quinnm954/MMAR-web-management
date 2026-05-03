@@ -11,6 +11,8 @@ import WarrantyPolicy from "./pages/WarrantyPolicy";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import ProtectedRoute from "./components/admin/ProtectedRoute";
+import ServiceCategory from "./pages/ServiceCategory";
+import CityPage from "./pages/CityPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +28,8 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/financing-contract" element={<FinancingContract />} />
             <Route path="/warranty-policy" element={<WarrantyPolicy />} />
+            <Route path="/services/:slug" element={<ServiceCategory />} />
+            <Route path="/areas/:city" element={<CityPage />} />
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route
               path="/admin/dashboard"
