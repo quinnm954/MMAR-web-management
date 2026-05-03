@@ -26,12 +26,14 @@ import {
   Cog,
   type LucideIcon,
 } from "lucide-react";
+import { useState } from "react";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import QuoteRequestDialog from "./QuoteRequestDialog";
 
 type Service = { icon: LucideIcon; name: string };
 type Category = { id: string; title: string; icon: LucideIcon; services: Service[] };
