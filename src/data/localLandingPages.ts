@@ -892,7 +892,7 @@ export const localLandingPages: LocalLandingPage[] = [
     slug: "oil-change-lehigh-acres",
     service: "Mobile Oil Change",
     citySlug: "lehigh-acres",
-    categoryId: "maintenance",
+    categoryId: "oil-fluids",
     h1: "Mobile Oil Change in Lehigh Acres, FL",
     metaTitle: "Mobile Oil Change in Lehigh Acres, FL | At Your Driveway",
     metaDescription:
