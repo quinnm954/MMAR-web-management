@@ -92,7 +92,7 @@ const ServiceCategory = () => {
             </h2>
             <p className="text-muted-foreground mb-4">
               Mike's Mobile Auto Repair brings {category.title.toLowerCase()}{" "}
-              services to your driveway, workplace, or roadside breakdown. We cover
+              services to your driveway or workplace. We cover
               all of Lee County and surrounding areas.
             </p>
             <div className="flex flex-wrap gap-2">

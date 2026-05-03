@@ -17,7 +17,7 @@ const HomeServicesOverview = () => {
 
           <article className="space-y-5 text-foreground/90 leading-relaxed text-base md:text-lg">
             <p>
-              Mike's Mobile Auto Repair brings ASE-level service straight to your driveway, office, or roadside breakdown anywhere in Southwest Florida. Instead of waiting half a day at a brick-and-mortar shop in Fort Myers or paying for a tow out of Lehigh Acres, we roll up with the diagnostic tools, quality parts, and experience to handle most repairs in a single visit. A real technician answers the phone — never a call center.
+              Mike's Mobile Auto Repair brings ASE-level service straight to your driveway or office anywhere in Southwest Florida. Instead of waiting half a day at a brick-and-mortar shop in Fort Myers or paying for a tow out of Lehigh Acres, we roll up with the diagnostic tools, quality parts, and experience to handle most repairs in a single visit. A real technician answers the phone — never a call center.
             </p>
             <p>
               Our most-called services include{" "}

@@ -26,7 +26,6 @@ const SERVICES = [
   { to: "/alternator-repair", label: "Alternator Repair" },
   { to: "/mobile-starter-repair", label: "Starter Repair" },
   { to: "/no-start-diagnostics", label: "No-Start Diagnostics" },
-  { to: "/emergency-roadside-mechanic", label: "Emergency Roadside Mechanic" },
 ];
 
 const AREAS = [

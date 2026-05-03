@@ -128,7 +128,7 @@ const WarrantyPolicy = () => {
               <p>5.1. <strong>MAXIMUM LIABILITY:</strong> Except for claims arising from gross negligence, willful misconduct, or reckless conduct by MMAR, MMAR's maximum liability for any claim shall not exceed the original cost of the repair or service giving rise to the claim.</p>
               <p>5.2. <strong>EXCLUSION OF DAMAGES:</strong> TO THE FULLEST EXTENT PERMITTED BY LAW, AND EXCEPT FOR DAMAGES ARISING FROM GROSS NEGLIGENCE, WILLFUL MISCONDUCT, OR RECKLESS CONDUCT, MMAR SHALL NOT BE LIABLE FOR ANY CONSEQUENTIAL, INCIDENTAL, SPECIAL, PUNITIVE, OR INDIRECT DAMAGES, INCLUDING BUT NOT LIMITED TO:</p>
               <ul className="list-disc list-inside ml-4 space-y-1">
-                <li>Towing charges or roadside assistance</li>
+                <li>Towing charges</li>
                 <li>Rental car or substitute transportation costs</li>
                 <li>Lost wages, lost business, or lost profits</li>
                 <li>Hotel, meal, or travel expenses</li>

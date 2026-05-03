@@ -71,7 +71,6 @@ const TAG_INTROS: Record<string, { title: string; intro: string; related: { href
       "Single click, no crank, dead dash, or engine spins but won't fire — every no-start has a different cause. These articles walk through how to figure out which one you have, and how a mobile mechanic can fix most of them on the spot.",
     related: [
       { href: "/mobile-no-start-diagnostics", label: "Mobile No-Start Diagnostics" },
-      { href: "/emergency-roadside-mechanic", label: "Emergency Roadside Mechanic" },
       { href: "/mobile-battery-replacement", label: "Mobile Battery Replacement" },
       { href: "/mobile-starter-repair", label: "Mobile Starter Repair" },
     ],

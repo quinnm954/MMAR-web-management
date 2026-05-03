@@ -14,12 +14,12 @@ const points = [
   {
     icon: Truck,
     title: "We Come to You",
-    body: "Driveway, office parking lot, apartment complex, or roadside — we bring the shop to you. Skip the tow truck, skip the rideshare, skip the day off work.",
+    body: "Driveway, office parking lot, or apartment complex — we bring the shop to you. Skip the tow truck, skip the rideshare, skip the day off work.",
   },
   {
     icon: Clock,
     title: "Fast Response, 7am–9pm",
-    body: "Most appointments are same-day across Lehigh Acres, Fort Myers, and Cape Coral. Emergency roadside calls get prioritized — a real technician answers, not a call center.",
+    body: "Most appointments are same-day across Lehigh Acres, Fort Myers, and Cape Coral — a real technician answers, not a call center.",
   },
   {
     icon: ShieldCheck,

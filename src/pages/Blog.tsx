@@ -20,7 +20,6 @@ const SERVICE_LINKS = [
   { href: "/mobile-battery-replacement", label: "Mobile Battery Replacement" },
   { href: "/mobile-starter-repair", label: "Mobile Starter Repair" },
   { href: "/mobile-oil-change", label: "Mobile Oil Change" },
-  { href: "/emergency-roadside-mechanic", label: "Emergency Roadside Mechanic" },
 ];
 
 const Blog = () => {

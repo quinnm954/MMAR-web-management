@@ -151,13 +151,13 @@ export const blogPosts: BlogPost[] = [
       </ul>
 
       <h2>Why mobile is the right call for no-starts</h2>
-      <p>A no-start is the worst possible time to need a tow. Our <a href="/emergency-mobile-mechanic-lehigh-acres">emergency mobile mechanic</a> service rolls to your driveway, parking lot, or roadside breakdown with diagnostic scanners, jump packs, replacement batteries, starters, and the experience to find the real problem fast. Most no-starts in SWFL get fixed on the spot.</p>
+      <p>A no-start is the worst possible time to need a tow. Our <a href="/no-start-diagnostics">mobile no-start diagnostics</a> service rolls to your driveway or parking lot with diagnostic scanners, jump packs, replacement batteries, starters, and the experience to find the real problem fast. Most no-starts in SWFL get fixed on the spot.</p>
 
       <p>Stuck right now in <a href="/areas/lehigh-acres">Lehigh Acres</a>, <a href="/areas/fort-myers">Fort Myers</a>, or anywhere in SWFL? Call <a href="tel:8135017572">(813) 501-7572</a>.</p>
     `,
     faqs: [
-      { question: "Can a mobile mechanic fix a no-start in a parking lot?", answer: "Yes. Most no-starts — dead battery, bad starter, fuel pump, sensor faults — are diagnosed and repaired right where the car sits, including parking lots, driveways, and roadside." },
-      { question: "How fast can you get to me for a no-start?", answer: "Typical response time across Lehigh Acres, Fort Myers, and Cape Coral is 60–120 minutes for emergency no-start calls. Call (813) 501-7572 for current ETA." },
+      { question: "Can a mobile mechanic fix a no-start in a parking lot?", answer: "Yes. Most no-starts — dead battery, bad starter, fuel pump, sensor faults — are diagnosed and repaired right where the car sits, including parking lots and driveways." },
+      { question: "How fast can you get to me for a no-start?", answer: "Typical response time across Lehigh Acres, Fort Myers, and Cape Coral is 60–120 minutes for no-start calls. Call (813) 501-7572 for current ETA." },
       { question: "Is mobile no-start service cheaper than a tow plus shop?", answer: "Almost always. A tow alone is $100–$250 in SWFL, plus shop diagnostic fees and waiting. Mobile diagnosis is typically $89–$129 with no tow needed." },
     ],
   },
@@ -226,7 +226,7 @@ export const blogPosts: BlogPost[] = [
       <p>Less common on modern fuel-injected cars, but worth mentioning: very hot fuel-rail temps can cause hard hot starts. Bad gas — water-contaminated or stale — also shows up after summer storms when filling stations get water in their underground tanks.</p>
 
       <h2>What to do right now</h2>
-      <p>If you're reading this stranded in a parking lot, call or text <a href="tel:8135017572">(813) 501-7572</a> for emergency <a href="/no-start-diagnostics">no-start diagnostics</a>. We'll bring a battery tester, jump pack, fuel-pressure gauge, and OBD-II scanner — and most no-starts in Lehigh Acres, Fort Myers, and Cape Coral are diagnosed and fixed on the spot without a tow.</p>
+      <p>If you're reading this stranded in a parking lot, call or text <a href="tel:8135017572">(813) 501-7572</a> for <a href="/no-start-diagnostics">mobile no-start diagnostics</a>. We'll bring a battery tester, jump pack, fuel-pressure gauge, and OBD-II scanner — and most no-starts in Lehigh Acres, Fort Myers, and Cape Coral are diagnosed and fixed on the spot without a tow.</p>
     `,
     faqs: [
       { question: "Why does my car only refuse to start when it's hot outside?", answer: "Three usual suspects: a battery that's heat-degraded, a starter solenoid that fails after the engine has heat-soaked, or a fuel-pump issue triggered by hot fuel-system temps. All three are testable on site." },
