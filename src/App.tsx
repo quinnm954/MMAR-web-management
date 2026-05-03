@@ -12,11 +12,16 @@ import AdminLogin from "./pages/admin/AdminLogin";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import ProtectedRoute from "./components/admin/ProtectedRoute";
 import ServiceCategory from "./pages/ServiceCategory";
+import ServicesIndex from "./pages/ServicesIndex";
 import CityPage from "./pages/CityPage";
+import ServiceAreas from "./pages/ServiceAreas";
 import LocalLanding from "./pages/LocalLanding";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
 import BlogTag from "./pages/BlogTag";
+import AboutPage from "./pages/AboutPage";
+import Reviews from "./pages/Reviews";
+import ContactPage from "./pages/ContactPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
