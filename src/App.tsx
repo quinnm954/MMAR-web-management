@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import Index from "./pages/Index";
-import GarageAce from "./pages/GarageAce";
+
 import FinancingContract from "./pages/FinancingContract";
 import WarrantyPolicy from "./pages/WarrantyPolicy";
 import AdminLogin from "./pages/admin/AdminLogin";
