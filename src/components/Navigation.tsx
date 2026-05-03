@@ -60,14 +60,6 @@ const Navigation = () => {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            <a
-              href="https://garage-ace.mikesmautorepair.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-accent font-semibold hover:text-accent/80 transition-colors duration-200"
-            >
-              Garage Ace
-            </a>
             <Button variant="hero" size="default" asChild>
               <a href="tel:8135017572">Get a Quote</a>
             </Button>
