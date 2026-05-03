@@ -843,6 +843,136 @@ export const localLandingPages: LocalLandingPage[] = [
       { q: "What if it's something you can't fix on site?", a: "We give you a transparent written quote and, if needed, coordinate towing. We never push unnecessary repairs." },
     ],
   },
+  // ===== New SEO pages: Naples city + short-slug services =====
+  {
+    slug: "mobile-mechanic-naples",
+    service: "Mobile Mechanic",
+    citySlug: "naples",
+    categoryId: "engine",
+    h1: "Mobile Mechanic in Naples, FL",
+    metaTitle: "Mobile Mechanic in Naples, FL | Mike's Mobile Auto Repair",
+    metaDescription:
+      "Trusted mobile mechanic in Naples, FL. On-site diagnostics, brakes, batteries, alternators, and AC. Same-day service. Call (813) 501-7572.",
+    intro:
+      "Looking for a reliable mobile mechanic in Naples, FL? Mike's Mobile Auto Repair brings ASE-level service to driveways and offices across Naples and Collier County — no tow, no shop wait.",
+    paragraphs: [
+      "Naples drivers shouldn't have to lose a workday — or a beach day — sitting in a shop waiting room. Our mobile service truck rolls right to you with diagnostic scanners, common parts, and the experience to handle most repairs in a single visit. From Old Naples and Aqualane Shores to Pelican Bay, North Naples, Vineyards, and Golden Gate, we cover the entire metro area.",
+      "Common Naples calls include AC recharges and compressor work (Florida heat is unforgiving), battery and alternator replacements, brake jobs, starter swaps, full check-engine-light diagnostics, and routine maintenance. We service every Naples ZIP including 34102, 34103, 34104, 34105, 34108, 34109, 34110, 34112, 34113, 34114, 34116, 34117, and 34119.",
+      "Pricing is quoted up front — no surprise fees and no upselling. A real technician answers the phone. Same-day appointments are usually available across Naples. Call or text (813) 501-7572 to book.",
+    ],
+    included: [
+      "On-site diagnostics with professional OBD-II scanners",
+      "Brake pad, rotor, and caliper replacement",
+      "Battery, alternator, and starter replacement",
+      "AC recharge and electrical system repairs",
+      "Mobile oil changes and routine maintenance",
+      "No-start and check-engine-light diagnostics",
+      "Light fleet maintenance for Naples businesses",
+    ],
+    faqs: [
+      { q: "Do you really come anywhere in Naples?", a: "Yes — every Naples ZIP from Old Naples to North Naples and out to Golden Gate Estates. We also cover the rest of Collier County." },
+      { q: "What does a service call cost?", a: "There's no separate trip fee inside our regular Naples service area. You only pay for the diagnostic and any repair, quoted up front." },
+      { q: "How fast can you come?", a: "Same-day appointments are usually available across Naples." },
+      { q: "Can you handle AC repairs in my driveway?", a: "Yes — AC recharges and many compressor and condenser jobs are routinely completed on site." },
+    ],
+  },
+  {
+    slug: "oil-change",
+    service: "Mobile Oil Change",
+    categoryId: "oil-fluids",
+    h1: "Mobile Oil Change in Southwest Florida",
+    metaTitle: "Mobile Oil Change in SWFL | At Your Home or Office",
+    metaDescription:
+      "Full-service mobile oil change at your driveway across Lehigh Acres, Fort Myers, Cape Coral, Estero, Bonita Springs and Naples. Call (813) 501-7572.",
+    canonical: "https://www.mikesmautorepair.com/oil-change",
+    intro:
+      "Skip the quick-lube line. Mike's Mobile Auto Repair performs full-service oil changes — conventional, blend, or full synthetic — right in your driveway anywhere in Southwest Florida.",
+    paragraphs: [
+      "A mobile oil change is the easiest service to fit into a busy schedule. We arrive with quality oil and a new filter, set up containment, drain and replace the oil, swap the filter, top off fluids, reset the maintenance light, and properly recycle the used oil. The whole appointment usually takes 20–30 minutes and you never have to leave home.",
+      "We carry conventional, synthetic-blend, and full-synthetic oils plus the right filter for your specific vehicle. Most modern cars and trucks need full synthetic — we'll confirm what's correct based on your owner's manual before we start. Pricing is up front and includes the multi-point inspection (tires, brakes, belts, hoses, lights) at no extra charge.",
+      "We service every Lehigh Acres, Fort Myers, Cape Coral, Estero, Bonita Springs, and Naples ZIP code. Call or text (813) 501-7572 to book a mobile oil change today.",
+    ],
+    included: [
+      "Up to 5 quarts of conventional, blend, or full synthetic oil",
+      "New OE-equivalent oil filter",
+      "Drain plug and gasket inspection",
+      "Used oil and filter recycled at no charge",
+      "Top-off of washer fluid and visible reservoirs",
+      "Free multi-point safety inspection",
+      "Maintenance reminder light reset",
+    ],
+    faqs: [
+      { q: "How much does a mobile oil change cost?", a: "Conventional from $59, synthetic blend from $79, full synthetic from $99 — pricing depends on oil capacity and filter." },
+      { q: "How long does it take?", a: "Most oil changes are completed in 20–30 minutes on site." },
+      { q: "Do you take the old oil?", a: "Yes — we contain it on site and recycle it properly at no extra charge." },
+      { q: "Will you remind me when I'm due again?", a: "Yes — we'll text you a reminder based on your driving and the oil type used." },
+    ],
+  },
+  {
+    slug: "diagnostics",
+    service: "Mobile Vehicle Diagnostics",
+    categoryId: "engine",
+    h1: "Mobile Vehicle Diagnostics in Southwest Florida",
+    metaTitle: "Mobile Vehicle Diagnostics in SWFL | Real OBD-II Testing",
+    metaDescription:
+      "Real mobile diagnostics across Lehigh Acres, Fort Myers, Cape Coral, Estero, Bonita Springs and Naples — OBD-II, live data, electrical. Call (813) 501-7572.",
+    canonical: "https://www.mikesmautorepair.com/diagnostics",
+    intro:
+      "Check engine light on? Strange shifting, intermittent stalls, or an electrical gremlin? Mike's Mobile Auto Repair brings real vehicle diagnostics — OBD-II, live data, drivability, and electrical testing — to your driveway anywhere in Southwest Florida.",
+    paragraphs: [
+      "A parts-store 'free scan' just reads the code and hands you a list of every part it could possibly be. That's a guess, not a diagnosis, and it routinely costs SWFL drivers hundreds of dollars in unnecessary parts. Real diagnostics means freeze-frame data, live sensor values, fuel-trim analysis, misfire counters, and — when needed — wiring tests with a multimeter or scope. We do the real work, then quote the actual repair before any wrench turns.",
+      "We diagnose check-engine lights, hard shifts, intermittent stalls, no-starts, hesitation under acceleration, electrical glitches, AC faults, ABS and traction-control warnings, and emissions readiness for tag renewal. On-the-spot fixes are common when the problem is straightforward — sensors, gaskets, ignition components, fuel-pump relays — and we provide a transparent written quote when follow-up parts are needed.",
+      "Service is available in every Lehigh Acres, Fort Myers, Cape Coral, Estero, Bonita Springs, and Naples ZIP. The diagnostic appointment runs $80–$150 and is fully credited toward any repair we perform. Call or text (813) 501-7572 to book.",
+    ],
+    included: [
+      "OBD-II scan with full code retrieval",
+      "Freeze-frame and live data analysis",
+      "Drivability and road-test verification",
+      "Electrical and wiring checks where needed",
+      "ABS, SRS, and body-control module scanning",
+      "Honest written diagnostic findings",
+      "Up-front repair quote — diagnostic fee credited toward repair",
+    ],
+    faqs: [
+      { q: "How much does a mobile diagnostic cost?", a: "Standard diagnostic appointments run $80–$150 and are credited toward any repair we perform the same visit." },
+      { q: "Can you reset my check-engine light?", a: "Yes — but only after we identify and address the actual cause. Otherwise it just comes back." },
+      { q: "Do you handle ABS and electrical issues?", a: "Yes — full chassis-wide diagnostics on most makes including ABS, SRS, and body-control modules." },
+      { q: "Same-day appointments?", a: "Yes — same-day mobile diagnostics are usually available across SWFL." },
+    ],
+  },
+  {
+    slug: "battery-alternator-starter",
+    service: "Mobile Battery, Alternator & Starter Service",
+    categoryId: "electrical",
+    h1: "Mobile Battery, Alternator & Starter Service in SWFL",
+    metaTitle:
+      "Mobile Battery, Alternator & Starter Repair | SWFL | (813) 501-7572",
+    metaDescription:
+      "On-site battery, alternator, and starter testing and replacement across Lehigh Acres, Fort Myers, Cape Coral, Estero, Bonita Springs and Naples. Call (813) 501-7572.",
+    canonical: "https://www.mikesmautorepair.com/battery-alternator-starter",
+    intro:
+      "No-crank, single click, dim lights, or battery warning light? Mike's Mobile Auto Repair tests and replaces the entire starting and charging system — battery, alternator, and starter — at your home or office across Southwest Florida.",
+    paragraphs: [
+      "When a vehicle won't crank, the cause is almost always one of three parts: a dead battery, a failing alternator, or a bad starter. Symptoms overlap, so we test the whole starting and charging system before we recommend anything. That means a load test on the battery, an output test on the alternator under demand, voltage-drop tests on the main cables, and a starter draw test if needed. You only pay for what's actually wrong.",
+      "Florida heat is brutal on starting systems. Most batteries last only 2–3 years here, alternators run hot under constant AC load, and starter solenoids weather faster than they should. We carry quality replacement batteries (standard and AGM), alternators for most makes and models, and source most starters same-day. Installation is on the spot — usually 30 to 90 minutes depending on the part — and we verify a clean 13.8–14.7-volt charge before we leave.",
+      "Service is available across every Lehigh Acres, Fort Myers, Cape Coral, Estero, Bonita Springs, and Naples ZIP. Stuck right now with a no-start? Call or text (813) 501-7572 — same-day mobile service is usually available.",
+    ],
+    included: [
+      "Free battery load test and charging-system test",
+      "Battery replacement (standard and AGM)",
+      "Alternator replacement on most makes and models",
+      "Starter testing and replacement",
+      "Voltage-drop testing on main cables and grounds",
+      "Terminal cleaning and corrosion removal",
+      "Old battery hauled away and properly recycled",
+    ],
+    faqs: [
+      { q: "How do I know which part is bad?", a: "We test all three before recommending anything. A weak battery, a failing alternator, and a bad starter can produce identical symptoms." },
+      { q: "How much does each repair cost?", a: "Battery: $180–$320 installed. Alternator: $350–$650 installed. Starter: $400–$750 installed. All quoted up front." },
+      { q: "Can you do it in my driveway?", a: "Yes — almost every battery, alternator, and starter job is done on site without a tow." },
+      { q: "Same-day service?", a: "Usually yes for common vehicles. Special-order parts may push to next day." },
+    ],
+  },
 ];
 
 export const getLandingPageBySlug = (slug: string) =>

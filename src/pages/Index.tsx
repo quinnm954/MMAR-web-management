@@ -11,6 +11,7 @@ import TestimonialsPreview from "@/components/home/TestimonialsPreview";
 import WhyChooseUs from "@/components/home/WhyChooseUs";
 import HomeServicesOverview from "@/components/home/HomeServicesOverview";
 import HomeFAQ from "@/components/home/HomeFAQ";
+import LocalPhotoGallery from "@/components/home/LocalPhotoGallery";
 import FinalCTA from "@/components/home/FinalCTA";
 import { useSeo } from "@/lib/useSeo";
 import { REVIEWS_META } from "@/data/reviewsMeta";
@@ -45,6 +46,42 @@ const Index = () => {
           telephone: "+18135017572",
           priceRange: "$$",
           image: "https://iili.io/3QividB.jpg",
+          areaServed: [
+            "Lehigh Acres, FL",
+            "Fort Myers, FL",
+            "Cape Coral, FL",
+            "Estero, FL",
+            "Bonita Springs, FL",
+            "Naples, FL",
+          ].map((name) => ({ "@type": "City", name })),
+          openingHoursSpecification: [
+            {
+              "@type": "OpeningHoursSpecification",
+              dayOfWeek: [
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday",
+                "Friday",
+                "Saturday",
+              ],
+              opens: "07:00",
+              closes: "21:00",
+            },
+            {
+              "@type": "OpeningHoursSpecification",
+              dayOfWeek: ["Sunday"],
+              opens: "09:00",
+              closes: "17:00",
+              description: "By appointment",
+            },
+          ],
+          sameAs: [
+            "https://www.facebook.com/Mikesmobileautorepairllc/",
+            "https://www.tiktok.com/@mikesmobileautorepair",
+            "https://www.yelp.com/biz/mikes-mobile-auto-repair-lehigh-acres",
+            "https://nextdoor.com/page/mikes-mobile-auto-repair-llc-lehigh-acres-fl",
+          ],
           aggregateRating: {
             "@type": "AggregateRating",
             ratingValue: REVIEWS_META.ratingValue,
@@ -90,6 +127,7 @@ const Index = () => {
       <TestimonialsPreview />
       <WhyChooseUs />
       <HomeServicesOverview />
+      <LocalPhotoGallery />
       <HomeFAQ />
       <FinalCTA />
       <Footer />

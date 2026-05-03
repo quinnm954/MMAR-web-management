@@ -1,73 +1,88 @@
-## Goal
+# SEO Indexing & Local-Ranking Pass
 
-Close the remaining SEO gaps from the recommendation list: ship the missing city+service landing pages, beef up homepage crawlable text, expand structured data (LocalBusiness/Review/Service/Breadcrumb), and add a first batch of high-intent blog posts. Backlinks, real-photo content, and Google Map embed are noted as out-of-code follow-ups.
+Goal: give Google more crawlable, well-linked local pages, surface them in the menu, and put full NAP + social/photo signals on every page.
 
-## 1. New city+service landing pages
+## 1. Add the missing landing pages
 
-Add these entries to `src/data/localLandingPages.ts`. Each gets ~800–1,200 words of city-specific copy across `intro` + `paragraphs`, an `included` checklist, 5 FAQs, full `metaTitle` / `metaDescription`. They route automatically through `/:landingSlug` → `LocalLanding.tsx`, which already emits `Service` + `FAQPage` JSON-LD.
+Add new entries to `src/data/localLandingPages.ts` (each ~700–900 words, FAQ block, included-services list, canonical, meta — matching the existing pattern):
 
-New short-slug city+service combos:
-- `/brake-repair-lehigh-acres`
-- `/alternator-repair-fort-myers`
-- `/battery-replacement-lehigh-acres`
-- `/roadside-mechanic-fort-myers`
-- `/oil-change-lehigh-acres`
-- `/diagnostics-lehigh-acres`
+- `mobile-mechanic-naples` — region/city page for Naples (parallels Lehigh/Fort Myers/Cape Coral).
+- `oil-change` — short-slug region page (currently only `/mobile-oil-change` exists; add `/oil-change` as canonical short slug requested).
+- `diagnostics` — short-slug region page (currently only `/vehicle-diagnostics` and `/mobile-vehicle-diagnostics`).
+- `battery-alternator-starter` — combined electrical-starting-system page targeting that exact phrase.
 
-Existing long-slug equivalents (e.g. `mobile-brake-repair-lehigh-acres`) get a `canonical` field pointing to the new short slug so equity consolidates — same pattern already used for the service-only short slugs.
+These slugs already render through the existing `/:landingSlug` route in `App.tsx` + `LocalLanding.tsx`, so no new routes needed — only data.
 
-All 6 new URLs are appended to `public/sitemap.xml`.
+## 2. Update the hamburger / desktop menu
 
-## 2. LocalLanding template upgrades
+Edit `src/components/Navigation.tsx` so both the `SERVICES` and `AREAS` arrays expose the requested links:
 
-Update `src/pages/LocalLanding.tsx` JSON-LD graph to also emit:
-- `BreadcrumbList` (Home → City or Service → This page)
-- `LocalBusiness` / `AutoRepair` provider node with full NAP, hours, areaServed (mirrors `index.html`)
-- `AggregateRating` on the Service node (uses real Google Reviews count we already cite — pulled from a single constant in `src/data/reviewsMeta.ts`, new file)
+Services dropdown:
+- `/brake-repair`
+- `/oil-change` (new)
+- `/diagnostics` (new)
+- `/battery-alternator-starter` (new — replaces the three separate battery/alternator/starter items, keep "All Services")
 
-Add a small "What customers say" block on each landing page that surfaces 2 city-relevant testimonials from `src/components/Testimonials.tsx` data, so the page has visible review content matching the schema.
+Service Areas dropdown:
+- `/mobile-mechanic-lehigh-acres`
+- `/mobile-mechanic-fort-myers`
+- `/mobile-mechanic-naples` (new — currently links to `/areas/naples`)
+- Keep Cape Coral, Estero, Bonita Springs.
 
-## 3. Homepage content expansion
+## 3. Footer NAP, hours, socials (global)
 
-Goal: ~1,200–1,600 visible words on `/` while keeping it conversion-focused. Add three new lightweight sections between `TestimonialsPreview` and `FinalCTA` in `src/pages/Index.tsx`:
+Edit `src/components/Footer.tsx` to add a dedicated NAP block visible on every page:
 
-- `WhyChooseUs.tsx` — 4–6 trust bullets with short paragraphs (ASE-level work, transparent pricing, 7am–9pm, mobile-first, warranty, locally owned in Lee County).
-- `HomeServicesOverview.tsx` — 4–6 short paragraphs naturally mentioning brake repair, alternator/battery, diagnostics, no-start, roadside, oil change, with inline links to the new landing pages.
-- `HomeFAQ.tsx` — 6 FAQs (cost, response time, warranty, areas served, payment, parts) rendered with the existing `Accordion` component. Emits `FAQPage` JSON-LD via a small effect.
+- **Business name:** Mike's Mobile Auto Repair LLC
+- **Phone:** (813) 501-7572 (tel + sms links)
+- **Service areas:** Lehigh Acres, Fort Myers, Cape Coral, Estero, Bonita Springs, Naples (Lee & Collier County, SWFL)
+- **Hours:** Mon–Sat 8am–7pm, Sun by appointment (confirm wording with you if different — using these as default)
+- **Socials:** add Facebook (existing) + TikTok (placeholder URL until you supply the handle) alongside the existing Google/Yelp/Nextdoor chips.
 
-Also add a `BreadcrumbList` + reinforced `LocalBusiness`/`AutoRepair` JSON-LD block on the homepage (the existing `index.html` block stays; the new one adds `aggregateRating` and explicit `service` list).
+Also wrap the NAP in `LocalBusiness` JSON-LD already present on the home page — extend it to include `openingHoursSpecification` and `sameAs` (Facebook, TikTok) so the structured data is complete.
 
-## 4. Blog content batch
+## 4. Photo gallery with SEO alt text
 
-Add 4 new posts to `src/data/blogPosts.ts` (existing infra already renders Article + FAQ JSON-LD and BreadcrumbList):
-- "Why Your Car Won't Start in Florida Heat"
-- "Signs Your Alternator Is Failing"
-- "Mobile Mechanic vs Shop in Lehigh Acres"
-- "Most Common Chevy Cruze Problems in SWFL"
+Add a new `src/components/home/LocalPhotoGallery.tsx` rendered on the home page and on each city short-slug page (`mobile-mechanic-*`). It will display 4–6 `<img>` tags pointing to images you upload (placeholders until then) with descriptive alt text such as:
+- "Mobile mechanic working on a car battery in Lehigh Acres FL"
+- "Brake pad replacement at customer driveway in Fort Myers FL"
+- "Mobile auto repair van serving Naples FL"
+- "Alternator replacement on a Chevy Cruze in Cape Coral FL"
 
-Each: 700–1,100 words, 4–6 FAQs, internal links to relevant landing pages, tagged for `/blog/tag/...`. Append to `public/sitemap.xml`.
+You can swap the placeholder images by uploading photos in chat — I'll wire them in.
 
-## 5. Performance / mobile polish
+## 5. Sitemap
 
-- Add `loading="lazy"` and `decoding="async"` to non-hero `<img>` tags across Hero/Testimonials/Blog cards where missing.
-- Add `fetchpriority="high"` to the hero image and `width`/`height` attributes to prevent CLS.
-- Verify Vite already code-splits routes (it does via React Router) — no change needed.
+Update `public/sitemap.xml` to add:
+- `/mobile-mechanic-naples`
+- `/oil-change`
+- `/diagnostics`
+- `/battery-alternator-starter`
 
-## 6. Out of code (noted in response, not implemented)
+Bump `lastmod` to today on changed URLs.
 
-Backlinks (Yelp/BBB/Chamber/Nextdoor), real customer before/after photos, embedded Google Map iframe (needs Maps API key — will ask before adding), and weekly blog cadence are owner tasks. Will list these in the final message.
+## 6. Google Search Console (manual — your action)
 
-## File changes
+Indexing requires you to:
+1. Verify the property `https://www.mikesmautorepair.com/` in Search Console.
+2. Submit `https://www.mikesmautorepair.com/sitemap.xml`.
+3. Use **URL Inspection → Request Indexing** for the new short-slug pages and homepage.
+4. (Optional) Submit the sitemap to Bing Webmaster Tools.
 
-- edit `src/data/localLandingPages.ts` (6 new entries + canonicals on 4 long-slug pages)
-- edit `src/pages/LocalLanding.tsx` (BreadcrumbList + LocalBusiness + AggregateRating in JSON-LD, testimonials block)
-- create `src/data/reviewsMeta.ts` (single source for review count/rating)
-- create `src/components/home/WhyChooseUs.tsx`
-- create `src/components/home/HomeServicesOverview.tsx`
-- create `src/components/home/HomeFAQ.tsx`
-- edit `src/pages/Index.tsx` (mount new sections + homepage JSON-LD effect)
-- edit `src/data/blogPosts.ts` (4 new posts)
-- edit `public/sitemap.xml` (10 new URLs)
-- minor img attribute tweaks in Hero/Testimonials/blog card components
+I can't do this for you — it requires Google account access. Once submitted, indexing typically takes 3–14 days.
 
-No new routes needed — `/:landingSlug` and `/blog/:slug` already cover them.
+## Files touched
+
+- `src/data/localLandingPages.ts` — 4 new entries
+- `src/components/Navigation.tsx` — menu items
+- `src/components/Footer.tsx` — NAP block, hours, TikTok link
+- `src/pages/Index.tsx` — extend JSON-LD with `sameAs` + hours; render gallery
+- `src/components/home/LocalPhotoGallery.tsx` — new
+- `src/pages/LocalLanding.tsx` — render gallery on city pages
+- `public/sitemap.xml` — 4 new URLs
+
+## Open questions
+
+- Confirm business hours (using Mon–Sat 8am–7pm, Sun by appt as default).
+- Share your TikTok URL (will leave a placeholder otherwise).
+- Will you upload photos now, or should I use neutral placeholders for the gallery initially?

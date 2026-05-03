@@ -7,6 +7,7 @@ import FloatingCallButton from "@/components/FloatingCallButton";
 import RequestQuoteCTA from "@/components/RequestQuoteCTA";
 import InlineCallStrip from "@/components/InlineCallStrip";
 import TrustBadges from "@/components/TrustBadges";
+import LocalPhotoGallery from "@/components/home/LocalPhotoGallery";
 
 import { getLandingPageBySlug, localLandingPages } from "@/data/localLandingPages";
 import { cities, getCityBySlug } from "@/data/cities";
@@ -295,6 +296,8 @@ const LocalLanding = () => {
           </div>
         </div>
       </section>
+
+      {city && <LocalPhotoGallery />}
 
       <Footer />
       <FloatingCallButton />

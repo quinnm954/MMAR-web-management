@@ -20,11 +20,10 @@ import {
 
 const SERVICES = [
   { to: "/services", label: "All Services" },
-  { to: "/vehicle-diagnostics", label: "Diagnostics" },
   { to: "/brake-repair", label: "Brake Repair" },
-  { to: "/battery-replacement", label: "Battery Replacement" },
-  { to: "/alternator-repair", label: "Alternator Repair" },
-  { to: "/mobile-starter-repair", label: "Starter Repair" },
+  { to: "/oil-change", label: "Oil Change" },
+  { to: "/diagnostics", label: "Diagnostics" },
+  { to: "/battery-alternator-starter", label: "Battery / Alternator / Starter" },
   { to: "/no-start-diagnostics", label: "No-Start Diagnostics" },
 ];
 
@@ -33,9 +32,9 @@ const AREAS = [
   { to: "/mobile-mechanic-lehigh-acres", label: "Lehigh Acres" },
   { to: "/mobile-mechanic-fort-myers", label: "Fort Myers" },
   { to: "/mobile-mechanic-cape-coral", label: "Cape Coral" },
+  { to: "/mobile-mechanic-naples", label: "Naples" },
   { to: "/areas/estero", label: "Estero" },
   { to: "/areas/bonita-springs", label: "Bonita Springs" },
-  { to: "/areas/naples", label: "Naples" },
 ];
 
 const RESOURCES = [

@@ -12,23 +12,37 @@ const Footer = () => {
           <div>
             <img
               src={mmarLogo}
-              alt="MMAR Logo"
+              alt="Mike's Mobile Auto Repair logo — mobile mechanic in Lehigh Acres FL"
               className="h-12 w-auto rounded mb-3"
             />
+            <p className="text-sm font-semibold text-foreground">
+              Mike's Mobile Auto Repair LLC
+            </p>
             <p className="text-sm text-muted-foreground">
               Mobile auto repair across Southwest Florida.
             </p>
             <a
               href="tel:8135017572"
-              className="block mt-3 text-primary hover:underline text-sm font-medium"
+              className="block mt-2 text-primary hover:underline text-sm font-medium"
             >
-              (813) 501-7572
+              Call: (813) 501-7572
             </a>
+            <a
+              href="sms:8135017572"
+              className="block text-primary hover:underline text-sm font-medium"
+            >
+              Text: (813) 501-7572
+            </a>
+            <p className="mt-3 text-xs text-muted-foreground leading-relaxed">
+              <span className="block"><span className="font-semibold text-foreground/80">Hours:</span> Mon–Sat 7am–9pm · Sun by appointment</span>
+              <span className="block mt-1"><span className="font-semibold text-foreground/80">Service area:</span> Lehigh Acres, Fort Myers, Cape Coral, Estero, Bonita Springs, Naples (Lee &amp; Collier County, SWFL)</span>
+            </p>
             <div className="mt-4">
-              <p className="text-xs uppercase tracking-wider text-muted-foreground mb-2">Reviews</p>
+              <p className="text-xs uppercase tracking-wider text-muted-foreground mb-2">Reviews &amp; Social</p>
               <div className="flex flex-wrap gap-2 text-xs">
                 <a href="https://share.google/81sCiU8gosp3ZhCJD" target="_blank" rel="noopener noreferrer" className="px-2.5 py-1 rounded-full bg-primary/10 text-primary hover:bg-primary/20">Google</a>
                 <a href="https://www.facebook.com/Mikesmobileautorepairllc/" target="_blank" rel="noopener noreferrer" className="px-2.5 py-1 rounded-full bg-primary/10 text-primary hover:bg-primary/20">Facebook</a>
+                <a href="https://www.tiktok.com/@mikesmobileautorepair" target="_blank" rel="noopener noreferrer" className="px-2.5 py-1 rounded-full bg-primary/10 text-primary hover:bg-primary/20">TikTok</a>
                 <a href="https://www.yelp.com/biz/mikes-mobile-auto-repair-lehigh-acres" target="_blank" rel="noopener noreferrer" className="px-2.5 py-1 rounded-full bg-primary/10 text-primary hover:bg-primary/20">Yelp</a>
                 <a href="https://nextdoor.com/page/mikes-mobile-auto-repair-llc-lehigh-acres-fl" target="_blank" rel="noopener noreferrer" className="px-2.5 py-1 rounded-full bg-primary/10 text-primary hover:bg-primary/20">Nextdoor</a>
               </div>
