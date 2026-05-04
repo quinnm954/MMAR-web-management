@@ -977,5 +977,9 @@ const _allLocalLandingPages: LocalLandingPage[] = [
   },
 ];
 
+export const localLandingPages: LocalLandingPage[] = _allLocalLandingPages.filter(
+  (p) => !p.citySlug || ALLOWED_CITY_SLUGS.has(p.citySlug)
+);
+
 export const getLandingPageBySlug = (slug: string) =>
   localLandingPages.find((p) => p.slug === slug);
