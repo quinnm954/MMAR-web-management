@@ -5,11 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "node scripts/check-forbidden-terms.mjs && node scripts/generate-sitemap.mjs && vite build && node scripts/prerender.mjs",
-    "build:dev": "node scripts/check-forbidden-terms.mjs && node scripts/generate-sitemap.mjs && vite build --mode development && node scripts/prerender.mjs",
+    "build": "node scripts/check-forbidden-terms.mjs && node scripts/generate-sitemap.mjs && vite build && node scripts/prerender.mjs && node scripts/validate-jsonld.mjs",
+    "build:dev": "node scripts/check-forbidden-terms.mjs && node scripts/generate-sitemap.mjs && vite build --mode development && node scripts/prerender.mjs && node scripts/validate-jsonld.mjs",
     "lint": "eslint .",
     "check:forbidden": "node scripts/check-forbidden-terms.mjs",
     "generate:sitemap": "node scripts/generate-sitemap.mjs",
+    "validate:jsonld": "node scripts/validate-jsonld.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
