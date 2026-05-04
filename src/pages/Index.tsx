@@ -49,10 +49,6 @@ const Index = () => {
           areaServed: [
             "Lehigh Acres, FL",
             "Fort Myers, FL",
-            "Cape Coral, FL",
-            "Estero, FL",
-            "Bonita Springs, FL",
-            "Naples, FL",
           ].map((name) => ({ "@type": "City", name })),
           openingHoursSpecification: [
             {

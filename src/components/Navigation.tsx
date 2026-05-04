@@ -31,10 +31,6 @@ const AREAS = [
   { to: "/service-areas", label: "All Service Areas" },
   { to: "/mobile-mechanic-lehigh-acres", label: "Lehigh Acres" },
   { to: "/mobile-mechanic-fort-myers", label: "Fort Myers" },
-  { to: "/mobile-mechanic-cape-coral", label: "Cape Coral" },
-  { to: "/mobile-mechanic-naples", label: "Naples" },
-  { to: "/areas/estero", label: "Estero" },
-  { to: "/areas/bonita-springs", label: "Bonita Springs" },
 ];
 
 const RESOURCES = [
