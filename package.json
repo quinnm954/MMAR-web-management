@@ -11,6 +11,7 @@
     "check:forbidden": "node scripts/check-forbidden-terms.mjs",
     "generate:sitemap": "node scripts/generate-sitemap.mjs",
     "validate:jsonld": "node scripts/validate-jsonld.mjs",
+    "coverage:jsonld": "node scripts/jsonld-coverage.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
