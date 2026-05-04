@@ -237,6 +237,7 @@ for (const file of walk(DIST)) {
     continue;
   }
 
+  const parsedBlocks = [];
   blocks.forEach((raw, i) => {
     totalBlocks++;
     let parsed;
@@ -251,6 +252,7 @@ for (const file of walk(DIST)) {
       totalErrors++;
       return;
     }
+    parsedBlocks.push(parsed);
     const ctx = {
       error: (m) => {
         failures.push({
@@ -271,6 +273,77 @@ for (const file of walk(DIST)) {
     };
     validateDoc(parsed, ctx);
   });
+
+  // -------- cross-block checks --------
+  // Google rejects pages where the same business entity is declared more
+  // than once with different aggregateRatings ("Review has multiple
+  // aggregate ratings"). Collect every business-like node across all
+  // blocks on this page, key by a stable identity, and fail if more than
+  // one rating is attached to the same business.
+  const BUSINESS_TYPES = new Set([
+    "LocalBusiness",
+    "AutoRepair",
+    "AutomotiveBusiness",
+    "Organization",
+    "Store",
+  ]);
+  const ratingsByKey = new Map(); // key -> Set of "rating|count"
+  function visit(node) {
+    if (Array.isArray(node)) return node.forEach(visit);
+    if (!isObj(node)) return;
+    if (Array.isArray(node["@graph"])) node["@graph"].forEach(visit);
+    const types = getTypes(node);
+    const isBiz = types.some((t) => BUSINESS_TYPES.has(t));
+    if (isBiz && isObj(node.aggregateRating)) {
+      const key =
+        node["@id"] ||
+        `${(node.name || "").toLowerCase()}|${(node.url || "").toLowerCase()}`;
+      const sig = `${node.aggregateRating.ratingValue ?? ""}|${
+        node.aggregateRating.reviewCount ?? node.aggregateRating.ratingCount ?? ""
+      }`;
+      if (!ratingsByKey.has(key)) ratingsByKey.set(key, new Set());
+      ratingsByKey.get(key).add(sig);
+    }
+    // recurse into nested values that may carry nodes
+    for (const v of Object.values(node)) {
+      if (v && typeof v === "object") visit(v);
+    }
+  }
+  parsedBlocks.forEach(visit);
+  for (const [key, sigs] of ratingsByKey) {
+    if (sigs.size > 1 || ratingsByKey.get(key).size > 0) {
+      // Count duplicates by occurrence, not just distinct values.
+    }
+  }
+  // Re-walk to count occurrences per key (not just distinct values).
+  const occByKey = new Map();
+  function countVisit(node) {
+    if (Array.isArray(node)) return node.forEach(countVisit);
+    if (!isObj(node)) return;
+    if (Array.isArray(node["@graph"])) node["@graph"].forEach(countVisit);
+    const types = getTypes(node);
+    const isBiz = types.some((t) => BUSINESS_TYPES.has(t));
+    if (isBiz && isObj(node.aggregateRating)) {
+      const key =
+        node["@id"] ||
+        `${(node.name || "").toLowerCase()}|${(node.url || "").toLowerCase()}`;
+      occByKey.set(key, (occByKey.get(key) || 0) + 1);
+    }
+    for (const v of Object.values(node)) {
+      if (v && typeof v === "object") countVisit(v);
+    }
+  }
+  parsedBlocks.forEach(countVisit);
+  for (const [key, count] of occByKey) {
+    if (count > 1) {
+      failures.push({
+        route: display,
+        msg: `business entity "${key}" has aggregateRating declared ${count} times across JSON-LD blocks (Google: "Review has multiple aggregate ratings")`,
+        level: "error",
+      });
+      totalErrors++;
+    }
+  }
 }
 
 // -------- report --------
