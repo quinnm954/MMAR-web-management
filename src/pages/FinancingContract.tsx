@@ -449,7 +449,7 @@ const FinancingContract = () => {
                 </div>
                 <div>
                   <p className="text-muted-foreground">Down Payment</p>
-                  <p className="font-medium">75% of Total</p>
+                  <p className="font-medium">100% Parts + 50% Labor</p>
                 </div>
                 <div>
                   <p className="text-muted-foreground">Finance Charge</p>
