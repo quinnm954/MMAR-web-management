@@ -22,7 +22,7 @@ const Index = () => {
   useSeo({
     title: "Mobile Mechanic in Lehigh Acres & Fort Myers, FL | Mike's Mobile Auto Repair",
     description:
-      "On-site auto repair, diagnostics, and mobile mechanic service in Lehigh Acres and Fort Myers & Lehigh Acres and Fort Myers. Call (813) 501-7572.",
+      "On-site auto repair, diagnostics, and mobile mechanic service in Lehigh Acres and Fort Myers, FL. Call (813) 501-7572.",
     canonical: `${SITE}/`,
   });
 
