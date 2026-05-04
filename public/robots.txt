@@ -1,8 +1,16 @@
+# https://mikesmautorepair.com/robots.txt
 User-agent: *
 Allow: /
 Disallow: /admin/
+Disallow: /admin
+Disallow: /financing-contract
+Disallow: /review
 
+# Allow common asset directories explicitly (some bots respect this)
+Allow: /assets/
+Allow: /favicon.ico
+Allow: /favicon.jpeg
+Allow: /mmar-logo.jpeg
+
+# Single sitemap index — all other sitemaps are referenced from here
 Sitemap: https://mikesmautorepair.com/sitemap-index.xml
-Sitemap: https://mikesmautorepair.com/sitemap.xml
-Sitemap: https://mikesmautorepair.com/sitemap-locations.xml
-Sitemap: https://mikesmautorepair.com/sitemap-blog.xml
