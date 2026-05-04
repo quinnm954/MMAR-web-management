@@ -576,11 +576,11 @@ const FinancingContract = () => {
             <CardContent>
               <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                 <div className="text-center p-3 bg-background rounded-lg">
-                  <p className="text-xs text-muted-foreground uppercase tracking-wide">Down Payment (75%)</p>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wide">Down Payment (Parts + 50% Labor)</p>
                   <p className="text-xl font-bold text-foreground">{formatCurrency(calculations.downPayment)}</p>
                 </div>
                 <div className="text-center p-3 bg-background rounded-lg">
-                  <p className="text-xs text-muted-foreground uppercase tracking-wide">Financed (25%)</p>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wide">Financed (50% Labor)</p>
                   <p className="text-xl font-bold text-foreground">{formatCurrency(calculations.principal)}</p>
                 </div>
                 <div className="text-center p-3 bg-background rounded-lg">
