@@ -18,6 +18,7 @@ interface EditableContractData {
   agreementDate: string;
   serviceDescription: string;
   totalServicePrice: string;
+  partsPrice: string;
   firstPaymentDate: string;
   vehicleInfo: string;
 }
