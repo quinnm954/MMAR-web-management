@@ -685,11 +685,11 @@ const FinancingContract = () => {
             <p className="mb-3">Client agrees to pay the Total Service Price as follows:</p>
             <div className="ml-4 space-y-2">
               <p>
-                <strong>a) Down Payment:</strong> {formatCurrency(calculations.downPayment)} (75% of Total Service Price),
+                <strong>a) Down Payment:</strong> {formatCurrency(calculations.downPayment)} — equal to 100% of Parts ({formatCurrency(calculations.partsPrice)}) plus 50% of Labor ({formatCurrency(calculations.laborDown)} of {formatCurrency(calculations.laborPrice)} labor),
                 due upon execution of this Agreement.
               </p>
               <p>
-                <strong>b) Financed Amount:</strong> {formatCurrency(calculations.principal)} (25% of Total Service Price),
+                <strong>b) Financed Amount:</strong> {formatCurrency(calculations.principal)} (remaining 50% of Labor),
                 to be financed under the terms described in Section 5.
               </p>
             </div>
