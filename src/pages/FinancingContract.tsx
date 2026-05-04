@@ -18,6 +18,7 @@ interface EditableContractData {
   agreementDate: string;
   serviceDescription: string;
   totalServicePrice: string;
+  partsPrice: string;
   firstPaymentDate: string;
   vehicleInfo: string;
 }
@@ -43,8 +44,7 @@ const PROVIDER = {
 } as const;
 
 const TERMS = {
-  downPaymentRate: 0.75,
-  financedRate: 0.25,
+  laborDownPaymentRate: 0.5,
   annualInterestRate: 0.25,
   termMonths: 12,
   // Fixed business terms (not editable)
@@ -62,6 +62,7 @@ const defaultEditableData: EditableContractData = {
   agreementDate: new Date().toISOString().split("T")[0],
   serviceDescription: "",
   totalServicePrice: "",
+  partsPrice: "",
   firstPaymentDate: "",
   vehicleInfo: "",
 };
@@ -174,8 +175,11 @@ const FinancingContract = () => {
   // Auto-calculations
   const calculations = useMemo(() => {
     const totalPrice = sanitizeNumber(formData.totalServicePrice);
-    const downPayment = totalPrice * TERMS.downPaymentRate;
-    const principal = totalPrice * TERMS.financedRate;
+    const partsPrice = Math.min(sanitizeNumber(formData.partsPrice), totalPrice);
+    const laborPrice = Math.max(totalPrice - partsPrice, 0);
+    const laborDown = laborPrice * TERMS.laborDownPaymentRate;
+    const downPayment = partsPrice + laborDown;
+    const principal = Math.max(totalPrice - downPayment, 0);
     const interest = principal * TERMS.annualInterestRate * 1; // simple interest for 1 year
     const totalFinanced = principal + interest;
 
@@ -186,6 +190,9 @@ const FinancingContract = () => {
 
     return {
       totalPrice,
+      partsPrice,
+      laborPrice,
+      laborDown,
       downPayment,
       principal,
       interest,
@@ -193,7 +200,7 @@ const FinancingContract = () => {
       baseMonthlyPayment,
       finalPayment,
     };
-  }, [formData.totalServicePrice]);
+  }, [formData.totalServicePrice, formData.partsPrice]);
 
   // Payment schedule
   const paymentSchedule = useMemo(() => {
@@ -442,7 +449,7 @@ const FinancingContract = () => {
                 </div>
                 <div>
                   <p className="text-muted-foreground">Down Payment</p>
-                  <p className="font-medium">75% of Total</p>
+                  <p className="font-medium">100% Parts + 50% Labor</p>
                 </div>
                 <div>
                   <p className="text-muted-foreground">Finance Charge</p>
@@ -537,6 +544,18 @@ const FinancingContract = () => {
                   />
                 </div>
                 <div>
+                  <Label htmlFor="partsPrice">Parts Cost ($) *</Label>
+                  <Input
+                    id="partsPrice"
+                    value={formData.partsPrice}
+                    onChange={(e) => handleInputChange("partsPrice", e.target.value)}
+                    placeholder="e.g., 400.00"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Parts are paid 100% upfront; labor down is 50%.
+                  </p>
+                </div>
+                <div>
                   <Label htmlFor="firstPaymentDate">First Payment Due Date *</Label>
                   <Input
                     id="firstPaymentDate"
@@ -557,11 +576,11 @@ const FinancingContract = () => {
             <CardContent>
               <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                 <div className="text-center p-3 bg-background rounded-lg">
-                  <p className="text-xs text-muted-foreground uppercase tracking-wide">Down Payment (75%)</p>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wide">Down Payment (Parts + 50% Labor)</p>
                   <p className="text-xl font-bold text-foreground">{formatCurrency(calculations.downPayment)}</p>
                 </div>
                 <div className="text-center p-3 bg-background rounded-lg">
-                  <p className="text-xs text-muted-foreground uppercase tracking-wide">Financed (25%)</p>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wide">Financed (50% Labor)</p>
                   <p className="text-xl font-bold text-foreground">{formatCurrency(calculations.principal)}</p>
                 </div>
                 <div className="text-center p-3 bg-background rounded-lg">
@@ -666,11 +685,11 @@ const FinancingContract = () => {
             <p className="mb-3">Client agrees to pay the Total Service Price as follows:</p>
             <div className="ml-4 space-y-2">
               <p>
-                <strong>a) Down Payment:</strong> {formatCurrency(calculations.downPayment)} (75% of Total Service Price),
+                <strong>a) Down Payment:</strong> {formatCurrency(calculations.downPayment)} — equal to 100% of Parts ({formatCurrency(calculations.partsPrice)}) plus 50% of Labor ({formatCurrency(calculations.laborDown)} of {formatCurrency(calculations.laborPrice)} labor),
                 due upon execution of this Agreement.
               </p>
               <p>
-                <strong>b) Financed Amount:</strong> {formatCurrency(calculations.principal)} (25% of Total Service Price),
+                <strong>b) Financed Amount:</strong> {formatCurrency(calculations.principal)} (remaining 50% of Labor),
                 to be financed under the terms described in Section 5.
               </p>
             </div>
