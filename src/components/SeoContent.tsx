@@ -8,7 +8,7 @@ import InlineCallStrip from "./InlineCallStrip";
 const faqs = [
   {
     q: "What areas do you service?",
-    a: "We serve Lehigh Acres, Fort Myers, Cape Coral, Estero, Bonita Springs, and Naples — and most surrounding Southwest Florida communities. Call (813) 501-7572 if you're not sure we cover your address.",
+    a: "We serve Lehigh Acres and Fort Myers — and most surrounding Southwest Florida communities. Call (813) 501-7572 if you're not sure we cover your address.",
   },
   {
     q: "Are you really mobile? You come to my house?",
@@ -32,7 +32,7 @@ const faqs = [
   },
   {
     q: "Do you handle fleet vehicles?",
-    a: "Yes — recurring fleet maintenance is available for businesses across Lee and Collier counties.",
+    a: "Yes — recurring fleet maintenance is available for businesses across Lee County.",
   },
   {
     q: "Do you accept walk-up payments at the truck?",
@@ -73,7 +73,7 @@ const SeoContent = () => {
             <span className="text-gold">MOBILE MECHANIC</span>
           </h2>
           <p className="text-base md:text-lg text-muted-foreground">
-            Serving Lehigh Acres, Fort Myers, Cape Coral, Estero, Bonita Springs and Naples
+            Serving Lehigh Acres and Fort Myers
           </p>
         </header>
 
@@ -82,8 +82,7 @@ const SeoContent = () => {
             <p>
               Mike's Mobile Auto Repair is the trusted{" "}
               <strong>mobile mechanic</strong> serving Southwest Florida from
-              Lehigh Acres east to the Gulf and from Fort Myers down through
-              Naples. We bring the full power of a real auto shop straight to
+              Lehigh Acres west to Fort Myers. We bring the full power of a real auto shop straight to
               your home, workplace, or wherever your vehicle decided to quit on
               you. Our service truck is stocked with professional-grade tools,
               quality parts, and the same diagnostic scanners used by
@@ -137,8 +136,7 @@ const SeoContent = () => {
               <Link to="/mobile-starter-repair" className="text-primary underline-offset-4 hover:underline">
                 mobile starter repair
               </Link>{" "}
-              are two of our most-requested services across Lee and Collier
-              counties. Most replacements take 60–120 minutes in a driveway or
+              are two of our most-requested services across Lee County. Most replacements take 60–120 minutes in a driveway or
               parking lot.
             </p>
           </div>

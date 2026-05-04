@@ -12,8 +12,7 @@ const FinalCTA = () => {
             <span className="text-gold">MECHANIC TODAY?</span>
           </h2>
           <p className="text-base md:text-lg text-muted-foreground mb-7 max-w-xl mx-auto">
-            Same-day mobile service across Lehigh Acres, Fort Myers, Cape Coral
-            and all of Southwest Florida.
+            Same-day mobile service across Lehigh Acres and Fort Myers.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Button variant="hero" size="lg" className="min-h-[52px]" asChild>

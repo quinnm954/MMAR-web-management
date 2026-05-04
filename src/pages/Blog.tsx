@@ -49,7 +49,7 @@ const Blog = () => {
         ? "Mobile Mechanic Blog | SWFL Auto Repair Tips"
         : `Mobile Mechanic Blog — Page ${safePage} | Mike's Mobile Auto Repair`,
     description:
-      "Mobile mechanic guides for Lehigh Acres, Fort Myers, Cape Coral and all of Southwest Florida — diagnostics, brakes, batteries, alternators, no-start fixes, and Florida-specific car care.",
+      "Mobile mechanic guides for Lehigh Acres and Fort Myers — diagnostics, brakes, batteries, alternators, no-start fixes, and Florida-specific car care.",
     canonical,
   });
 

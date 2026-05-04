@@ -43,7 +43,7 @@ export const blogPosts: BlogPost[] = [
     faqs: [
       { question: "Is it safe to drive a car that's overheating?", answer: "No. Driving even a few miles with the temperature gauge in the red can warp the cylinder head, blow the head gasket, or destroy the engine. Pull over, shut it down, and call a mobile mechanic." },
       { question: "How much does it cost to fix an overheating car in Florida?", answer: "A thermostat or hose replacement is usually $150–$350 mobile. Water pumps run $300–$700. Radiator replacement is typically $400–$900. Most jobs are done on site without a tow bill." },
-      { question: "Can a mobile mechanic fix a cooling system in my driveway?", answer: "Yes. Coolant flushes, thermostat replacement, hose and water pump jobs, and even most radiator swaps are routinely done at your home or workplace across Lehigh Acres, Fort Myers, and Cape Coral." },
+      { question: "Can a mobile mechanic fix a cooling system in my driveway?", answer: "Yes. Coolant flushes, thermostat replacement, hose and water pump jobs, and even most radiator swaps are routinely done at your home or workplace across Lehigh Acres and Fort Myers." },
     ],
   },
   {
@@ -117,7 +117,7 @@ export const blogPosts: BlogPost[] = [
     faqs: [
       { question: "How can I tell if it's the battery or the starter?", answer: "Dim dash lights and slow cranking point to the battery. Bright dash lights with a single loud click and no crank point to the starter. A 5-minute on-site test confirms which one it is." },
       { question: "Will jump-starting damage my car if it's actually the starter?", answer: "No, but it won't help either. If your battery tests good, no amount of jumping will fix a bad starter — you need the starter replaced." },
-      { question: "Can a mobile mechanic replace a starter in my driveway?", answer: "Yes. Starter replacement is one of the most common mobile repairs we perform across Lehigh Acres, Fort Myers, and Cape Coral. Most jobs take under 2 hours." },
+      { question: "Can a mobile mechanic replace a starter in my driveway?", answer: "Yes. Starter replacement is one of the most common mobile repairs we perform across Lehigh Acres and Fort Myers. Most jobs take under 2 hours." },
     ],
   },
   {
@@ -157,7 +157,7 @@ export const blogPosts: BlogPost[] = [
     `,
     faqs: [
       { question: "Can a mobile mechanic fix a no-start in a parking lot?", answer: "Yes. Most no-starts — dead battery, bad starter, fuel pump, sensor faults — are diagnosed and repaired right where the car sits, including parking lots and driveways." },
-      { question: "How fast can you get to me for a no-start?", answer: "Typical response time across Lehigh Acres, Fort Myers, and Cape Coral is 60–120 minutes for no-start calls. Call (813) 501-7572 for current ETA." },
+      { question: "How fast can you get to me for a no-start?", answer: "Typical response time across Lehigh Acres and Fort Myers is 60–120 minutes for no-start calls. Call (813) 501-7572 for current ETA." },
       { question: "Is mobile no-start service cheaper than a tow plus shop?", answer: "Almost always. A tow alone is $100–$250 in SWFL, plus shop diagnostic fees and waiting. Mobile diagnosis is typically $89–$129 with no tow needed." },
     ],
   },
@@ -185,7 +185,7 @@ export const blogPosts: BlogPost[] = [
       <p>See our full guide on <a href="/blog/why-cars-overheat-in-florida">why cars overheat in Florida</a>. Stuck thermostats, failing water pumps, and clogged radiators top the list.</p>
 
       <h2>5. Salt-air corrosion on coastal vehicles</h2>
-      <p>If you live anywhere near the Gulf — Cape Coral, Bonita Beach, Naples — salt eats brake lines, exhaust, suspension components, and electrical connectors. Annual undercarriage inspections matter.</p>
+      <p>If you live near the Gulf, salt eats brake lines, exhaust, suspension components, and electrical connectors. Annual undercarriage inspections matter.</p>
 
       <h2>6. Alternator and electrical gremlins</h2>
       <p>Heat plus humidity plus age = electrical issues. Bad alternators, corroded grounds, and failing fuses become more common past 80,000 miles. See <a href="/blog/signs-of-a-bad-alternator">7 signs of a bad alternator</a>.</p>
@@ -196,7 +196,7 @@ export const blogPosts: BlogPost[] = [
     faqs: [
       { question: "Why do car batteries die so fast in Florida?", answer: "Year-round heat boils off battery electrolyte and accelerates internal corrosion. Most SWFL batteries last 2–3 years instead of the 4–5 years rated by the manufacturer." },
       { question: "How often should I service my AC in Southwest Florida?", answer: "AC performance check every 1–2 years, refrigerant level check annually. Florida AC systems run nearly year-round and develop leaks faster than in cooler climates." },
-      { question: "Does salt air really damage cars in Cape Coral and Naples?", answer: "Yes. Salt corrodes brake lines, exhaust, suspension components, and electrical connectors. An annual undercarriage inspection catches issues early on coastal vehicles." },
+      { question: "Does salt air really damage cars in Southwest Florida?", answer: "Yes. Salt corrodes brake lines, exhaust, suspension components, and electrical connectors. An annual undercarriage inspection catches issues early on coastal vehicles." },
     ],
   },
   {
@@ -226,7 +226,7 @@ export const blogPosts: BlogPost[] = [
       <p>Less common on modern fuel-injected cars, but worth mentioning: very hot fuel-rail temps can cause hard hot starts. Bad gas — water-contaminated or stale — also shows up after summer storms when filling stations get water in their underground tanks.</p>
 
       <h2>What to do right now</h2>
-      <p>If you're reading this stranded in a parking lot, call or text <a href="tel:8135017572">(813) 501-7572</a> for <a href="/no-start-diagnostics">mobile no-start diagnostics</a>. We'll bring a battery tester, jump pack, fuel-pressure gauge, and OBD-II scanner — and most no-starts in Lehigh Acres, Fort Myers, and Cape Coral are diagnosed and fixed on the spot without a tow.</p>
+      <p>If you're reading this stranded in a parking lot, call or text <a href="tel:8135017572">(813) 501-7572</a> for <a href="/no-start-diagnostics">mobile no-start diagnostics</a>. We'll bring a battery tester, jump pack, fuel-pressure gauge, and OBD-II scanner — and most no-starts in Lehigh Acres and Fort Myers are diagnosed and fixed on the spot without a tow.</p>
     `,
     faqs: [
       { question: "Why does my car only refuse to start when it's hot outside?", answer: "Three usual suspects: a battery that's heat-degraded, a starter solenoid that fails after the engine has heat-soaked, or a fuel-pump issue triggered by hot fuel-system temps. All three are testable on site." },
@@ -334,7 +334,7 @@ export const blogPosts: BlogPost[] = [
     readMinutes: 7,
     tags: ["Battery", "Pricing", "Maintenance"],
     body: `
-      <p>If you live in Lee or Collier county, you've probably already had this happen: you turn the key (or push the button) and you get a click, a slow crank, or nothing at all. Welcome to Florida battery life. The brutal truth is that a car battery in Southwest Florida lasts about <strong>2 to 3 years</strong> — not the 4 to 5 it might last in a cooler northern climate.</p>
+      <p>If you live in Lee County, you've probably already had this happen: you turn the key (or push the button) and you get a click, a slow crank, or nothing at all. Welcome to Florida battery life. The brutal truth is that a car battery in Southwest Florida lasts about <strong>2 to 3 years</strong> — not the 4 to 5 it might last in a cooler northern climate.</p>
 
       <h2>Why Florida heat kills batteries faster</h2>
       <p>It's not the cold that kills batteries — it's the heat. Cold weather just exposes a battery that was already dying. Heat is what actually destroys it. High under-hood temperatures speed up the chemical reactions inside a lead-acid battery, evaporate the electrolyte, and corrode the internal plates. By year 3, capacity has dropped enough that the next cool morning or extra-long crank kills it.</p>
@@ -397,7 +397,7 @@ export const blogPosts: BlogPost[] = [
         <li><strong>Humidity.</strong> Moisture in the air gets pulled into the system through any micro-leak and corrodes the evaporator and condenser from the inside out.</li>
         <li><strong>Constant use.</strong> Most cars in SWFL run AC 9–10 months a year. The system never gets a break.</li>
       </ul>
-      <p>Add salt air on coastal cars (Cape Coral, Bonita, Fort Myers Beach, Naples) and condensers can corrode through in 7–10 years.</p>
+      <p>Add salt air on coastal cars (Fort Myers Beach and other coastal areas) and condensers can corrode through in 7–10 years.</p>
 
       <h2>Signs your AC needs service right now</h2>
       <ul>
