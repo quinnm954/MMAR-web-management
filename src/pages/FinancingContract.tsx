@@ -44,8 +44,7 @@ const PROVIDER = {
 } as const;
 
 const TERMS = {
-  downPaymentRate: 0.75,
-  financedRate: 0.25,
+  laborDownPaymentRate: 0.5,
   annualInterestRate: 0.25,
   termMonths: 12,
   // Fixed business terms (not editable)
@@ -63,6 +62,7 @@ const defaultEditableData: EditableContractData = {
   agreementDate: new Date().toISOString().split("T")[0],
   serviceDescription: "",
   totalServicePrice: "",
+  partsPrice: "",
   firstPaymentDate: "",
   vehicleInfo: "",
 };
