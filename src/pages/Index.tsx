@@ -14,7 +14,6 @@ import HomeFAQ from "@/components/home/HomeFAQ";
 import LocalPhotoGallery from "@/components/home/LocalPhotoGallery";
 import FinalCTA from "@/components/home/FinalCTA";
 import { useSeo } from "@/lib/useSeo";
-import { REVIEWS_META } from "@/data/reviewsMeta";
 
 const SITE = "https://mikesmautorepair.com";
 
