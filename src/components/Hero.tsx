@@ -10,7 +10,7 @@ const Hero = () => {
       <div className="absolute inset-0 z-0">
         <img
           src={heroBanner}
-          alt="Mike's Mobile Auto Repair — on-site mechanic in Southwest Florida"
+          alt="Mike's Mobile Auto Repair — on-site mechanic in Lehigh Acres and Fort Myers"
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-background/85 via-background/65 to-background" />
@@ -28,7 +28,7 @@ const Hero = () => {
             className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-7 md:mb-9 px-2 animate-slide-up"
             style={{ animationDelay: "0.1s" }}
           >
-            On-site auto repair and full diagnostics across Southwest Florida — we come to you.
+            On-site auto repair and full diagnostics across Lehigh Acres and Fort Myers — we come to you.
           </p>
 
           <div
@@ -58,7 +58,7 @@ const Hero = () => {
           >
             <div className="flex items-center gap-2">
               <MapPin className="w-5 h-5 text-primary shrink-0" />
-              <span className="text-sm sm:text-base">Southwest Florida</span>
+              <span className="text-sm sm:text-base">Lehigh Acres and Fort Myers</span>
             </div>
             <a href="tel:8135017572" onClick={trackConversion} className="flex items-center gap-2 hover:text-accent transition-colors active:scale-95">
               <Phone className="w-5 h-5 text-accent shrink-0" />

@@ -17,12 +17,12 @@ export const blogPosts: BlogPost[] = [
     slug: "why-cars-overheat-in-florida",
     title: "Why Cars Overheat in Florida (and How to Prevent It)",
     excerpt:
-      "Florida's brutal heat punishes cooling systems. Here's what causes overheating in Southwest Florida and how to stop it before you're stuck on the side of I-75.",
+      "Florida's brutal heat punishes cooling systems. Here's what causes overheating in Lehigh Acres and Fort Myers and how to stop it before you're stuck on the side of I-75.",
     dateISO: "2026-04-15",
     readMinutes: 6,
     tags: ["Cooling", "Maintenance"],
     body: `
-      <p>If you've lived in Southwest Florida for more than a summer, you already know what 95°F at 90% humidity does to a car. Cooling systems work harder here than almost anywhere else in the country, and when something inside that system starts to fail, you find out about it fast — usually in stop-and-go traffic on US-41 or I-75 with the temperature gauge climbing.</p>
+      <p>If you've lived in Lehigh Acres and Fort Myers for more than a summer, you already know what 95°F at 90% humidity does to a car. Cooling systems work harder here than almost anywhere else in the country, and when something inside that system starts to fail, you find out about it fast — usually in stop-and-go traffic on US-41 or I-75 with the temperature gauge climbing.</p>
 
       <h2>The most common reasons cars overheat in Florida</h2>
       <p>Almost every overheating call we take in <a href="/areas/lehigh-acres">Lehigh Acres</a>, <a href="/areas/fort-myers">Fort Myers</a> traces back to one of these:</p>
@@ -69,14 +69,14 @@ export const blogPosts: BlogPost[] = [
       </ol>
 
       <h2>Battery vs alternator — which is it?</h2>
-      <p>Both can produce the same symptoms. We always test both before condemning a part. If you're in <a href="/areas/fort-myers">Fort Myers</a>, or anywhere across SWFL, our <a href="/mobile-alternator-repair-fort-myers">mobile alternator repair</a> service includes a full charging-system test on site so you only pay for what you actually need.</p>
+      <p>Both can produce the same symptoms. We always test both before condemning a part. If you're in <a href="/areas/fort-myers">Fort Myers</a>, or anywhere across Lehigh Acres and Fort Myers, our <a href="/mobile-alternator-repair-fort-myers">mobile alternator repair</a> service includes a full charging-system test on site so you only pay for what you actually need.</p>
 
       <p>Stuck right now? Call <a href="tel:8135017572">(813) 501-7572</a> — same-day mobile service is usually available.</p>
     `,
     faqs: [
       { question: "Can a bad alternator drain a brand new battery?", answer: "Yes. A failing alternator can either undercharge (slowly draining the battery while you drive) or overcharge (boiling and ruining a new battery in days). Always test the alternator before replacing the battery." },
       { question: "How long can I drive with a bad alternator?", answer: "Usually 20–60 minutes once the warning light comes on, depending on accessories running. Once the battery is depleted, the engine stalls. Don't risk it — get tested same day." },
-      { question: "How much does mobile alternator replacement cost in Fort Myers?", answer: "Most alternator jobs in SWFL run $350–$750 fully installed mobile, depending on vehicle. We provide upfront quotes after a free on-site charging-system test." },
+      { question: "How much does mobile alternator replacement cost in Fort Myers?", answer: "Most alternator jobs in Lehigh Acres and Fort Myers run $350–$750 fully installed mobile, depending on vehicle. We provide upfront quotes after a free on-site charging-system test." },
     ],
   },
   {
@@ -112,7 +112,7 @@ export const blogPosts: BlogPost[] = [
       <p>If the car runs but slowly dies, or starts after a jump and won't restart later, that's an <a href="/blog/signs-of-a-bad-alternator">alternator problem</a>, not a starter or battery one.</p>
 
       <h2>Don't guess — test</h2>
-      <p>A real charging-system test takes 5 minutes and saves you from buying the wrong part. Our mobile mechanics test the battery, alternator, and starter circuit on site before recommending any repair. Get help anywhere in SWFL at <a href="tel:8135017572">(813) 501-7572</a> or learn more about <a href="/mobile-battery-replacement">mobile battery replacement</a>.</p>
+      <p>A real charging-system test takes 5 minutes and saves you from buying the wrong part. Our mobile mechanics test the battery, alternator, and starter circuit on site before recommending any repair. Get help anywhere in Lehigh Acres and Fort Myers at <a href="tel:8135017572">(813) 501-7572</a> or learn more about <a href="/mobile-battery-replacement">mobile battery replacement</a>.</p>
     `,
     faqs: [
       { question: "How can I tell if it's the battery or the starter?", answer: "Dim dash lights and slow cranking point to the battery. Bright dash lights with a single loud click and no crank point to the starter. A 5-minute on-site test confirms which one it is." },
@@ -151,29 +151,29 @@ export const blogPosts: BlogPost[] = [
       </ul>
 
       <h2>Why mobile is the right call for no-starts</h2>
-      <p>A no-start is the worst possible time to need a tow. Our <a href="/no-start-diagnostics">mobile no-start diagnostics</a> service rolls to your driveway or parking lot with diagnostic scanners, jump packs, replacement batteries, starters, and the experience to find the real problem fast. Most no-starts in SWFL get fixed on the spot.</p>
+      <p>A no-start is the worst possible time to need a tow. Our <a href="/no-start-diagnostics">mobile no-start diagnostics</a> service rolls to your driveway or parking lot with diagnostic scanners, jump packs, replacement batteries, starters, and the experience to find the real problem fast. Most no-starts in Lehigh Acres and Fort Myers get fixed on the spot.</p>
 
-      <p>Stuck right now in <a href="/areas/lehigh-acres">Lehigh Acres</a>, <a href="/areas/fort-myers">Fort Myers</a>, or anywhere in SWFL? Call <a href="tel:8135017572">(813) 501-7572</a>.</p>
+      <p>Stuck right now in <a href="/areas/lehigh-acres">Lehigh Acres</a>, <a href="/areas/fort-myers">Fort Myers</a>, or anywhere in Lehigh Acres and Fort Myers? Call <a href="tel:8135017572">(813) 501-7572</a>.</p>
     `,
     faqs: [
       { question: "Can a mobile mechanic fix a no-start in a parking lot?", answer: "Yes. Most no-starts — dead battery, bad starter, fuel pump, sensor faults — are diagnosed and repaired right where the car sits, including parking lots and driveways." },
       { question: "How fast can you get to me for a no-start?", answer: "Typical response time across Lehigh Acres and Fort Myers is 60–120 minutes for no-start calls. Call (813) 501-7572 for current ETA." },
-      { question: "Is mobile no-start service cheaper than a tow plus shop?", answer: "Almost always. A tow alone is $100–$250 in SWFL, plus shop diagnostic fees and waiting. Mobile diagnosis is typically $89–$129 with no tow needed." },
+      { question: "Is mobile no-start service cheaper than a tow plus shop?", answer: "Almost always. A tow alone is $100–$250 in Lehigh Acres and Fort Myers, plus shop diagnostic fees and waiting. Mobile diagnosis is typically $89–$129 with no tow needed." },
     ],
   },
   {
     slug: "common-car-problems-southwest-florida",
-    title: "6 Common Car Problems in Southwest Florida",
+    title: "6 Common Car Problems in Lehigh Acres and Fort Myers",
     excerpt:
-      "Heat, salt air, stop-and-go traffic — SWFL is hard on vehicles. Here are the six issues we see most often and how to stay ahead of them.",
+      "Heat, salt air, stop-and-go traffic — Lehigh Acres and Fort Myers is hard on vehicles. Here are the six issues we see most often and how to stay ahead of them.",
     dateISO: "2026-05-03",
     readMinutes: 6,
     tags: ["Maintenance", "Local"],
     body: `
-      <p>Cars in Southwest Florida live a tougher life than most people realize. Year-round heat, season-long humidity, salt air on the coast, and the daily creep of season traffic all conspire against the average vehicle. After thousands of mobile service calls across <a href="/areas/lehigh-acres">Lehigh Acres</a>, <a href="/areas/fort-myers">Fort Myers</a>, and beyond, the same six problems keep coming up.</p>
+      <p>Cars in Lehigh Acres and Fort Myers live a tougher life than most people realize. Year-round heat, season-long humidity, salt air on the coast, and the daily creep of season traffic all conspire against the average vehicle. After thousands of mobile service calls across <a href="/areas/lehigh-acres">Lehigh Acres</a>, <a href="/areas/fort-myers">Fort Myers</a>, and beyond, the same six problems keep coming up.</p>
 
       <h2>1. Dead batteries (way earlier than expected)</h2>
-      <p>Most batteries are rated for 4–5 years. In SWFL, plan on 2–3. Heat boils off the electrolyte and accelerates internal corrosion. Get yours load-tested every visit.</p>
+      <p>Most batteries are rated for 4–5 years. In Lehigh Acres and Fort Myers, plan on 2–3. Heat boils off the electrolyte and accelerates internal corrosion. Get yours load-tested every visit.</p>
 
       <h2>2. AC compressor and recharge issues</h2>
       <p>Florida AC systems run nearly year-round. Compressors fail, refrigerant leaks develop, and condenser fans burn out. A weak AC is a maintenance issue here, not a luxury problem.</p>
@@ -194,9 +194,9 @@ export const blogPosts: BlogPost[] = [
       <p>Skip the shop visits — we come to you for inspections, fluid services, and repairs on your schedule. Call or text <a href="tel:8135017572">(813) 501-7572</a> to book.</p>
     `,
     faqs: [
-      { question: "Why do car batteries die so fast in Florida?", answer: "Year-round heat boils off battery electrolyte and accelerates internal corrosion. Most SWFL batteries last 2–3 years instead of the 4–5 years rated by the manufacturer." },
-      { question: "How often should I service my AC in Southwest Florida?", answer: "AC performance check every 1–2 years, refrigerant level check annually. Florida AC systems run nearly year-round and develop leaks faster than in cooler climates." },
-      { question: "Does salt air really damage cars in Southwest Florida?", answer: "Yes. Salt corrodes brake lines, exhaust, suspension components, and electrical connectors. An annual undercarriage inspection catches issues early on coastal vehicles." },
+      { question: "Why do car batteries die so fast in Florida?", answer: "Year-round heat boils off battery electrolyte and accelerates internal corrosion. Most Lehigh Acres and Fort Myers batteries last 2–3 years instead of the 4–5 years rated by the manufacturer." },
+      { question: "How often should I service my AC in Lehigh Acres and Fort Myers?", answer: "AC performance check every 1–2 years, refrigerant level check annually. Florida AC systems run nearly year-round and develop leaks faster than in cooler climates." },
+      { question: "Does salt air really damage cars in Lehigh Acres and Fort Myers?", answer: "Yes. Salt corrodes brake lines, exhaust, suspension components, and electrical connectors. An annual undercarriage inspection catches issues early on coastal vehicles." },
     ],
   },
   {
@@ -208,10 +208,10 @@ export const blogPosts: BlogPost[] = [
     readMinutes: 7,
     tags: ["Electrical", "No-Start", "Local"],
     body: `
-      <p>It happens every summer in Southwest Florida: 95° outside, you finish a Publix run in <a href="/areas/lehigh-acres">Lehigh Acres</a> or <a href="/areas/fort-myers">Fort Myers</a>, walk back to your car, turn the key — and nothing. Or just a click. Or a long, lazy crank that finally gives up. Florida heat is one of the hardest environments in the country on the systems that get an engine running, and after thousands of mobile service calls, the same culprits show up again and again.</p>
+      <p>It happens every summer in Lehigh Acres and Fort Myers: 95° outside, you finish a Publix run in <a href="/areas/lehigh-acres">Lehigh Acres</a> or <a href="/areas/fort-myers">Fort Myers</a>, walk back to your car, turn the key — and nothing. Or just a click. Or a long, lazy crank that finally gives up. Florida heat is one of the hardest environments in the country on the systems that get an engine running, and after thousands of mobile service calls, the same culprits show up again and again.</p>
 
       <h2>1. The battery is heat-dead, even if it tested good in March</h2>
-      <p>The single most common cause of a hot-weather no-start is a battery that's quietly given up. Heat boils off the electrolyte inside the battery and accelerates internal corrosion. Most batteries are rated for 4–5 years; in SWFL, plan on 2–3. The cruel part is that a heat-killed battery often passes a quick parts-store test in the morning and then fails the same afternoon when the car has been baking in a parking lot. If you're seeing slow cranking, dim dome lights, or any clicking, get a real load test — not just a 10-second voltmeter reading. We bring one to you on every <a href="/battery-replacement">battery replacement</a> call.</p>
+      <p>The single most common cause of a hot-weather no-start is a battery that's quietly given up. Heat boils off the electrolyte inside the battery and accelerates internal corrosion. Most batteries are rated for 4–5 years; in Lehigh Acres and Fort Myers, plan on 2–3. The cruel part is that a heat-killed battery often passes a quick parts-store test in the morning and then fails the same afternoon when the car has been baking in a parking lot. If you're seeing slow cranking, dim dome lights, or any clicking, get a real load test — not just a 10-second voltmeter reading. We bring one to you on every <a href="/battery-replacement">battery replacement</a> call.</p>
 
       <h2>2. The starter is overheating ("hot soak" no-start)</h2>
       <p>Starters live right next to the engine block, which in Florida summer can hit 200°+ underhood after a drive. Some starters — especially on Hondas, older Toyotas, and a lot of GM trucks — start to fail in a very predictable way: cold-start fine in the morning, but won't crank after the engine has been hot for an hour. This is called a "hot-soak no-start" and it almost always means the starter solenoid contacts are worn down. The fix is a starter replacement. The diagnosis is straightforward and we do it on site.</p>
@@ -231,7 +231,7 @@ export const blogPosts: BlogPost[] = [
     faqs: [
       { question: "Why does my car only refuse to start when it's hot outside?", answer: "Three usual suspects: a battery that's heat-degraded, a starter solenoid that fails after the engine has heat-soaked, or a fuel-pump issue triggered by hot fuel-system temps. All three are testable on site." },
       { question: "Can a hot-soak no-start fix itself when the car cools down?", answer: "Yes — that's actually the classic symptom of a failing starter. It cranks fine in the morning, won't crank after a long drive, then cranks again once everything has cooled off. The fix is a starter replacement before it leaves you stranded." },
-      { question: "How long does it take to diagnose a no-start in Southwest Florida?", answer: "Most mobile no-start diagnostics take 30–60 minutes on site, and the majority are repaired the same visit. Diagnostic appointments run $80–$150 and credit toward any repair." },
+      { question: "How long does it take to diagnose a no-start in Lehigh Acres and Fort Myers?", answer: "Most mobile no-start diagnostics take 30–60 minutes on site, and the majority are repaired the same visit. Diagnostic appointments run $80–$150 and credit toward any repair." },
       { question: "Should I just buy a new battery and hope?", answer: "Not without testing the charging system first. About 1 in 4 'dead-battery' no-starts is actually a failing alternator. Replacing only the battery means you're stranded again in a few days." },
     ],
   },
@@ -285,14 +285,14 @@ export const blogPosts: BlogPost[] = [
   },
   {
     slug: "common-chevy-cruze-problems-swfl",
-    title: "Most Common Chevy Cruze Problems We See in SWFL",
+    title: "Most Common Chevy Cruze Problems We See in Lehigh Acres and Fort Myers",
     excerpt:
       "The Chevy Cruze is one of the most common cars on Lehigh Acres and Fort Myers roads. Here are the issues that bring them to our mobile service truck most often.",
     dateISO: "2026-05-24",
     readMinutes: 7,
     tags: ["Diagnostics", "Maintenance", "Local"],
     body: `
-      <p>The Chevy Cruze (2011–2019, both gen 1 and gen 2) is everywhere in Southwest Florida. They're cheap to buy used, they get great gas mileage, and they hold up reasonably well — but they have a list of repeat problems that show up over and over on our mobile service calls in <a href="/areas/lehigh-acres">Lehigh Acres</a>, <a href="/areas/fort-myers">Fort Myers</a>. If you own one or are about to buy one, here's what to expect.</p>
+      <p>The Chevy Cruze (2011–2019, both gen 1 and gen 2) is everywhere in Lehigh Acres and Fort Myers. They're cheap to buy used, they get great gas mileage, and they hold up reasonably well — but they have a list of repeat problems that show up over and over on our mobile service calls in <a href="/areas/lehigh-acres">Lehigh Acres</a>, <a href="/areas/fort-myers">Fort Myers</a>. If you own one or are about to buy one, here's what to expect.</p>
 
       <h2>1. Coolant leaks (water pump and thermostat housing)</h2>
       <p>This is the number-one Cruze problem we see. The plastic thermostat housing cracks. The water pump weep hole starts dripping. The coolant reservoir cap goes bad. The result: you keep adding coolant, you eventually overheat, and if you ignore it long enough you crack a head gasket. The fix is preventative — replace the thermostat housing, water pump, and reservoir cap together around 80,000–100,000 miles. We do this entire job on site.</p>
@@ -316,7 +316,7 @@ export const blogPosts: BlogPost[] = [
       <p>Some 1.4L turbos burn oil between changes — anywhere from a half-quart to a quart per 1,000 miles. Check your dipstick monthly. Catastrophic damage from a low-oil event is the most expensive thing that can happen to one of these engines.</p>
 
       <h2>Stay ahead of it</h2>
-      <p>If you own a Cruze in SWFL, the best thing you can do is run regular <a href="/oil-change-lehigh-acres">oil changes</a> with a multi-point inspection and address coolant leaks the moment they appear. Want a Cruze-specific health check at your driveway? Call or text <a href="tel:8135017572">(813) 501-7572</a>.</p>
+      <p>If you own a Cruze in Lehigh Acres and Fort Myers, the best thing you can do is run regular <a href="/oil-change-lehigh-acres">oil changes</a> with a multi-point inspection and address coolant leaks the moment they appear. Want a Cruze-specific health check at your driveway? Call or text <a href="tel:8135017572">(813) 501-7572</a>.</p>
     `,
     faqs: [
       { question: "Are Chevy Cruzes reliable in Florida?", answer: "Reasonably — but they have well-known weak points around the cooling system and turbo on the 1.4L engine. Stay ahead of those and a Cruze can easily run past 150,000 miles." },
@@ -329,18 +329,18 @@ export const blogPosts: BlogPost[] = [
     slug: "car-battery-cost-florida-heat-2026",
     title: "What It Really Costs to Replace a Car Battery in Florida Heat (2026)",
     excerpt:
-      "Florida batteries die in 2-3 years, not 4-5. Here's what a battery replacement actually costs in Southwest Florida in 2026, OEM vs aftermarket, and why mobile is usually cheaper than a shop.",
+      "Florida batteries die in 2-3 years, not 4-5. Here's what a battery replacement actually costs in Lehigh Acres and Fort Myers in 2026, OEM vs aftermarket, and why mobile is usually cheaper than a shop.",
     dateISO: "2026-05-04",
     readMinutes: 7,
     tags: ["Battery", "Pricing", "Maintenance"],
     body: `
-      <p>If you live in Lee County, you've probably already had this happen: you turn the key (or push the button) and you get a click, a slow crank, or nothing at all. Welcome to Florida battery life. The brutal truth is that a car battery in Southwest Florida lasts about <strong>2 to 3 years</strong> — not the 4 to 5 it might last in a cooler northern climate.</p>
+      <p>If you live in Lee County, you've probably already had this happen: you turn the key (or push the button) and you get a click, a slow crank, or nothing at all. Welcome to Florida battery life. The brutal truth is that a car battery in Lehigh Acres and Fort Myers lasts about <strong>2 to 3 years</strong> — not the 4 to 5 it might last in a cooler northern climate.</p>
 
       <h2>Why Florida heat kills batteries faster</h2>
       <p>It's not the cold that kills batteries — it's the heat. Cold weather just exposes a battery that was already dying. Heat is what actually destroys it. High under-hood temperatures speed up the chemical reactions inside a lead-acid battery, evaporate the electrolyte, and corrode the internal plates. By year 3, capacity has dropped enough that the next cool morning or extra-long crank kills it.</p>
       <p>This is why every battery you buy in Florida should be rated for high heat (look for "Heavy Duty" or AGM construction) and why the cheap "house brand" battery from a discount auto-parts store almost never makes it past the warranty period.</p>
 
-      <h2>Real 2026 prices for a battery replacement in SWFL</h2>
+      <h2>Real 2026 prices for a battery replacement in Lehigh Acres and Fort Myers</h2>
       <p>Here's what you can actually expect to pay in <a href="/areas/lehigh-acres">Lehigh Acres</a>, <a href="/areas/fort-myers">Fort Myers</a> in 2026, all-in (battery + labor + tax + recycling fee):</p>
       <ul>
         <li><strong>Standard flooded lead-acid (most sedans):</strong> $185 – $245 mobile, installed</li>
@@ -369,7 +369,7 @@ export const blogPosts: BlogPost[] = [
       <p>If your car came from the factory with an AGM battery (most newer European cars, anything with start/stop), you must replace it with another AGM — an ordinary flooded battery will fail prematurely and may damage charging electronics. If your car came with a flooded battery, AGM is an upgrade worth considering for Florida: better heat tolerance, longer typical lifespan, and more reliable cranking.</p>
 
       <h2>Get a real quote in 5 minutes</h2>
-      <p>Tell us your year, make, and model and we'll text back a flat all-in price for a mobile battery replacement at your home or workplace anywhere in <a href="/service-areas">Southwest Florida</a>. Call or text <a href="tel:8135017572">(813) 501-7572</a> — same-day service is usually available, and we always quote in writing before any work begins. See more on our <a href="/battery-alternator-starter">mobile battery, alternator, and starter</a> page.</p>
+      <p>Tell us your year, make, and model and we'll text back a flat all-in price for a mobile battery replacement at your home or workplace anywhere in <a href="/service-areas">Lehigh Acres and Fort Myers</a>. Call or text <a href="tel:8135017572">(813) 501-7572</a> — same-day service is usually available, and we always quote in writing before any work begins. See more on our <a href="/battery-alternator-starter">mobile battery, alternator, and starter</a> page.</p>
     `,
     faqs: [
       { question: "How much does it cost to replace a car battery in Fort Myers in 2026?", answer: "A standard flooded lead-acid battery replacement costs $185–$245 all-in for a mobile install. AGM and premium high-heat batteries run $245–$345. European luxury and large truck batteries can run $325–$475+." },
@@ -395,7 +395,7 @@ export const blogPosts: BlogPost[] = [
       <ul>
         <li><strong>Heat.</strong> High under-hood and ambient temperatures expand seals and rubber lines, accelerating permeation loss.</li>
         <li><strong>Humidity.</strong> Moisture in the air gets pulled into the system through any micro-leak and corrodes the evaporator and condenser from the inside out.</li>
-        <li><strong>Constant use.</strong> Most cars in SWFL run AC 9–10 months a year. The system never gets a break.</li>
+        <li><strong>Constant use.</strong> Most cars in Lehigh Acres and Fort Myers run AC 9–10 months a year. The system never gets a break.</li>
       </ul>
       <p>Add salt air on coastal cars (Fort Myers Beach and other coastal areas) and condensers can corrode through in 7–10 years.</p>
 
@@ -421,7 +421,7 @@ export const blogPosts: BlogPost[] = [
       </ul>
       <p>If a shop does it any faster than 45 minutes start to finish, they probably skipped the vacuum step — and skipping the vacuum is the single biggest reason a "fixed" AC dies again two months later.</p>
 
-      <h2>Real 2026 SWFL pricing</h2>
+      <h2>Real 2026 Lehigh Acres and Fort Myers pricing</h2>
       <ul>
         <li><strong>AC recharge with leak check (R-134a):</strong> $145 – $215 mobile</li>
         <li><strong>AC recharge with leak check (R-1234yf, newer cars):</strong> $245 – $385 mobile (refrigerant alone runs $80–$120/lb)</li>
@@ -444,11 +444,11 @@ export const blogPosts: BlogPost[] = [
       <p>Cars closer to the coast and any vehicle that gets weak each summer should be on the 2-year cycle starting earlier. Catching a small leak in year 5 is a $150 fix; ignoring it until the compressor seizes in year 7 is a $1,500 fix.</p>
 
       <h2>Get your AC checked at your driveway</h2>
-      <p>We bring full AC service equipment — recovery, vacuum, and recharge — to your home or workplace anywhere in <a href="/service-areas">Southwest Florida</a>. Most appointments take 60–90 minutes and you stay cool the rest of the season. Call or text <a href="tel:8135017572">(813) 501-7572</a> for a quote, or learn more on our <a href="/services/ac-heating">mobile AC service page</a>.</p>
+      <p>We bring full AC service equipment — recovery, vacuum, and recharge — to your home or workplace anywhere in <a href="/service-areas">Lehigh Acres and Fort Myers</a>. Most appointments take 60–90 minutes and you stay cool the rest of the season. Call or text <a href="tel:8135017572">(813) 501-7572</a> for a quote, or learn more on our <a href="/services/ac-heating">mobile AC service page</a>.</p>
     `,
     faqs: [
       { question: "How often should I service my car AC in Florida?", answer: "Every 2 years for cars 5+ years old. Florida heat, humidity, and constant AC use cause systems to lose refrigerant 3–5x faster than in dry, cool climates." },
-      { question: "How much does an AC recharge cost in Southwest Florida in 2026?", answer: "$145–$215 for an R-134a recharge with leak check, mobile. Newer cars using R-1234yf run $245–$385 because the refrigerant itself costs $80–$120 per pound." },
+      { question: "How much does an AC recharge cost in Lehigh Acres and Fort Myers in 2026?", answer: "$145–$215 for an R-134a recharge with leak check, mobile. Newer cars using R-1234yf run $245–$385 because the refrigerant itself costs $80–$120 per pound." },
       { question: "Can a mobile mechanic recharge my car AC?", answer: "Yes — we bring recovery, vacuum, and recharge equipment to your driveway. The whole service typically takes 60–90 minutes." },
       { question: "Are AC recharge cans from the auto-parts store safe?", answer: "Avoid the all-in-one cans with sealant. They can contaminate the system and destroy the compressor — turning a $150 problem into a $1,500 one. A proper recharge requires pulling a vacuum, which the cans cannot do." },
       { question: "Why is my AC cold while driving but warm at idle?", answer: "Usually a failing condenser fan, low refrigerant, or a weak compressor clutch. A mobile diagnostic will tell you which in about 30 minutes." },

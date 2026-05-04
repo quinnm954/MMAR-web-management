@@ -9,7 +9,7 @@ const Reviews = () => {
   useSeo({
     title: "Customer Reviews | Mike's Mobile Auto Repair",
     description:
-      "5-star customer reviews for Mike's Mobile Auto Repair across Google, Facebook, Yelp, and Nextdoor — serving Southwest Florida.",
+      "5-star customer reviews for Mike's Mobile Auto Repair across Google, Facebook, Yelp, and Nextdoor — serving Lehigh Acres and Fort Myers.",
     canonical: "https://mikesmautorepair.com/reviews",
   });
 

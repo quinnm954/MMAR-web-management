@@ -8,7 +8,7 @@ const HomeServicesOverview = () => {
           <div className="text-center mb-10 md:mb-12">
             <h2 className="font-display text-3xl sm:text-4xl md:text-5xl tracking-wide mb-3">
               <span className="text-sky">MOBILE AUTO REPAIR</span>{" "}
-              <span className="text-gold">IN SOUTHWEST FLORIDA</span>
+              <span className="text-gold">LEHIGH ACRES &amp; FORT MYERS</span>
             </h2>
             <p className="text-base md:text-lg text-muted-foreground">
               Honest, on-site auto repair across Lehigh Acres and Fort Myers.
@@ -17,7 +17,7 @@ const HomeServicesOverview = () => {
 
           <article className="space-y-5 text-foreground/90 leading-relaxed text-base md:text-lg">
             <p>
-              Mike's Mobile Auto Repair brings ASE-level service straight to your driveway or office anywhere in Southwest Florida. Instead of waiting half a day at a brick-and-mortar shop in Fort Myers or paying for a tow out of Lehigh Acres, we roll up with the diagnostic tools, quality parts, and experience to handle most repairs in a single visit. A real technician answers the phone — never a call center.
+              Mike's Mobile Auto Repair brings ASE-level service straight to your driveway or office anywhere in Lehigh Acres and Fort Myers. Instead of waiting half a day at a brick-and-mortar shop in Fort Myers or paying for a tow out of Lehigh Acres, we roll up with the diagnostic tools, quality parts, and experience to handle most repairs in a single visit. A real technician answers the phone — never a call center.
             </p>
             <p>
               Our most-called services include{" "}
@@ -46,7 +46,7 @@ const HomeServicesOverview = () => {
               for same-day mobile mechanic service, or browse all of our{" "}
               <Link to="/services" className="text-primary hover:underline">repair services</Link>{" "}
               and{" "}
-              <Link to="/blog" className="text-primary hover:underline">SWFL auto-repair guides</Link>.
+              <Link to="/blog" className="text-primary hover:underline">Lehigh Acres and Fort Myers auto-repair guides</Link>.
             </p>
           </article>
         </div>

@@ -34,7 +34,7 @@ const LocalPhotoGallery = () => {
       <div className="container mx-auto px-4">
         <div className="max-w-2xl mb-8">
           <h2 className="font-display text-2xl md:text-3xl text-sky mb-2">
-            On-Site Work Across Southwest Florida
+            On-Site Work Across Lehigh Acres and Fort Myers
           </h2>
           <p className="text-muted-foreground text-sm md:text-base">
             Real mobile auto repair jobs from driveways across Lehigh Acres, Fort Myers, Cape Coral, and Naples.

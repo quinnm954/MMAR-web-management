@@ -19,7 +19,7 @@ const Footer = () => {
               Mike's Mobile Auto Repair LLC
             </p>
             <p className="text-sm text-muted-foreground">
-              Mobile auto repair across Southwest Florida.
+              Mobile auto repair across Lehigh Acres and Fort Myers.
             </p>
             <a
               href="tel:8135017572"
@@ -35,7 +35,7 @@ const Footer = () => {
             </a>
             <p className="mt-3 text-xs text-muted-foreground leading-relaxed">
               <span className="block"><span className="font-semibold text-foreground/80">Hours:</span> 9am–5pm daily · By appointment only</span>
-              <span className="block mt-1"><span className="font-semibold text-foreground/80">Service area:</span> Lehigh Acres and Fort Myers (Lee County, SWFL)</span>
+              <span className="block mt-1"><span className="font-semibold text-foreground/80">Service area:</span> Lehigh Acres and Fort Myers (Lee County, Lehigh Acres and Fort Myers)</span>
             </p>
             <div className="mt-4">
               <p className="text-xs uppercase tracking-wider text-muted-foreground mb-2">Reviews &amp; Social</p>
@@ -115,7 +115,7 @@ const Footer = () => {
           <p>
             © {new Date().getFullYear()} Capital Services Management, INC. All rights reserved.
           </p>
-          <span>Southwest Florida</span>
+          <span>Lehigh Acres and Fort Myers</span>
         </div>
       </div>
     </footer>

@@ -29,7 +29,7 @@ const points = [
   {
     icon: MapPin,
     title: "Locally Owned in Lee County",
-    body: "Mike's Mobile Auto Repair LLC lives and works in Southwest Florida. We know the neighborhoods, the highways, and the way Florida heat treats your car.",
+    body: "Mike's Mobile Auto Repair LLC lives and works in Lehigh Acres and Fort Myers. We know the neighborhoods, the highways, and the way Florida heat treats your car.",
   },
 ];
 
@@ -43,7 +43,7 @@ const WhyChooseUs = () => {
             <span className="text-gold">MIKE'S</span>
           </h2>
           <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
-            Six reasons drivers across Southwest Florida call us first.
+            Six reasons drivers across Lehigh Acres and Fort Myers call us first.
           </p>
         </div>
 

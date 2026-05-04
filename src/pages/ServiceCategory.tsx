@@ -60,7 +60,7 @@ const ServiceCategory = () => {
 
   useSeo({
     title: category
-      ? `${category.title} | Mobile Mechanic SWFL | Mike's Mobile Auto Repair`
+      ? `${category.title} | Mobile Mechanic Lehigh Acres and Fort Myers | Mike's Mobile Auto Repair`
       : "Service Not Found",
     description: category?.description,
     canonical: url,
@@ -129,7 +129,7 @@ const ServiceCategory = () => {
 
           <div className="glass-card rounded-xl p-6 md:p-8 border border-border/50">
             <h2 className="font-display text-2xl md:text-3xl text-sky mb-3">
-              Available Across Southwest Florida
+              Available Across Lehigh Acres and Fort Myers
             </h2>
             <p className="text-muted-foreground mb-4">
               Mike's Mobile Auto Repair brings {category.title.toLowerCase()}{" "}

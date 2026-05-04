@@ -115,16 +115,16 @@ const _allLocalLandingPages: LocalLandingPage[] = [
     slug: "mobile-brake-repair",
     service: "Mobile Brake Repair",
     categoryId: "brakes",
-    h1: "Mobile Brake Repair in Southwest Florida",
+    h1: "Mobile Brake Repair in Lehigh Acres and Fort Myers",
     metaTitle:
-      "Mobile Brake Repair in SWFL | Pads, Rotors & Calipers At Your Driveway",
+      "Mobile Brake Repair in Lehigh Acres and Fort Myers | Pads, Rotors & Calipers At Your Driveway",
     metaDescription:
       "On-site mobile brake repair across Lehigh Acres and Fort Myers. Pads, rotors, calipers, fluid. Call (813) 501-7572.",
     canonical: "https://mikesmautorepair.com/brake-repair",
     intro:
-      "Squealing, grinding, or a soft pedal? Mike's Mobile Auto Repair brings full mobile brake service — pads, rotors, calipers, lines, fluid, and ABS diagnostics — to driveways and workplaces across Southwest Florida.",
+      "Squealing, grinding, or a soft pedal? Mike's Mobile Auto Repair brings full mobile brake service — pads, rotors, calipers, lines, fluid, and ABS diagnostics — to driveways and workplaces across Lehigh Acres and Fort Myers.",
     paragraphs: [
-      "Brake jobs are the single most common reason SWFL drivers end up dealing with a tow truck and a long shop wait. We cut both out of the equation. Our mobile service truck arrives with quality pads and rotors for most makes and models, fresh DOT brake fluid, and the tools to handle the repair on the spot — usually in 60 to 90 minutes per axle.",
+      "Brake jobs are the single most common reason Lehigh Acres and Fort Myers drivers end up dealing with a tow truck and a long shop wait. We cut both out of the equation. Our mobile service truck arrives with quality pads and rotors for most makes and models, fresh DOT brake fluid, and the tools to handle the repair on the spot — usually in 60 to 90 minutes per axle.",
       "Florida driving is hard on brakes. Stop-and-go season traffic, daily red-light commuting, and the weight of larger trucks and SUVs all wear pads down faster than highway driving. If you're hearing squeal, feeling pulsation in the pedal, or noticing the brake warning light, it's time. Waiting turns a $200 pad job into a $500+ pad-and-rotor job, or worse.",
       "We service the whole region — every Lehigh Acres and Fort Myers ZIP code. Quotes are always up front and your wheels are torqued to manufacturer spec on every job. Call or text (813) 501-7572 to book.",
     ],
@@ -148,14 +148,14 @@ const _allLocalLandingPages: LocalLandingPage[] = [
     slug: "mobile-alternator-repair",
     service: "Mobile Alternator Repair",
     categoryId: "electrical",
-    h1: "Mobile Alternator Repair in Southwest Florida",
+    h1: "Mobile Alternator Repair in Lehigh Acres and Fort Myers",
     metaTitle:
-      "Mobile Alternator Repair in SWFL | On-Site Charging System Service",
+      "Mobile Alternator Repair in Lehigh Acres and Fort Myers | On-Site Charging System Service",
     metaDescription:
       "Mobile alternator replacement and full charging-system service across Lehigh Acres and Fort Myers. Call (813) 501-7572.",
     canonical: "https://mikesmautorepair.com/alternator-repair",
     intro:
-      "Battery light on, dim headlights, or a no-start after a jump? Mike's Mobile Auto Repair handles full mobile alternator repair and charging-system testing across Southwest Florida — at your home or office.",
+      "Battery light on, dim headlights, or a no-start after a jump? Mike's Mobile Auto Repair handles full mobile alternator repair and charging-system testing across Lehigh Acres and Fort Myers — at your home or office.",
     paragraphs: [
       "Alternator failures rarely happen at a convenient time. The good news: you don't need a tow. We arrive with professional charging-system testers, replacement alternators for most makes and models, and the tools to swap one out in your driveway or a parking lot — usually in 60 to 120 minutes.",
       "We always test the entire charging system before condemning a part — battery, alternator output under load, voltage drop on the main cables, and the serpentine belt and tensioner. That way you only pay for what's actually wrong. If the alternator is the issue, we install a quality replacement and verify a clean 13.8–14.7-volt charge before we leave.",
@@ -171,7 +171,7 @@ const _allLocalLandingPages: LocalLandingPage[] = [
     ],
     faqs: [
       { q: "How much does it cost?", a: "Typical alternator replacements run $350–$650 installed depending on vehicle and amperage." },
-      { q: "How fast can you get to me?", a: "Same-day mobile service is usually available across SWFL." },
+      { q: "How fast can you get to me?", a: "Same-day mobile service is usually available across Lehigh Acres and Fort Myers." },
       { q: "How do I know it's the alternator and not the battery?", a: "We test both before recommending parts. A weak battery and a failing alternator can look very similar." },
     ],
   },
@@ -179,14 +179,14 @@ const _allLocalLandingPages: LocalLandingPage[] = [
     slug: "mobile-battery-replacement",
     service: "Mobile Battery Replacement",
     categoryId: "electrical",
-    h1: "Mobile Car Battery Replacement in Southwest Florida",
+    h1: "Mobile Car Battery Replacement in Lehigh Acres and Fort Myers",
     metaTitle:
-      "Mobile Battery Replacement in SWFL | Same-Day Delivery & Install",
+      "Mobile Battery Replacement in Lehigh Acres and Fort Myers | Same-Day Delivery & Install",
     metaDescription:
-      "We deliver and install quality car batteries at your home or office across SWFL. Free charging-system test included. Call (813) 501-7572.",
+      "We deliver and install quality car batteries at your home or office across Lehigh Acres and Fort Myers. Free charging-system test included. Call (813) 501-7572.",
     canonical: "https://mikesmautorepair.com/battery-replacement",
     intro:
-      "Dead battery? Skip the tow and the parts-store parking lot. We deliver and install quality car batteries anywhere in Southwest Florida — usually the same day.",
+      "Dead battery? Skip the tow and the parts-store parking lot. We deliver and install quality car batteries anywhere in Lehigh Acres and Fort Myers — usually the same day.",
     paragraphs: [
       "Florida heat is brutal on batteries. Most last only 2–3 years here before they start failing. When yours finally gives up, we bring the new battery to you, test the charging system to make sure it's not actually an alternator issue, and install everything cleanly — terminals cleaned, hold-down secured, charge verified.",
       "We carry batteries for cars, trucks, SUVs, and most light commercial vehicles, and we'll match the right group size, cold-cranking amps, and warranty for your specific vehicle. AGM and standard flooded options available.",
@@ -210,16 +210,16 @@ const _allLocalLandingPages: LocalLandingPage[] = [
     slug: "mobile-starter-repair",
     service: "Mobile Starter Repair",
     categoryId: "electrical",
-    h1: "Mobile Starter Repair & Replacement in Southwest Florida",
+    h1: "Mobile Starter Repair & Replacement in Lehigh Acres and Fort Myers",
     metaTitle:
-      "Mobile Starter Repair in SWFL | On-Site Starter Replacement",
+      "Mobile Starter Repair in Lehigh Acres and Fort Myers | On-Site Starter Replacement",
     metaDescription:
-      "Single click and no crank? We replace failed starters at your home across SWFL. Call (813) 501-7572 for same-day mobile service.",
+      "Single click and no crank? We replace failed starters at your home across Lehigh Acres and Fort Myers. Call (813) 501-7572 for same-day mobile service.",
     intro:
-      "If you turn the key and just hear a click — or nothing at all — your starter has likely failed. Mike's Mobile Auto Repair replaces starters on site across Southwest Florida, no tow required.",
+      "If you turn the key and just hear a click — or nothing at all — your starter has likely failed. Mike's Mobile Auto Repair replaces starters on site across Lehigh Acres and Fort Myers, no tow required.",
     paragraphs: [
       "A failing starter usually announces itself: single loud click with full dash lights, intermittent no-start that gets worse over a couple of weeks, or grinding noises during cranking. We test the starter circuit and battery before condemning the part, then install a quality replacement on site.",
-      "Most starter replacements take 60 to 120 minutes depending on the vehicle. We carry starters for many common models and source same-day for most others. Service is available across all SWFL — Lehigh Acres and Fort Myers.",
+      "Most starter replacements take 60 to 120 minutes depending on the vehicle. We carry starters for many common models and source same-day for most others. Service is available across all Lehigh Acres and Fort Myers — Lehigh Acres and Fort Myers.",
       "Stuck and can't get the car going? Call or text (813) 501-7572. Real technician answers, not a call center.",
     ],
     included: [
@@ -239,14 +239,14 @@ const _allLocalLandingPages: LocalLandingPage[] = [
     slug: "mobile-vehicle-diagnostics",
     service: "Mobile Vehicle Diagnostics",
     categoryId: "engine",
-    h1: "Mobile Vehicle Diagnostics in Southwest Florida",
+    h1: "Mobile Vehicle Diagnostics in Lehigh Acres and Fort Myers",
     metaTitle:
-      "Mobile Car Diagnostics in SWFL | OBD-II Scan & Drivability Testing",
+      "Mobile Car Diagnostics in Lehigh Acres and Fort Myers | OBD-II Scan & Drivability Testing",
     metaDescription:
       "Professional mobile vehicle diagnostics with real OBD-II scanners and live data. Check engine lights, drivability, electrical. Call (813) 501-7572.",
     canonical: "https://mikesmautorepair.com/vehicle-diagnostics",
     intro:
-      "Modern vehicles speak in trouble codes — and we speak the language. Mike's Mobile Auto Repair brings professional OBD-II scanners, live data analysis, and real drivability testing to your driveway anywhere in Southwest Florida.",
+      "Modern vehicles speak in trouble codes — and we speak the language. Mike's Mobile Auto Repair brings professional OBD-II scanners, live data analysis, and real drivability testing to your driveway anywhere in Lehigh Acres and Fort Myers.",
     paragraphs: [
       "Most parts-store 'free scans' just read codes and clear them. That's not diagnostics — that's a starting point. Real diagnostics means reading freeze-frame data, live sensor values, fuel trims, misfire counts, and sometimes wiring tests with a multimeter. We do the real work, find the actual cause, and quote the repair before any wrench turns.",
       "We diagnose check-engine lights, hard shifts, intermittent stalls, no-starts, electrical gremlins, AC faults, and ABS / traction-control warnings. If we can fix it on the spot we will; if it needs follow-up parts we'll quote it transparently.",
@@ -270,13 +270,13 @@ const _allLocalLandingPages: LocalLandingPage[] = [
     slug: "mobile-oil-change",
     service: "Mobile Oil Change",
     categoryId: "oil-fluids",
-    h1: "Mobile Oil Change Service in Southwest Florida",
+    h1: "Mobile Oil Change Service in Lehigh Acres and Fort Myers",
     metaTitle:
-      "Mobile Oil Change in SWFL | At Your Home or Office",
+      "Mobile Oil Change in Lehigh Acres and Fort Myers | At Your Home or Office",
     metaDescription:
-      "Conventional, blend, and full synthetic mobile oil changes across SWFL. We come to your driveway or office. Call (813) 501-7572.",
+      "Conventional, blend, and full synthetic mobile oil changes across Lehigh Acres and Fort Myers. We come to your driveway or office. Call (813) 501-7572.",
     intro:
-      "Skip the oil-change shop wait. Mike's Mobile Auto Repair brings conventional, synthetic blend, and full synthetic oil changes to your home or workplace anywhere in Southwest Florida.",
+      "Skip the oil-change shop wait. Mike's Mobile Auto Repair brings conventional, synthetic blend, and full synthetic oil changes to your home or workplace anywhere in Lehigh Acres and Fort Myers.",
     paragraphs: [
       "A typical oil change at a quick-lube shop eats up an hour of your day with the wait and the upsell pitch. Ours takes about 25 minutes in your driveway with no waiting room and no surprises. We use quality oil and a name-brand filter matched to your vehicle's spec.",
       "Florida heat is hard on engine oil. The hotter it runs, the faster it breaks down. We recommend interval checks every 3,000 miles for conventional, 5,000 for blends, and 7,500–10,000 for full synthetic — and we'll inspect belts, fluids, and tire pressure at every visit.",
@@ -300,17 +300,17 @@ const _allLocalLandingPages: LocalLandingPage[] = [
     slug: "mobile-suspension-steering",
     service: "Mobile Suspension & Steering Repair",
     categoryId: "suspension",
-    h1: "Mobile Suspension & Steering Repair in Southwest Florida",
+    h1: "Mobile Suspension & Steering Repair in Lehigh Acres and Fort Myers",
     metaTitle:
-      "Mobile Suspension & Steering Repair in SWFL | On-Site Service",
+      "Mobile Suspension & Steering Repair in Lehigh Acres and Fort Myers | On-Site Service",
     metaDescription:
-      "Shocks, struts, control arms, ball joints, tie rods, wheel bearings — mobile suspension and steering repair across SWFL. Call (813) 501-7572.",
+      "Shocks, struts, control arms, ball joints, tie rods, wheel bearings — mobile suspension and steering repair across Lehigh Acres and Fort Myers. Call (813) 501-7572.",
     intro:
-      "Clunks over bumps, vague steering, or pulling to one side? Mike's Mobile Auto Repair handles mobile suspension and steering repairs at your home or workplace across Southwest Florida.",
+      "Clunks over bumps, vague steering, or pulling to one side? Mike's Mobile Auto Repair handles mobile suspension and steering repairs at your home or workplace across Lehigh Acres and Fort Myers.",
     paragraphs: [
       "Florida roads — and especially the patched-up surfaces around Lehigh Acres and east Lee County — are hard on suspension. Worn shocks and struts hurt ride quality and increase stopping distance; loose ball joints and tie rods are a safety issue.",
       "We replace shocks, struts, control arms, ball joints, sway bar links, tie rods, and wheel bearings on most vehicles right in your driveway. We also handle power-steering pump and rack diagnostics.",
-      "Service available across SWFL. Call or text (813) 501-7572 for an on-site quote.",
+      "Service available across Lehigh Acres and Fort Myers. Call or text (813) 501-7572 for an on-site quote.",
     ],
     included: [
       "Shock and strut replacement",
@@ -329,17 +329,17 @@ const _allLocalLandingPages: LocalLandingPage[] = [
     slug: "mobile-engine-diagnostics",
     service: "Mobile Engine Diagnostics",
     categoryId: "engine",
-    h1: "Mobile Engine Diagnostics in Southwest Florida",
+    h1: "Mobile Engine Diagnostics in Lehigh Acres and Fort Myers",
     metaTitle:
-      "Mobile Engine Diagnostics in SWFL | Check Engine Light & Drivability",
+      "Mobile Engine Diagnostics in Lehigh Acres and Fort Myers | Check Engine Light & Drivability",
     metaDescription:
-      "On-site engine diagnostics for check engine lights, misfires, rough idle, and drivability problems across SWFL. Call (813) 501-7572.",
+      "On-site engine diagnostics for check engine lights, misfires, rough idle, and drivability problems across Lehigh Acres and Fort Myers. Call (813) 501-7572.",
     intro:
-      "Check engine light on, misfiring, or running rough? Mike's Mobile Auto Repair brings full engine diagnostic capability to your driveway across Southwest Florida.",
+      "Check engine light on, misfiring, or running rough? Mike's Mobile Auto Repair brings full engine diagnostic capability to your driveway across Lehigh Acres and Fort Myers.",
     paragraphs: [
       "Engine drivability problems are usually a chain of small clues — a single misfire code, slightly off fuel trims, a vacuum leak, an ignition coil getting weak. Real diagnostics means looking at all of it, not just slapping in a part and hoping.",
       "We diagnose misfires, rough idle, hesitation, lack of power, knocking, oil leaks, coolant leaks, and emissions failures. Repairs we commonly handle on site include spark plugs, coils, sensors, valve cover gaskets, and serpentine belts.",
-      "Available across SWFL. Book at (813) 501-7572.",
+      "Available across Lehigh Acres and Fort Myers. Book at (813) 501-7572.",
     ],
     included: [
       "Full OBD-II scan and live data",
@@ -358,18 +358,18 @@ const _allLocalLandingPages: LocalLandingPage[] = [
     slug: "mobile-no-start-diagnostics",
     service: "Mobile No-Start Diagnostics",
     categoryId: "electrical",
-    h1: "Mobile No-Start Diagnostics in Southwest Florida",
+    h1: "Mobile No-Start Diagnostics in Lehigh Acres and Fort Myers",
     metaTitle:
-      "Mobile No-Start Diagnostics in SWFL | Won't Crank or Won't Fire",
+      "Mobile No-Start Diagnostics in Lehigh Acres and Fort Myers | Won't Crank or Won't Fire",
     metaDescription:
-      "Car won't start? Mobile no-start diagnostics across SWFL — battery, starter, fuel, ignition, and security. Call (813) 501-7572.",
+      "Car won't start? Mobile no-start diagnostics across Lehigh Acres and Fort Myers — battery, starter, fuel, ignition, and security. Call (813) 501-7572.",
     canonical: "https://mikesmautorepair.com/no-start-diagnostics",
     intro:
-      "Won't crank? Cranks but won't fire? Mike's Mobile Auto Repair specializes in mobile no-start diagnostics across Southwest Florida — at your driveway or parking lot.",
+      "Won't crank? Cranks but won't fire? Mike's Mobile Auto Repair specializes in mobile no-start diagnostics across Lehigh Acres and Fort Myers — at your driveway or parking lot.",
     paragraphs: [
       "A no-start is the worst possible time to need a tow. Our mobile service truck arrives with battery testers, jump packs, fuel-pressure gauges, OBD-II scanners, and the experience to walk through every common cause systematically: battery, starter, fuel pressure, spark, security/immobilizer, and key sensors.",
       "Most no-starts get diagnosed and often repaired on the same visit. Common fixes we complete on site: battery replacement, starter replacement, alternator replacement, fuel-pump relay, crank sensor, and ignition switch.",
-      "Available across all of SWFL. Stuck right now? Call or text (813) 501-7572 — a real tech answers.",
+      "Available across all of Lehigh Acres and Fort Myers. Stuck right now? Call or text (813) 501-7572 — a real tech answers.",
     ],
     included: [
       "Full battery and charging-system test",
@@ -410,7 +410,7 @@ const _allLocalLandingPages: LocalLandingPage[] = [
       "Mobile oil changes and routine maintenance",
           ],
     faqs: [
-      { q: "Are you really a mobile mechanic in Lehigh Acres?", a: "Yes — we live and work right here in SWFL. Service covers every Lehigh Acres ZIP code." },
+      { q: "Are you really a mobile mechanic in Lehigh Acres?", a: "Yes — we live and work right here in Lehigh Acres and Fort Myers. Service covers every Lehigh Acres ZIP code." },
       { q: "What do you charge for a service call?", a: "There's no separate trip fee inside our regular service area — you only pay for the diagnostic and the work performed, quoted up front." },
       { q: "How fast can you come out?", a: "Same-day appointments are usually available." },
       { q: "Do you do brakes and batteries on site?", a: "Yes — both are among our most common Lehigh Acres jobs and almost always completed in a single visit." },
@@ -442,7 +442,7 @@ const _allLocalLandingPages: LocalLandingPage[] = [
       "Light fleet maintenance",
     ],
     faqs: [
-      { q: "Do you cover all of Fort Myers?", a: "Yes — every ZIP code in Fort Myers, plus surrounding cities across SWFL." },
+      { q: "Do you cover all of Fort Myers?", a: "Yes — every ZIP code in Fort Myers, plus surrounding cities across Lehigh Acres and Fort Myers." },
       { q: "Can you handle AC repairs in my driveway?", a: "Yes. AC recharges and many compressor and condenser jobs are routinely done on site." },
       { q: "How do payments work?", a: "We accept cards, ACH, and offer financing on qualifying repairs. Quotes are always up front." },
       { q: "Same-day service?", a: "Almost always for in-stock work. Special-order parts may push to next day." },
@@ -453,16 +453,16 @@ const _allLocalLandingPages: LocalLandingPage[] = [
     slug: "alternator-repair",
     service: "Alternator Repair",
     categoryId: "electrical",
-    h1: "Alternator Repair in Southwest Florida",
-    metaTitle: "Alternator Repair in SWFL | Mobile Charging-System Service",
+    h1: "Alternator Repair in Lehigh Acres and Fort Myers",
+    metaTitle: "Alternator Repair in Lehigh Acres and Fort Myers | Mobile Charging-System Service",
     metaDescription:
       "Mobile alternator repair and replacement across Lehigh Acres and Fort Myers. Call (813) 501-7572.",
     intro:
-      "Battery light on, dim headlights, dying after a jump? We diagnose and replace failed alternators at your home or office anywhere in Southwest Florida.",
+      "Battery light on, dim headlights, dying after a jump? We diagnose and replace failed alternators at your home or office anywhere in Lehigh Acres and Fort Myers.",
     paragraphs: [
       "Alternator failure rarely happens at a convenient time. We arrive with professional charging-system testers and quality replacement alternators for most makes and models, then verify a clean 13.8–14.7-volt charge before we leave.",
       "We always test the entire charging system — battery, alternator output under load, voltage drops, and the serpentine belt — before condemning a part. You only pay for what's actually wrong.",
-      "Service available in every SWFL ZIP. Call or text (813) 501-7572 for same-day mobile alternator service.",
+      "Service available in every Lehigh Acres and Fort Myers ZIP. Call or text (813) 501-7572 for same-day mobile alternator service.",
     ],
     included: [
       "Full charging-system test",
@@ -483,16 +483,16 @@ const _allLocalLandingPages: LocalLandingPage[] = [
     slug: "battery-replacement",
     service: "Car Battery Replacement",
     categoryId: "electrical",
-    h1: "Car Battery Replacement in Southwest Florida",
-    metaTitle: "Car Battery Replacement in SWFL | Same-Day Mobile Install",
+    h1: "Car Battery Replacement in Lehigh Acres and Fort Myers",
+    metaTitle: "Car Battery Replacement in Lehigh Acres and Fort Myers | Same-Day Mobile Install",
     metaDescription:
-      "Mobile car battery delivery and installation across SWFL. Free charging-system test included. Old battery hauled away. Call (813) 501-7572.",
+      "Mobile car battery delivery and installation across Lehigh Acres and Fort Myers. Free charging-system test included. Old battery hauled away. Call (813) 501-7572.",
     intro:
-      "Dead battery? Skip the tow. We deliver and install quality car batteries anywhere in Southwest Florida — usually the same day.",
+      "Dead battery? Skip the tow. We deliver and install quality car batteries anywhere in Lehigh Acres and Fort Myers — usually the same day.",
     paragraphs: [
       "Florida heat is brutal on batteries. Most last only 2–3 years here. When yours gives up, we bring the new one, test the charging system to make sure it's not actually an alternator, and install everything cleanly.",
       "We carry batteries for cars, trucks, SUVs, and most light commercial vehicles, in standard and AGM, with warranties up to 36 months.",
-      "Service across all of SWFL. Need a battery now? Call or text (813) 501-7572.",
+      "Service across all of Lehigh Acres and Fort Myers. Need a battery now? Call or text (813) 501-7572.",
     ],
     included: [
       "Free battery and charging-system test",
@@ -513,16 +513,16 @@ const _allLocalLandingPages: LocalLandingPage[] = [
     slug: "brake-repair",
     service: "Brake Repair",
     categoryId: "brakes",
-    h1: "Brake Repair in Southwest Florida",
-    metaTitle: "Brake Repair in SWFL | Mobile Pads, Rotors & Calipers",
+    h1: "Brake Repair in Lehigh Acres and Fort Myers",
+    metaTitle: "Brake Repair in Lehigh Acres and Fort Myers | Mobile Pads, Rotors & Calipers",
     metaDescription:
-      "Mobile brake repair across SWFL — pads, rotors, calipers, fluid, ABS diagnostics. Done in your driveway. Call (813) 501-7572.",
+      "Mobile brake repair across Lehigh Acres and Fort Myers — pads, rotors, calipers, fluid, ABS diagnostics. Done in your driveway. Call (813) 501-7572.",
     intro:
-      "Squealing, grinding, or a soft pedal? We bring complete brake service to your driveway across Southwest Florida — pads, rotors, calipers, fluid, and ABS diagnostics.",
+      "Squealing, grinding, or a soft pedal? We bring complete brake service to your driveway across Lehigh Acres and Fort Myers — pads, rotors, calipers, fluid, and ABS diagnostics.",
     paragraphs: [
-      "Brake jobs are the single most common reason SWFL drivers waste a day at a shop. We cut that out. Our mobile truck carries quality pads and rotors for most makes and models, fresh DOT brake fluid, and the tools to handle most repairs in 60–90 minutes per axle.",
+      "Brake jobs are the single most common reason Lehigh Acres and Fort Myers drivers waste a day at a shop. We cut that out. Our mobile truck carries quality pads and rotors for most makes and models, fresh DOT brake fluid, and the tools to handle most repairs in 60–90 minutes per axle.",
       "Florida driving is hard on brakes — stop-and-go season traffic, daily commuting, and heavy SUVs all wear pads faster. Waiting turns a $200 pad job into a $500+ pad-and-rotor job.",
-      "Available in every SWFL ZIP. Quotes always up front; wheels torqued to spec. Call or text (813) 501-7572.",
+      "Available in every Lehigh Acres and Fort Myers ZIP. Quotes always up front; wheels torqued to spec. Call or text (813) 501-7572.",
     ],
     included: [
       "Front and rear pad replacement",
@@ -543,16 +543,16 @@ const _allLocalLandingPages: LocalLandingPage[] = [
     slug: "vehicle-diagnostics",
     service: "Vehicle Diagnostics",
     categoryId: "engine",
-    h1: "Vehicle Diagnostics in Southwest Florida",
-    metaTitle: "Vehicle Diagnostics in SWFL | Mobile OBD-II & Live Data",
+    h1: "Vehicle Diagnostics in Lehigh Acres and Fort Myers",
+    metaTitle: "Vehicle Diagnostics in Lehigh Acres and Fort Myers | Mobile OBD-II & Live Data",
     metaDescription:
-      "Real mobile vehicle diagnostics across SWFL — OBD-II, live data, drivability, electrical. Honest findings and up-front repair quotes. Call (813) 501-7572.",
+      "Real mobile vehicle diagnostics across Lehigh Acres and Fort Myers — OBD-II, live data, drivability, electrical. Honest findings and up-front repair quotes. Call (813) 501-7572.",
     intro:
-      "Modern vehicles speak in trouble codes — and we speak the language. We bring professional OBD-II scanners, live data, and real drivability testing to your driveway anywhere in Southwest Florida.",
+      "Modern vehicles speak in trouble codes — and we speak the language. We bring professional OBD-II scanners, live data, and real drivability testing to your driveway anywhere in Lehigh Acres and Fort Myers.",
     paragraphs: [
       "Most parts-store 'free scans' just read codes. Real diagnostics means freeze-frame data, live sensor values, fuel trims, misfire counts, and sometimes wiring tests. We do the real work and quote the repair before any wrench turns.",
       "We diagnose check-engine lights, hard shifts, intermittent stalls, no-starts, electrical issues, AC faults, and ABS / traction-control warnings. On-spot fixes when possible; transparent quotes when follow-up parts are needed.",
-      "Service across all SWFL. Call or text (813) 501-7572 to book.",
+      "Service across all Lehigh Acres and Fort Myers. Call or text (813) 501-7572 to book.",
     ],
     included: [
       "OBD-II scan with full code retrieval",
@@ -566,23 +566,23 @@ const _allLocalLandingPages: LocalLandingPage[] = [
       { q: "How much does a mobile diagnostic cost?", a: "Standard appointments run $80–$150, credited toward any repair we perform." },
       { q: "Can you reset my check engine light?", a: "Yes — but only after we identify and address the cause." },
       { q: "Do you handle ABS and electrical issues?", a: "Yes, full chassis-wide diagnostics including ABS and SRS warnings." },
-      { q: "Same-day appointments?", a: "Usually available across SWFL." },
+      { q: "Same-day appointments?", a: "Usually available across Lehigh Acres and Fort Myers." },
     ],
   },
   {
     slug: "no-start-diagnostics",
     service: "No-Start Diagnostics",
     categoryId: "electrical",
-    h1: "No-Start Diagnostics in Southwest Florida",
-    metaTitle: "No-Start Diagnostics in SWFL | Mobile Won't-Start Service",
+    h1: "No-Start Diagnostics in Lehigh Acres and Fort Myers",
+    metaTitle: "No-Start Diagnostics in Lehigh Acres and Fort Myers | Mobile Won't-Start Service",
     metaDescription:
-      "Car won't start? Mobile no-start diagnostics across SWFL — battery, starter, fuel, ignition, security. Same-day. Call (813) 501-7572.",
+      "Car won't start? Mobile no-start diagnostics across Lehigh Acres and Fort Myers — battery, starter, fuel, ignition, security. Same-day. Call (813) 501-7572.",
     intro:
-      "Won't crank? Cranks but won't fire? We specialize in mobile no-start diagnostics across Southwest Florida — at your driveway or parking lot.",
+      "Won't crank? Cranks but won't fire? We specialize in mobile no-start diagnostics across Lehigh Acres and Fort Myers — at your driveway or parking lot.",
     paragraphs: [
       "A no-start is the worst possible time to need a tow. Our mobile truck arrives with battery testers, jump packs, fuel-pressure gauges, and OBD-II scanners to systematically work every common cause: battery, starter, fuel pressure, spark, security/immobilizer, and key sensors.",
       "Most no-starts get diagnosed and often repaired on the same visit. Frequent on-site fixes: battery, starter, alternator, fuel-pump relay, crank sensor, ignition switch.",
-      "Available across all SWFL. Stuck right now? Call or text (813) 501-7572 — a real tech answers.",
+      "Available across all Lehigh Acres and Fort Myers. Stuck right now? Call or text (813) 501-7572 — a real tech answers.",
     ],
     included: [
       "Battery and charging-system test",
@@ -612,7 +612,7 @@ const _allLocalLandingPages: LocalLandingPage[] = [
     intro:
       "Need brake repair in Lehigh Acres? Mike's Mobile Auto Repair comes to your home or workplace and handles complete brake service — pads, rotors, calipers, fluid, and ABS diagnostics — usually in 60 to 90 minutes per axle.",
     paragraphs: [
-      "Brakes wear out faster in Lehigh Acres than most people realize. Stop-and-go traffic on Lee Boulevard, Sunshine, Homestead, and Gunnery Road, paired with the heat and humidity of Southwest Florida, beats up pads, rotors, and brake fluid year-round. The result: most Lehigh Acres drivers need brake service every 30,000 to 45,000 miles — sometimes sooner on heavier SUVs and trucks.",
+      "Brakes wear out faster in Lehigh Acres than most people realize. Stop-and-go traffic on Lee Boulevard, Sunshine, Homestead, and Gunnery Road, paired with the heat and humidity of Lehigh Acres and Fort Myers, beats up pads, rotors, and brake fluid year-round. The result: most Lehigh Acres drivers need brake service every 30,000 to 45,000 miles — sometimes sooner on heavier SUVs and trucks.",
       "Instead of dropping your vehicle at a brick-and-mortar shop and burning a workday in a waiting room, our mobile service truck rolls to your driveway in any Lehigh Acres ZIP code (33936, 33971, 33972, 33973, 33974, 33976) with quality pads and rotors for most makes and models, fresh DOT brake fluid, calipers when needed, and the tools to handle the repair on site. We test-drive every job, torque every wheel to manufacturer spec, and bed your new pads in properly so the very first stop feels confident.",
       "We also handle the trickier stuff: stuck or seized calipers, dragging brakes, ABS warning lights, parking brake adjustments, and brake-fluid flushes. If your pedal feels soft, your truck is pulling under braking, or you're hearing a metal-on-metal grind, that's a now problem — not a next-month problem. Waiting turns a $200 pad job into a $500-plus pad-and-rotor job, and a destroyed rotor can damage the caliper too.",
       "Pricing is quoted up front before any work begins. No surprise add-ons, no shop diagnostic fee on top of a job we're already doing. Mike's Mobile Auto Repair is locally owned in Lee County, fully insured, and answered by a real technician — not a call center. Call or text (813) 501-7572 for same-day mobile brake repair in Lehigh Acres, FL.",
@@ -775,13 +775,13 @@ const _allLocalLandingPages: LocalLandingPage[] = [
     slug: "oil-change",
     service: "Mobile Oil Change",
     categoryId: "oil-fluids",
-    h1: "Mobile Oil Change in Southwest Florida",
-    metaTitle: "Mobile Oil Change in SWFL | At Your Home or Office",
+    h1: "Mobile Oil Change in Lehigh Acres and Fort Myers",
+    metaTitle: "Mobile Oil Change in Lehigh Acres and Fort Myers | At Your Home or Office",
     metaDescription:
       "Full-service mobile oil change at your driveway across Lehigh Acres and Fort Myers. Call (813) 501-7572.",
     canonical: "https://mikesmautorepair.com/oil-change",
     intro:
-      "Skip the quick-lube line. Mike's Mobile Auto Repair performs full-service oil changes — conventional, blend, or full synthetic — right in your driveway anywhere in Southwest Florida.",
+      "Skip the quick-lube line. Mike's Mobile Auto Repair performs full-service oil changes — conventional, blend, or full synthetic — right in your driveway anywhere in Lehigh Acres and Fort Myers.",
     paragraphs: [
       "A mobile oil change is the easiest service to fit into a busy schedule. We arrive with quality oil and a new filter, set up containment, drain and replace the oil, swap the filter, top off fluids, reset the maintenance light, and properly recycle the used oil. The whole appointment usually takes 20–30 minutes and you never have to leave home.",
       "We carry conventional, synthetic-blend, and full-synthetic oils plus the right filter for your specific vehicle. Most modern cars and trucks need full synthetic — we'll confirm what's correct based on your owner's manual before we start. Pricing is up front and includes the multi-point inspection (tires, brakes, belts, hoses, lights) at no extra charge.",
@@ -807,15 +807,15 @@ const _allLocalLandingPages: LocalLandingPage[] = [
     slug: "diagnostics",
     service: "Mobile Vehicle Diagnostics",
     categoryId: "engine",
-    h1: "Mobile Vehicle Diagnostics in Southwest Florida",
-    metaTitle: "Mobile Vehicle Diagnostics in SWFL | Real OBD-II Testing",
+    h1: "Mobile Vehicle Diagnostics in Lehigh Acres and Fort Myers",
+    metaTitle: "Mobile Vehicle Diagnostics in Lehigh Acres and Fort Myers | Real OBD-II Testing",
     metaDescription:
       "Real mobile diagnostics across Lehigh Acres and Fort Myers — OBD-II, live data, electrical. Call (813) 501-7572.",
     canonical: "https://mikesmautorepair.com/diagnostics",
     intro:
-      "Check engine light on? Strange shifting, intermittent stalls, or an electrical gremlin? Mike's Mobile Auto Repair brings real vehicle diagnostics — OBD-II, live data, drivability, and electrical testing — to your driveway anywhere in Southwest Florida.",
+      "Check engine light on? Strange shifting, intermittent stalls, or an electrical gremlin? Mike's Mobile Auto Repair brings real vehicle diagnostics — OBD-II, live data, drivability, and electrical testing — to your driveway anywhere in Lehigh Acres and Fort Myers.",
     paragraphs: [
-      "A parts-store 'free scan' just reads the code and hands you a list of every part it could possibly be. That's a guess, not a diagnosis, and it routinely costs SWFL drivers hundreds of dollars in unnecessary parts. Real diagnostics means freeze-frame data, live sensor values, fuel-trim analysis, misfire counters, and — when needed — wiring tests with a multimeter or scope. We do the real work, then quote the actual repair before any wrench turns.",
+      "A parts-store 'free scan' just reads the code and hands you a list of every part it could possibly be. That's a guess, not a diagnosis, and it routinely costs Lehigh Acres and Fort Myers drivers hundreds of dollars in unnecessary parts. Real diagnostics means freeze-frame data, live sensor values, fuel-trim analysis, misfire counters, and — when needed — wiring tests with a multimeter or scope. We do the real work, then quote the actual repair before any wrench turns.",
       "We diagnose check-engine lights, hard shifts, intermittent stalls, no-starts, hesitation under acceleration, electrical glitches, AC faults, ABS and traction-control warnings, and emissions readiness for tag renewal. On-the-spot fixes are common when the problem is straightforward — sensors, gaskets, ignition components, fuel-pump relays — and we provide a transparent written quote when follow-up parts are needed.",
       "Service is available in every Lehigh Acres and Fort Myers ZIP. The diagnostic appointment runs $80–$150 and is fully credited toward any repair we perform. Call or text (813) 501-7572 to book.",
     ],
@@ -832,21 +832,21 @@ const _allLocalLandingPages: LocalLandingPage[] = [
       { q: "How much does a mobile diagnostic cost?", a: "Standard diagnostic appointments run $80–$150 and are credited toward any repair we perform the same visit." },
       { q: "Can you reset my check-engine light?", a: "Yes — but only after we identify and address the actual cause. Otherwise it just comes back." },
       { q: "Do you handle ABS and electrical issues?", a: "Yes — full chassis-wide diagnostics on most makes including ABS, SRS, and body-control modules." },
-      { q: "Same-day appointments?", a: "Yes — same-day mobile diagnostics are usually available across SWFL." },
+      { q: "Same-day appointments?", a: "Yes — same-day mobile diagnostics are usually available across Lehigh Acres and Fort Myers." },
     ],
   },
   {
     slug: "battery-alternator-starter",
     service: "Mobile Battery, Alternator & Starter Service",
     categoryId: "electrical",
-    h1: "Mobile Battery, Alternator & Starter Service in SWFL",
+    h1: "Mobile Battery, Alternator & Starter Service in Lehigh Acres and Fort Myers",
     metaTitle:
-      "Mobile Battery, Alternator & Starter Repair | SWFL | (813) 501-7572",
+      "Mobile Battery, Alternator & Starter Repair | Lehigh Acres and Fort Myers | (813) 501-7572",
     metaDescription:
       "On-site battery, alternator, and starter testing and replacement across Lehigh Acres and Fort Myers. Call (813) 501-7572.",
     canonical: "https://mikesmautorepair.com/battery-alternator-starter",
     intro:
-      "No-crank, single click, dim lights, or battery warning light? Mike's Mobile Auto Repair tests and replaces the entire starting and charging system — battery, alternator, and starter — at your home or office across Southwest Florida.",
+      "No-crank, single click, dim lights, or battery warning light? Mike's Mobile Auto Repair tests and replaces the entire starting and charging system — battery, alternator, and starter — at your home or office across Lehigh Acres and Fort Myers.",
     paragraphs: [
       "When a vehicle won't crank, the cause is almost always one of three parts: a dead battery, a failing alternator, or a bad starter. Symptoms overlap, so we test the whole starting and charging system before we recommend anything. That means a load test on the battery, an output test on the alternator under demand, voltage-drop tests on the main cables, and a starter draw test if needed. You only pay for what's actually wrong.",
       "Florida heat is brutal on starting systems. Most batteries last only 2–3 years here, alternators run hot under constant AC load, and starter solenoids weather faster than they should. We carry quality replacement batteries (standard and AGM), alternators for most makes and models, and source most starters same-day. Installation is on the spot — usually 30 to 90 minutes depending on the part — and we verify a clean 13.8–14.7-volt charge before we leave.",

@@ -8,7 +8,7 @@ import {
 
 const faqs = [
   {
-    q: "How much does a mobile mechanic cost in Southwest Florida?",
+    q: "How much does a mobile mechanic cost in Lehigh Acres and Fort Myers?",
     a: "Most repairs are billed the same as a brick-and-mortar shop — there's no separate trip fee inside our regular service area. Diagnostic appointments run $80–$150 and are credited toward any repair we perform. You always get a written quote before any work begins.",
   },
   {
@@ -63,7 +63,7 @@ const HomeFAQ = () => {
             <span className="text-gold">QUESTIONS</span>
           </h2>
           <p className="text-base md:text-lg text-muted-foreground">
-            Common questions from Southwest Florida drivers.
+            Common questions from Lehigh Acres and Fort Myers drivers.
           </p>
         </div>
 

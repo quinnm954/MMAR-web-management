@@ -239,7 +239,7 @@ const LocalLanding = () => {
           ) : (
             <div className="glass-card rounded-xl p-6 md:p-8 border border-border/50 mb-12">
               <h2 className="font-display text-xl md:text-2xl text-sky mb-3">
-                Available Across Southwest Florida
+                Available Across Lehigh Acres and Fort Myers
               </h2>
               <p className="text-muted-foreground mb-4">
                 {page.service} is available in all our service cities. Tap your city for full local details.

@@ -46,7 +46,7 @@ const Blog = () => {
   useSeo({
     title:
       safePage === 1
-        ? "Mobile Mechanic Blog | SWFL Auto Repair Tips"
+        ? "Mobile Mechanic Blog | Lehigh Acres and Fort Myers Auto Repair Tips"
         : `Mobile Mechanic Blog — Page ${safePage} | Mike's Mobile Auto Repair`,
     description:
       "Mobile mechanic guides for Lehigh Acres and Fort Myers — diagnostics, brakes, batteries, alternators, no-start fixes, and Florida-specific car care.",

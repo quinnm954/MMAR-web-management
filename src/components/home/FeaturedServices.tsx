@@ -28,7 +28,7 @@ const FeaturedServices = () => {
             <span className="text-gold">SERVICES</span>
           </h2>
           <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
-            The mobile repairs we get called for most across Southwest Florida.
+            The mobile repairs we get called for most across Lehigh Acres and Fort Myers.
           </p>
         </div>
 
