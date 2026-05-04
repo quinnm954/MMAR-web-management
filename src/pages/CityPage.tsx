@@ -85,6 +85,13 @@ const CityPage = () => {
     description: city?.intro,
     canonical: url,
     jsonLd,
+    breadcrumbs: city
+      ? [
+          { name: "Home", url: "https://mikesmautorepair.com/" },
+          { name: "Service Areas", url: "https://mikesmautorepair.com/service-areas" },
+          { name: city.name, url },
+        ]
+      : undefined,
   });
 
   if (!city) return <NotFound />;

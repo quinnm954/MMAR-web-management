@@ -65,6 +65,13 @@ const ServiceCategory = () => {
     description: category?.description,
     canonical: url,
     jsonLd,
+    breadcrumbs: category
+      ? [
+          { name: "Home", url: "https://mikesmautorepair.com/" },
+          { name: "Services", url: "https://mikesmautorepair.com/services" },
+          { name: category.title, url },
+        ]
+      : undefined,
   });
 
   if (!category) return <NotFound />;

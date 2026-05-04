@@ -11,6 +11,10 @@ const Reviews = () => {
     description:
       "5-star customer reviews for Mike's Mobile Auto Repair across Google, Facebook, Yelp, and Nextdoor — serving Lehigh Acres and Fort Myers.",
     canonical: "https://mikesmautorepair.com/reviews",
+    breadcrumbs: [
+      { name: "Home", url: "https://mikesmautorepair.com/" },
+      { name: "Reviews", url: "https://mikesmautorepair.com/reviews" },
+    ],
   });
 
   return (

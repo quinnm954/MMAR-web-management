@@ -13,6 +13,10 @@ const ServiceAreas = () => {
     description:
       "Mobile mechanic service areas across Lehigh Acres and Fort Myers, FL.",
     canonical: "https://mikesmautorepair.com/service-areas",
+    breadcrumbs: [
+      { name: "Home", url: "https://mikesmautorepair.com/" },
+      { name: "Service Areas", url: "https://mikesmautorepair.com/service-areas" },
+    ],
   });
 
   return (

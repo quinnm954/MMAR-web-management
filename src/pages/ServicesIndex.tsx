@@ -25,6 +25,10 @@ const ServicesIndex = () => {
     description:
       "All mobile mechanic services offered across Lehigh Acres and Fort Myers — diagnostics, brakes, batteries, alternators, no-start.",
     canonical: "https://mikesmautorepair.com/services",
+    breadcrumbs: [
+      { name: "Home", url: "https://mikesmautorepair.com/" },
+      { name: "Services", url: "https://mikesmautorepair.com/services" },
+    ],
   });
 
   return (

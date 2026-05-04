@@ -10,6 +10,10 @@ const ContactPage = () => {
     description:
       "Call or text Mike's Mobile Auto Repair at (813) 501-7572 for same-day mobile mechanic service across Lehigh Acres and Fort Myers.",
     canonical: "https://mikesmautorepair.com/contact",
+    breadcrumbs: [
+      { name: "Home", url: "https://mikesmautorepair.com/" },
+      { name: "Contact", url: "https://mikesmautorepair.com/contact" },
+    ],
   });
 
   return (
