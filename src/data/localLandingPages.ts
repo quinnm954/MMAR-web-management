@@ -119,14 +119,14 @@ const _allLocalLandingPages: LocalLandingPage[] = [
     metaTitle:
       "Mobile Brake Repair in SWFL | Pads, Rotors & Calipers At Your Driveway",
     metaDescription:
-      "On-site mobile brake repair across Lehigh Acres, Fort Myers, Cape Coral, Estero, Bonita Springs and Naples. Pads, rotors, calipers, fluid. Call (813) 501-7572.",
+      "On-site mobile brake repair across Lehigh Acres and Fort Myers. Pads, rotors, calipers, fluid. Call (813) 501-7572.",
     canonical: "https://mikesmautorepair.com/brake-repair",
     intro:
       "Squealing, grinding, or a soft pedal? Mike's Mobile Auto Repair brings full mobile brake service — pads, rotors, calipers, lines, fluid, and ABS diagnostics — to driveways and workplaces across Southwest Florida.",
     paragraphs: [
       "Brake jobs are the single most common reason SWFL drivers end up dealing with a tow truck and a long shop wait. We cut both out of the equation. Our mobile service truck arrives with quality pads and rotors for most makes and models, fresh DOT brake fluid, and the tools to handle the repair on the spot — usually in 60 to 90 minutes per axle.",
       "Florida driving is hard on brakes. Stop-and-go season traffic, daily red-light commuting, and the weight of larger trucks and SUVs all wear pads down faster than highway driving. If you're hearing squeal, feeling pulsation in the pedal, or noticing the brake warning light, it's time. Waiting turns a $200 pad job into a $500+ pad-and-rotor job, or worse.",
-      "We service the whole region — every Lehigh Acres, Fort Myers, Cape Coral, Estero, Bonita Springs, and Naples ZIP code. Quotes are always up front and your wheels are torqued to manufacturer spec on every job. Call or text (813) 501-7572 to book.",
+      "We service the whole region — every Lehigh Acres and Fort Myers ZIP code. Quotes are always up front and your wheels are torqued to manufacturer spec on every job. Call or text (813) 501-7572 to book.",
     ],
     included: [
       "Front and rear brake pad replacement",
@@ -152,14 +152,14 @@ const _allLocalLandingPages: LocalLandingPage[] = [
     metaTitle:
       "Mobile Alternator Repair in SWFL | On-Site Charging System Service",
     metaDescription:
-      "Mobile alternator replacement and full charging-system service across Lehigh Acres, Fort Myers, Cape Coral, Estero, Bonita Springs and Naples. Call (813) 501-7572.",
+      "Mobile alternator replacement and full charging-system service across Lehigh Acres and Fort Myers. Call (813) 501-7572.",
     canonical: "https://mikesmautorepair.com/alternator-repair",
     intro:
       "Battery light on, dim headlights, or a no-start after a jump? Mike's Mobile Auto Repair handles full mobile alternator repair and charging-system testing across Southwest Florida — at your home or office.",
     paragraphs: [
       "Alternator failures rarely happen at a convenient time. The good news: you don't need a tow. We arrive with professional charging-system testers, replacement alternators for most makes and models, and the tools to swap one out in your driveway or a parking lot — usually in 60 to 120 minutes.",
       "We always test the entire charging system before condemning a part — battery, alternator output under load, voltage drop on the main cables, and the serpentine belt and tensioner. That way you only pay for what's actually wrong. If the alternator is the issue, we install a quality replacement and verify a clean 13.8–14.7-volt charge before we leave.",
-      "Service is available across every Lehigh Acres, Fort Myers, Cape Coral, Estero, Bonita Springs, and Naples ZIP. Stuck right now? Call or text (813) 501-7572 — same-day service is usually available.",
+      "Service is available across every Lehigh Acres and Fort Myers ZIP. Stuck right now? Call or text (813) 501-7572 — same-day service is usually available.",
     ],
     included: [
       "Full charging-system test (battery, alternator, belt)",
@@ -190,7 +190,7 @@ const _allLocalLandingPages: LocalLandingPage[] = [
     paragraphs: [
       "Florida heat is brutal on batteries. Most last only 2–3 years here before they start failing. When yours finally gives up, we bring the new battery to you, test the charging system to make sure it's not actually an alternator issue, and install everything cleanly — terminals cleaned, hold-down secured, charge verified.",
       "We carry batteries for cars, trucks, SUVs, and most light commercial vehicles, and we'll match the right group size, cold-cranking amps, and warranty for your specific vehicle. AGM and standard flooded options available.",
-      "We cover all of Lehigh Acres, Fort Myers, Cape Coral, Estero, Bonita Springs, and Naples. Need a battery now? Call or text (813) 501-7572.",
+      "We cover all of Lehigh Acres and Fort Myers. Need a battery now? Call or text (813) 501-7572.",
     ],
     included: [
       "Free battery and charging-system test",
@@ -219,7 +219,7 @@ const _allLocalLandingPages: LocalLandingPage[] = [
       "If you turn the key and just hear a click — or nothing at all — your starter has likely failed. Mike's Mobile Auto Repair replaces starters on site across Southwest Florida, no tow required.",
     paragraphs: [
       "A failing starter usually announces itself: single loud click with full dash lights, intermittent no-start that gets worse over a couple of weeks, or grinding noises during cranking. We test the starter circuit and battery before condemning the part, then install a quality replacement on site.",
-      "Most starter replacements take 60 to 120 minutes depending on the vehicle. We carry starters for many common models and source same-day for most others. Service is available across all SWFL — Lehigh Acres, Fort Myers, Cape Coral, Estero, Bonita Springs, Naples.",
+      "Most starter replacements take 60 to 120 minutes depending on the vehicle. We carry starters for many common models and source same-day for most others. Service is available across all SWFL — Lehigh Acres and Fort Myers.",
       "Stuck and can't get the car going? Call or text (813) 501-7572. Real technician answers, not a call center.",
     ],
     included: [
@@ -250,7 +250,7 @@ const _allLocalLandingPages: LocalLandingPage[] = [
     paragraphs: [
       "Most parts-store 'free scans' just read codes and clear them. That's not diagnostics — that's a starting point. Real diagnostics means reading freeze-frame data, live sensor values, fuel trims, misfire counts, and sometimes wiring tests with a multimeter. We do the real work, find the actual cause, and quote the repair before any wrench turns.",
       "We diagnose check-engine lights, hard shifts, intermittent stalls, no-starts, electrical gremlins, AC faults, and ABS / traction-control warnings. If we can fix it on the spot we will; if it needs follow-up parts we'll quote it transparently.",
-      "Available across Lehigh Acres, Fort Myers, Cape Coral, Estero, Bonita Springs, and Naples. Call or text (813) 501-7572 to book a diagnostic appointment.",
+      "Available across Lehigh Acres and Fort Myers. Call or text (813) 501-7572 to book a diagnostic appointment.",
     ],
     included: [
       "OBD-II scan with full code retrieval",
@@ -280,7 +280,7 @@ const _allLocalLandingPages: LocalLandingPage[] = [
     paragraphs: [
       "A typical oil change at a quick-lube shop eats up an hour of your day with the wait and the upsell pitch. Ours takes about 25 minutes in your driveway with no waiting room and no surprises. We use quality oil and a name-brand filter matched to your vehicle's spec.",
       "Florida heat is hard on engine oil. The hotter it runs, the faster it breaks down. We recommend interval checks every 3,000 miles for conventional, 5,000 for blends, and 7,500–10,000 for full synthetic — and we'll inspect belts, fluids, and tire pressure at every visit.",
-      "Service available across Lehigh Acres, Fort Myers, Cape Coral, Estero, Bonita Springs, and Naples. Book at (813) 501-7572.",
+      "Service available across Lehigh Acres and Fort Myers. Book at (813) 501-7572.",
     ],
     included: [
       "Up to 5 quarts of oil (extra by quart)",
@@ -456,7 +456,7 @@ const _allLocalLandingPages: LocalLandingPage[] = [
     h1: "Alternator Repair in Southwest Florida",
     metaTitle: "Alternator Repair in SWFL | Mobile Charging-System Service",
     metaDescription:
-      "Mobile alternator repair and replacement across Lehigh Acres, Fort Myers, Cape Coral, Estero, Bonita Springs and Naples. Call (813) 501-7572.",
+      "Mobile alternator repair and replacement across Lehigh Acres and Fort Myers. Call (813) 501-7572.",
     intro:
       "Battery light on, dim headlights, dying after a jump? We diagnose and replace failed alternators at your home or office anywhere in Southwest Florida.",
     paragraphs: [
@@ -778,14 +778,14 @@ const _allLocalLandingPages: LocalLandingPage[] = [
     h1: "Mobile Oil Change in Southwest Florida",
     metaTitle: "Mobile Oil Change in SWFL | At Your Home or Office",
     metaDescription:
-      "Full-service mobile oil change at your driveway across Lehigh Acres, Fort Myers, Cape Coral, Estero, Bonita Springs and Naples. Call (813) 501-7572.",
+      "Full-service mobile oil change at your driveway across Lehigh Acres and Fort Myers. Call (813) 501-7572.",
     canonical: "https://mikesmautorepair.com/oil-change",
     intro:
       "Skip the quick-lube line. Mike's Mobile Auto Repair performs full-service oil changes — conventional, blend, or full synthetic — right in your driveway anywhere in Southwest Florida.",
     paragraphs: [
       "A mobile oil change is the easiest service to fit into a busy schedule. We arrive with quality oil and a new filter, set up containment, drain and replace the oil, swap the filter, top off fluids, reset the maintenance light, and properly recycle the used oil. The whole appointment usually takes 20–30 minutes and you never have to leave home.",
       "We carry conventional, synthetic-blend, and full-synthetic oils plus the right filter for your specific vehicle. Most modern cars and trucks need full synthetic — we'll confirm what's correct based on your owner's manual before we start. Pricing is up front and includes the multi-point inspection (tires, brakes, belts, hoses, lights) at no extra charge.",
-      "We service every Lehigh Acres, Fort Myers, Cape Coral, Estero, Bonita Springs, and Naples ZIP code. Call or text (813) 501-7572 to book a mobile oil change today.",
+      "We service every Lehigh Acres and Fort Myers ZIP code. Call or text (813) 501-7572 to book a mobile oil change today.",
     ],
     included: [
       "Up to 5 quarts of conventional, blend, or full synthetic oil",
@@ -810,14 +810,14 @@ const _allLocalLandingPages: LocalLandingPage[] = [
     h1: "Mobile Vehicle Diagnostics in Southwest Florida",
     metaTitle: "Mobile Vehicle Diagnostics in SWFL | Real OBD-II Testing",
     metaDescription:
-      "Real mobile diagnostics across Lehigh Acres, Fort Myers, Cape Coral, Estero, Bonita Springs and Naples — OBD-II, live data, electrical. Call (813) 501-7572.",
+      "Real mobile diagnostics across Lehigh Acres and Fort Myers — OBD-II, live data, electrical. Call (813) 501-7572.",
     canonical: "https://mikesmautorepair.com/diagnostics",
     intro:
       "Check engine light on? Strange shifting, intermittent stalls, or an electrical gremlin? Mike's Mobile Auto Repair brings real vehicle diagnostics — OBD-II, live data, drivability, and electrical testing — to your driveway anywhere in Southwest Florida.",
     paragraphs: [
       "A parts-store 'free scan' just reads the code and hands you a list of every part it could possibly be. That's a guess, not a diagnosis, and it routinely costs SWFL drivers hundreds of dollars in unnecessary parts. Real diagnostics means freeze-frame data, live sensor values, fuel-trim analysis, misfire counters, and — when needed — wiring tests with a multimeter or scope. We do the real work, then quote the actual repair before any wrench turns.",
       "We diagnose check-engine lights, hard shifts, intermittent stalls, no-starts, hesitation under acceleration, electrical glitches, AC faults, ABS and traction-control warnings, and emissions readiness for tag renewal. On-the-spot fixes are common when the problem is straightforward — sensors, gaskets, ignition components, fuel-pump relays — and we provide a transparent written quote when follow-up parts are needed.",
-      "Service is available in every Lehigh Acres, Fort Myers, Cape Coral, Estero, Bonita Springs, and Naples ZIP. The diagnostic appointment runs $80–$150 and is fully credited toward any repair we perform. Call or text (813) 501-7572 to book.",
+      "Service is available in every Lehigh Acres and Fort Myers ZIP. The diagnostic appointment runs $80–$150 and is fully credited toward any repair we perform. Call or text (813) 501-7572 to book.",
     ],
     included: [
       "OBD-II scan with full code retrieval",
@@ -843,14 +843,14 @@ const _allLocalLandingPages: LocalLandingPage[] = [
     metaTitle:
       "Mobile Battery, Alternator & Starter Repair | SWFL | (813) 501-7572",
     metaDescription:
-      "On-site battery, alternator, and starter testing and replacement across Lehigh Acres, Fort Myers, Cape Coral, Estero, Bonita Springs and Naples. Call (813) 501-7572.",
+      "On-site battery, alternator, and starter testing and replacement across Lehigh Acres and Fort Myers. Call (813) 501-7572.",
     canonical: "https://mikesmautorepair.com/battery-alternator-starter",
     intro:
       "No-crank, single click, dim lights, or battery warning light? Mike's Mobile Auto Repair tests and replaces the entire starting and charging system — battery, alternator, and starter — at your home or office across Southwest Florida.",
     paragraphs: [
       "When a vehicle won't crank, the cause is almost always one of three parts: a dead battery, a failing alternator, or a bad starter. Symptoms overlap, so we test the whole starting and charging system before we recommend anything. That means a load test on the battery, an output test on the alternator under demand, voltage-drop tests on the main cables, and a starter draw test if needed. You only pay for what's actually wrong.",
       "Florida heat is brutal on starting systems. Most batteries last only 2–3 years here, alternators run hot under constant AC load, and starter solenoids weather faster than they should. We carry quality replacement batteries (standard and AGM), alternators for most makes and models, and source most starters same-day. Installation is on the spot — usually 30 to 90 minutes depending on the part — and we verify a clean 13.8–14.7-volt charge before we leave.",
-      "Service is available across every Lehigh Acres, Fort Myers, Cape Coral, Estero, Bonita Springs, and Naples ZIP. Stuck right now with a no-start? Call or text (813) 501-7572 — same-day mobile service is usually available.",
+      "Service is available across every Lehigh Acres and Fort Myers ZIP. Stuck right now with a no-start? Call or text (813) 501-7572 — same-day mobile service is usually available.",
     ],
     included: [
       "Free battery load test and charging-system test",

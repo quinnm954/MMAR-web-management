@@ -43,7 +43,7 @@ export const blogPosts: BlogPost[] = [
     faqs: [
       { question: "Is it safe to drive a car that's overheating?", answer: "No. Driving even a few miles with the temperature gauge in the red can warp the cylinder head, blow the head gasket, or destroy the engine. Pull over, shut it down, and call a mobile mechanic." },
       { question: "How much does it cost to fix an overheating car in Florida?", answer: "A thermostat or hose replacement is usually $150–$350 mobile. Water pumps run $300–$700. Radiator replacement is typically $400–$900. Most jobs are done on site without a tow bill." },
-      { question: "Can a mobile mechanic fix a cooling system in my driveway?", answer: "Yes. Coolant flushes, thermostat replacement, hose and water pump jobs, and even most radiator swaps are routinely done at your home or workplace across Lehigh Acres, Fort Myers, and Cape Coral." },
+      { question: "Can a mobile mechanic fix a cooling system in my driveway?", answer: "Yes. Coolant flushes, thermostat replacement, hose and water pump jobs, and even most radiator swaps are routinely done at your home or workplace across Lehigh Acres and Fort Myers." },
     ],
   },
   {
@@ -117,7 +117,7 @@ export const blogPosts: BlogPost[] = [
     faqs: [
       { question: "How can I tell if it's the battery or the starter?", answer: "Dim dash lights and slow cranking point to the battery. Bright dash lights with a single loud click and no crank point to the starter. A 5-minute on-site test confirms which one it is." },
       { question: "Will jump-starting damage my car if it's actually the starter?", answer: "No, but it won't help either. If your battery tests good, no amount of jumping will fix a bad starter — you need the starter replaced." },
-      { question: "Can a mobile mechanic replace a starter in my driveway?", answer: "Yes. Starter replacement is one of the most common mobile repairs we perform across Lehigh Acres, Fort Myers, and Cape Coral. Most jobs take under 2 hours." },
+      { question: "Can a mobile mechanic replace a starter in my driveway?", answer: "Yes. Starter replacement is one of the most common mobile repairs we perform across Lehigh Acres and Fort Myers. Most jobs take under 2 hours." },
     ],
   },
   {
@@ -157,7 +157,7 @@ export const blogPosts: BlogPost[] = [
     `,
     faqs: [
       { question: "Can a mobile mechanic fix a no-start in a parking lot?", answer: "Yes. Most no-starts — dead battery, bad starter, fuel pump, sensor faults — are diagnosed and repaired right where the car sits, including parking lots and driveways." },
-      { question: "How fast can you get to me for a no-start?", answer: "Typical response time across Lehigh Acres, Fort Myers, and Cape Coral is 60–120 minutes for no-start calls. Call (813) 501-7572 for current ETA." },
+      { question: "How fast can you get to me for a no-start?", answer: "Typical response time across Lehigh Acres and Fort Myers is 60–120 minutes for no-start calls. Call (813) 501-7572 for current ETA." },
       { question: "Is mobile no-start service cheaper than a tow plus shop?", answer: "Almost always. A tow alone is $100–$250 in SWFL, plus shop diagnostic fees and waiting. Mobile diagnosis is typically $89–$129 with no tow needed." },
     ],
   },
@@ -226,7 +226,7 @@ export const blogPosts: BlogPost[] = [
       <p>Less common on modern fuel-injected cars, but worth mentioning: very hot fuel-rail temps can cause hard hot starts. Bad gas — water-contaminated or stale — also shows up after summer storms when filling stations get water in their underground tanks.</p>
 
       <h2>What to do right now</h2>
-      <p>If you're reading this stranded in a parking lot, call or text <a href="tel:8135017572">(813) 501-7572</a> for <a href="/no-start-diagnostics">mobile no-start diagnostics</a>. We'll bring a battery tester, jump pack, fuel-pressure gauge, and OBD-II scanner — and most no-starts in Lehigh Acres, Fort Myers, and Cape Coral are diagnosed and fixed on the spot without a tow.</p>
+      <p>If you're reading this stranded in a parking lot, call or text <a href="tel:8135017572">(813) 501-7572</a> for <a href="/no-start-diagnostics">mobile no-start diagnostics</a>. We'll bring a battery tester, jump pack, fuel-pressure gauge, and OBD-II scanner — and most no-starts in Lehigh Acres and Fort Myers are diagnosed and fixed on the spot without a tow.</p>
     `,
     faqs: [
       { question: "Why does my car only refuse to start when it's hot outside?", answer: "Three usual suspects: a battery that's heat-degraded, a starter solenoid that fails after the engine has heat-soaked, or a fuel-pump issue triggered by hot fuel-system temps. All three are testable on site." },

@@ -17,7 +17,7 @@ const TAG_INTROS: Record<string, { title: string; intro: string; related: { href
   diagnostics: {
     title: "Mobile Diagnostics & Troubleshooting",
     intro:
-      "Check engine lights, no-start issues, electrical gremlins — these articles walk through how to diagnose the most common problems we see across Lehigh Acres, Fort Myers, and Cape Coral. Need hands-on help? Our mobile diagnostic service comes to your driveway with the same scan tools the dealership uses.",
+      "Check engine lights, no-start issues, electrical gremlins — these articles walk through how to diagnose the most common problems we see across Lehigh Acres and Fort Myers. Need hands-on help? Our mobile diagnostic service comes to your driveway with the same scan tools the dealership uses.",
     related: [
       { href: "/mobile-vehicle-diagnostics", label: "Mobile Vehicle Diagnostics" },
       { href: "/mobile-engine-diagnostics", label: "Mobile Engine Diagnostics" },
@@ -86,7 +86,7 @@ const BlogTag = () => {
   const meta = matchedLabel
     ? (TAG_INTROS[tagSlug] ?? {
         title: `${matchedLabel} Articles`,
-        intro: `Mobile mechanic articles tagged ${matchedLabel} from Mike's Mobile Auto Repair, serving Lehigh Acres, Fort Myers, Cape Coral, and all of Southwest Florida.`,
+        intro: `Mobile mechanic articles tagged ${matchedLabel} from Mike's Mobile Auto Repair, serving Lehigh Acres and Fort Myers.`,
         related: [] as { href: string; label: string }[],
       })
     : { title: "", intro: "", related: [] as { href: string; label: string }[] };

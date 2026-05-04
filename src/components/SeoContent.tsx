@@ -8,7 +8,7 @@ import InlineCallStrip from "./InlineCallStrip";
 const faqs = [
   {
     q: "What areas do you service?",
-    a: "We serve Lehigh Acres, Fort Myers, Cape Coral, Estero, Bonita Springs, and Naples — and most surrounding Southwest Florida communities. Call (813) 501-7572 if you're not sure we cover your address.",
+    a: "We serve Lehigh Acres and Fort Myers — and most surrounding Southwest Florida communities. Call (813) 501-7572 if you're not sure we cover your address.",
   },
   {
     q: "Are you really mobile? You come to my house?",
@@ -32,7 +32,7 @@ const faqs = [
   },
   {
     q: "Do you handle fleet vehicles?",
-    a: "Yes — recurring fleet maintenance is available for businesses across Lee and Collier counties.",
+    a: "Yes — recurring fleet maintenance is available for businesses across Lee County.",
   },
   {
     q: "Do you accept walk-up payments at the truck?",
@@ -73,7 +73,7 @@ const SeoContent = () => {
             <span className="text-gold">MOBILE MECHANIC</span>
           </h2>
           <p className="text-base md:text-lg text-muted-foreground">
-            Serving Lehigh Acres, Fort Myers, Cape Coral, Estero, Bonita Springs and Naples
+            Serving Lehigh Acres and Fort Myers
           </p>
         </header>
 

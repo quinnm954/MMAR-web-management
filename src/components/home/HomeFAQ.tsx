@@ -13,7 +13,7 @@ const faqs = [
   },
   {
     q: "How fast can you get to me?",
-    a: "Same-day appointments are usually available across Lehigh Acres, Fort Myers, Cape Coral, Estero, Bonita Springs, and Naples. Most calls are reached within an hour.",
+    a: "Same-day appointments are usually available across Lehigh Acres and Fort Myers. Most calls are reached within an hour.",
   },
   {
     q: "Are your repairs warrantied?",

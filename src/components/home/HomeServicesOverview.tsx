@@ -11,7 +11,7 @@ const HomeServicesOverview = () => {
               <span className="text-gold">IN SOUTHWEST FLORIDA</span>
             </h2>
             <p className="text-base md:text-lg text-muted-foreground">
-              Honest, on-site auto repair across Lehigh Acres, Fort Myers, Cape Coral, Estero, Bonita Springs, and Naples.
+              Honest, on-site auto repair across Lehigh Acres and Fort Myers.
             </p>
           </div>
 
