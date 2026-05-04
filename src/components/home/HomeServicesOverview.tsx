@@ -30,7 +30,7 @@ const HomeServicesOverview = () => {
             </p>
             <p>
               Florida heat is hard on vehicles. Batteries that would last five years up north barely make two or three down here. Brakes wear faster in stop-and-go traffic on Lee Boulevard, US-41, and Daniels Parkway. Cooling systems get pushed to their limits every summer. Routine{" "}
-              <Link to="/services/maintenance" className="text-primary hover:underline">maintenance</Link>{" "}
+              <Link to="/services/oil-fluids" className="text-primary hover:underline">maintenance</Link>{" "}
               like mobile oil changes, fluid flushes, and multi-point inspections is the cheapest insurance against the kind of breakdown that strands you in 95° heat.
             </p>
             <p>
