@@ -119,13 +119,6 @@ const LocalLanding = () => {
           provider: { "@id": `${SITE}/#business` },
           url: canonicalUrl,
           description: page.metaDescription,
-          aggregateRating: {
-            "@type": "AggregateRating",
-            ratingValue: REVIEWS_META.ratingValue,
-            reviewCount: REVIEWS_META.reviewCount,
-            bestRating: REVIEWS_META.bestRating,
-            worstRating: REVIEWS_META.worstRating,
-          },
         },
         {
           "@type": "BreadcrumbList",

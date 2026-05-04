@@ -62,9 +62,8 @@ const Index = () => {
                 "Saturday",
                 "Sunday",
               ],
-              opens: "09:00",
-              closes: "17:00",
-              description: "By appointment only",
+              opens: "08:00",
+              closes: "19:00",
             },
           ],
           sameAs: [

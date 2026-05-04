@@ -60,16 +60,33 @@ const Blog = () => {
     document.getElementById(blogId)?.remove();
     document.getElementById(crumbId)?.remove();
 
+    const publisher = {
+      "@type": "Organization",
+      name: "Mike's Mobile Auto Repair",
+      logo: {
+        "@type": "ImageObject",
+        url: `${SITE}/mmar-logo.jpeg`,
+        width: 600,
+        height: 600,
+      },
+    };
     const blogLd = {
       "@context": "https://schema.org",
       "@type": "Blog",
       name: "Mike's Mobile Auto Repair Blog",
       url: `${SITE}/blog`,
+      publisher,
       blogPost: sorted.map((p) => ({
         "@type": "BlogPosting",
-        headline: p.title,
+        headline: p.title.length > 110 ? p.title.slice(0, 107) + "..." : p.title,
         url: `${SITE}/blog/${p.slug}`,
+        mainEntityOfPage: `${SITE}/blog/${p.slug}`,
         datePublished: p.dateISO,
+        dateModified: p.dateISO,
+        author: { "@type": "Organization", name: "Mike's Mobile Auto Repair", url: SITE },
+        publisher,
+        image: [`${SITE}/blog-hero.jpg`],
+        description: p.excerpt,
       })),
     };
     const breadcrumbLd = {
