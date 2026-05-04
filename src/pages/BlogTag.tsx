@@ -27,7 +27,7 @@ const TAG_INTROS: Record<string, { title: string; intro: string; related: { href
   electrical: {
     title: "Mobile Electrical Repair",
     intro:
-      "Batteries, alternators, starters, and charging-system problems make up roughly a third of all mobile mechanic calls in Southwest Florida. These guides explain the symptoms, the real causes, and what a mobile electrical repair actually costs.",
+      "Batteries, alternators, starters, and charging-system problems make up roughly a third of all mobile mechanic calls in Lehigh Acres and Fort Myers. These guides explain the symptoms, the real causes, and what a mobile electrical repair actually costs.",
     related: [
       { href: "/services/electrical", label: "Mobile Electrical Service" },
       { href: "/mobile-alternator-repair", label: "Mobile Alternator Repair" },
@@ -47,7 +47,7 @@ const TAG_INTROS: Record<string, { title: string; intro: string; related: { href
   maintenance: {
     title: "Car Maintenance Tips",
     intro:
-      "Routine maintenance keeps SWFL vehicles on the road longer in our heat, humidity, and salt air. These guides explain what to service and when — and how to do most of it without ever visiting a shop.",
+      "Routine maintenance keeps Lehigh Acres and Fort Myers vehicles on the road longer in our heat, humidity, and salt air. These guides explain what to service and when — and how to do most of it without ever visiting a shop.",
     related: [
       { href: "/services/oil-fluids", label: "Mobile Oil & Fluid Services" },
       { href: "/services/inspections", label: "Mobile Inspections" },
@@ -55,7 +55,7 @@ const TAG_INTROS: Record<string, { title: string; intro: string; related: { href
     ],
   },
   local: {
-    title: "Southwest Florida Car Care",
+    title: "Lehigh Acres and Fort Myers Car Care",
     intro:
       "Local conditions — salt air, year-round heat, season traffic — affect every vehicle in Lehigh Acres and Fort Myers. These articles focus on what that means for your car.",
     related: [

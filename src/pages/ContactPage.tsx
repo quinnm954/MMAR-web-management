@@ -8,7 +8,7 @@ const ContactPage = () => {
   useSeo({
     title: "Contact Mike's Mobile Auto Repair | Call or Text (813) 501-7572",
     description:
-      "Call or text Mike's Mobile Auto Repair at (813) 501-7572 for same-day mobile mechanic service across Southwest Florida.",
+      "Call or text Mike's Mobile Auto Repair at (813) 501-7572 for same-day mobile mechanic service across Lehigh Acres and Fort Myers.",
     canonical: "https://mikesmautorepair.com/contact",
   });
 

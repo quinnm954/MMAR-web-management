@@ -11,7 +11,7 @@ const ServiceAreas = () => {
   useSeo({
     title: "Service Areas | Mike's Mobile Auto Repair",
     description:
-      "Mobile mechanic service areas across Southwest Florida — Lehigh Acres and Fort Myers.",
+      "Mobile mechanic service areas across Lehigh Acres and Fort Myers — Lehigh Acres and Fort Myers.",
     canonical: "https://mikesmautorepair.com/service-areas",
   });
 
@@ -25,7 +25,7 @@ const ServiceAreas = () => {
             <span className="text-gold">AREAS</span>
           </h1>
           <p className="text-base md:text-lg text-muted-foreground mb-10 max-w-3xl">
-            We bring fully-equipped mobile mechanic service to driveways and workplaces across Southwest Florida.
+            We bring fully-equipped mobile mechanic service to driveways and workplaces across Lehigh Acres and Fort Myers.
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

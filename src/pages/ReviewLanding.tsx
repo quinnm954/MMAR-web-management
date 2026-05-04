@@ -18,7 +18,7 @@ const ReviewLanding = () => {
   useSeo({
     title: "Leave a Review | Mike's Mobile Auto Repair",
     description:
-      "Thanks for choosing Mike's Mobile Auto Repair. Share your experience on Google in 30 seconds — your review helps other Southwest Florida drivers find honest mobile service.",
+      "Thanks for choosing Mike's Mobile Auto Repair. Share your experience on Google in 30 seconds — your review helps other Lehigh Acres and Fort Myers drivers find honest mobile service.",
     canonical: "https://mikesmautorepair.com/review",
     noindex: true,
   });
@@ -48,7 +48,7 @@ const ReviewLanding = () => {
           </h1>
 
           <p className="text-base md:text-lg text-muted-foreground mb-8 leading-relaxed">
-            Your feedback genuinely helps a small Southwest Florida business and helps other
+            Your feedback genuinely helps a small Lehigh Acres and Fort Myers business and helps other
             drivers find honest mobile service. If we earned it, would you take 30 seconds to
             leave a Google review?
           </p>
@@ -99,7 +99,7 @@ const ReviewLanding = () => {
           </div>
 
           <p className="text-xs text-muted-foreground text-center">
-            Mike's Mobile Auto Repair LLC · (813) 501-7572 · Southwest Florida
+            Mike's Mobile Auto Repair LLC · (813) 501-7572 · Lehigh Acres and Fort Myers
           </p>
         </div>
       </section>

@@ -8,7 +8,7 @@ import InlineCallStrip from "./InlineCallStrip";
 const faqs = [
   {
     q: "What areas do you service?",
-    a: "We serve Lehigh Acres and Fort Myers — and most surrounding Southwest Florida communities. Call (813) 501-7572 if you're not sure we cover your address.",
+    a: "We serve Lehigh Acres and Fort Myers — and most surrounding Lehigh Acres and Fort Myers neighborhoods. Call (813) 501-7572 if you're not sure we cover your address.",
   },
   {
     q: "Are you really mobile? You come to my house?",
@@ -16,7 +16,7 @@ const faqs = [
   },
   {
     q: "Do you offer same-day service?",
-    a: "Same-day appointments are usually available across SWFL, including evenings and weekends whenever possible.",
+    a: "Same-day appointments are usually available across Lehigh Acres and Fort Myers, including evenings and weekends whenever possible.",
   },
   {
     q: "How is pricing handled?",
@@ -81,7 +81,7 @@ const SeoContent = () => {
           <div>
             <p>
               Mike's Mobile Auto Repair is the trusted{" "}
-              <strong>mobile mechanic</strong> serving Southwest Florida from
+              <strong>mobile mechanic</strong> serving Lehigh Acres and Fort Myers from
               Lehigh Acres west to Fort Myers. We bring the full power of a real auto shop straight to
               your home, workplace, or wherever your vehicle decided to quit on
               you. Our service truck is stocked with professional-grade tools,
@@ -99,7 +99,7 @@ const SeoContent = () => {
             </h3>
             <p>
               Squealing, grinding, soft pedal, or pulsation when you stop?
-              Brakes are the single most common reason SWFL drivers end up
+              Brakes are the single most common reason Lehigh Acres and Fort Myers drivers end up
               dealing with a tow and a long shop wait. We cut both out of the
               equation. Our{" "}
               <Link to="/mobile-brake-repair" className="text-primary underline-offset-4 hover:underline">
@@ -151,7 +151,7 @@ const SeoContent = () => {
               here before they start failing. When yours finally gives up, you
               don't need a ride to the parts store and a wrestling match with
               corroded terminals — we deliver and install fresh, quality
-              batteries anywhere in SWFL with{" "}
+              batteries anywhere in Lehigh Acres and Fort Myers with{" "}
               <Link to="/mobile-battery-replacement" className="text-primary underline-offset-4 hover:underline">
                 mobile battery replacement
               </Link>
@@ -219,7 +219,7 @@ const SeoContent = () => {
             </h3>
             <p>
               We proudly serve homes, businesses, and stranded drivers across
-              Southwest Florida:
+              Lehigh Acres and Fort Myers:
             </p>
             <ul className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-4">
               <li><Link to="/areas/lehigh-acres" className="text-primary underline-offset-4 hover:underline">Lehigh Acres</Link></li>

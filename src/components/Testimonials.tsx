@@ -56,7 +56,7 @@ const testimonials = [
     name: "David Chen",
     location: "Naples, FL",
     rating: 5,
-    text: "Best mobile mechanic in Southwest Florida. Fair prices and he explains everything clearly. Been using him for all my vehicles.",
+    text: "Best mobile mechanic in Lehigh Acres and Fort Myers. Fair prices and he explains everything clearly. Been using him for all my vehicles.",
   },
   {
     name: "Jennifer Williams",

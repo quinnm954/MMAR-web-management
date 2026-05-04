@@ -205,7 +205,7 @@ export const categories: Category[] = [
     title: "Inspections & Fleet",
     icon: ClipboardCheck,
     description:
-      "Pre-purchase inspections, multi-point safety checks, and fleet maintenance plans for businesses across Southwest Florida.",
+      "Pre-purchase inspections, multi-point safety checks, and fleet maintenance plans for businesses across Lehigh Acres and Fort Myers.",
     services: [
       { icon: Search, name: "Pre-Purchase Vehicle Inspection" },
       { icon: ClipboardCheck, name: "Mobile Safety Inspection" },

@@ -16,7 +16,7 @@ const ServiceAreasPreview = () => {
             <span className="text-gold">AREAS</span>
           </h2>
           <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
-            Mobile mechanic service across Southwest Florida.
+            Mobile mechanic service across Lehigh Acres and Fort Myers.
           </p>
         </div>
 

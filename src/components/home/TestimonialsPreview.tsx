@@ -15,7 +15,7 @@ const previews = [
   {
     name: "David Chen",
     location: "Naples, FL",
-    text: "Best mobile mechanic in SWFL. Fair prices and explains everything clearly.",
+    text: "Best mobile mechanic in Lehigh Acres and Fort Myers. Fair prices and explains everything clearly.",
   },
 ];
 
@@ -29,7 +29,7 @@ const TestimonialsPreview = () => {
             <span className="text-gold">REVIEWS</span>
           </h2>
           <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
-            Real customers across Southwest Florida.
+            Real customers across Lehigh Acres and Fort Myers.
           </p>
         </div>
 

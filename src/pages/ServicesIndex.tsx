@@ -37,7 +37,7 @@ const ServicesIndex = () => {
             <span className="text-gold">SERVICES</span>
           </h1>
           <p className="text-base md:text-lg text-muted-foreground mb-10 max-w-3xl">
-            Browse every repair we perform on-site across Southwest Florida.
+            Browse every repair we perform on-site across Lehigh Acres and Fort Myers.
             Tap any service for full details, pricing notes, and FAQs.
           </p>
 

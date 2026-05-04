@@ -24,7 +24,7 @@ const AboutPage = () => {
             <span className="text-gold">MMAR</span>
           </h1>
           <p className="text-base md:text-lg text-muted-foreground">
-            Honest mobile mechanic service across Southwest Florida — built on
+            Honest mobile mechanic service across Lehigh Acres and Fort Myers — built on
             transparent pricing, on-site convenience, and quality work.
           </p>
         </div>
