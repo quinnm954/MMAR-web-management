@@ -82,8 +82,7 @@ const SeoContent = () => {
             <p>
               Mike's Mobile Auto Repair is the trusted{" "}
               <strong>mobile mechanic</strong> serving Southwest Florida from
-              Lehigh Acres east to the Gulf and from Fort Myers down through
-              Naples. We bring the full power of a real auto shop straight to
+              Lehigh Acres west to Fort Myers. We bring the full power of a real auto shop straight to
               your home, workplace, or wherever your vehicle decided to quit on
               you. Our service truck is stocked with professional-grade tools,
               quality parts, and the same diagnostic scanners used by
@@ -137,8 +136,7 @@ const SeoContent = () => {
               <Link to="/mobile-starter-repair" className="text-primary underline-offset-4 hover:underline">
                 mobile starter repair
               </Link>{" "}
-              are two of our most-requested services across Lee and Collier
-              counties. Most replacements take 60–120 minutes in a driveway or
+              are two of our most-requested services across Lee County. Most replacements take 60–120 minutes in a driveway or
               parking lot.
             </p>
           </div>

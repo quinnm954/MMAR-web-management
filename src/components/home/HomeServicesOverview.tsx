@@ -34,10 +34,10 @@ const HomeServicesOverview = () => {
               like mobile oil changes, fluid flushes, and multi-point inspections is the cheapest insurance against the kind of breakdown that strands you in 95° heat.
             </p>
             <p>
-              When something does go wrong, our mobile service responds across Lee County — usually within an hour. Dead battery in an office lot in Fort Myers? On-site replacement in 30 minutes. Brakes went metal-on-metal on the way home in Cape Coral? We bring the parts and fix it in your driveway. No-start in a Lehigh Acres garage? We diagnose, replace the failed component, and verify the repair before we leave.
+              When something does go wrong, our mobile service responds across Lee County — usually within an hour. Dead battery in an office lot in Fort Myers? On-site replacement in 30 minutes. Brakes went metal-on-metal on the way home in Fort Myers? We bring the parts and fix it in your driveway. No-start in a Lehigh Acres garage? We diagnose, replace the failed component, and verify the repair before we leave.
             </p>
             <p>
-              We service vehicles in every Lehigh Acres ZIP (33936, 33971, 33972, 33973, 33974, 33976), every Fort Myers ZIP (33901, 33907, 33908, 33912, 33913, 33916, 33919, 33966), every Cape Coral ZIP, plus Estero, Bonita Springs, and Naples. Local fleets and multi-vehicle households get on-site maintenance with no shop downtime — see our{" "}
+              We service vehicles in every Lehigh Acres ZIP (33936, 33971, 33972, 33973, 33974, 33976), and every Fort Myers ZIP (33901, 33907, 33908, 33912, 33913, 33916, 33919, 33966). Local fleets and multi-vehicle households get on-site maintenance with no shop downtime — see our{" "}
               <Link to="/service-areas" className="text-primary hover:underline">full service area map</Link>.
             </p>
             <p>

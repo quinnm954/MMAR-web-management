@@ -21,7 +21,7 @@ const faqs = [
   },
   {
     q: "Which areas do you serve?",
-    a: "Every Lehigh Acres ZIP (33936, 33971, 33972, 33973, 33974, 33976), every Fort Myers ZIP, every Cape Coral ZIP, plus Estero, Bonita Springs, and Naples. Browse our service-areas page for the full map.",
+    a: "Every Lehigh Acres ZIP (33936, 33971, 33972, 33973, 33974, 33976) and every Fort Myers ZIP. Browse our service-areas page for the full map.",
   },
   {
     q: "How do payments work?",

@@ -185,7 +185,7 @@ export const blogPosts: BlogPost[] = [
       <p>See our full guide on <a href="/blog/why-cars-overheat-in-florida">why cars overheat in Florida</a>. Stuck thermostats, failing water pumps, and clogged radiators top the list.</p>
 
       <h2>5. Salt-air corrosion on coastal vehicles</h2>
-      <p>If you live anywhere near the Gulf — Cape Coral, Bonita Beach, Naples — salt eats brake lines, exhaust, suspension components, and electrical connectors. Annual undercarriage inspections matter.</p>
+      <p>If you live near the Gulf, salt eats brake lines, exhaust, suspension components, and electrical connectors. Annual undercarriage inspections matter.</p>
 
       <h2>6. Alternator and electrical gremlins</h2>
       <p>Heat plus humidity plus age = electrical issues. Bad alternators, corroded grounds, and failing fuses become more common past 80,000 miles. See <a href="/blog/signs-of-a-bad-alternator">7 signs of a bad alternator</a>.</p>
@@ -196,7 +196,7 @@ export const blogPosts: BlogPost[] = [
     faqs: [
       { question: "Why do car batteries die so fast in Florida?", answer: "Year-round heat boils off battery electrolyte and accelerates internal corrosion. Most SWFL batteries last 2–3 years instead of the 4–5 years rated by the manufacturer." },
       { question: "How often should I service my AC in Southwest Florida?", answer: "AC performance check every 1–2 years, refrigerant level check annually. Florida AC systems run nearly year-round and develop leaks faster than in cooler climates." },
-      { question: "Does salt air really damage cars in Cape Coral and Naples?", answer: "Yes. Salt corrodes brake lines, exhaust, suspension components, and electrical connectors. An annual undercarriage inspection catches issues early on coastal vehicles." },
+      { question: "Does salt air really damage cars in Southwest Florida?", answer: "Yes. Salt corrodes brake lines, exhaust, suspension components, and electrical connectors. An annual undercarriage inspection catches issues early on coastal vehicles." },
     ],
   },
   {
@@ -334,7 +334,7 @@ export const blogPosts: BlogPost[] = [
     readMinutes: 7,
     tags: ["Battery", "Pricing", "Maintenance"],
     body: `
-      <p>If you live in Lee or Collier county, you've probably already had this happen: you turn the key (or push the button) and you get a click, a slow crank, or nothing at all. Welcome to Florida battery life. The brutal truth is that a car battery in Southwest Florida lasts about <strong>2 to 3 years</strong> — not the 4 to 5 it might last in a cooler northern climate.</p>
+      <p>If you live in Lee County, you've probably already had this happen: you turn the key (or push the button) and you get a click, a slow crank, or nothing at all. Welcome to Florida battery life. The brutal truth is that a car battery in Southwest Florida lasts about <strong>2 to 3 years</strong> — not the 4 to 5 it might last in a cooler northern climate.</p>
 
       <h2>Why Florida heat kills batteries faster</h2>
       <p>It's not the cold that kills batteries — it's the heat. Cold weather just exposes a battery that was already dying. Heat is what actually destroys it. High under-hood temperatures speed up the chemical reactions inside a lead-acid battery, evaporate the electrolyte, and corrode the internal plates. By year 3, capacity has dropped enough that the next cool morning or extra-long crank kills it.</p>
@@ -397,7 +397,7 @@ export const blogPosts: BlogPost[] = [
         <li><strong>Humidity.</strong> Moisture in the air gets pulled into the system through any micro-leak and corrodes the evaporator and condenser from the inside out.</li>
         <li><strong>Constant use.</strong> Most cars in SWFL run AC 9–10 months a year. The system never gets a break.</li>
       </ul>
-      <p>Add salt air on coastal cars (Cape Coral, Bonita, Fort Myers Beach, Naples) and condensers can corrode through in 7–10 years.</p>
+      <p>Add salt air on coastal cars (Fort Myers Beach and other coastal areas) and condensers can corrode through in 7–10 years.</p>
 
       <h2>Signs your AC needs service right now</h2>
       <ul>
