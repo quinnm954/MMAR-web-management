@@ -175,8 +175,11 @@ const FinancingContract = () => {
   // Auto-calculations
   const calculations = useMemo(() => {
     const totalPrice = sanitizeNumber(formData.totalServicePrice);
-    const downPayment = totalPrice * TERMS.downPaymentRate;
-    const principal = totalPrice * TERMS.financedRate;
+    const partsPrice = Math.min(sanitizeNumber(formData.partsPrice), totalPrice);
+    const laborPrice = Math.max(totalPrice - partsPrice, 0);
+    const laborDown = laborPrice * TERMS.laborDownPaymentRate;
+    const downPayment = partsPrice + laborDown;
+    const principal = Math.max(totalPrice - downPayment, 0);
     const interest = principal * TERMS.annualInterestRate * 1; // simple interest for 1 year
     const totalFinanced = principal + interest;
 
@@ -187,6 +190,9 @@ const FinancingContract = () => {
 
     return {
       totalPrice,
+      partsPrice,
+      laborPrice,
+      laborDown,
       downPayment,
       principal,
       interest,
@@ -194,7 +200,7 @@ const FinancingContract = () => {
       baseMonthlyPayment,
       finalPayment,
     };
-  }, [formData.totalServicePrice]);
+  }, [formData.totalServicePrice, formData.partsPrice]);
 
   // Payment schedule
   const paymentSchedule = useMemo(() => {
