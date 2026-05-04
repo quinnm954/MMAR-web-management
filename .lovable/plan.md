@@ -1,57 +1,65 @@
-## Diagnosis
+## SEO Power Pack — what I'll ship
 
-I checked the live `robots.txt` and the site headers. **Your robots.txt is not actually blocking indexing.** Here's what I found:
+### 1. Schema markup (JSON-LD) sitewide
+- **Home (`index.html`)**: already has `AutoRepair` — extend with `geo` (lat/lng), `aggregateRating` (using current Google review numbers), and explicit `@id` for entity consolidation.
+- **City pages (`CityPage.tsx`)**: inject per-page `LocalBusiness` + `Service` schema with `areaServed`, `geo`, ZIPs, neighborhoods.
+- **Service category pages**: add `Service` schema with `provider` referencing the home `@id`.
+- **Blog posts**: add `Article` + `FAQPage` schema (FAQs already exist in data).
+- **Breadcrumbs**: add `BreadcrumbList` schema on city/service/blog pages.
 
-- `https://mikesmautorepair.com/robots.txt` returns **HTTP 200** with the correct content.
-- It explicitly **allows** Googlebot, Bingbot, and `*` — only `/admin/` is disallowed (which is intentional).
-- No `X-Robots-Tag` header and no `<meta name="robots" content="noindex">` anywhere on the site.
+Implementation: extend `useSeo.ts` to accept an optional `jsonLd` object/array and inject/cleanup `<script type="application/ld+json" data-dynamic>` tags on route change.
 
-The file content is exactly what we want:
-```
-User-agent: Googlebot
-Allow: /
-...
-User-agent: *
-Allow: /
-Disallow: /admin/
+### 2. Expand city pages to 1,500+ words
+Rewrite each city in `src/data/cities.ts` to include:
+- Expanded intro + 6–8 substantive paragraphs (currently 3)
+- **Pricing ranges** table (oil change, brakes, battery, alt, AC, diagnostics)
+- **Neighborhood mini-callouts** (2 sentences per neighborhood)
+- **Local landmarks / commute pain points** (I-75, US-41, Pine Island Rd, etc.)
+- **Why-mobile-here** angle specific to each city
+- **City-specific FAQs** (5 per city) — rendered with FAQ schema
 
-Sitemap: https://mikesmautorepair.com/sitemap-index.xml
-```
+Update `CityPage.tsx` to render the new sections and embed a Google Maps iframe of the service area.
 
-## Most likely cause of the warning
+### 3. Two link-bait blog posts
+Add to `src/data/blogPosts.ts`:
+- **"What it really costs to replace a car battery in Florida heat (2026)"** — pricing table, why FL batteries die in 2–3 years, OEM vs aftermarket, mobile vs shop cost.
+- **"Why Florida cars need AC service every 2 years"** — humidity/refrigerant loss explanation, signs, cost ranges, DIY recharge warning.
 
-Google Search Console is reporting "blocked" because of a **property/host mismatch**, not the file contents:
+Both with FAQs, internal links to city + service pages, and Article+FAQ schema.
 
-- `https://www.mikesmautorepair.com/robots.txt` returns a **301 redirect** to the non-www version.
-- If your GSC property is the **www** version (or the URL Inspection tool was run against a `www.` URL), Google flags the robots.txt as unreachable/blocked because it can't fetch a 200 directly at that hostname.
-- We already normalized the entire site to the non-www canonical host last round, so the `www` property in GSC is now stale.
+### 4. Review-request page + QR-friendly short URL
+- New route `/review` → branded page with one big "Leave a Google Review" button (deep link to GBP review form), plus a "Text us first" fallback.
+- Add `noindex` on this page (utility, not for ranking).
+- This lets Mike text/QR customers post-job to drive review volume — the #1 map-pack ranking factor.
 
-## Plan
+### 5. Performance fixes
+- Audit hero & gallery images: convert oversize JPGs, add explicit `width`/`height`, `fetchpriority="high"` on the LCP hero image, `loading="lazy"` everywhere else (most already done).
+- Add `<link rel="preconnect">` for Google Fonts / GTM in `index.html`.
+- Defer non-critical gtag if needed.
+- I'll report measured Lighthouse-style wins after the changes; can't run PageSpeed Insights against the live domain from here, but I'll fix the patterns known to hurt LCP/CLS.
 
-Two small things to do, then a manual GSC step:
+### 6. Small wins
+- Add `<html lang="en">` ✅ (already)
+- Add Open Graph `og:locale`, `og:site_name`
+- Add `robots` meta `index,follow,max-image-preview:large` (helps image SEO)
+- Internal linking: add a "Nearby cities" block on each city page
 
-1. **Tighten `public/robots.txt`** to remove redundancy and make it 100% unambiguous for Google's parser:
-   - Drop the per-bot `Allow: /` blocks (they're redundant — `User-agent: *` already allows all).
-   - Keep only the wildcard rule + the sitemap entries.
-   - Result:
-     ```
-     User-agent: *
-     Allow: /
-     Disallow: /admin/
+### Files I'll touch
+- `index.html` — extra meta, preconnect, schema enrichments
+- `src/lib/useSeo.ts` — JSON-LD support
+- `src/data/cities.ts` — expanded content + FAQ + pricing data
+- `src/pages/CityPage.tsx` — render new sections, schema, breadcrumbs, map embed, nearby-cities
+- `src/pages/ServiceCategory.tsx` — Service schema + breadcrumbs
+- `src/pages/BlogPost.tsx` — Article + FAQ schema
+- `src/data/blogPosts.ts` — 2 new posts
+- `src/pages/Review.tsx` (new) — review-request landing
+- `src/App.tsx` — register `/review` route
+- `public/sitemap-blog.xml` + `scripts/generate-sitemap.mjs` — include new posts
 
-     Sitemap: https://mikesmautorepair.com/sitemap-index.xml
-     ```
-   This eliminates any chance of a parser treating the multiple user-agent blocks oddly.
+### Out of scope (you have to do these — they matter MORE than code)
+1. **Optimize Google Business Profile**: verify, fill 100%, add 20+ photos, set 6 service areas, post weekly.
+2. **Get listed**: Yelp, Angi, Nextdoor, BBB, RepairPal, MechanicAdvisor, local Chamber — identical NAP everywhere.
+3. **Drive Google reviews** — text every customer the new `/review` link. Aim 50+.
+4. **Backlinks**: pitch the two new blog posts to local Fort Myers / Naples news + community blogs.
 
-2. **Verify no stray noindex** — double-check `index.html` and the SEO hook don't emit `noindex` for any route. (Quick scan already shows none, but I'll confirm in build mode.)
-
-3. **Manual step in Google Search Console (you):**
-   - Make sure the **active GSC property is `https://mikesmautorepair.com`** (non-www), not the www version.
-   - If only the www property is verified, add and verify the non-www property, then re-submit `https://mikesmautorepair.com/sitemap-index.xml` there.
-   - Use **URL Inspection** on `https://mikesmautorepair.com/` (no www) to confirm it reads "Allowed" for crawling.
-
-## Files I'll change
-
-- `public/robots.txt` — simplified to a single wildcard block + sitemaps.
-
-No other code changes needed. Approve and I'll apply the robots.txt simplification.
+Ready to build — approve and I'll ship it.
