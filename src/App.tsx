@@ -21,6 +21,7 @@ import BlogPost from "./pages/BlogPost";
 import BlogTag from "./pages/BlogTag";
 import AboutPage from "./pages/AboutPage";
 import Reviews from "./pages/Reviews";
+import ReviewLanding from "./pages/ReviewLanding";
 import ContactPage from "./pages/ContactPage";
 import NotFound from "./pages/NotFound";
 
@@ -43,6 +44,7 @@ const App = () => (
             <Route path="/service-areas" element={<ServiceAreas />} />
             <Route path="/areas/:city" element={<CityPage />} />
             <Route path="/reviews" element={<Reviews />} />
+            <Route path="/review" element={<ReviewLanding />} />
             <Route path="/contact" element={<ContactPage />} />
             <Route path="/blog" element={<Blog />} />
             <Route path="/blog/tag/:tag" element={<BlogTag />} />

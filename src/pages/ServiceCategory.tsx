@@ -18,12 +18,53 @@ const ServiceCategory = () => {
   const [selectedService, setSelectedService] = useState<string | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
 
+  const SITE = "https://mikesmautorepair.com";
+  const url = `${SITE}/services/${slug}`;
+  const jsonLd = category
+    ? [
+        {
+          "@context": "https://schema.org",
+          "@type": "Service",
+          name: category.title,
+          description: category.description,
+          serviceType: category.title,
+          url,
+          provider: {
+            "@type": "AutoRepair",
+            "@id": `${SITE}#business`,
+            name: "Mike's Mobile Auto Repair",
+            telephone: "+18135017572",
+            url: SITE,
+          },
+          areaServed: cities.map((c) => ({ "@type": "City", name: `${c.name}, ${c.state}` })),
+          hasOfferCatalog: {
+            "@type": "OfferCatalog",
+            name: category.title,
+            itemListElement: category.services.map((s) => ({
+              "@type": "Offer",
+              itemOffered: { "@type": "Service", name: s.name },
+            })),
+          },
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            { "@type": "ListItem", position: 1, name: "Home", item: SITE },
+            { "@type": "ListItem", position: 2, name: "Services", item: `${SITE}/services` },
+            { "@type": "ListItem", position: 3, name: category.title, item: url },
+          ],
+        },
+      ]
+    : undefined;
+
   useSeo({
     title: category
       ? `${category.title} | Mobile Mechanic SWFL | Mike's Mobile Auto Repair`
       : "Service Not Found",
     description: category?.description,
-    canonical: `https://mikesmautorepair.com/services/${slug}`,
+    canonical: url,
+    jsonLd,
   });
 
   if (!category) return <NotFound />;

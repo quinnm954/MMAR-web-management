@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ArrowLeft, ArrowRight, Calendar, ChevronRight, Clock, Home } from "lucide-react";
 import Navigation from "@/components/Navigation";
@@ -16,110 +15,69 @@ const BlogPost = () => {
   const { slug = "" } = useParams();
   const post = getBlogPostBySlug(slug);
 
+  const heroImage = `${SITE}/blog-hero.jpg`;
+  const logoImage = `${SITE}/mmar-logo.jpeg`;
+  const wordCount = post
+    ? post.body.replace(/<[^>]+>/g, " ").trim().split(/\s+/).length
+    : 0;
+
+  const jsonLd = post
+    ? [
+        {
+          "@context": "https://schema.org",
+          "@type": "Article",
+          headline: post.title.length > 110 ? post.title.slice(0, 107) + "..." : post.title,
+          description: post.excerpt,
+          image: [heroImage],
+          datePublished: post.dateISO,
+          dateModified: post.dateISO,
+          author: { "@type": "Organization", name: "Mike's Mobile Auto Repair", url: SITE },
+          publisher: {
+            "@type": "Organization",
+            name: "Mike's Mobile Auto Repair",
+            logo: { "@type": "ImageObject", url: logoImage, width: 600, height: 600 },
+          },
+          mainEntityOfPage: { "@type": "WebPage", "@id": `${SITE}/blog/${post.slug}` },
+          keywords: post.tags.join(", "),
+          articleSection: "Auto Repair",
+          inLanguage: "en-US",
+          url: `${SITE}/blog/${post.slug}`,
+          wordCount,
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            { "@type": "ListItem", position: 1, name: "Home", item: SITE },
+            { "@type": "ListItem", position: 2, name: "Blog", item: `${SITE}/blog` },
+            { "@type": "ListItem", position: 3, name: post.title, item: `${SITE}/blog/${post.slug}` },
+          ],
+        },
+        ...(post.faqs && post.faqs.length
+          ? [{
+              "@context": "https://schema.org",
+              "@type": "FAQPage",
+              mainEntity: post.faqs.map((q) => ({
+                "@type": "Question",
+                name: q.question,
+                acceptedAnswer: { "@type": "Answer", text: q.answer },
+              })),
+            }]
+          : []),
+      ]
+    : undefined;
+
   useSeo({
-    title: post
-      ? `${post.title} | Mike's Mobile Auto Repair`
-      : "Article Not Found",
+    title: post ? `${post.title} | Mike's Mobile Auto Repair` : "Article Not Found",
     description: post?.excerpt,
     canonical: post ? `${SITE}/blog/${post.slug}` : undefined,
+    jsonLd,
   });
-
-  useEffect(() => {
-    if (!post) return;
-    const articleId = "ld-blog-post";
-    const faqId = "ld-blog-faq";
-    document.getElementById(articleId)?.remove();
-    document.getElementById(faqId)?.remove();
-
-    const heroImage = `${SITE}/blog-hero.jpg`;
-    const logoImage = `${SITE}/mmar-logo.jpeg`;
-    const wordCount = post.body.replace(/<[^>]+>/g, " ").trim().split(/\s+/).length;
-    const article = {
-      "@context": "https://schema.org",
-      "@type": "Article",
-      headline: post.title.length > 110 ? post.title.slice(0, 107) + "..." : post.title,
-      description: post.excerpt,
-      image: [heroImage],
-      datePublished: post.dateISO,
-      dateModified: post.dateISO,
-      author: {
-        "@type": "Organization",
-        name: "Mike's Mobile Auto Repair",
-        url: SITE,
-      },
-      publisher: {
-        "@type": "Organization",
-        name: "Mike's Mobile Auto Repair",
-        logo: {
-          "@type": "ImageObject",
-          url: logoImage,
-          width: 600,
-          height: 600,
-        },
-      },
-      mainEntityOfPage: { "@type": "WebPage", "@id": `${SITE}/blog/${post.slug}` },
-      keywords: post.tags.join(", "),
-      articleSection: "Auto Repair",
-      inLanguage: "en-US",
-      url: `${SITE}/blog/${post.slug}`,
-      wordCount,
-    };
-    const a = document.createElement("script");
-    a.type = "application/ld+json";
-    a.id = articleId;
-    a.text = JSON.stringify(article);
-    document.head.appendChild(a);
-
-    let f: HTMLScriptElement | null = null;
-    if (post.faqs && post.faqs.length) {
-      const faq = {
-        "@context": "https://schema.org",
-        "@type": "FAQPage",
-        mainEntity: post.faqs.map((q) => ({
-          "@type": "Question",
-          name: q.question,
-          acceptedAnswer: { "@type": "Answer", text: q.answer },
-        })),
-      };
-      f = document.createElement("script");
-      f.type = "application/ld+json";
-      f.id = faqId;
-      f.text = JSON.stringify(faq);
-      document.head.appendChild(f);
-    }
-    return () => {
-      a.remove();
-      f?.remove();
-    };
-  }, [post]);
-
-
 
   const idx = post ? blogPosts.findIndex((p) => p.slug === post.slug) : -1;
   const prev = idx > 0 ? blogPosts[idx - 1] : null;
   const next = idx >= 0 && idx < blogPosts.length - 1 ? blogPosts[idx + 1] : null;
   const others = post ? blogPosts.filter((p) => p.slug !== post.slug).slice(0, 3) : [];
-
-  useEffect(() => {
-    if (!post) return;
-    const id = "ld-breadcrumb-blog";
-    document.getElementById(id)?.remove();
-    const ld = {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      itemListElement: [
-        { "@type": "ListItem", position: 1, name: "Home", item: SITE },
-        { "@type": "ListItem", position: 2, name: "Blog", item: `${SITE}/blog` },
-        { "@type": "ListItem", position: 3, name: post.title, item: `${SITE}/blog/${post.slug}` },
-      ],
-    };
-    const s = document.createElement("script");
-    s.type = "application/ld+json";
-    s.id = id;
-    s.text = JSON.stringify(ld);
-    document.head.appendChild(s);
-    return () => s.remove();
-  }, [post]);
 
   if (!post) return <NotFound />;
 

@@ -325,6 +325,135 @@ export const blogPosts: BlogPost[] = [
       { question: "Can you service my Chevy Cruze in my Lehigh Acres driveway?", answer: "Yes — the most common Cruze repairs (cooling system, valve cover, battery cable, AC) are all routinely done on site. Call (813) 501-7572 to book." },
     ],
   },
+  {
+    slug: "car-battery-cost-florida-heat-2026",
+    title: "What It Really Costs to Replace a Car Battery in Florida Heat (2026)",
+    excerpt:
+      "Florida batteries die in 2-3 years, not 4-5. Here's what a battery replacement actually costs in Southwest Florida in 2026, OEM vs aftermarket, and why mobile is usually cheaper than a shop.",
+    dateISO: "2026-05-04",
+    readMinutes: 7,
+    tags: ["Battery", "Pricing", "Maintenance"],
+    body: `
+      <p>If you live in Lee or Collier county, you've probably already had this happen: you turn the key (or push the button) and you get a click, a slow crank, or nothing at all. Welcome to Florida battery life. The brutal truth is that a car battery in Southwest Florida lasts about <strong>2 to 3 years</strong> — not the 4 to 5 it might last in a cooler northern climate.</p>
+
+      <h2>Why Florida heat kills batteries faster</h2>
+      <p>It's not the cold that kills batteries — it's the heat. Cold weather just exposes a battery that was already dying. Heat is what actually destroys it. High under-hood temperatures speed up the chemical reactions inside a lead-acid battery, evaporate the electrolyte, and corrode the internal plates. By year 3, capacity has dropped enough that the next cool morning or extra-long crank kills it.</p>
+      <p>This is why every battery you buy in Florida should be rated for high heat (look for "Heavy Duty" or AGM construction) and why the cheap "house brand" battery from a discount auto-parts store almost never makes it past the warranty period.</p>
+
+      <h2>Real 2026 prices for a battery replacement in SWFL</h2>
+      <p>Here's what you can actually expect to pay in <a href="/areas/lehigh-acres">Lehigh Acres</a>, <a href="/areas/fort-myers">Fort Myers</a>, <a href="/areas/cape-coral">Cape Coral</a>, and <a href="/areas/naples">Naples</a> in 2026, all-in (battery + labor + tax + recycling fee):</p>
+      <ul>
+        <li><strong>Standard flooded lead-acid (most sedans):</strong> $185 – $245 mobile, installed</li>
+        <li><strong>Premium high-heat or AGM (newer cars with start/stop):</strong> $245 – $345 mobile, installed</li>
+        <li><strong>European luxury or large truck/SUV battery:</strong> $325 – $475+ mobile, installed</li>
+        <li><strong>Hidden / under-seat / trunk battery (BMW, Mercedes, some GMs):</strong> add $40 – $80 labor</li>
+      </ul>
+      <p>Most chain shops charge $250 – $400 for the same battery, plus the cost of getting your car there if it won't start. Big-box stores ($110 – $180 for the battery alone) sound great until you factor in the tow, the install fee, and an afternoon of your time.</p>
+
+      <h2>Mobile vs shop — the actual math</h2>
+      <p>A typical battery replacement in a chain shop in Fort Myers in 2026 costs about $260 once you add labor and disposal. Add a $95 tow (because the car won't start, that's why you're calling) and you're at $355. Total time invested: half a day.</p>
+      <p>Mobile? We come to you, install in 20–40 minutes, and the all-in cost is usually $185 – $245 for a standard battery. That's a meaningful difference, and you don't burn an afternoon.</p>
+
+      <h2>How to know if it's actually the battery</h2>
+      <p>Symptoms that point to a dying battery (vs an alternator or starter problem):</p>
+      <ul>
+        <li>Slow crank that's worst on hot days or after sitting overnight</li>
+        <li>Headlights that visibly dim when you start the car</li>
+        <li>Random electrical glitches (radio resets, dash warnings, power windows acting up)</li>
+        <li>Battery age over 3 years on a sticker or invoice</li>
+        <li>You needed a jump-start in the last week</li>
+      </ul>
+      <p>If you've been jumped twice, the alternator may be involved too — see our post on <a href="/blog/signs-of-a-bad-alternator">7 warning signs of a bad alternator</a>. We test both with the same visit.</p>
+
+      <h2>Should you upgrade to AGM?</h2>
+      <p>If your car came from the factory with an AGM battery (most newer European cars, anything with start/stop), you must replace it with another AGM — an ordinary flooded battery will fail prematurely and may damage charging electronics. If your car came with a flooded battery, AGM is an upgrade worth considering for Florida: better heat tolerance, longer typical lifespan, and more reliable cranking.</p>
+
+      <h2>Get a real quote in 5 minutes</h2>
+      <p>Tell us your year, make, and model and we'll text back a flat all-in price for a mobile battery replacement at your home or workplace anywhere in <a href="/service-areas">Southwest Florida</a>. Call or text <a href="tel:8135017572">(813) 501-7572</a> — same-day service is usually available, and we always quote in writing before any work begins. See more on our <a href="/battery-alternator-starter">mobile battery, alternator, and starter</a> page.</p>
+    `,
+    faqs: [
+      { question: "How much does it cost to replace a car battery in Fort Myers in 2026?", answer: "A standard flooded lead-acid battery replacement costs $185–$245 all-in for a mobile install. AGM and premium high-heat batteries run $245–$345. European luxury and large truck batteries can run $325–$475+." },
+      { question: "How long do car batteries last in Florida?", answer: "About 2–3 years on average, vs 4–5 in cooler climates. Florida heat dramatically accelerates internal corrosion and electrolyte loss in lead-acid batteries." },
+      { question: "Is a mobile battery replacement cheaper than a shop?", answer: "Usually yes when you account for the tow (your car won't start, after all), the install fee, and the lost time. A typical chain-shop battery in Fort Myers ends up around $260 + tow; mobile is usually $185–$245 all-in." },
+      { question: "Can a mobile mechanic replace a battery in my driveway?", answer: "Yes — battery replacement is one of the most common mobile-mechanic jobs. We test the alternator at the same visit to make sure the new battery isn't being killed by a charging-system problem." },
+      { question: "Do I need an AGM battery for my car?", answer: "Only if it came with one from the factory (most modern European cars and any car with start/stop). For older flooded-battery cars, AGM is a good optional upgrade in Florida heat." },
+    ],
+  },
+  {
+    slug: "florida-ac-service-every-2-years",
+    title: "Why Florida Cars Need AC Service Every 2 Years",
+    excerpt:
+      "AC systems in Florida lose refrigerant faster than anywhere else in the country. Here's why, what it costs to fix, and the $20 mistake that destroys $1,500 compressors.",
+    dateISO: "2026-05-04",
+    readMinutes: 6,
+    tags: ["AC", "Maintenance", "Pricing"],
+    body: `
+      <p>Ask any mobile mechanic in <a href="/areas/cape-coral">Cape Coral</a>, <a href="/areas/naples">Naples</a>, or <a href="/areas/lehigh-acres">Lehigh Acres</a> what call comes in most between April and October and you'll get the same answer: <strong>weak AC</strong>. Florida cars need AC service on a roughly 2-year cycle, and skipping it doesn't just leave you sweaty — it destroys the most expensive part of the system.</p>
+
+      <h2>Why Florida AC systems lose refrigerant faster</h2>
+      <p>Every car AC system leaks a tiny amount of refrigerant — that's normal. In a dry, cool climate, that loss is so slow you'll never notice it for the life of the car. In Florida, three things make it dramatically worse:</p>
+      <ul>
+        <li><strong>Heat.</strong> High under-hood and ambient temperatures expand seals and rubber lines, accelerating permeation loss.</li>
+        <li><strong>Humidity.</strong> Moisture in the air gets pulled into the system through any micro-leak and corrodes the evaporator and condenser from the inside out.</li>
+        <li><strong>Constant use.</strong> Most cars in SWFL run AC 9–10 months a year. The system never gets a break.</li>
+      </ul>
+      <p>Add salt air on coastal cars (Cape Coral, Bonita, Fort Myers Beach, Naples) and condensers can corrode through in 7–10 years.</p>
+
+      <h2>Signs your AC needs service right now</h2>
+      <ul>
+        <li>Air is "cool" but not cold (more than 50°F at the vents on a hot day)</li>
+        <li>You have to turn the temperature dial to "max cold" all the time</li>
+        <li>AC is great when driving but warm at idle</li>
+        <li>Strange smell when the AC kicks on</li>
+        <li>Hissing or clicking from the dash</li>
+        <li>Compressor cycles on and off rapidly</li>
+      </ul>
+
+      <h2>What an AC service actually does</h2>
+      <p>A real AC service is not just "topping up the freon." Done properly it includes:</p>
+      <ul>
+        <li>Connect manifold gauges and check static and operating pressures</li>
+        <li>Inject UV dye and trace for leaks</li>
+        <li>Recover and weigh existing refrigerant</li>
+        <li>Vacuum the system to verify it holds (no leak) and remove moisture</li>
+        <li>Recharge with the exact factory-spec amount of R-134a or R-1234yf</li>
+        <li>Verify vent temperature drops below 40°F at idle</li>
+      </ul>
+      <p>If a shop does it any faster than 45 minutes start to finish, they probably skipped the vacuum step — and skipping the vacuum is the single biggest reason a "fixed" AC dies again two months later.</p>
+
+      <h2>Real 2026 SWFL pricing</h2>
+      <ul>
+        <li><strong>AC recharge with leak check (R-134a):</strong> $145 – $215 mobile</li>
+        <li><strong>AC recharge with leak check (R-1234yf, newer cars):</strong> $245 – $385 mobile (refrigerant alone runs $80–$120/lb)</li>
+        <li><strong>Condenser replacement:</strong> $485 – $885</li>
+        <li><strong>Compressor replacement:</strong> $785 – $1,650 depending on vehicle</li>
+        <li><strong>Evaporator replacement:</strong> $1,200 – $2,400 (very labor-intensive)</li>
+      </ul>
+
+      <h2>The $20 mistake that destroys $1,500 compressors</h2>
+      <p>Please do not use the all-in-one "AC Pro" can from the gas station. The cheap recharge cans contain refrigerant plus stop-leak sealant. The sealant can plug your evaporator, contaminate the dryer, and — worst case — set up inside the compressor and seize it. Replacing a compressor that died from stop-leak contamination runs $1,000–$1,800 and almost always means you also have to flush the entire system, which adds hundreds more.</p>
+      <p>Have a mechanic do it. Have someone who pulls a vacuum first do it. The all-in-one cans are the most expensive cheap fix in automotive.</p>
+
+      <h2>The 2-year cycle</h2>
+      <p>For most Florida vehicles 5+ years old, plan on:</p>
+      <ul>
+        <li><strong>Year 0–4:</strong> No service needed if performance is good</li>
+        <li><strong>Year 5–6:</strong> First AC service (recharge + leak check)</li>
+        <li><strong>Every 2 years after:</strong> Recharge and leak check</li>
+      </ul>
+      <p>Cars closer to the coast and any vehicle that gets weak each summer should be on the 2-year cycle starting earlier. Catching a small leak in year 5 is a $150 fix; ignoring it until the compressor seizes in year 7 is a $1,500 fix.</p>
+
+      <h2>Get your AC checked at your driveway</h2>
+      <p>We bring full AC service equipment — recovery, vacuum, and recharge — to your home or workplace anywhere in <a href="/service-areas">Southwest Florida</a>. Most appointments take 60–90 minutes and you stay cool the rest of the season. Call or text <a href="tel:8135017572">(813) 501-7572</a> for a quote, or learn more on our <a href="/services/ac-heating">mobile AC service page</a>.</p>
+    `,
+    faqs: [
+      { question: "How often should I service my car AC in Florida?", answer: "Every 2 years for cars 5+ years old. Florida heat, humidity, and constant AC use cause systems to lose refrigerant 3–5x faster than in dry, cool climates." },
+      { question: "How much does an AC recharge cost in Southwest Florida in 2026?", answer: "$145–$215 for an R-134a recharge with leak check, mobile. Newer cars using R-1234yf run $245–$385 because the refrigerant itself costs $80–$120 per pound." },
+      { question: "Can a mobile mechanic recharge my car AC?", answer: "Yes — we bring recovery, vacuum, and recharge equipment to your driveway. The whole service typically takes 60–90 minutes." },
+      { question: "Are AC recharge cans from the auto-parts store safe?", answer: "Avoid the all-in-one cans with sealant. They can contaminate the system and destroy the compressor — turning a $150 problem into a $1,500 one. A proper recharge requires pulling a vacuum, which the cans cannot do." },
+      { question: "Why is my AC cold while driving but warm at idle?", answer: "Usually a failing condenser fan, low refrigerant, or a weak compressor clutch. A mobile diagnostic will tell you which in about 30 minutes." },
+    ],
+  },
 ];
 
 export const getBlogPostBySlug = (slug: string) =>
