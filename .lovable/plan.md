@@ -1,56 +1,83 @@
-## Problem
+## Goal
 
-Google Search Console URL Inspector is reporting **"Review has multiple aggregate ratings"** on `https://mikesmautorepair.com/`. This kills the review-stars rich result.
+Make `mikesmautorepair.com` installable to the home screen on iPhone and Android as a Progressive Web App. Customers tap the Mike's icon and get a fullscreen, app-like experience powered by the same React code that runs the website. The live site stays exactly the same for normal browser visitors and for Google's crawler.
 
-Root cause: the same business entity is declared multiple times per page, each with its own `aggregateRating`:
+## What gets added
 
-| Source | Entity | aggregateRating? |
-|---|---|---|
-| `index.html` (static, every page) | `AutoRepair @id="…#business"` | ✅ 5.0 / 47 |
-| `src/pages/Index.tsx` (runtime, `/`) | `AutoRepair @id="…/#business"` | ✅ from `REVIEWS_META` |
-| `src/pages/LocalLanding.tsx` (runtime, landing pages) | `AutoRepair @id="…/#business"` | ✅ from `REVIEWS_META` |
-| `scripts/prerender.mjs` (city pages) | `AutoRepair @id="<page>#business"` (new id per page) | ❌ none |
+### 1. Web App Manifest (`public/manifest.webmanifest`)
+- `name`: "Mike's Mobile Auto Repair"
+- `short_name`: "Mike's Auto"
+- `start_url`: `/`
+- `display`: `standalone` (no browser chrome when launched from home screen)
+- `theme_color`: sky blue `hsl(200 80% 60%)` → hex equivalent
+- `background_color`: dark background to match the site
+- `icons`: 192×192 and 512×512 PNGs (plus a maskable variant for Android adaptive icons)
 
-Google merges duplicate business nodes and sees two ratings → invalid.
+### 2. PWA Icons (`public/icons/`)
+Generate from the existing Mike's logo:
+- `icon-192.png`
+- `icon-512.png`
+- `icon-512-maskable.png` (with safe-zone padding for Android)
+- `apple-touch-icon.png` (180×180, for iOS home screen)
 
-## Fix Strategy
+### 3. Meta tags in `index.html`
+Add (without touching existing SEO/JSON-LD):
+- `<link rel="manifest" href="/manifest.webmanifest">`
+- `<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">`
+- `<meta name="apple-mobile-web-app-capable" content="yes">`
+- `<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">`
+- `<meta name="theme-color" content="...sky blue...">`
 
-**Single source of truth:** the `AutoRepair` business entity (with `aggregateRating`, hours, address, sameAs, etc.) lives in **one place only — `index.html`**. Every other page references it by `@id` instead of redefining it.
+### 4. `/install` page (`src/pages/InstallApp.tsx`)
+A simple page customers can be sent to with step-by-step "Add to Home Screen" instructions:
+- **iPhone (Safari)**: Share button → Add to Home Screen
+- **Android (Chrome)**: Menu → Install app (with a real install button when the browser fires `beforeinstallprompt`)
+- Detects platform and shows the relevant section first
+- Branded with the existing dark theme + sky/gold accents
+- Linked from the footer as "Install App"
 
-### Changes
+Route added to `App.tsx` above the catch-all.
 
-1. **`src/pages/Index.tsx`**
-   - Remove the runtime-injected `AutoRepair` node entirely (it duplicates `index.html`).
-   - Keep only the page-specific `BreadcrumbList` (and any FAQ if present).
-   - Drop the `aggregateRating` / `REVIEWS_META` import here.
+### 5. No service worker (intentional)
+Skipping `vite-plugin-pwa` and service workers entirely. Reasons:
+- Installability only requires the manifest + icons + HTTPS — all already true.
+- Service workers cache aggressively and would interfere with the prerendered SEO HTML and the Lovable preview iframe.
+- Offline support isn't valuable for this business (the whole point is to call/text Mike, which needs a network anyway).
 
-2. **`src/pages/LocalLanding.tsx`**
-   - Remove the full `AutoRepair` redefinition.
-   - Replace `provider` and any business reference with `{ "@id": "https://mikesmautorepair.com/#business" }` so the `Service` node points at the canonical business without redeclaring it.
-   - Remove the local `aggregateRating` block.
+This keeps the setup safe, low-risk, and avoids the stale-cache problems documented for Lovable PWAs.
 
-3. **`scripts/prerender.mjs` (city pages, `/areas/...`)**
-   - Stop emitting a second `AutoRepair` node with a per-page `@id`.
-   - Instead emit a single `LocalBusiness`-typed reference via `@id: "…/#business"` only when needed, OR drop the duplicate AutoRepair entirely and rely on the one in `index.html` plus a `BreadcrumbList` + `Place`/`City` context.
-   - Net effect: each city page has Breadcrumb + FAQ + the inherited `index.html` business block — no duplicate rating.
+## What does NOT change
 
-4. **`scripts/validate-jsonld.mjs`**
-   - Add a new check: across all JSON-LD blocks on a single page, no two nodes resolving to the same business `@id` (or same `AutoRepair`/`LocalBusiness` `name`+`url`) may both carry `aggregateRating`. Fail the build if violated.
-   - This guarantees the "multiple aggregate ratings" error can never be reintroduced.
+- All 59 prerendered routes, JSON-LD, sitemaps, Google indexing — untouched
+- Existing pages, components, styling, phone/SMS buttons — untouched
+- `index.html` JSON-LD `AutoRepair` block with the single aggregateRating — untouched
+- Build pipeline (`scripts/prerender.mjs`, `scripts/validate-jsonld.mjs`) — untouched
+- No new dependencies, no service worker, no Lovable preview interference
 
-5. **`src/data/reviewsMeta.ts`**
-   - Keep the constant (still used by visible UI components like the testimonials section), but it should no longer be referenced by any JSON-LD emitter.
+## How customers install it
 
-### Verification
+After this ships and you publish:
+1. Visit `mikesmautorepair.com` on their phone, OR go to `mikesmautorepair.com/install`
+2. **iPhone**: Tap Share → "Add to Home Screen" → Add
+3. **Android**: Tap the install banner Chrome shows automatically, or Menu → "Install app"
+4. Mike's icon appears on their home screen. Tapping it opens the site fullscreen, no browser bar — looks and feels like a native app. Call/text buttons fire the dialer exactly like before.
 
-After the changes, run the existing pipeline:
-- `npm run build` → prerender + validate-jsonld + check-jsonld-urls
-- New duplicate-rating check should pass on all 59 routes.
-- Manually re-test `/` in Google's Rich Results Test — the "multiple aggregate ratings" error disappears, and the single `AggregateRating` (5.0 / 47) from `index.html` remains valid.
+## Files
 
-### Files to edit
+**Created:**
+- `public/manifest.webmanifest`
+- `public/icons/icon-192.png`, `icon-512.png`, `icon-512-maskable.png`, `apple-touch-icon.png`
+- `src/pages/InstallApp.tsx`
 
-- `src/pages/Index.tsx`
-- `src/pages/LocalLanding.tsx`
-- `scripts/prerender.mjs`
-- `scripts/validate-jsonld.mjs`
+**Edited:**
+- `index.html` — add manifest link + apple-touch-icon + theme-color meta tags
+- `src/App.tsx` — add `/install` route
+- `src/components/Footer.tsx` — add "Install App" link
+
+## Verification
+
+After implementation:
+- Open the published site on a phone → confirm "Add to Home Screen" works on both iOS and Android
+- Confirm the installed app launches fullscreen with the correct icon and splash colors
+- Re-run the existing build (`npm run build`) → all 59 prerendered routes + JSON-LD validation still pass
+- Confirm Google's Rich Results Test on `/` is still clean (no regressions to the SEO work we just finished)
