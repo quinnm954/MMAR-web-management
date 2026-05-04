@@ -1,0 +1,32 @@
+{
+  "name": "Mike's Mobile Auto Repair",
+  "short_name": "Mike's Auto",
+  "description": "Mobile mechanic in Lehigh Acres & Fort Myers, FL. Tap to call or text (813) 501-7572.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#141a1f",
+  "theme_color": "#3FB6E6",
+  "categories": ["business", "utilities"],
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
