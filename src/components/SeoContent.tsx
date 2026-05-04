@@ -8,7 +8,7 @@ import InlineCallStrip from "./InlineCallStrip";
 const faqs = [
   {
     q: "What areas do you service?",
-    a: "We serve Lehigh Acres and Fort Myers — and most surrounding Lehigh Acres and Fort Myers neighborhoods. Call (813) 501-7572 if you're not sure we cover your address.",
+    a: "We serve Lehigh Acres and Fort Myers and surrounding neighborhoods. Call (813) 501-7572 if you're not sure we cover your address.",
   },
   {
     q: "Are you really mobile? You come to my house?",

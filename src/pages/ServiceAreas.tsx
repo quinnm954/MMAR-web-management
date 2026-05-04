@@ -11,7 +11,7 @@ const ServiceAreas = () => {
   useSeo({
     title: "Service Areas | Mike's Mobile Auto Repair",
     description:
-      "Mobile mechanic service areas across Lehigh Acres and Fort Myers — Lehigh Acres and Fort Myers.",
+      "Mobile mechanic service areas across Lehigh Acres and Fort Myers, FL.",
     canonical: "https://mikesmautorepair.com/service-areas",
   });
 
