@@ -65,52 +65,14 @@ const LocalLanding = () => {
     }
     breadcrumbItems.push({ name: page.h1, item: canonicalUrl });
 
+    // NOTE: The AutoRepair business entity (with aggregateRating, hours,
+    // address, sameAs) is declared once in index.html. Do NOT redeclare it
+    // here — Google merges duplicate business nodes and rejects "multiple
+    // aggregate ratings". The Service node references the canonical business
+    // by @id instead.
     const ld = {
       "@context": "https://schema.org",
       "@graph": [
-        {
-          "@type": "AutoRepair",
-          "@id": `${SITE}/#business`,
-          name: "Mike's Mobile Auto Repair LLC",
-          url: SITE,
-          telephone: "+18135017572",
-          priceRange: "$$",
-          image: "https://iili.io/3QividB.jpg",
-          address: {
-            "@type": "PostalAddress",
-            addressLocality: "Lehigh Acres",
-            addressRegion: "FL",
-            postalCode: "33936",
-            addressCountry: "US",
-          },
-          areaServed: cities.map((c) => ({
-            "@type": "City",
-            name: `${c.name}, ${c.state}`,
-          })),
-          openingHoursSpecification: [
-            {
-              "@type": "OpeningHoursSpecification",
-              dayOfWeek: [
-                "Monday",
-                "Tuesday",
-                "Wednesday",
-                "Thursday",
-                "Friday",
-                "Saturday",
-                "Sunday",
-              ],
-              opens: "07:00",
-              closes: "21:00",
-            },
-          ],
-          aggregateRating: {
-            "@type": "AggregateRating",
-            ratingValue: REVIEWS_META.ratingValue,
-            reviewCount: REVIEWS_META.reviewCount,
-            bestRating: REVIEWS_META.bestRating,
-            worstRating: REVIEWS_META.worstRating,
-          },
-        },
         {
           "@type": "Service",
           name: page.service,
