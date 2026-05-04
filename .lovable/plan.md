@@ -1,64 +1,56 @@
-# Make All Pages Rankable on Google
+## Problem
 
-## Current Issues Found
+Google Search Console URL Inspector is reporting **"Review has multiple aggregate ratings"** on `https://mikesmautorepair.com/`. This kills the review-stars rich result.
 
-1. **SPA with empty HTML** — `index.html` ships an empty `<div id="root">`. Google renders JS but indexing is slower and unreliable. Without prerendering, content-heavy SEO pages compete poorly.
-2. **Sitemap gaps** — `sitemap-locations.xml` is missing many slugs that exist in `localLandingPages.ts` (e.g. `mobile-brake-repair`, `mobile-alternator-repair`, `mobile-battery-replacement`, `mobile-vehicle-diagnostics`, `mobile-no-start-diagnostics`, `mobile-brake-repair-lehigh-acres`, `alternator-repair-lehigh-acres`, etc.). `sitemap.xml` is also missing `/financing-contract` and `/areas/:city` parents.
-3. **No prerendered HTML** — Title, description, and JSON-LD are injected client-side via `useSeo`/`useEffect`. Crawlers that don't execute JS see only the default `index.html` title/description for every route.
-4. **NotFound page** — should send 404 signal; currently returns 200 with SPA fallback.
-5. **AggregateRating** is hard-coded in `index.html` (47 reviews) but `REVIEWS_META` is the source of truth — risk of mismatch flagged by Google Rich Results.
-6. **Duplicate AutoRepair schema** — both `index.html` (static) and `Index.tsx` (runtime) emit a `#business` AutoRepair node, which can trigger schema warnings.
-7. **Image alts, internal linking, breadcrumbs** — only Index has BreadcrumbList; sub-pages should too.
+Root cause: the same business entity is declared multiple times per page, each with its own `aggregateRating`:
 
-## Plan
+| Source | Entity | aggregateRating? |
+|---|---|---|
+| `index.html` (static, every page) | `AutoRepair @id="…#business"` | ✅ 5.0 / 47 |
+| `src/pages/Index.tsx` (runtime, `/`) | `AutoRepair @id="…/#business"` | ✅ from `REVIEWS_META` |
+| `src/pages/LocalLanding.tsx` (runtime, landing pages) | `AutoRepair @id="…/#business"` | ✅ from `REVIEWS_META` |
+| `scripts/prerender.mjs` (city pages) | `AutoRepair @id="<page>#business"` (new id per page) | ❌ none |
 
-### 1. Add static prerendering (biggest win)
-Install `vite-plugin-prerender-spa` (or `vite-plugin-ssg`/`react-snap`) to crawl all routes at build time and emit static HTML for each route with the rendered title, meta, content, and JSON-LD baked in. Routes to prerender:
-- `/`, `/about`, `/services`, `/services/:slug` (all 11 categories), `/service-areas`, `/areas/lehigh-acres`, `/areas/fort-myers`, `/reviews`, `/contact`, `/blog`, `/blog/:slug` (all posts), `/blog/tag/:tag`, `/warranty-policy`, and every `localLandingPages` slug.
+Google merges duplicate business nodes and sees two ratings → invalid.
 
-This makes every page fully indexable without JS execution.
+## Fix Strategy
 
-### 2. Complete the sitemaps
-Update `scripts/generate-sitemap.mjs` so it:
-- Reads `localLandingPages.ts` and emits **every** slug into `sitemap-locations.xml`.
-- Adds `/areas/lehigh-acres`, `/areas/fort-myers` to locations.
-- Adds `/financing-contract` (or excludes if intentionally private) to `sitemap.xml`.
-- Iterates all blog tags from `blogPosts.ts` automatically.
-Re-run script and commit the regenerated XML files.
+**Single source of truth:** the `AutoRepair` business entity (with `aggregateRating`, hours, address, sameAs, etc.) lives in **one place only — `index.html`**. Every other page references it by `@id` instead of redefining it.
 
-### 3. De-duplicate and unify JSON-LD
-- Remove the static AutoRepair block from `index.html` (Index.tsx already emits a richer one with live `REVIEWS_META`).
-- Keep one canonical schema source per page.
+### Changes
 
-### 4. Add Breadcrumb JSON-LD on every sub-page
-Wire `BreadcrumbList` into `useSeo`'s `jsonLd` array for AboutPage, ServicesIndex, ServiceCategory, ServiceAreas, CityPage, Reviews, ContactPage, Blog, BlogPost, BlogTag, LocalLanding.
+1. **`src/pages/Index.tsx`**
+   - Remove the runtime-injected `AutoRepair` node entirely (it duplicates `index.html`).
+   - Keep only the page-specific `BreadcrumbList` (and any FAQ if present).
+   - Drop the `aggregateRating` / `REVIEWS_META` import here.
 
-### 5. Per-page meta hardening
-Audit each page using `useSeo` to confirm:
-- Unique `<title>` ≤ 60 chars with primary keyword + city.
-- Unique `description` ≤ 155 chars, no duplicates across pages.
-- `canonical` matches the served URL exactly (no trailing-slash mismatches).
-- `og:image` set (use existing hero image as default).
-Add an `og:image` default in `useSeo` so every page has social card.
+2. **`src/pages/LocalLanding.tsx`**
+   - Remove the full `AutoRepair` redefinition.
+   - Replace `provider` and any business reference with `{ "@id": "https://mikesmautorepair.com/#business" }` so the `Service` node points at the canonical business without redeclaring it.
+   - Remove the local `aggregateRating` block.
 
-### 6. NotFound returns proper signal
-Add `<meta name="robots" content="noindex">` in `NotFound.tsx` via `useSeo({ noindex: true })`.
+3. **`scripts/prerender.mjs` (city pages, `/areas/...`)**
+   - Stop emitting a second `AutoRepair` node with a per-page `@id`.
+   - Instead emit a single `LocalBusiness`-typed reference via `@id: "…/#business"` only when needed, OR drop the duplicate AutoRepair entirely and rely on the one in `index.html` plus a `BreadcrumbList` + `Place`/`City` context.
+   - Net effect: each city page has Breadcrumb + FAQ + the inherited `index.html` business block — no duplicate rating.
 
-### 7. Performance / Core Web Vitals
-- Add `loading="lazy"` and explicit `width`/`height` to non-hero images.
-- Preload the hero image in `index.html`.
+4. **`scripts/validate-jsonld.mjs`**
+   - Add a new check: across all JSON-LD blocks on a single page, no two nodes resolving to the same business `@id` (or same `AutoRepair`/`LocalBusiness` `name`+`url`) may both carry `aggregateRating`. Fail the build if violated.
+   - This guarantees the "multiple aggregate ratings" error can never be reintroduced.
 
-### 8. robots.txt
-Already good. Add `Disallow: /review` if that URL is a private redirect; otherwise leave.
+5. **`src/data/reviewsMeta.ts`**
+   - Keep the constant (still used by visible UI components like the testimonials section), but it should no longer be referenced by any JSON-LD emitter.
 
-## Technical Section
+### Verification
 
-- **Prerender tooling**: `vite-plugin-prerender-spa` (Puppeteer-based) with a `routes` array generated from the same data files used at runtime so it stays in sync.
-- **Build flow**: `vite build` → prerender plugin crawls dev-server style and writes `dist/<route>/index.html` files. Lovable hosting serves them directly; SPA fallback still handles deep client navigation.
-- **Sitemap script**: extend `scripts/generate-sitemap.mjs` to import the TS data via `tsx` or duplicate slug arrays in JS. Run during build.
-- **useSeo enhancements**: extend hook to accept `breadcrumbs: {name,url}[]` and emit BreadcrumbList automatically; add default `ogImage`.
+After the changes, run the existing pipeline:
+- `npm run build` → prerender + validate-jsonld + check-jsonld-urls
+- New duplicate-rating check should pass on all 59 routes.
+- Manually re-test `/` in Google's Rich Results Test — the "multiple aggregate ratings" error disappears, and the single `AggregateRating` (5.0 / 47) from `index.html` remains valid.
 
-## Out of Scope
-- Backlink building, Google Search Console verification (user action), Google Business Profile updates.
+### Files to edit
 
-Ready to implement on approval.
+- `src/pages/Index.tsx`
+- `src/pages/LocalLanding.tsx`
+- `scripts/prerender.mjs`
+- `scripts/validate-jsonld.mjs`
