@@ -4,13 +4,9 @@
 // React still hydrates client-side; this just gives crawlers full SEO signals
 // without requiring JS execution.
 
-import { readFileSync, writeFileSync, mkdirSync, existsSync, copyFileSync } from "node:fs";
-import { fileURLToPath, pathToFileURL } from "node:url";
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { dirname, resolve, join } from "node:path";
-import { register } from "node:module";
-
-// Enable on-the-fly TS loading so we can import data files directly.
-register("ts-blank-space/register", pathToFileURL(import.meta.url));
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..");
