@@ -35,7 +35,7 @@ const Footer = () => {
             </a>
             <p className="mt-3 text-xs text-muted-foreground leading-relaxed">
               <span className="block"><span className="font-semibold text-foreground/80">Hours:</span> 9am–5pm daily · By appointment only</span>
-              <span className="block mt-1"><span className="font-semibold text-foreground/80">Service area:</span> Lehigh Acres and Fort Myers (Lee County, Lehigh Acres and Fort Myers)</span>
+              <span className="block mt-1"><span className="font-semibold text-foreground/80">Service area:</span> Lehigh Acres and Fort Myers (Lee County, FL)</span>
             </p>
             <div className="mt-4">
               <p className="text-xs uppercase tracking-wider text-muted-foreground mb-2">Reviews &amp; Social</p>
