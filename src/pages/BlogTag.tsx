@@ -57,12 +57,10 @@ const TAG_INTROS: Record<string, { title: string; intro: string; related: { href
   local: {
     title: "Southwest Florida Car Care",
     intro:
-      "Local conditions — salt air, year-round heat, season traffic — affect every vehicle in Lehigh Acres, Fort Myers, Cape Coral, Estero, Bonita Springs, and Naples. These articles focus on what that means for your car.",
+      "Local conditions — salt air, year-round heat, season traffic — affect every vehicle in Lehigh Acres and Fort Myers. These articles focus on what that means for your car.",
     related: [
       { href: "/areas/lehigh-acres", label: "Lehigh Acres" },
       { href: "/areas/fort-myers", label: "Fort Myers" },
-      { href: "/areas/cape-coral", label: "Cape Coral" },
-      { href: "/areas/naples", label: "Naples" },
     ],
   },
   "no-start": {

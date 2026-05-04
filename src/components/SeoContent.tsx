@@ -112,9 +112,8 @@ const SeoContent = () => {
               to manufacturer spec, and the new pads are properly bedded so you
               get a quiet, confident pedal from the very first stop. Ask about
               brake repair in{" "}
-              <Link to="/mobile-brake-repair-lehigh-acres" className="text-primary underline-offset-4 hover:underline">Lehigh Acres</Link>,{" "}
-              <Link to="/areas/fort-myers" className="text-primary underline-offset-4 hover:underline">Fort Myers</Link>, or{" "}
-              <Link to="/areas/cape-coral" className="text-primary underline-offset-4 hover:underline">Cape Coral</Link>.
+              <Link to="/mobile-brake-repair-lehigh-acres" className="text-primary underline-offset-4 hover:underline">Lehigh Acres</Link> or{" "}
+              <Link to="/areas/fort-myers" className="text-primary underline-offset-4 hover:underline">Fort Myers</Link>.
             </p>
           </div>
 
@@ -161,9 +160,7 @@ const SeoContent = () => {
               . Every install includes a free charging-system test (so we don't
               hand you a new battery if your alternator is the real culprit),
               terminal cleaning, and old-battery recycling at no extra charge.
-              Need a battery in{" "}
-              <Link to="/mobile-battery-replacement-cape-coral" className="text-primary underline-offset-4 hover:underline">Cape Coral</Link>{" "}
-              or anywhere else in SWFL? Same-day service is the norm.
+              Same-day service is the norm anywhere in our service area.
             </p>
           </div>
 
@@ -229,10 +226,6 @@ const SeoContent = () => {
             <ul className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-4">
               <li><Link to="/areas/lehigh-acres" className="text-primary underline-offset-4 hover:underline">Lehigh Acres</Link></li>
               <li><Link to="/areas/fort-myers" className="text-primary underline-offset-4 hover:underline">Fort Myers</Link></li>
-              <li><Link to="/areas/cape-coral" className="text-primary underline-offset-4 hover:underline">Cape Coral</Link></li>
-              <li><Link to="/areas/estero" className="text-primary underline-offset-4 hover:underline">Estero</Link></li>
-              <li><Link to="/areas/bonita-springs" className="text-primary underline-offset-4 hover:underline">Bonita Springs</Link></li>
-              <li><Link to="/areas/naples" className="text-primary underline-offset-4 hover:underline">Naples</Link></li>
               <li>San Carlos Park</li>
               <li>Gateway</li>
               <li>North Fort Myers</li>

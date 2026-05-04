@@ -123,12 +123,8 @@ const Blog = () => {
             Honest, no-fluff guides from a working mobile mechanic in Southwest
             Florida. Diagnostics walkthroughs, brake and battery advice, no-start
             troubleshooting, and Florida-specific car care for{" "}
-            <Link to="/areas/lehigh-acres" className="text-primary hover:underline">Lehigh Acres</Link>,{" "}
-            <Link to="/areas/fort-myers" className="text-primary hover:underline">Fort Myers</Link>,{" "}
-            <Link to="/areas/cape-coral" className="text-primary hover:underline">Cape Coral</Link>,{" "}
-            <Link to="/areas/estero" className="text-primary hover:underline">Estero</Link>,{" "}
-            <Link to="/areas/bonita-springs" className="text-primary hover:underline">Bonita Springs</Link>, and{" "}
-            <Link to="/areas/naples" className="text-primary hover:underline">Naples</Link>.
+            <Link to="/areas/lehigh-acres" className="text-primary hover:underline">Lehigh Acres</Link> and{" "}
+            <Link to="/areas/fort-myers" className="text-primary hover:underline">Fort Myers</Link>.
           </p>
           <p className="text-sm md:text-base text-muted-foreground mb-8 max-w-3xl">
             Need help right now instead of reading? See our{" "}

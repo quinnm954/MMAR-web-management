@@ -16,7 +16,9 @@ export type LocalLandingPage = {
   faqs: FAQ[];
 };
 
-export const localLandingPages: LocalLandingPage[] = [
+const ALLOWED_CITY_SLUGS = new Set(["lehigh-acres", "fort-myers"]);
+
+const _allLocalLandingPages: LocalLandingPage[] = [
   {
     slug: "mobile-brake-repair-lehigh-acres",
     service: "Mobile Brake Repair",
@@ -105,50 +107,6 @@ export const localLandingPages: LocalLandingPage[] = [
       {
         q: "How do I know it's the alternator and not the battery?",
         a: "We test both. A weak battery and a failing alternator can look similar, so we check actual charging output and battery condition before recommending any parts.",
-      },
-    ],
-  },
-  {
-    slug: "mobile-battery-replacement-cape-coral",
-    service: "Mobile Battery Replacement",
-    citySlug: "cape-coral",
-    categoryId: "electrical",
-    h1: "Mobile Battery Replacement in Cape Coral, FL",
-    metaTitle:
-      "Mobile Battery Replacement in Cape Coral, FL | Mike's Mobile Auto Repair",
-    metaDescription:
-      "Same-day mobile car battery replacement in Cape Coral, FL. We test, deliver, and install — at your home or office. Call (813) 501-7572.",
-    intro:
-      "Dead battery in Cape Coral? Skip the tow and the parts-store parking lot. Mike's Mobile Auto Repair delivers and installs fresh, quality car batteries anywhere in Cape Coral, FL — usually the same day.",
-    paragraphs: [
-      "Florida heat is brutal on car batteries. Most last only 2–3 years here before they start failing. When yours finally gives up, you don't need to ride along with a friend to the parts store and wrestle with corroded terminals — we bring the new battery to you, test the charging system to make sure it's not actually an alternator issue, and install everything cleanly.",
-      "We carry batteries for cars, trucks, SUVs, and most light commercial vehicles, and we'll match the right group size, cold-cranking amps, and warranty for your specific vehicle. After installation we reset terminals, clean any corrosion, and verify proper charging voltage before we leave.",
-      "We cover every Cape Coral ZIP — 33904, 33909, 33914, 33990, 33991, 33993 — from South Cape and Cape Harbour to Sandoval, Pelican, and up by Burnt Store Road. Need a battery right now? Call or text (813) 501-7572.",
-    ],
-    included: [
-      "Free battery and charging-system test",
-      "Quality replacement battery delivered to you",
-      "Professional installation with terminal cleaning",
-      "Old battery hauled away for recycling",
-      "Post-install charging verification",
-      "Battery warranty options up to 36 months",
-    ],
-    faqs: [
-      {
-        q: "How much does a mobile battery replacement cost in Cape Coral?",
-        a: "Most installed mobile battery replacements in Cape Coral run $180–$320 depending on group size and warranty. Premium AGM batteries cost more.",
-      },
-      {
-        q: "How fast can you get to me?",
-        a: "Same-day service is usually available across Cape Coral. For dead-battery emergencies we prioritize the call. Phone or text (813) 501-7572.",
-      },
-      {
-        q: "What if it's not the battery?",
-        a: "We test the charging system before replacing anything. If your alternator is the real culprit we'll tell you up front and quote that repair instead.",
-      },
-      {
-        q: "Do you take the old battery?",
-        a: "Yes — we haul away and properly recycle your old battery at no extra charge.",
       },
     ],
   },
@@ -490,36 +448,6 @@ export const localLandingPages: LocalLandingPage[] = [
       { q: "Same-day service?", a: "Almost always for in-stock work. Special-order parts may push to next day." },
     ],
   },
-  {
-    slug: "mobile-mechanic-cape-coral",
-    service: "Mobile Mechanic",
-    citySlug: "cape-coral",
-    categoryId: "engine",
-    h1: "Mobile Mechanic in Cape Coral, FL",
-    metaTitle: "Mobile Mechanic in Cape Coral, FL | Mike's Mobile Auto Repair",
-    metaDescription:
-      "On-call mobile mechanic in Cape Coral, FL. Diagnostics, brakes, batteries, alternators, and AC — at your home. Call (813) 501-7572.",
-    intro:
-      "Mike's Mobile Auto Repair is your trusted mobile mechanic in Cape Coral, FL — bringing professional diagnostics, quality parts, and honest pricing right to your driveway anywhere from South Cape to Burnt Store.",
-    paragraphs: [
-      "Cape Coral's sprawling layout means a simple shop visit can chew up half a day in traffic. We solve that. Skip the tow truck and the rideshare and let our mobile service truck come to you.",
-      "We cover every Cape Coral ZIP including 33904, 33909, 33914, 33990, 33991, and 33993. Common jobs: brakes, batteries, alternators, starters, AC, and full computer diagnostics.",
-      "Need a mobile mechanic in Cape Coral? Call or text (813) 501-7572.",
-    ],
-    included: [
-      "Mobile diagnostics with full code retrieval",
-      "Brake repair and replacement on site",
-      "Battery delivery and installation",
-      "Alternator and starter replacement",
-      "AC recharge and electrical work",
-          ],
-    faqs: [
-      { q: "Do you serve all of Cape Coral?", a: "Yes — every Cape Coral ZIP and the surrounding Lee County area." },
-      { q: "How long does a brake job take?", a: "Typically 60–90 minutes per axle on site." },
-      { q: "Can you replace a battery in my driveway?", a: "Absolutely — usually under 30 minutes including a free charging-system test." },
-      { q: "What hours do you work?", a: "Standard hours 7am–9pm, plus evening and weekend coverage." },
-    ],
-  },
   // ===== Short-slug SEO landing pages (region-wide service) =====
   {
     slug: "alternator-repair",
@@ -843,39 +771,6 @@ export const localLandingPages: LocalLandingPage[] = [
       { q: "What if it's something you can't fix on site?", a: "We give you a transparent written quote and, if needed, coordinate towing. We never push unnecessary repairs." },
     ],
   },
-  // ===== New SEO pages: Naples city + short-slug services =====
-  {
-    slug: "mobile-mechanic-naples",
-    service: "Mobile Mechanic",
-    citySlug: "naples",
-    categoryId: "engine",
-    h1: "Mobile Mechanic in Naples, FL",
-    metaTitle: "Mobile Mechanic in Naples, FL | Mike's Mobile Auto Repair",
-    metaDescription:
-      "Trusted mobile mechanic in Naples, FL. On-site diagnostics, brakes, batteries, alternators, and AC. Same-day service. Call (813) 501-7572.",
-    intro:
-      "Looking for a reliable mobile mechanic in Naples, FL? Mike's Mobile Auto Repair brings ASE-level service to driveways and offices across Naples and Collier County — no tow, no shop wait.",
-    paragraphs: [
-      "Naples drivers shouldn't have to lose a workday — or a beach day — sitting in a shop waiting room. Our mobile service truck rolls right to you with diagnostic scanners, common parts, and the experience to handle most repairs in a single visit. From Old Naples and Aqualane Shores to Pelican Bay, North Naples, Vineyards, and Golden Gate, we cover the entire metro area.",
-      "Common Naples calls include AC recharges and compressor work (Florida heat is unforgiving), battery and alternator replacements, brake jobs, starter swaps, full check-engine-light diagnostics, and routine maintenance. We service every Naples ZIP including 34102, 34103, 34104, 34105, 34108, 34109, 34110, 34112, 34113, 34114, 34116, 34117, and 34119.",
-      "Pricing is quoted up front — no surprise fees and no upselling. A real technician answers the phone. Same-day appointments are usually available across Naples. Call or text (813) 501-7572 to book.",
-    ],
-    included: [
-      "On-site diagnostics with professional OBD-II scanners",
-      "Brake pad, rotor, and caliper replacement",
-      "Battery, alternator, and starter replacement",
-      "AC recharge and electrical system repairs",
-      "Mobile oil changes and routine maintenance",
-      "No-start and check-engine-light diagnostics",
-      "Light fleet maintenance for Naples businesses",
-    ],
-    faqs: [
-      { q: "Do you really come anywhere in Naples?", a: "Yes — every Naples ZIP from Old Naples to North Naples and out to Golden Gate Estates. We also cover the rest of Collier County." },
-      { q: "What does a service call cost?", a: "There's no separate trip fee inside our regular Naples service area. You only pay for the diagnostic and any repair, quoted up front." },
-      { q: "How fast can you come?", a: "Same-day appointments are usually available across Naples." },
-      { q: "Can you handle AC repairs in my driveway?", a: "Yes — AC recharges and many compressor and condenser jobs are routinely completed on site." },
-    ],
-  },
   {
     slug: "oil-change",
     service: "Mobile Oil Change",
@@ -974,6 +869,10 @@ export const localLandingPages: LocalLandingPage[] = [
     ],
   },
 ];
+
+export const localLandingPages: LocalLandingPage[] = _allLocalLandingPages.filter(
+  (p) => !p.citySlug || ALLOWED_CITY_SLUGS.has(p.citySlug)
+);
 
 export const getLandingPageBySlug = (slug: string) =>
   localLandingPages.find((p) => p.slug === slug);
