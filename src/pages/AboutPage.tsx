@@ -12,6 +12,10 @@ const AboutPage = () => {
     description:
       "Mike's Mobile Auto Repair LLC — honest, on-site mobile mechanic serving Lehigh Acres and Fort Myers.",
     canonical: "https://mikesmautorepair.com/about",
+    breadcrumbs: [
+      { name: "Home", url: "https://mikesmautorepair.com/" },
+      { name: "About", url: "https://mikesmautorepair.com/about" },
+    ],
   });
 
   return (

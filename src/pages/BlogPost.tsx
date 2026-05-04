@@ -72,6 +72,13 @@ const BlogPost = () => {
     description: post?.excerpt,
     canonical: post ? `${SITE}/blog/${post.slug}` : undefined,
     jsonLd,
+    breadcrumbs: post
+      ? [
+          { name: "Home", url: `${SITE}/` },
+          { name: "Blog", url: `${SITE}/blog` },
+          { name: post.title, url: `${SITE}/blog/${post.slug}` },
+        ]
+      : undefined,
   });
 
   const idx = post ? blogPosts.findIndex((p) => p.slug === post.slug) : -1;

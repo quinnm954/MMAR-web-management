@@ -28,6 +28,13 @@ const LocalLanding = () => {
     title: page?.metaTitle ?? "Page Not Found",
     description: page?.metaDescription,
     canonical: page ? (page.canonical ?? `${SITE}/${page.slug}`) : undefined,
+    breadcrumbs: page
+      ? [
+          { name: "Home", url: `${SITE}/` },
+          { name: "Services", url: `${SITE}/services` },
+          { name: page.service, url: page.canonical ?? `${SITE}/${page.slug}` },
+        ]
+      : undefined,
   });
 
   useEffect(() => {
