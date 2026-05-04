@@ -544,6 +544,18 @@ const FinancingContract = () => {
                   />
                 </div>
                 <div>
+                  <Label htmlFor="partsPrice">Parts Cost ($) *</Label>
+                  <Input
+                    id="partsPrice"
+                    value={formData.partsPrice}
+                    onChange={(e) => handleInputChange("partsPrice", e.target.value)}
+                    placeholder="e.g., 400.00"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Parts are paid 100% upfront; labor down is 50%.
+                  </p>
+                </div>
+                <div>
                   <Label htmlFor="firstPaymentDate">First Payment Due Date *</Label>
                   <Input
                     id="firstPaymentDate"
