@@ -16,7 +16,9 @@ export type LocalLandingPage = {
   faqs: FAQ[];
 };
 
-export const localLandingPages: LocalLandingPage[] = [
+const ALLOWED_CITY_SLUGS = new Set(["lehigh-acres", "fort-myers"]);
+
+const _allLocalLandingPages: LocalLandingPage[] = [
   {
     slug: "mobile-brake-repair-lehigh-acres",
     service: "Mobile Brake Repair",
