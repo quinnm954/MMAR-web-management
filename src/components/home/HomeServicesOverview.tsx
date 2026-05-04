@@ -8,7 +8,7 @@ const HomeServicesOverview = () => {
           <div className="text-center mb-10 md:mb-12">
             <h2 className="font-display text-3xl sm:text-4xl md:text-5xl tracking-wide mb-3">
               <span className="text-sky">MOBILE AUTO REPAIR</span>{" "}
-              <span className="text-gold">IN SOUTHWEST FLORIDA</span>
+              <span className="text-gold">LEHIGH ACRES &amp; FORT MYERS</span>
             </h2>
             <p className="text-base md:text-lg text-muted-foreground">
               Honest, on-site auto repair across Lehigh Acres and Fort Myers.
