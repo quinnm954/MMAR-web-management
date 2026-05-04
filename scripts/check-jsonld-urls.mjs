@@ -78,58 +78,62 @@ function collectUrls(node, path, out) {
   }
 }
 
-// Pull out the "self URL" claims in this JSON-LD doc:
+// Pull out the "self URL" claims from TOP-LEVEL nodes only:
 //   - any node's `url`
 //   - mainEntityOfPage (string or { "@id": ... })
 //   - the LAST BreadcrumbList item.item
+// Nested entities (Blog.blogPost[*], Organization.logo, etc.) are skipped —
+// they legitimately point to other URLs.
+const SELF_TYPES = new Set([
+  "Article",
+  "NewsArticle",
+  "BlogPosting",
+  "Service",
+  "WebPage",
+  "BreadcrumbList",
+]);
+
 function collectSelfUrls(doc, out) {
-  const visit = (node) => {
-    if (!node || typeof node !== "object") return;
-    if (Array.isArray(node)) {
-      node.forEach(visit);
-      return;
-    }
+  const topLevel = [];
+  if (Array.isArray(doc)) topLevel.push(...doc);
+  else if (doc && typeof doc === "object") {
+    if (Array.isArray(doc["@graph"])) topLevel.push(...doc["@graph"]);
+    else topLevel.push(doc);
+  }
+
+  for (const node of topLevel) {
+    if (!node || typeof node !== "object") continue;
     const types = node["@type"]
       ? Array.isArray(node["@type"])
         ? node["@type"]
         : [node["@type"]]
       : [];
+    const isSelfType = types.some((t) => SELF_TYPES.has(t));
 
-    if (
-      typeof node.url === "string" &&
-      ABS.test(node.url) &&
-      // Skip the AutoRepair business node — its `url` is the homepage.
-      !types.some((t) =>
-        ["AutoRepair", "LocalBusiness", "AutomotiveBusiness", "Organization", "WebSite", "Blog"].includes(t)
-      )
-    ) {
-      out.push({ url: node.url, path: `${types[0] || "node"}.url` });
+    if (isSelfType && typeof node.url === "string" && ABS.test(node.url)) {
+      out.push({ url: node.url, path: `${types[0]}.url` });
     }
-
-    if (node.mainEntityOfPage) {
+    if (isSelfType && node.mainEntityOfPage) {
       const u =
         typeof node.mainEntityOfPage === "string"
           ? node.mainEntityOfPage
           : node.mainEntityOfPage["@id"];
       if (typeof u === "string" && ABS.test(u))
-        out.push({ url: u, path: `${types[0] || "node"}.mainEntityOfPage` });
+        out.push({ url: u, path: `${types[0]}.mainEntityOfPage` });
     }
-
-    if (types.includes("BreadcrumbList") && Array.isArray(node.itemListElement)) {
+    if (
+      types.includes("BreadcrumbList") &&
+      Array.isArray(node.itemListElement)
+    ) {
       const last = node.itemListElement[node.itemListElement.length - 1];
       if (last) {
-        const u = typeof last.item === "string" ? last.item : last.item?.["@id"];
+        const u =
+          typeof last.item === "string" ? last.item : last.item?.["@id"];
         if (typeof u === "string" && ABS.test(u))
           out.push({ url: u, path: "BreadcrumbList.lastItem" });
       }
     }
-
-    if (Array.isArray(node["@graph"])) node["@graph"].forEach(visit);
-    for (const v of Object.values(node)) {
-      if (v && typeof v === "object") visit(v);
-    }
-  };
-  visit(doc);
+  }
 }
 
 // Normalize: strip trailing slash (except root), strip query/hash for path
