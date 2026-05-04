@@ -4,10 +4,6 @@ import { MapPin, ArrowRight } from "lucide-react";
 const cities = [
   { slug: "lehigh-acres", name: "Lehigh Acres" },
   { slug: "fort-myers", name: "Fort Myers" },
-  { slug: "cape-coral", name: "Cape Coral" },
-  { slug: "estero", name: "Estero" },
-  { slug: "bonita-springs", name: "Bonita Springs" },
-  { slug: "naples", name: "Naples" },
 ];
 
 const ServiceAreasPreview = () => {
