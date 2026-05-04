@@ -112,7 +112,7 @@ export const blogPosts: BlogPost[] = [
       <p>If the car runs but slowly dies, or starts after a jump and won't restart later, that's an <a href="/blog/signs-of-a-bad-alternator">alternator problem</a>, not a starter or battery one.</p>
 
       <h2>Don't guess — test</h2>
-      <p>A real charging-system test takes 5 minutes and saves you from buying the wrong part. Our mobile mechanics test the battery, alternator, and starter circuit on site before recommending any repair. Get help anywhere in SWFL at <a href="tel:8135017572">(813) 501-7572</a> or learn more about <a href="/mobile-battery-replacement-cape-coral">mobile battery replacement</a>.</p>
+      <p>A real charging-system test takes 5 minutes and saves you from buying the wrong part. Our mobile mechanics test the battery, alternator, and starter circuit on site before recommending any repair. Get help anywhere in SWFL at <a href="tel:8135017572">(813) 501-7572</a> or learn more about <a href="/mobile-battery-replacement">mobile battery replacement</a>.</p>
     `,
     faqs: [
       { question: "How can I tell if it's the battery or the starter?", answer: "Dim dash lights and slow cranking point to the battery. Bright dash lights with a single loud click and no crank point to the starter. A 5-minute on-site test confirms which one it is." },
@@ -388,7 +388,7 @@ export const blogPosts: BlogPost[] = [
     readMinutes: 6,
     tags: ["AC", "Maintenance", "Pricing"],
     body: `
-      <p>Ask any mobile mechanic in <a href="/areas/cape-coral">Cape Coral</a>, <a href="/areas/naples">Naples</a>, or <a href="/areas/lehigh-acres">Lehigh Acres</a> what call comes in most between April and October and you'll get the same answer: <strong>weak AC</strong>. Florida cars need AC service on a roughly 2-year cycle, and skipping it doesn't just leave you sweaty — it destroys the most expensive part of the system.</p>
+      <p>Ask any mobile mechanic in <a href="/areas/lehigh-acres">Lehigh Acres</a> or <a href="/areas/fort-myers">Fort Myers</a> what call comes in most between April and October and you'll get the same answer: <strong>weak AC</strong>. Florida cars need AC service on a roughly 2-year cycle, and skipping it doesn't just leave you sweaty — it destroys the most expensive part of the system.</p>
 
       <h2>Why Florida AC systems lose refrigerant faster</h2>
       <p>Every car AC system leaks a tiny amount of refrigerant — that's normal. In a dry, cool climate, that loss is so slow you'll never notice it for the life of the car. In Florida, three things make it dramatically worse:</p>
