@@ -121,6 +121,9 @@ export const cities: City[] = [
       "We also service local businesses with fleet maintenance — keep your vans, trucks, and work vehicles on the road without the downtime of shop visits. Call or text (813) 501-7572 for a fast, transparent quote anywhere in Fort Myers.",
     ],
   },
+];
+
+const _removedCities_unused = [
   {
     slug: "cape-coral",
     name: "Cape Coral",
