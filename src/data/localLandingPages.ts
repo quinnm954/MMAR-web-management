@@ -219,7 +219,7 @@ const _allLocalLandingPages: LocalLandingPage[] = [
       "If you turn the key and just hear a click — or nothing at all — your starter has likely failed. Mike's Mobile Auto Repair replaces starters on site across Lehigh Acres and Fort Myers, no tow required.",
     paragraphs: [
       "A failing starter usually announces itself: single loud click with full dash lights, intermittent no-start that gets worse over a couple of weeks, or grinding noises during cranking. We test the starter circuit and battery before condemning the part, then install a quality replacement on site.",
-      "Most starter replacements take 60 to 120 minutes depending on the vehicle. We carry starters for many common models and source same-day for most others. Service is available across all Lehigh Acres and Fort Myers — Lehigh Acres and Fort Myers.",
+      "Most starter replacements take 60 to 120 minutes depending on the vehicle. We carry starters for many common models and source same-day for most others. Service is available across Lehigh Acres and Fort Myers.",
       "Stuck and can't get the car going? Call or text (813) 501-7572. Real technician answers, not a call center.",
     ],
     included: [
