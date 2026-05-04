@@ -25,7 +25,7 @@ export const blogPosts: BlogPost[] = [
       <p>If you've lived in Southwest Florida for more than a summer, you already know what 95°F at 90% humidity does to a car. Cooling systems work harder here than almost anywhere else in the country, and when something inside that system starts to fail, you find out about it fast — usually in stop-and-go traffic on US-41 or I-75 with the temperature gauge climbing.</p>
 
       <h2>The most common reasons cars overheat in Florida</h2>
-      <p>Almost every overheating call we take in <a href="/areas/lehigh-acres">Lehigh Acres</a>, <a href="/areas/fort-myers">Fort Myers</a>, and <a href="/areas/cape-coral">Cape Coral</a> traces back to one of these:</p>
+      <p>Almost every overheating call we take in <a href="/areas/lehigh-acres">Lehigh Acres</a>, <a href="/areas/fort-myers">Fort Myers</a> traces back to one of these:</p>
       <ul>
         <li><strong>Low coolant.</strong> Either you're due for a flush or there's a leak somewhere — radiator, water pump, hose, or a failing intake gasket.</li>
         <li><strong>Bad thermostat.</strong> Stuck closed and the engine can't shed heat. Stuck open and it never reaches operating temperature, which is also bad.</li>
@@ -69,7 +69,7 @@ export const blogPosts: BlogPost[] = [
       </ol>
 
       <h2>Battery vs alternator — which is it?</h2>
-      <p>Both can produce the same symptoms. We always test both before condemning a part. If you're in <a href="/areas/fort-myers">Fort Myers</a>, <a href="/areas/cape-coral">Cape Coral</a>, or anywhere across SWFL, our <a href="/mobile-alternator-repair-fort-myers">mobile alternator repair</a> service includes a full charging-system test on site so you only pay for what you actually need.</p>
+      <p>Both can produce the same symptoms. We always test both before condemning a part. If you're in <a href="/areas/fort-myers">Fort Myers</a>, or anywhere across SWFL, our <a href="/mobile-alternator-repair-fort-myers">mobile alternator repair</a> service includes a full charging-system test on site so you only pay for what you actually need.</p>
 
       <p>Stuck right now? Call <a href="tel:8135017572">(813) 501-7572</a> — same-day mobile service is usually available.</p>
     `,
@@ -170,7 +170,7 @@ export const blogPosts: BlogPost[] = [
     readMinutes: 6,
     tags: ["Maintenance", "Local"],
     body: `
-      <p>Cars in Southwest Florida live a tougher life than most people realize. Year-round heat, season-long humidity, salt air on the coast, and the daily creep of season traffic all conspire against the average vehicle. After thousands of mobile service calls across <a href="/areas/lehigh-acres">Lehigh Acres</a>, <a href="/areas/fort-myers">Fort Myers</a>, <a href="/areas/cape-coral">Cape Coral</a>, and beyond, the same six problems keep coming up.</p>
+      <p>Cars in Southwest Florida live a tougher life than most people realize. Year-round heat, season-long humidity, salt air on the coast, and the daily creep of season traffic all conspire against the average vehicle. After thousands of mobile service calls across <a href="/areas/lehigh-acres">Lehigh Acres</a>, <a href="/areas/fort-myers">Fort Myers</a>, and beyond, the same six problems keep coming up.</p>
 
       <h2>1. Dead batteries (way earlier than expected)</h2>
       <p>Most batteries are rated for 4–5 years. In SWFL, plan on 2–3. Heat boils off the electrolyte and accelerates internal corrosion. Get yours load-tested every visit.</p>
@@ -292,7 +292,7 @@ export const blogPosts: BlogPost[] = [
     readMinutes: 7,
     tags: ["Diagnostics", "Maintenance", "Local"],
     body: `
-      <p>The Chevy Cruze (2011–2019, both gen 1 and gen 2) is everywhere in Southwest Florida. They're cheap to buy used, they get great gas mileage, and they hold up reasonably well — but they have a list of repeat problems that show up over and over on our mobile service calls in <a href="/areas/lehigh-acres">Lehigh Acres</a>, <a href="/areas/fort-myers">Fort Myers</a>, and <a href="/areas/cape-coral">Cape Coral</a>. If you own one or are about to buy one, here's what to expect.</p>
+      <p>The Chevy Cruze (2011–2019, both gen 1 and gen 2) is everywhere in Southwest Florida. They're cheap to buy used, they get great gas mileage, and they hold up reasonably well — but they have a list of repeat problems that show up over and over on our mobile service calls in <a href="/areas/lehigh-acres">Lehigh Acres</a>, <a href="/areas/fort-myers">Fort Myers</a>. If you own one or are about to buy one, here's what to expect.</p>
 
       <h2>1. Coolant leaks (water pump and thermostat housing)</h2>
       <p>This is the number-one Cruze problem we see. The plastic thermostat housing cracks. The water pump weep hole starts dripping. The coolant reservoir cap goes bad. The result: you keep adding coolant, you eventually overheat, and if you ignore it long enough you crack a head gasket. The fix is preventative — replace the thermostat housing, water pump, and reservoir cap together around 80,000–100,000 miles. We do this entire job on site.</p>
@@ -341,7 +341,7 @@ export const blogPosts: BlogPost[] = [
       <p>This is why every battery you buy in Florida should be rated for high heat (look for "Heavy Duty" or AGM construction) and why the cheap "house brand" battery from a discount auto-parts store almost never makes it past the warranty period.</p>
 
       <h2>Real 2026 prices for a battery replacement in SWFL</h2>
-      <p>Here's what you can actually expect to pay in <a href="/areas/lehigh-acres">Lehigh Acres</a>, <a href="/areas/fort-myers">Fort Myers</a>, <a href="/areas/cape-coral">Cape Coral</a>, and <a href="/areas/naples">Naples</a> in 2026, all-in (battery + labor + tax + recycling fee):</p>
+      <p>Here's what you can actually expect to pay in <a href="/areas/lehigh-acres">Lehigh Acres</a>, <a href="/areas/fort-myers">Fort Myers</a> in 2026, all-in (battery + labor + tax + recycling fee):</p>
       <ul>
         <li><strong>Standard flooded lead-acid (most sedans):</strong> $185 – $245 mobile, installed</li>
         <li><strong>Premium high-heat or AGM (newer cars with start/stop):</strong> $245 – $345 mobile, installed</li>
