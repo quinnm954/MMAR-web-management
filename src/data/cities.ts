@@ -252,6 +252,8 @@ const _removedCities_unused = [
     ],
   },
 ];
+void _removedCities_unused;
+
 
 // Attach defaults (pricing + FAQs) without bloating the literals above.
 for (const c of cities) {
