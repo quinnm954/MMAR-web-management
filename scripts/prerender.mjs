@@ -179,16 +179,16 @@ push({
 // City pages
 for (const city of DATA.cities) {
   const url = `${SITE}/areas/${city.slug}`;
+  // NOTE: The AutoRepair business entity (with aggregateRating, hours,
+  // address, sameAs) is declared once in index.html. Do NOT redeclare it
+  // per city — Google merges duplicate business nodes by name/URL and
+  // rejects "multiple aggregate ratings". Each city page only contributes
+  // a Place + BreadcrumbList (+ optional FAQ).
   const blocks = [
     {
       "@context": "https://schema.org",
-      "@type": "AutoRepair",
-      "@id": `${url}#business`,
-      name: `Mike's Mobile Auto Repair — ${city.name}`,
-      image: LOGO,
-      url,
-      telephone: "+18135017572",
-      priceRange: "$$",
+      "@type": "Place",
+      name: `${city.name}, ${city.state}`,
       address: {
         "@type": "PostalAddress",
         addressLocality: city.name,
@@ -201,23 +201,6 @@ for (const city of DATA.cities) {
         latitude: city.geo.lat,
         longitude: city.geo.lng,
       },
-      areaServed: { "@type": "City", name: `${city.name}, ${city.state}` },
-      openingHoursSpecification: [
-        {
-          "@type": "OpeningHoursSpecification",
-          dayOfWeek: [
-            "Monday",
-            "Tuesday",
-            "Wednesday",
-            "Thursday",
-            "Friday",
-            "Saturday",
-            "Sunday",
-          ],
-          opens: "08:00",
-          closes: "19:00",
-        },
-      ],
     },
     breadcrumb([
       { name: "Home", item: `${SITE}/` },
