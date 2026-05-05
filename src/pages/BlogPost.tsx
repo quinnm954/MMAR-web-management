@@ -7,6 +7,7 @@ import RequestQuoteCTA from "@/components/RequestQuoteCTA";
 import InlineCallStrip from "@/components/InlineCallStrip";
 import { getBlogPostBySlug, blogPosts } from "@/data/blogPosts";
 import { useSeo } from "@/lib/useSeo";
+import BlogComments from "@/components/blog/BlogComments";
 import NotFound from "./NotFound";
 
 const SITE = "https://mikesmautorepair.com";
