@@ -150,6 +150,27 @@ const Blog = () => {
             mobile mechanic services — or just call <a href="tel:8135017572" className="text-primary hover:underline">(813) 501-7572</a>.
           </p>
 
+          {/* Featured external article */}
+          <div className="mb-8 glass-card rounded-xl p-5 md:p-6 border border-primary/40 bg-primary/5">
+            <div className="flex items-center gap-2 mb-2 text-xs uppercase tracking-widest text-gold">
+              <Tag className="w-4 h-4" /> Featured Article
+            </div>
+            <h2 className="font-display text-lg md:text-2xl text-foreground mb-2">
+              How Florida Drivers Can Prevent Roadside Breakdowns
+            </h2>
+            <p className="text-muted-foreground text-sm md:text-base mb-3">
+              Practical heat, battery, and tire tips from our team — published on Medium.
+            </p>
+            <a
+              href="https://medium.com/@quinnm954/how-florida-drivers-can-prevent-roadside-breakdowns-58c5ea9a452b"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 text-primary text-sm font-semibold hover:underline"
+            >
+              Read on Medium <ArrowRight className="w-4 h-4" />
+            </a>
+          </div>
+
           {/* Tag cloud */}
           <div className="mb-8">
             <div className="flex items-center gap-2 mb-3 text-muted-foreground">
