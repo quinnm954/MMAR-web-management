@@ -5,14 +5,14 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "node scripts/check-forbidden-terms.mjs && node scripts/generate-sitemap.mjs && vite build && bun scripts/dump-seo-data.ts && node scripts/prerender.mjs && node scripts/validate-jsonld.mjs && node scripts/check-jsonld-urls.mjs",
-    "build:dev": "node scripts/check-forbidden-terms.mjs && node scripts/generate-sitemap.mjs && vite build --mode development && bun scripts/dump-seo-data.ts && node scripts/prerender.mjs && node scripts/validate-jsonld.mjs && node scripts/check-jsonld-urls.mjs",
+    "build": "node scripts/check-forbidden-terms.mjs && node scripts/generate-sitemap.mjs && vite build && bun scripts/dump-seo-data.ts && node scripts/prerender.mjs && node scripts/validate-jsonld.mjs && node scripts/check-jsonld-urls.mjs && node scripts/check-home-links.mjs",
+    "build:dev": "node scripts/check-forbidden-terms.mjs && node scripts/generate-sitemap.mjs && vite build --mode development && bun scripts/dump-seo-data.ts && node scripts/prerender.mjs && node scripts/validate-jsonld.mjs && node scripts/check-jsonld-urls.mjs && node scripts/check-home-links.mjs",
     "lint": "eslint .",
     "check:forbidden": "node scripts/check-forbidden-terms.mjs",
     "generate:sitemap": "node scripts/generate-sitemap.mjs",
     "validate:jsonld": "node scripts/validate-jsonld.mjs",
     "coverage:jsonld": "node scripts/jsonld-coverage.mjs",
-    "check:jsonld-urls": "node scripts/check-jsonld-urls.mjs",
+    "check:jsonld-urls": "node scripts/check-jsonld-urls.mjs && node scripts/check-home-links.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
