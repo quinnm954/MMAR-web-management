@@ -190,7 +190,9 @@ const BlogPost = () => {
             ) : null}
           </nav>
 
-          <div className="border-t border-border pt-8">
+          <BlogComments postSlug={post.slug} />
+
+          <div className="border-t border-border pt-8 mt-10">
             <h2 className="font-display text-xl md:text-2xl text-sky mb-4">
               Keep reading
             </h2>
