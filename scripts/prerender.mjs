@@ -119,6 +119,16 @@ push({
         {
           "@type": "AutoRepair",
           "@id": `${SITE}/#business`,
+          name: "Mike's Mobile Auto Repair LLC",
+          telephone: "+18135017572",
+          url: `${SITE}/`,
+          address: {
+            "@type": "PostalAddress",
+            addressLocality: "Lehigh Acres",
+            addressRegion: "FL",
+            postalCode: "33936",
+            addressCountry: "US",
+          },
           areaServed: [
             {
               "@type": "GeoCircle",
