@@ -78,17 +78,100 @@ const routes = [];
 const push = (r) => routes.push(r);
 
 // Home
+const HOME_SERVICES = [
+  "Mobile Auto Repair",
+  "Brake Repair",
+  "Battery Replacement",
+  "Alternator Repair",
+  "Vehicle Diagnostics",
+  "Check Engine Light Diagnostics",
+  "Oil Change",
+  "AC Repair",
+  "Cooling System Repair",
+  "Starter Replacement",
+  "No-Start Diagnostics",
+  "Pre-Purchase Inspection",
+];
+const HOME_CITIES = [
+  { name: "Lehigh Acres", state: "FL", lat: 26.6121, lng: -81.6237 },
+  { name: "Fort Myers", state: "FL", lat: 26.6406, lng: -81.8723 },
+  { name: "Cape Coral", state: "FL", lat: 26.5629, lng: -81.9495 },
+  { name: "Naples", state: "FL", lat: 26.1420, lng: -81.7948 },
+  { name: "Estero", state: "FL", lat: 26.4384, lng: -81.8068 },
+  { name: "Bonita Springs", state: "FL", lat: 26.3398, lng: -81.7787 },
+];
 push({
   path: "/",
   title:
-    "Mobile Mechanic in Lehigh Acres & Fort Myers, FL | Mike's Mobile Auto Repair",
+    "Auto Repair Near Me | Mobile Auto Repair in Lehigh Acres, Fort Myers, Cape Coral, Naples, Estero & Bonita Springs FL",
   description:
-    "On-site auto repair, diagnostics, and mobile mechanic service in Lehigh Acres and Fort Myers, FL. Call (813) 501-7572.",
+    "Auto repair near me in Lehigh Acres, Fort Myers, Cape Coral, Naples, Estero & Bonita Springs, FL. Mobile mechanic comes to you — diagnostics, brakes, batteries, oil changes. Call (813) 501-7572.",
   canonical: `${SITE}/`,
-  // Home already has AutoRepair JSON-LD baked into index.html, plus a HomeFAQ
-  // injected at runtime; we add a Home BreadcrumbList for completeness.
+  // The AutoRepair business entity (with aggregateRating, hours, address,
+  // sameAs) is declared once in index.html under @id #business. Here we
+  // augment that node with a GeoCircle service area, an OfferCatalog of
+  // services, per-city Service nodes, and a BreadcrumbList — all referencing
+  // the canonical business via @id to avoid duplicate entities.
   jsonLd: [
-    breadcrumb([{ name: "Home", item: `${SITE}/` }]),
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "AutoRepair",
+          "@id": `${SITE}/#business`,
+          areaServed: [
+            {
+              "@type": "GeoCircle",
+              geoMidpoint: {
+                "@type": "GeoCoordinates",
+                latitude: 26.6121,
+                longitude: -81.6237,
+              },
+              geoRadius: 50000,
+            },
+            ...HOME_CITIES.map((c) => ({
+              "@type": "City",
+              name: `${c.name}, ${c.state}`,
+              geo: {
+                "@type": "GeoCoordinates",
+                latitude: c.lat,
+                longitude: c.lng,
+              },
+            })),
+          ],
+          hasOfferCatalog: {
+            "@type": "OfferCatalog",
+            name: "Mobile Auto Repair Services",
+            itemListElement: HOME_SERVICES.map((s) => ({
+              "@type": "Offer",
+              itemOffered: { "@type": "Service", name: s },
+            })),
+          },
+        },
+        ...HOME_CITIES.map((c) => ({
+          "@type": "Service",
+          name: `Auto Repair in ${c.name}, ${c.state}`,
+          serviceType: "Mobile Auto Repair",
+          provider: businessRef,
+          areaServed: {
+            "@type": "City",
+            name: `${c.name}, ${c.state}`,
+            geo: {
+              "@type": "GeoCoordinates",
+              latitude: c.lat,
+              longitude: c.lng,
+            },
+          },
+          url: `${SITE}/`,
+        })),
+        {
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            { "@type": "ListItem", position: 1, name: "Home", item: `${SITE}/` },
+          ],
+        },
+      ],
+    },
   ],
 });
 
