@@ -7,6 +7,7 @@ import RequestQuoteCTA from "@/components/RequestQuoteCTA";
 import InlineCallStrip from "@/components/InlineCallStrip";
 import { getBlogPostBySlug, blogPosts } from "@/data/blogPosts";
 import { useSeo } from "@/lib/useSeo";
+import BlogComments from "@/components/blog/BlogComments";
 import NotFound from "./NotFound";
 
 const SITE = "https://mikesmautorepair.com";
@@ -189,7 +190,9 @@ const BlogPost = () => {
             ) : null}
           </nav>
 
-          <div className="border-t border-border pt-8">
+          <BlogComments postSlug={post.slug} />
+
+          <div className="border-t border-border pt-8 mt-10">
             <h2 className="font-display text-xl md:text-2xl text-sky mb-4">
               Keep reading
             </h2>

@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      blog_comments: {
+        Row: {
+          author_email: string
+          author_name: string
+          content: string
+          created_at: string
+          id: string
+          is_approved: boolean
+          post_slug: string
+        }
+        Insert: {
+          author_email: string
+          author_name: string
+          content: string
+          created_at?: string
+          id?: string
+          is_approved?: boolean
+          post_slug: string
+        }
+        Update: {
+          author_email?: string
+          author_name?: string
+          content?: string
+          created_at?: string
+          id?: string
+          is_approved?: boolean
+          post_slug?: string
+        }
+        Relationships: []
+      }
       financing_contracts: {
         Row: {
           agreement_date: string
