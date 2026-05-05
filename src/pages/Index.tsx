@@ -135,6 +135,7 @@ const Index = () => {
       <TestimonialsPreview />
       <WhyChooseUs />
       <HomeServicesOverview />
+      <PopularLocalServices />
       <LocalPhotoGallery />
       <HomeFAQ />
       <FinalCTA />
