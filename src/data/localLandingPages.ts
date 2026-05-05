@@ -1012,6 +1012,205 @@ const _allLocalLandingPages: LocalLandingPage[] = [
       { q: "Do you cover all of Fort Myers?", a: "Yes — every Fort Myers ZIP plus surrounding cities across Lee County." },
     ],
   },
+  // ===== Additional service-specific "-fl" SEO landing pages =====
+  {
+    slug: "battery-replacement-lehigh-acres-fl",
+    service: "Battery Replacement",
+    citySlug: "lehigh-acres",
+    categoryId: "electrical",
+    h1: "Mobile Battery Replacement in Lehigh Acres, FL",
+    metaTitle: "Battery Replacement in Lehigh Acres, FL | Same-Day Mobile Install",
+    metaDescription:
+      "Mobile car battery replacement in Lehigh Acres, FL. Delivered and installed in your driveway. Same-day service. Call (813) 501-7572.",
+    intro:
+      "Dead battery in Lehigh Acres, FL? Mike's Mobile Auto Repair delivers and installs a quality replacement battery at your home, workplace, or roadside anywhere in Lehigh Acres — usually within the same day.",
+    paragraphs: [
+      "Florida heat is the number-one killer of car batteries, and Lehigh Acres summers are some of the hardest in the state. Most batteries in Lehigh Acres last only 3 to 4 years before they start cranking slow, struggling on hot mornings, or dying outright. Instead of pushing your car or paying for a tow to a brick-and-mortar shop, our mobile mechanic comes to you anywhere in Lehigh Acres with the right battery on the truck.",
+      "We service every Lehigh Acres ZIP code: 33936, 33971, 33972, 33973, 33974, and 33976 — covering Lee Boulevard, Sunshine, Homestead, Gunnery, Joel, and every neighborhood in between. Before installing, we test the charging system to make sure the alternator isn't the real cause. A new battery in a Lehigh Acres driveway only fixes the problem if the alternator is actually charging it; otherwise you'll be stuck again next week.",
+      "Our typical Lehigh Acres battery service includes battery delivery, full charging-system test, terminal cleaning, voltage-drop check on the main cables, install, and proper recycling of your old battery. Most jobs take 20 to 40 minutes on site. We carry batteries for cars, light trucks, SUVs, and most work vans common in Lehigh Acres.",
+      "Pricing is quoted up front before any work — most Lehigh Acres mobile battery installs run $180 to $320 depending on group size and warranty. No trip fee inside the Lehigh Acres service area, no parts-markup games, and a real technician answers the phone. Every battery is backed by manufacturer warranty plus our mobile install warranty.",
+      "Need a jump or a same-day battery install in Lehigh Acres, FL? Call or text (813) 501-7572 and we'll be on the way. Most Lehigh Acres customers are running again the same morning or afternoon.",
+    ],
+    included: [
+      "Quality replacement battery delivered to you",
+      "Full charging-system test before install",
+      "Terminal cleaning and corrosion removal",
+      "Voltage-drop check on main cables",
+      "Old battery hauled away and recycled",
+      "Manufacturer + mobile install warranty",
+    ],
+    faqs: [
+      { q: "How much does battery replacement cost in Lehigh Acres?", a: "Most mobile battery installs in Lehigh Acres run $180–$320 depending on the group size and warranty length. Quoted up front." },
+      { q: "Same-day service in Lehigh Acres?", a: "Yes — almost every Lehigh Acres battery call is handled the same day, including evenings and weekends." },
+      { q: "Do you test the alternator too?", a: "Always. A new battery only solves the problem if the alternator in your Lehigh Acres vehicle is charging properly." },
+      { q: "What about my old battery?", a: "We haul it away and recycle it properly at no extra charge anywhere in Lehigh Acres." },
+    ],
+  },
+  {
+    slug: "battery-replacement-fort-myers-fl",
+    service: "Battery Replacement",
+    citySlug: "fort-myers",
+    categoryId: "electrical",
+    h1: "Mobile Battery Replacement in Fort Myers, FL",
+    metaTitle: "Battery Replacement in Fort Myers, FL | Same-Day Mobile Install",
+    metaDescription:
+      "Mobile car battery delivery and install in Fort Myers, FL. Tested charging system, hauled-away core, same-day service. Call (813) 501-7572.",
+    intro:
+      "Need a battery replacement in Fort Myers, FL today? Mike's Mobile Auto Repair brings the right battery to your driveway, parking lot, or roadside anywhere in Fort Myers — fully tested and installed on site.",
+    paragraphs: [
+      "Fort Myers heat is brutal on car batteries. Between long stretches in the sun on Colonial, US-41, and Daniels, plus the short trips most Fort Myers drivers do, batteries here often fail at 3 years instead of the rated 5. We see it every week — slow cranks, parasitic-draw deaths overnight, and surprise no-starts in the Edison Mall and HealthPark parking lots across Fort Myers.",
+      "Our mobile service truck rolls into every Fort Myers ZIP code — 33901, 33907, 33908, 33912, 33913, 33916, 33919, and 33966 — with quality replacement batteries on board for cars, light trucks, SUVs, and work vans. Downtown Fort Myers, McGregor, Gateway, Whiskey Creek, Iona, San Carlos Park, Page Field — same coverage, same up-front pricing, same same-day install.",
+      "Every Fort Myers battery job starts with a full charging-system test. We check battery state of health, alternator output, voltage drop on the main cables, and the ground straps. If the alternator is the real problem, you'll know before we sell you a battery. If it's just the battery, we install a quality replacement and verify a clean charge before we leave your Fort Myers driveway.",
+      "Pricing is quoted up front. Most mobile battery installs in Fort Myers run $180 to $320 depending on group size and warranty. No surprise add-ons, no shop diagnostic fee, and we haul away and recycle your old battery at no charge across all of Fort Myers.",
+      "Same-day mobile battery service in Fort Myers, FL is almost always available. Call or text (813) 501-7572 and we'll confirm a time window in minutes.",
+    ],
+    included: [
+      "Quality replacement battery for most makes/models",
+      "Full charging-system test before install",
+      "Terminal and ground cleaning",
+      "Voltage-drop testing on main cables",
+      "Old battery hauled away and recycled",
+      "Manufacturer + mobile install warranty",
+    ],
+    faqs: [
+      { q: "How much is a mobile battery install in Fort Myers?", a: "Most Fort Myers mobile battery installs run $180–$320 depending on group size and warranty length. Quoted up front." },
+      { q: "How fast can you get to me in Fort Myers?", a: "Same-day service is the norm anywhere in Fort Myers, including evenings and weekends." },
+      { q: "Will a new battery fix a no-start in Fort Myers?", a: "Often yes, but only if the alternator and starter are healthy. We test all three on every Fort Myers call." },
+      { q: "Do you cover Fort Myers fleets?", a: "Yes — light fleet and work-van battery service is a regular part of our Fort Myers route." },
+    ],
+  },
+  {
+    slug: "ac-repair-fort-myers-fl",
+    service: "AC Repair",
+    citySlug: "fort-myers",
+    categoryId: "ac",
+    h1: "Mobile AC Repair in Fort Myers, FL",
+    metaTitle: "Mobile AC Repair in Fort Myers, FL | Same-Day Recharge & Compressor Service",
+    metaDescription:
+      "Mobile auto AC repair in Fort Myers, FL. Recharges, compressor service, and leak diagnosis at your driveway. Same-day. Call (813) 501-7572.",
+    intro:
+      "Auto AC blowing warm in Fort Myers, FL? Mike's Mobile Auto Repair handles complete on-site AC service — recharges, leak detection, compressor and condenser work — at your home or office anywhere in Fort Myers.",
+    paragraphs: [
+      "There's no city in Florida where a broken AC matters more than Fort Myers. From May through October, an AC failure in Fort Myers isn't an inconvenience — it's a safety issue. Our mobile mechanic comes to you so you don't have to drive a 100° vehicle across town to a brick-and-mortar shop and sit in a waiting room for hours.",
+      "We cover every Fort Myers ZIP — 33901, 33907, 33908, 33912, 33913, 33916, 33919, and 33966 — including Downtown Fort Myers, McGregor Boulevard, Gateway, Whiskey Creek, Iona, San Carlos Park, and Page Field. Most-called AC service in Fort Myers right now: R-134a and R-1234yf recharges with proper evacuation, leak detection with UV dye and electronic sniffers, expansion-valve and orifice-tube replacement, condenser repairs after rock damage, and full compressor replacement when the clutch or internal pump fails.",
+      "Real diagnostics matter. A 'free recharge' from a parts store puts refrigerant into a leaking system — sometimes the wrong amount of the wrong refrigerant — and the AC is warm again two weeks later. We pull a vacuum, hold it to verify the system is sealed, and only then charge to spec by weight. That's how a Fort Myers AC repair actually lasts through the summer.",
+      "Pricing is up front. Most Fort Myers mobile AC recharges run $180–$280 depending on refrigerant and dye. Compressor jobs run higher and are quoted on site after diagnosis. No surprise add-ons, financing available on qualifying repairs, and a real technician answers the phone — not a call center.",
+      "Need same-day mobile AC repair in Fort Myers, FL? Call or text (813) 501-7572 and we'll be in your driveway with cold air on the way.",
+    ],
+    included: [
+      "R-134a and R-1234yf evacuation and recharge",
+      "UV dye and electronic leak detection",
+      "Expansion valve / orifice tube service",
+      "Condenser repair and replacement",
+      "Compressor and clutch replacement",
+      "Cabin air filter inspection",
+    ],
+    faqs: [
+      { q: "How much is mobile AC recharge in Fort Myers?", a: "Most Fort Myers mobile AC recharges run $180–$280 depending on refrigerant type. Compressor jobs are quoted on site." },
+      { q: "Can you really do AC work in my driveway?", a: "Yes — recharges and most leak repairs and compressor jobs are completed on site across Fort Myers." },
+      { q: "Why does my AC keep losing refrigerant?", a: "There's a leak — usually a Schrader valve, condenser, or O-ring. We find it with UV dye and electronic sniffers on every Fort Myers job." },
+      { q: "Do you offer financing in Fort Myers?", a: "Yes — financing is available on qualifying AC repairs across Fort Myers." },
+    ],
+  },
+  {
+    slug: "ac-repair-lehigh-acres-fl",
+    service: "AC Repair",
+    citySlug: "lehigh-acres",
+    categoryId: "ac",
+    h1: "Mobile AC Repair in Lehigh Acres, FL",
+    metaTitle: "Mobile AC Repair in Lehigh Acres, FL | Same-Day Recharge & Compressor Service",
+    metaDescription:
+      "Mobile auto AC repair in Lehigh Acres, FL. Recharges, leak detection, and compressor service at your driveway. Call (813) 501-7572.",
+    intro:
+      "Car AC blowing hot in Lehigh Acres, FL? Mike's Mobile Auto Repair handles full on-site AC service — recharges, leak detection, compressor and condenser work — at your driveway anywhere in Lehigh Acres.",
+    paragraphs: [
+      "An AC failure in Lehigh Acres during the summer is brutal. Long drives across Lee Boulevard, Sunshine, and Homestead in a 100° cabin are dangerous, especially with kids or older passengers in the vehicle. Our mobile mechanic service brings full AC repair to your Lehigh Acres driveway so you don't have to suffer through that drive twice — once to the shop, once back home.",
+      "We cover every Lehigh Acres ZIP — 33936, 33971, 33972, 33973, 33974, and 33976 — and we carry the equipment and refrigerant on the truck. Most-called AC service in Lehigh Acres: proper R-134a and R-1234yf recharges, UV-dye leak detection, expansion-valve and orifice-tube replacement, condenser swaps after rock damage on Lee Boulevard, and full compressor replacement when the clutch or pump fails.",
+      "We don't do parts-store-style 'recharge and hope.' Every Lehigh Acres job starts with diagnosis: pressure readings on both sides, leak detection with UV dye or electronic sniffer, and a vacuum hold test before any refrigerant goes in. That's how a Lehigh Acres AC repair lasts through the summer instead of failing again in three weeks.",
+      "Pricing is quoted up front. Mobile AC recharges in Lehigh Acres typically run $180–$280 depending on refrigerant. Compressor and condenser work is quoted on site after diagnosis, with financing available on qualifying repairs. A real technician answers the phone, not a call center.",
+      "Need same-day mobile AC repair in Lehigh Acres, FL? Call or text (813) 501-7572 and we'll have cold air blowing again the same day.",
+    ],
+    included: [
+      "R-134a and R-1234yf evacuation and recharge",
+      "UV dye and electronic leak detection",
+      "Expansion valve / orifice tube service",
+      "Condenser repair and replacement",
+      "Compressor and clutch replacement",
+      "Cabin air filter inspection",
+    ],
+    faqs: [
+      { q: "How much does mobile AC recharge cost in Lehigh Acres?", a: "Most Lehigh Acres recharges run $180–$280 depending on refrigerant. Compressor work is quoted on site." },
+      { q: "Can you do compressor jobs on site in Lehigh Acres?", a: "Yes — most compressor and condenser jobs are completed in your Lehigh Acres driveway in a single visit." },
+      { q: "Same-day AC service in Lehigh Acres?", a: "Almost always, including evenings and weekends across Lehigh Acres." },
+      { q: "Do you guarantee the repair?", a: "Yes — every Lehigh Acres AC job is backed by our parts-and-labor warranty." },
+    ],
+  },
+  {
+    slug: "engine-diagnostics-fort-myers-fl",
+    service: "Engine Diagnostics",
+    citySlug: "fort-myers",
+    categoryId: "engine",
+    h1: "Mobile Engine Diagnostics in Fort Myers, FL",
+    metaTitle: "Engine Diagnostics in Fort Myers, FL | Mobile Check-Engine-Light Testing",
+    metaDescription:
+      "Mobile check-engine-light and engine diagnostics in Fort Myers, FL. Real OBD-II scanners, live data, up-front pricing. Call (813) 501-7572.",
+    intro:
+      "Check engine light on in Fort Myers, FL? Mike's Mobile Auto Repair brings professional OBD-II scanners and real diagnostic experience to your driveway anywhere in Fort Myers — no parts-store guesswork.",
+    paragraphs: [
+      "A check-engine light in Fort Myers can mean a $20 gas cap or a $2,000 catalytic converter. Most Fort Myers drivers find out the hard way that a free parts-store code reader only gives you a code — not a diagnosis. We bring full bidirectional scanners that read live sensor data, fuel trims, misfire counters, freeze-frame data, and module-specific codes to identify the actual cause before any parts are recommended.",
+      "We cover every Fort Myers ZIP — 33901, 33907, 33908, 33912, 33913, 33916, 33919, and 33966 — Downtown Fort Myers, McGregor, Gateway, Whiskey Creek, Iona, San Carlos Park, and Page Field. Common Fort Myers diagnostic calls: misfires, P0420/P0430 catalyst codes, P0171/P0174 lean codes, EVAP small-leak codes, electrical no-starts, ABS and traction-control warnings, and intermittent stalling.",
+      "Diagnostics are an investment in not buying the wrong part. We charge a fair, flat diagnostic fee in Fort Myers and apply it toward the repair if you go ahead with us. You walk away with a written list of what's actually wrong, what's optional, and what to budget for next — no upsells, no scare tactics.",
+      "If the repair can be done on site in your Fort Myers driveway — which is most jobs — we'll schedule it the same day or the next morning. If it's a teardown that needs a lift, we'll tell you straight and recommend the right shop. That kind of honesty is rare in the Fort Myers auto-repair market.",
+      "Don't drive around with a flashing check-engine light in Fort Myers — that's active engine damage. Call or text (813) 501-7572 and we'll diagnose it the same day in your driveway.",
+    ],
+    included: [
+      "Full OBD-II and module scan (engine, ABS, SRS, body)",
+      "Live data and freeze-frame analysis",
+      "Misfire counter and fuel-trim review",
+      "EVAP and emissions diagnosis",
+      "Written diagnostic report",
+      "Diagnostic fee applied to repair",
+    ],
+    faqs: [
+      { q: "What does a diagnostic cost in Fort Myers?", a: "We charge a flat diagnostic fee in Fort Myers and apply it toward the repair if you go ahead with us. Quoted up front." },
+      { q: "Is it safe to drive with the check engine light on in Fort Myers?", a: "A solid light is usually OK short term. A flashing light means active misfire — pull over and call us in Fort Myers right away." },
+      { q: "Can you really diagnose modern cars in my driveway?", a: "Yes. Our Fort Myers scanners read every module the dealer reads, including bidirectional tests." },
+      { q: "Same-day diagnostic service in Fort Myers?", a: "Almost always — call or text (813) 501-7572 to confirm a window today." },
+    ],
+  },
+  {
+    slug: "oil-change-lehigh-acres-fl",
+    service: "Oil Change",
+    citySlug: "lehigh-acres",
+    categoryId: "engine",
+    h1: "Mobile Oil Change in Lehigh Acres, FL",
+    metaTitle: "Mobile Oil Change in Lehigh Acres, FL | At Your Driveway in 30 Minutes",
+    metaDescription:
+      "Mobile oil change in Lehigh Acres, FL. Synthetic and conventional, full multi-point inspection, in your driveway. Call (813) 501-7572.",
+    intro:
+      "Skip the oil-change waiting room in Lehigh Acres, FL. Mike's Mobile Auto Repair comes to your driveway anywhere in Lehigh Acres and handles the full service — oil, filter, multi-point inspection — in about 30 minutes.",
+    paragraphs: [
+      "Oil changes are the easiest service to put off — until they cause real engine damage. In Lehigh Acres heat, dirty oil breaks down faster than it does in cooler climates, especially on shorter trips around Lee Boulevard, Sunshine, Homestead, and Gunnery. Our mobile oil-change service makes it effortless: we come to your Lehigh Acres home or workplace, you keep working, and the job is done in 30 minutes.",
+      "We service every Lehigh Acres ZIP — 33936, 33971, 33972, 33973, 33974, and 33976 — with full-synthetic, synthetic-blend, and conventional oils, plus diesel-rated oils for work trucks common in Lehigh Acres. We use OEM-spec or premium-aftermarket filters and verify the correct oil weight and capacity for your specific vehicle, every time.",
+      "Every Lehigh Acres mobile oil change includes a free multi-point inspection: brakes, belts, hoses, tires, battery health, coolant condition, and any active warning lights. You'll get an honest read on what's healthy, what to watch, and what needs attention before the next service — no scare-tactic upsells, no fake 'safety alerts.'",
+      "Pricing is up front. Synthetic-blend oil changes in Lehigh Acres typically start around $69, full synthetic around $89–$119, and diesels are quoted by capacity. No trip fees inside our regular Lehigh Acres service area, and a real technician answers the phone.",
+      "Ready to skip the shop? Call or text (813) 501-7572 for same-day mobile oil change in Lehigh Acres, FL — at your home, office, or jobsite.",
+    ],
+    included: [
+      "Synthetic, blend, conventional, or diesel oil",
+      "OEM-spec or premium aftermarket filter",
+      "Free multi-point inspection",
+      "Tire pressure check and top-off",
+      "Fluid top-offs (washer, coolant, power steering)",
+      "Used oil and filter recycled properly",
+    ],
+    faqs: [
+      { q: "How much is a mobile oil change in Lehigh Acres?", a: "Synthetic blend in Lehigh Acres starts around $69, full synthetic around $89–$119. Diesel quoted by capacity." },
+      { q: "How long does it take?", a: "Most Lehigh Acres mobile oil changes are done in about 30 minutes in your driveway." },
+      { q: "Do you do fleet oil changes in Lehigh Acres?", a: "Yes — fleet and work-truck oil-change routes are a regular part of our Lehigh Acres service." },
+      { q: "Is there a trip fee in Lehigh Acres?", a: "No — there is no separate trip fee inside our regular Lehigh Acres service area." },
+    ],
+  },
 ];
 
 export const localLandingPages: LocalLandingPage[] = _allLocalLandingPages.filter(
