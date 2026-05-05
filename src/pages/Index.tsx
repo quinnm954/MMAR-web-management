@@ -10,6 +10,7 @@ import ServiceAreasPreview from "@/components/home/ServiceAreasPreview";
 import TestimonialsPreview from "@/components/home/TestimonialsPreview";
 import WhyChooseUs from "@/components/home/WhyChooseUs";
 import HomeServicesOverview from "@/components/home/HomeServicesOverview";
+import PopularLocalServices from "@/components/home/PopularLocalServices";
 import HomeFAQ from "@/components/home/HomeFAQ";
 import LocalPhotoGallery from "@/components/home/LocalPhotoGallery";
 import FinalCTA from "@/components/home/FinalCTA";
@@ -134,6 +135,7 @@ const Index = () => {
       <TestimonialsPreview />
       <WhyChooseUs />
       <HomeServicesOverview />
+      <PopularLocalServices />
       <LocalPhotoGallery />
       <HomeFAQ />
       <FinalCTA />
