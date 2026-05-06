@@ -14,6 +14,7 @@ import { cities, getCityBySlug } from "@/data/cities";
 import { getCategoryBySlug } from "@/data/serviceCategories";
 
 import { useSeo } from "@/lib/useSeo";
+import { buildLandingJsonLd } from "@/lib/landingJsonLd";
 import NotFound from "./NotFound";
 
 const SITE = "https://mikesmautorepair.com";
