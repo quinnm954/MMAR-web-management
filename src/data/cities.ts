@@ -141,14 +141,44 @@ export const cities: City[] = [
       { name: "Fort Myers Beach", note: "Salt air corrodes brake hardware and electrical connectors quickly. We keep extra connectors, dielectric grease, and stainless brake hardware in the truck." },
     ],
     intro:
-      "Looking for a reliable mobile mechanic in Fort Myers, FL? Mike's Mobile Auto Repair brings ASE-level service straight to your home or workplace anywhere in greater Fort Myers.",
+      "Need a mobile mechanic in Fort Myers, FL who works to OE service procedure? Mike's Mobile Auto Repair brings dealer-level diagnostics, factory-spec parts, and documented test data to your driveway or jobsite anywhere in greater Fort Myers.",
     paragraphs: [
-      "From Downtown to Gateway, McGregor to Iona, our Fort Myers customers get the same professional repairs they'd find in a traditional shop — without the tow bill, the rental car, or the wasted afternoon in a waiting room. Our mobile service truck carries the diagnostic equipment and common parts needed to handle most repairs on the spot.",
-      "We cover every major Fort Myers ZIP code including 33901, 33907, 33908, 33912, 33913, 33916, 33919, and 33966. Common Fort Myers calls include AC recharges (Florida heat is brutal), brake jobs, battery and alternator replacements, oil changes, and computer diagnostics for stubborn check-engine lights.",
-      "Fort Myers commuters spend a lot of time in stop-and-go on US-41, Colonial Boulevard, Daniels Parkway, and I-75 between Colonial and Alico. That kind of driving is uniquely punishing on brake systems and transmissions — we replace pads and rotors at almost double the rate we would in a less congested town. If your brakes are squealing or your pedal feels soft, get them checked before they damage rotors or calipers.",
-      "Fort Myers also has a real fleet-maintenance market. Plumbers, HVAC techs, landscapers, locksmiths, and small delivery operators can't afford a vehicle being stuck at a shop for two days. We come to your shop, knock out the maintenance, and your truck is back on the road the same day. Ask about our scheduled fleet plans for businesses with 3+ vehicles.",
-      "Closer to the coast — Iona, Fort Myers Beach, parts of South Fort Myers — salt air slowly destroys brake hardware, exhaust components, and electrical connectors. We routinely use stainless hardware and dielectric protection to slow that corrosion down. Tell us your car lives near the water and we'll plan for it.",
-      "We also service local businesses with fleet maintenance — keep your vans, trucks, and work vehicles on the road without the downtime of shop visits. Call or text (813) 501-7572 for a fast, transparent quote anywhere in Fort Myers.",
+      "Fort Myers is a dense, multi-ZIP service area where vehicle workload varies by neighborhood. Downtown and McGregor are dominated by short-trip, low-RPM use that depletes oil additive packages early and lets carbon build on intake valves of direct-injected engines. Gateway and the I-75 corridor punish brake systems and CVTs. Iona, Whiskey Creek, and Fort Myers Beach add a salt-air corrosion factor that destroys brake hardware, exhaust hangers, and connector pins on chassis harnesses. We adjust procedure and parts selection accordingly.",
+      "Coverage spans 33901, 33905, 33907, 33908, 33912, 33913, 33916, 33919, 33966, and 33967. Diagnostics are run on Autel MS909 and Snap-on Zeus platforms with bidirectional control — required for ABS bleeding, BMS battery registration on stop/start vehicles, throttle-body relearns, EVAP solenoid actuation, and most module programming after sensor or actuator replacement. We document live-data captures so you see the failure, not just the code.",
+      "Brake work in Fort Myers is high-volume because of stop-and-go on US-41, Colonial, Daniels, and the I-75 northbound morning crawl. Our procedure: pad measurement to the manufacturer's discard spec, rotor thickness with a micrometer, lateral runout under 0.002\" verified with a dial indicator, and G3500-grade carbon castings on replacement rotors. Caliper slide pins are cleaned and re-greased with high-temp synthetic — not generic chassis grease, which liquefies and migrates onto the friction surface in Florida heat. Brake fluid is moisture-tested with a refractometer; >3% triggers a full DOT 4 flush, since that's the threshold where boiling point drops into the soft-pedal range under hard use.",
+      "AC service in Fort Myers is a year-round demand. We carry separate R-134a and R-1234yf machines to prevent cross-contamination, identify the refrigerant before any service, evacuate to 29 in Hg and hold for 30 minutes to verify a leak-free system, then charge by weight to OE spec — never by sight glass or low-side pressure. UV dye and electronic leak detection are used together on intermittent leaks, since condenser micro-leaks often show up only at high-side pressure under hood-closed conditions. Compressor replacements always include receiver/drier, orifice tube or expansion valve, system flush, and PAG oil charge calculated to OE volume.",
+      "Coastal corrosion changes parts selection. On vehicles garaged in Iona, Sanibel-adjacent neighborhoods, or Fort Myers Beach, we use stainless brake hardware kits, dielectric grease on every connector we open, and corrosion-X on exposed grounds. We've seen 4-year-old brake calipers seized solid from salt intrusion when standard zinc hardware was used at the last service. The right parts cost a few dollars more and last 3–4x longer in this environment.",
+      "Fleet and small-business work is a meaningful share of our Fort Myers volume — plumbers, HVAC, landscapers, locksmiths, and last-mile delivery. We schedule on-site preventive maintenance during your downtime windows so trucks aren't pulled from revenue. Call or text (813) 501-7572 for fleet rates or a same-day quote anywhere in Fort Myers.",
+    ],
+    faqs: [
+      {
+        question: "Do you do bidirectional ABS bleeds and module programming in Fort Myers?",
+        answer: "Yes. ABS bleeding on most 2010+ vehicles requires the scan tool to cycle the HCU solenoids and pump motor — a manual two-person bleed will leave air trapped in the modulator and produce a low pedal. We run the procedure with Autel MS909 or manufacturer software (GDS2 for GM, FDRS for Ford, wiTECH for Chrysler/Stellantis, Techstream for Toyota).",
+      },
+      {
+        question: "How do you diagnose an intermittent AC leak that won't show up at idle?",
+        answer: "Static evacuation to 29 in Hg with a 30-minute hold isolates whether the system holds vacuum. If it does, we charge with UV dye plus the OE refrigerant weight, run the system through a heat-soak cycle (hood closed, high-side pressure pushed past 250 psi), then inspect with a UV light and an H10G electronic detector. Condenser micro-leaks and Schrader valve seeps almost always need that high-pressure soak to surface.",
+      },
+      {
+        question: "Why do brake jobs in Fort Myers wear out faster than the manufacturer estimate?",
+        answer: "Stop-and-go duty cycle. The MFR pad-life numbers assume mixed highway/city use; Fort Myers commuters on US-41 or I-75 between Colonial and Alico are running closer to severe-service. We typically install ceramic pads on daily commuters for lower dust and better fade resistance, and semi-metallic on trucks and SUVs that tow or haul.",
+      },
+      {
+        question: "What's different about coastal-area service near Fort Myers Beach or Iona?",
+        answer: "Salt air. We swap to stainless brake hardware kits, apply dielectric grease to every electrical connector we open, and use anti-seize on caliper bracket bolts and lug studs. Standard zinc-plated hardware from a parts-store brake kit will seize within 2–3 years near the coast.",
+      },
+      {
+        question: "Do you handle fleet maintenance for small businesses in Fort Myers?",
+        answer: "Yes — we run scheduled PM (oil, filters, tire rotation, brake inspection, fluid checks) for fleets of 3+ vehicles on-site at your shop or yard. We track each vehicle's mileage, service history, and recommended next-service date, and quote larger repairs in writing before any work begins.",
+      },
+      {
+        question: "Pricing and payment in Fort Myers?",
+        answer: "Pricing is at or below brick-and-mortar shop rates once tow and rental are factored in. We accept all major cards, Apple/Google Pay, Zelle, and cash, with financing available on larger jobs. Quotes are in writing before work starts.",
+      },
+      {
+        question: "Warranty?",
+        answer: "12 months / 12,000 miles on parts and labor for most repairs, in writing. Coastal corrosion warranty exclusions are documented up front — we'll tell you before the work, not after.",
+      },
     ],
   },
 ];
