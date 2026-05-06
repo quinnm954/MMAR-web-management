@@ -43,70 +43,35 @@ const LocalLanding = () => {
     const id = "ld-local-landing";
     document.getElementById(id)?.remove();
 
-    const areaServed = city
-      ? { "@type": "City", name: `${city.name}, ${city.state}` }
-      : cities.map((c) => ({ "@type": "City", name: `${c.name}, ${c.state}` }));
-
-    const canonicalUrl = page.canonical ?? `${SITE}/${page.slug}`;
-
-    const breadcrumbItems: Array<{ name: string; item: string }> = [
-      { name: "Home", item: `${SITE}/` },
-    ];
-    if (category) {
-      breadcrumbItems.push({
-        name: category.title,
-        item: `${SITE}/services/${category.id}`,
-      });
-    }
-    if (city) {
-      breadcrumbItems.push({
-        name: `${city.name}, ${city.state}`,
-        item: `${SITE}/areas/${city.slug}`,
-      });
-    }
-    breadcrumbItems.push({ name: page.h1, item: canonicalUrl });
-
     // NOTE: The AutoRepair business entity (with aggregateRating, hours,
     // address, sameAs) is declared once in index.html. Do NOT redeclare it
     // here — Google merges duplicate business nodes and rejects "multiple
     // aggregate ratings". The Service node references the canonical business
     // by @id instead.
-    const ld = {
-      "@context": "https://schema.org",
-      "@graph": [
-        {
-          "@type": "Service",
-          name: page.service,
-          serviceType: page.service,
-          areaServed,
-          provider: { "@id": `${SITE}/#business` },
-          url: canonicalUrl,
-          description: page.metaDescription,
-        },
-        {
-          "@type": "BreadcrumbList",
-          itemListElement: breadcrumbItems.map((b, i) => ({
-            "@type": "ListItem",
-            position: i + 1,
-            name: b.name,
-            item: b.item,
-          })),
-        },
-        {
-          "@type": "FAQPage",
-          mainEntity: page.faqs.map((f) => ({
-            "@type": "Question",
-            name: f.q,
-            acceptedAnswer: { "@type": "Answer", text: f.a },
-          })),
-        },
-      ],
-    };
+    const blocks = buildLandingJsonLd({
+      slug: page.slug,
+      service: page.service,
+      h1: page.h1,
+      metaDescription: page.metaDescription,
+      canonical: page.canonical,
+      faqs: page.faqs,
+      city: city
+        ? {
+            slug: city.slug,
+            name: city.name,
+            state: city.state,
+            zips: city.zips,
+            geo: city.geo,
+          }
+        : undefined,
+      category: category ? { id: category.id, title: category.title } : undefined,
+      allCities: cities.map((c) => ({ name: c.name, state: c.state })),
+    });
 
     const script = document.createElement("script");
     script.type = "application/ld+json";
     script.id = id;
-    script.text = JSON.stringify(ld);
+    script.text = JSON.stringify(blocks);
     document.head.appendChild(script);
     return () => script.remove();
   }, [page, city, category]);
