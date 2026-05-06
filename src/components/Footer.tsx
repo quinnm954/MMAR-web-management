@@ -86,11 +86,14 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="border-t border-border pt-6 mb-6">
-          <h3 className="font-display text-sm uppercase tracking-wider text-gold mb-3">
-            Local Mobile Services
-          </h3>
-          <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-2 text-sm">
+        <details className="border-t border-border pt-6 mb-6 group">
+          <summary className="flex items-center justify-between cursor-pointer list-none">
+            <h3 className="font-display text-sm uppercase tracking-wider text-gold">
+              Local Mobile Services
+            </h3>
+            <span className="text-muted-foreground text-xs transition-transform group-open:rotate-180" aria-hidden="true">▼</span>
+          </summary>
+          <ul className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-2 text-sm">
             {localLandingPages.map((p) => (
               <li key={p.slug}>
                 <Link
@@ -102,7 +105,7 @@ const Footer = () => {
               </li>
             ))}
           </ul>
-        </div>
+        </details>
 
         <div className="border-t border-border pt-6 mb-6 flex flex-wrap gap-x-6 gap-y-2 text-sm">
           <Link to="/blog" className="text-muted-foreground hover:text-primary">Blog</Link>
