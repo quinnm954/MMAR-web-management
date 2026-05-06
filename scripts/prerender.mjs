@@ -490,7 +490,16 @@ for (const lp of DATA.landingPages) {
   breadcrumbItems.push({ name: lp.h1, item: canonical });
 
   const areaServed = cityObj
-    ? { "@type": "City", name: `${cityObj.name}, ${cityObj.state}` }
+    ? {
+        "@type": "City",
+        name: `${cityObj.name}, ${cityObj.state}`,
+        containedInPlace: { "@type": "AdministrativeArea", name: "Lee County, FL" },
+        geo: {
+          "@type": "GeoCoordinates",
+          latitude: cityObj.geo.lat,
+          longitude: cityObj.geo.lng,
+        },
+      }
     : DATA.cities.map((c) => ({
         "@type": "City",
         name: `${c.name}, ${c.state}`,
@@ -500,19 +509,50 @@ for (const lp of DATA.landingPages) {
     {
       "@context": "https://schema.org",
       "@type": "Service",
+      "@id": `${canonical}#service`,
       name: lp.service,
       serviceType: lp.service,
+      category: categoryObj?.title,
+      description: lp.metaDescription,
+      url: canonical,
       areaServed,
       provider: businessRef,
-      url: canonical,
-      description: lp.metaDescription,
+      brand: businessRef,
+      audience: { "@type": "Audience", audienceType: "Vehicle owners" },
+      availableChannel: {
+        "@type": "ServiceChannel",
+        serviceUrl: canonical,
+        servicePhone: "+1-813-501-7572",
+        availableLanguage: ["English", "Spanish"],
+      },
+      hoursAvailable: {
+        "@type": "OpeningHoursSpecification",
+        dayOfWeek: [
+          "Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday",
+        ],
+        opens: "09:00",
+        closes: "17:00",
+      },
+      offers: {
+        "@type": "Offer",
+        priceCurrency: "USD",
+        priceSpecification: {
+          "@type": "PriceSpecification",
+          priceCurrency: "USD",
+          description: "Quoted in writing before any work begins.",
+        },
+        availability: "https://schema.org/InStock",
+        areaServed: cityObj
+          ? `${cityObj.name}, ${cityObj.state}`
+          : "Lee County, FL",
+      },
     },
     breadcrumb(breadcrumbItems),
   ];
   if (lp.faqs && lp.faqs.length) blocks.push(faqLd(lp.faqs));
 
   push({
-    path: canonPath,
+    path: canPath ?? canonPath,
     title: lp.metaTitle,
     description: lp.metaDescription,
     canonical,
