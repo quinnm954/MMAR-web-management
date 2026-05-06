@@ -6,7 +6,7 @@ type Item = { slug: string; label: string };
 const FORT_MYERS: Item[] = [
   { slug: "mobile-mechanic-fort-myers-fl", label: "Mobile Mechanic" },
   { slug: "brake-repair-fort-myers-fl", label: "Brake Repair" },
-  { slug: "alternator-repair-fort-myers-fl", label: "Alternator Repair" },
+  { slug: "alternator-repair-fort-myers", label: "Alternator Repair" },
   { slug: "battery-replacement-fort-myers-fl", label: "Battery Replacement" },
   { slug: "ac-repair-fort-myers-fl", label: "AC Repair" },
   { slug: "engine-diagnostics-fort-myers-fl", label: "Engine Diagnostics" },
