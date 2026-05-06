@@ -77,14 +77,44 @@ export const cities: City[] = [
       { name: "Alabama Road", note: "Fleet-vehicle territory — we keep a number of small-business trucks and vans on the road from Alabama Road shops." },
     ],
     intro:
-      "Mike's Mobile Auto Repair is the trusted mobile mechanic in Lehigh Acres, FL. We bring full-service auto repair, diagnostics, and on-site repair to homes and workplaces across Lehigh — no tow truck and no waiting room required.",
+      "Mike's Mobile Auto Repair delivers ASE-grade diagnostics and on-site repair across Lehigh Acres, FL. Our service truck arrives with bidirectional scan tools, OE-spec parts, and the same procedural discipline you'd expect from a brick-and-mortar shop — minus the tow and the waiting room.",
     paragraphs: [
-      "Lehigh Acres covers a huge area, and getting a stalled vehicle to a brick-and-mortar shop can be a real headache. That's where we come in. Whether you're stuck in a driveway off Lee Boulevard, parked at a workplace near Sunshine, or broken down on Gunnery Road, our fully-equipped mobile service truck rolls to you with the tools, diagnostic scanners, and parts to get the job done right the first time.",
-      "We service every Lehigh Acres ZIP code — 33936, 33971, 33972, 33973, 33974, and 33976 — and handle everything from oil changes and brake jobs to alternator replacements, AC recharges, and check-engine-light diagnostics. Many repairs we complete in a single visit, and we always quote you up front before any work begins.",
-      "Lehigh's climate is hard on cars in very specific ways. Summer heat regularly exceeds 95°F, which destroys lead-acid batteries in 2–3 years instead of the 4–5 they last up north. Humidity accelerates AC compressor failure and refrigerant loss. Long, flat commutes on Lee Boulevard and SR-82 wear brake pads quickly, especially for stop-and-go traffic into Fort Myers. We see all of it, every week, and we stock the right parts.",
-      "Most Lehigh customers ask the same first question: do you really come to my house? The answer is yes. We work in driveways, condo parking lots, employer parking lots, and even side streets. We carry a portable lift, a full set of scan tools (OBD-II, ABS, SRS, manufacturer-specific), and the most common consumables — batteries, oil, filters, brake pads, rotors, alternators, starters — so most jobs are one-and-done.",
-      "We also work with families that have multiple vehicles. If two cars need oil changes and one needs brakes, we can knock out all three in a single appointment instead of you running back and forth between shops. That's one of the biggest time savings of going mobile in a place like Lehigh, where the nearest shop might be a 25-minute drive each way.",
-      "Need help right now? Call or text (813) 501-7572 and a real technician will respond — no call-center runaround. Same-day appointments are usually available, with evening and weekend coverage throughout Lehigh Acres.",
+      "Lehigh Acres' grid covers roughly 96 square miles, and the drive time to the nearest dealer service lane often exceeds 35 minutes in rush traffic. That logistical reality is exactly why mobile diagnostics make sense here. We arrive with a Snap-on Zeus or Autel MS909 capable of bidirectional control — actuating ABS pump motors, commanding EVAP solenoids, and registering BMS modules on 2014+ vehicles that demand a battery-monitor reset after replacement. Skipping that reset is the #1 reason a brand-new battery still throws charging-system codes within a week.",
+      "We service every Lehigh Acres ZIP — 33936, 33971, 33972, 33973, 33974, 33976 — and tailor procedure to the failure mode, not just the symptom. A P0420 catalyst code on a Lee Boulevard commuter, for example, gets confirmed with pre- and post-cat O2 waveform capture before any cat replacement is quoted. A no-start gets a parasitic-draw isolation with an inductive amp clamp (target <50 mA after 40-minute module sleep) before we condemn the battery.",
+      "Lehigh's climate punishes specific systems on a predictable schedule. Underhood temperatures routinely break 175°F in July, which depletes the calcium-grid lead-acid chemistry in standard flooded batteries 35–40% faster than northern averages — most fail the CCA load test by year three. Severe-service oil intervals apply to virtually every vehicle here: short trips under 10 miles in 90°F+ ambient cause moisture and fuel dilution to accumulate in the sump faster than the oil's TBN reserve can neutralize, especially in direct-injected turbo engines vulnerable to LSPI.",
+      "Brake service in Lehigh is dictated by the stop-and-go on SR-82 and Lee Boulevard. We measure rotor thickness with a micrometer against the manufacturer's discard spec stamped on the hat, check lateral runout with a dial indicator (target <0.002\"), and use G3500-grade carbon castings on resurfaced or replacement rotors. Pads are matched to driving profile — ceramic for daily commuters, semi-metallic for fleet trucks pulling trailers off Alabama Road. Brake fluid is moisture-tested with a refractometer; anything over 3% gets a full DOT 4 flush, since boiling point degradation is what causes the soft-pedal complaints we hear most often.",
+      "Electrical diagnostics are a Lehigh specialty. We see a lot of failing alternators where the rotor windings are still intact but the diode pack is leaking AC ripple — captured cleanly on an oscilloscope as a >500 mV peak-to-peak ripple on the B+ post — which silently destroys downstream modules and batteries. A standard parts-counter alternator test will pass these units. We don't.",
+      "Need a real technician on-site today? Call or text (813) 501-7572. Same-day windows are typical for batteries, brakes, AC service, and no-start diagnostics throughout 33936, 33971, 33972, 33973, 33974, and 33976.",
+    ],
+    faqs: [
+      {
+        question: "What scan tool coverage do you bring to Lehigh Acres?",
+        answer: "We carry Autel MS909 and Snap-on Zeus platforms with bidirectional control, plus manufacturer-specific software for GM (GDS2), Ford (FDRS), Chrysler (wiTECH), and Toyota (Techstream). That covers ABS bleeding, BMS battery registration, throttle-body relearn, EVAP solenoid actuation, and most module programming required after a sensor or actuator replacement.",
+      },
+      {
+        question: "How do you confirm an alternator is actually bad before replacing it?",
+        answer: "Three checks. First, voltage drop across the B+ and ground cables under load (target <0.3V each). Second, AC ripple at the B+ post with a scope — anything above 100 mV peak-to-peak indicates a failing diode. Third, a controlled load test with the AC, headlights, and rear defrost on, watching for system voltage to hold above 13.5V. Counter-style 'bench tests' miss diode failures routinely.",
+      },
+      {
+        question: "Why do Lehigh batteries die so fast?",
+        answer: "Underhood temperatures here regularly hit 175°F, and heat — not cold — is what destroys lead-acid plates. Calcium grids in standard flooded batteries lose roughly 35–40% of their service life vs. northern climates. We recommend AGM chemistry for any 2014+ vehicle with stop/start or a battery-monitor sensor, and we always perform the BMS reset after replacement so the charging system targets the correct voltage profile.",
+      },
+      {
+        question: "Do you do AC work on R-1234yf systems?",
+        answer: "Yes. We carry a dedicated R-1234yf recovery, vacuum, and recharge machine separate from our R-134a unit to prevent cross-contamination. Identification is done with a refrigerant identifier before any service — mixed refrigerant is the fastest way to destroy a compressor and contaminate a recovery machine.",
+      },
+      {
+        question: "How much does a mobile mechanic cost in Lehigh Acres?",
+        answer: "Most jobs price within 5–10% of a brick-and-mortar shop, and usually less once you remove the tow bill ($85–$150 round trip from Lehigh) and the lost workday. We quote in writing before any work begins, and the diagnostic fee is waived if you book the repair.",
+      },
+      {
+        question: "Same-day service in Lehigh Acres?",
+        answer: "Yes — batteries, brakes, AC service, alternator/starter replacement, and no-start diagnostics are typically same-day across 33936, 33971, 33972, 33973, 33974, and 33976. Call or text (813) 501-7572.",
+      },
+      {
+        question: "Warranty on mobile repairs?",
+        answer: "12 months / 12,000 miles on parts and labor for most repairs, in writing. See our warranty policy page for details.",
+      },
     ],
   },
   {
