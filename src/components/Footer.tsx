@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import mmarLogo from "@/assets/mmar-logo.jpeg";
 import { categories } from "@/data/serviceCategories";
 import { cities } from "@/data/cities";
-import { localLandingPages } from "@/data/localLandingPages";
+import LocalServicesDropdown from "@/components/footer/LocalServicesDropdown";
 
 const Footer = () => {
   return (
