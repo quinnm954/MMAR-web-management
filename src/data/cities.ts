@@ -77,14 +77,44 @@ export const cities: City[] = [
       { name: "Alabama Road", note: "Fleet-vehicle territory — we keep a number of small-business trucks and vans on the road from Alabama Road shops." },
     ],
     intro:
-      "Mike's Mobile Auto Repair is the trusted mobile mechanic in Lehigh Acres, FL. We bring full-service auto repair, diagnostics, and on-site repair to homes and workplaces across Lehigh — no tow truck and no waiting room required.",
+      "Mike's Mobile Auto Repair delivers ASE-grade diagnostics and on-site repair across Lehigh Acres, FL. Our service truck arrives with bidirectional scan tools, OE-spec parts, and the same procedural discipline you'd expect from a brick-and-mortar shop — minus the tow and the waiting room.",
     paragraphs: [
-      "Lehigh Acres covers a huge area, and getting a stalled vehicle to a brick-and-mortar shop can be a real headache. That's where we come in. Whether you're stuck in a driveway off Lee Boulevard, parked at a workplace near Sunshine, or broken down on Gunnery Road, our fully-equipped mobile service truck rolls to you with the tools, diagnostic scanners, and parts to get the job done right the first time.",
-      "We service every Lehigh Acres ZIP code — 33936, 33971, 33972, 33973, 33974, and 33976 — and handle everything from oil changes and brake jobs to alternator replacements, AC recharges, and check-engine-light diagnostics. Many repairs we complete in a single visit, and we always quote you up front before any work begins.",
-      "Lehigh's climate is hard on cars in very specific ways. Summer heat regularly exceeds 95°F, which destroys lead-acid batteries in 2–3 years instead of the 4–5 they last up north. Humidity accelerates AC compressor failure and refrigerant loss. Long, flat commutes on Lee Boulevard and SR-82 wear brake pads quickly, especially for stop-and-go traffic into Fort Myers. We see all of it, every week, and we stock the right parts.",
-      "Most Lehigh customers ask the same first question: do you really come to my house? The answer is yes. We work in driveways, condo parking lots, employer parking lots, and even side streets. We carry a portable lift, a full set of scan tools (OBD-II, ABS, SRS, manufacturer-specific), and the most common consumables — batteries, oil, filters, brake pads, rotors, alternators, starters — so most jobs are one-and-done.",
-      "We also work with families that have multiple vehicles. If two cars need oil changes and one needs brakes, we can knock out all three in a single appointment instead of you running back and forth between shops. That's one of the biggest time savings of going mobile in a place like Lehigh, where the nearest shop might be a 25-minute drive each way.",
-      "Need help right now? Call or text (813) 501-7572 and a real technician will respond — no call-center runaround. Same-day appointments are usually available, with evening and weekend coverage throughout Lehigh Acres.",
+      "Lehigh Acres' grid covers roughly 96 square miles, and the drive time to the nearest dealer service lane often exceeds 35 minutes in rush traffic. That logistical reality is exactly why mobile diagnostics make sense here. We arrive with a Snap-on Zeus or Autel MS909 capable of bidirectional control — actuating ABS pump motors, commanding EVAP solenoids, and registering BMS modules on 2014+ vehicles that demand a battery-monitor reset after replacement. Skipping that reset is the #1 reason a brand-new battery still throws charging-system codes within a week.",
+      "We service every Lehigh Acres ZIP — 33936, 33971, 33972, 33973, 33974, 33976 — and tailor procedure to the failure mode, not just the symptom. A P0420 catalyst code on a Lee Boulevard commuter, for example, gets confirmed with pre- and post-cat O2 waveform capture before any cat replacement is quoted. A no-start gets a parasitic-draw isolation with an inductive amp clamp (target <50 mA after 40-minute module sleep) before we condemn the battery.",
+      "Lehigh's climate punishes specific systems on a predictable schedule. Underhood temperatures routinely break 175°F in July, which depletes the calcium-grid lead-acid chemistry in standard flooded batteries 35–40% faster than northern averages — most fail the CCA load test by year three. Severe-service oil intervals apply to virtually every vehicle here: short trips under 10 miles in 90°F+ ambient cause moisture and fuel dilution to accumulate in the sump faster than the oil's TBN reserve can neutralize, especially in direct-injected turbo engines vulnerable to LSPI.",
+      "Brake service in Lehigh is dictated by the stop-and-go on SR-82 and Lee Boulevard. We measure rotor thickness with a micrometer against the manufacturer's discard spec stamped on the hat, check lateral runout with a dial indicator (target <0.002\"), and use G3500-grade carbon castings on resurfaced or replacement rotors. Pads are matched to driving profile — ceramic for daily commuters, semi-metallic for fleet trucks pulling trailers off Alabama Road. Brake fluid is moisture-tested with a refractometer; anything over 3% gets a full DOT 4 flush, since boiling point degradation is what causes the soft-pedal complaints we hear most often.",
+      "Electrical diagnostics are a Lehigh specialty. We see a lot of failing alternators where the rotor windings are still intact but the diode pack is leaking AC ripple — captured cleanly on an oscilloscope as a >500 mV peak-to-peak ripple on the B+ post — which silently destroys downstream modules and batteries. A standard parts-counter alternator test will pass these units. We don't.",
+      "Need a real technician on-site today? Call or text (813) 501-7572. Same-day windows are typical for batteries, brakes, AC service, and no-start diagnostics throughout 33936, 33971, 33972, 33973, 33974, and 33976.",
+    ],
+    faqs: [
+      {
+        question: "What scan tool coverage do you bring to Lehigh Acres?",
+        answer: "We carry Autel MS909 and Snap-on Zeus platforms with bidirectional control, plus manufacturer-specific software for GM (GDS2), Ford (FDRS), Chrysler (wiTECH), and Toyota (Techstream). That covers ABS bleeding, BMS battery registration, throttle-body relearn, EVAP solenoid actuation, and most module programming required after a sensor or actuator replacement.",
+      },
+      {
+        question: "How do you confirm an alternator is actually bad before replacing it?",
+        answer: "Three checks. First, voltage drop across the B+ and ground cables under load (target <0.3V each). Second, AC ripple at the B+ post with a scope — anything above 100 mV peak-to-peak indicates a failing diode. Third, a controlled load test with the AC, headlights, and rear defrost on, watching for system voltage to hold above 13.5V. Counter-style 'bench tests' miss diode failures routinely.",
+      },
+      {
+        question: "Why do Lehigh batteries die so fast?",
+        answer: "Underhood temperatures here regularly hit 175°F, and heat — not cold — is what destroys lead-acid plates. Calcium grids in standard flooded batteries lose roughly 35–40% of their service life vs. northern climates. We recommend AGM chemistry for any 2014+ vehicle with stop/start or a battery-monitor sensor, and we always perform the BMS reset after replacement so the charging system targets the correct voltage profile.",
+      },
+      {
+        question: "Do you do AC work on R-1234yf systems?",
+        answer: "Yes. We carry a dedicated R-1234yf recovery, vacuum, and recharge machine separate from our R-134a unit to prevent cross-contamination. Identification is done with a refrigerant identifier before any service — mixed refrigerant is the fastest way to destroy a compressor and contaminate a recovery machine.",
+      },
+      {
+        question: "How much does a mobile mechanic cost in Lehigh Acres?",
+        answer: "Most jobs price within 5–10% of a brick-and-mortar shop, and usually less once you remove the tow bill ($85–$150 round trip from Lehigh) and the lost workday. We quote in writing before any work begins, and the diagnostic fee is waived if you book the repair.",
+      },
+      {
+        question: "Same-day service in Lehigh Acres?",
+        answer: "Yes — batteries, brakes, AC service, alternator/starter replacement, and no-start diagnostics are typically same-day across 33936, 33971, 33972, 33973, 33974, and 33976. Call or text (813) 501-7572.",
+      },
+      {
+        question: "Warranty on mobile repairs?",
+        answer: "12 months / 12,000 miles on parts and labor for most repairs, in writing. See our warranty policy page for details.",
+      },
     ],
   },
   {
@@ -111,14 +141,44 @@ export const cities: City[] = [
       { name: "Fort Myers Beach", note: "Salt air corrodes brake hardware and electrical connectors quickly. We keep extra connectors, dielectric grease, and stainless brake hardware in the truck." },
     ],
     intro:
-      "Looking for a reliable mobile mechanic in Fort Myers, FL? Mike's Mobile Auto Repair brings ASE-level service straight to your home or workplace anywhere in greater Fort Myers.",
+      "Need a mobile mechanic in Fort Myers, FL who works to OE service procedure? Mike's Mobile Auto Repair brings dealer-level diagnostics, factory-spec parts, and documented test data to your driveway or jobsite anywhere in greater Fort Myers.",
     paragraphs: [
-      "From Downtown to Gateway, McGregor to Iona, our Fort Myers customers get the same professional repairs they'd find in a traditional shop — without the tow bill, the rental car, or the wasted afternoon in a waiting room. Our mobile service truck carries the diagnostic equipment and common parts needed to handle most repairs on the spot.",
-      "We cover every major Fort Myers ZIP code including 33901, 33907, 33908, 33912, 33913, 33916, 33919, and 33966. Common Fort Myers calls include AC recharges (Florida heat is brutal), brake jobs, battery and alternator replacements, oil changes, and computer diagnostics for stubborn check-engine lights.",
-      "Fort Myers commuters spend a lot of time in stop-and-go on US-41, Colonial Boulevard, Daniels Parkway, and I-75 between Colonial and Alico. That kind of driving is uniquely punishing on brake systems and transmissions — we replace pads and rotors at almost double the rate we would in a less congested town. If your brakes are squealing or your pedal feels soft, get them checked before they damage rotors or calipers.",
-      "Fort Myers also has a real fleet-maintenance market. Plumbers, HVAC techs, landscapers, locksmiths, and small delivery operators can't afford a vehicle being stuck at a shop for two days. We come to your shop, knock out the maintenance, and your truck is back on the road the same day. Ask about our scheduled fleet plans for businesses with 3+ vehicles.",
-      "Closer to the coast — Iona, Fort Myers Beach, parts of South Fort Myers — salt air slowly destroys brake hardware, exhaust components, and electrical connectors. We routinely use stainless hardware and dielectric protection to slow that corrosion down. Tell us your car lives near the water and we'll plan for it.",
-      "We also service local businesses with fleet maintenance — keep your vans, trucks, and work vehicles on the road without the downtime of shop visits. Call or text (813) 501-7572 for a fast, transparent quote anywhere in Fort Myers.",
+      "Fort Myers is a dense, multi-ZIP service area where vehicle workload varies by neighborhood. Downtown and McGregor are dominated by short-trip, low-RPM use that depletes oil additive packages early and lets carbon build on intake valves of direct-injected engines. Gateway and the I-75 corridor punish brake systems and CVTs. Iona, Whiskey Creek, and Fort Myers Beach add a salt-air corrosion factor that destroys brake hardware, exhaust hangers, and connector pins on chassis harnesses. We adjust procedure and parts selection accordingly.",
+      "Coverage spans 33901, 33905, 33907, 33908, 33912, 33913, 33916, 33919, 33966, and 33967. Diagnostics are run on Autel MS909 and Snap-on Zeus platforms with bidirectional control — required for ABS bleeding, BMS battery registration on stop/start vehicles, throttle-body relearns, EVAP solenoid actuation, and most module programming after sensor or actuator replacement. We document live-data captures so you see the failure, not just the code.",
+      "Brake work in Fort Myers is high-volume because of stop-and-go on US-41, Colonial, Daniels, and the I-75 northbound morning crawl. Our procedure: pad measurement to the manufacturer's discard spec, rotor thickness with a micrometer, lateral runout under 0.002\" verified with a dial indicator, and G3500-grade carbon castings on replacement rotors. Caliper slide pins are cleaned and re-greased with high-temp synthetic — not generic chassis grease, which liquefies and migrates onto the friction surface in Florida heat. Brake fluid is moisture-tested with a refractometer; >3% triggers a full DOT 4 flush, since that's the threshold where boiling point drops into the soft-pedal range under hard use.",
+      "AC service in Fort Myers is a year-round demand. We carry separate R-134a and R-1234yf machines to prevent cross-contamination, identify the refrigerant before any service, evacuate to 29 in Hg and hold for 30 minutes to verify a leak-free system, then charge by weight to OE spec — never by sight glass or low-side pressure. UV dye and electronic leak detection are used together on intermittent leaks, since condenser micro-leaks often show up only at high-side pressure under hood-closed conditions. Compressor replacements always include receiver/drier, orifice tube or expansion valve, system flush, and PAG oil charge calculated to OE volume.",
+      "Coastal corrosion changes parts selection. On vehicles garaged in Iona, Sanibel-adjacent neighborhoods, or Fort Myers Beach, we use stainless brake hardware kits, dielectric grease on every connector we open, and corrosion-X on exposed grounds. We've seen 4-year-old brake calipers seized solid from salt intrusion when standard zinc hardware was used at the last service. The right parts cost a few dollars more and last 3–4x longer in this environment.",
+      "Fleet and small-business work is a meaningful share of our Fort Myers volume — plumbers, HVAC, landscapers, locksmiths, and last-mile delivery. We schedule on-site preventive maintenance during your downtime windows so trucks aren't pulled from revenue. Call or text (813) 501-7572 for fleet rates or a same-day quote anywhere in Fort Myers.",
+    ],
+    faqs: [
+      {
+        question: "Do you do bidirectional ABS bleeds and module programming in Fort Myers?",
+        answer: "Yes. ABS bleeding on most 2010+ vehicles requires the scan tool to cycle the HCU solenoids and pump motor — a manual two-person bleed will leave air trapped in the modulator and produce a low pedal. We run the procedure with Autel MS909 or manufacturer software (GDS2 for GM, FDRS for Ford, wiTECH for Chrysler/Stellantis, Techstream for Toyota).",
+      },
+      {
+        question: "How do you diagnose an intermittent AC leak that won't show up at idle?",
+        answer: "Static evacuation to 29 in Hg with a 30-minute hold isolates whether the system holds vacuum. If it does, we charge with UV dye plus the OE refrigerant weight, run the system through a heat-soak cycle (hood closed, high-side pressure pushed past 250 psi), then inspect with a UV light and an H10G electronic detector. Condenser micro-leaks and Schrader valve seeps almost always need that high-pressure soak to surface.",
+      },
+      {
+        question: "Why do brake jobs in Fort Myers wear out faster than the manufacturer estimate?",
+        answer: "Stop-and-go duty cycle. The MFR pad-life numbers assume mixed highway/city use; Fort Myers commuters on US-41 or I-75 between Colonial and Alico are running closer to severe-service. We typically install ceramic pads on daily commuters for lower dust and better fade resistance, and semi-metallic on trucks and SUVs that tow or haul.",
+      },
+      {
+        question: "What's different about coastal-area service near Fort Myers Beach or Iona?",
+        answer: "Salt air. We swap to stainless brake hardware kits, apply dielectric grease to every electrical connector we open, and use anti-seize on caliper bracket bolts and lug studs. Standard zinc-plated hardware from a parts-store brake kit will seize within 2–3 years near the coast.",
+      },
+      {
+        question: "Do you handle fleet maintenance for small businesses in Fort Myers?",
+        answer: "Yes — we run scheduled PM (oil, filters, tire rotation, brake inspection, fluid checks) for fleets of 3+ vehicles on-site at your shop or yard. We track each vehicle's mileage, service history, and recommended next-service date, and quote larger repairs in writing before any work begins.",
+      },
+      {
+        question: "Pricing and payment in Fort Myers?",
+        answer: "Pricing is at or below brick-and-mortar shop rates once tow and rental are factored in. We accept all major cards, Apple/Google Pay, Zelle, and cash, with financing available on larger jobs. Quotes are in writing before work starts.",
+      },
+      {
+        question: "Warranty?",
+        answer: "12 months / 12,000 miles on parts and labor for most repairs, in writing. Coastal corrosion warranty exclusions are documented up front — we'll tell you before the work, not after.",
+      },
     ],
   },
 ];
