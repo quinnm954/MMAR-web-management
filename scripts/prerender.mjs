@@ -552,7 +552,7 @@ for (const lp of DATA.landingPages) {
   if (lp.faqs && lp.faqs.length) blocks.push(faqLd(lp.faqs));
 
   push({
-    path: canPath ?? canonPath,
+    path: canonPath,
     title: lp.metaTitle,
     description: lp.metaDescription,
     canonical,
