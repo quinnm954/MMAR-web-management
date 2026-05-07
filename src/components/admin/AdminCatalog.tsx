@@ -94,7 +94,43 @@ const AdminCatalog = () => {
             </Button>
           ))}
         </div>
-        <Button onClick={() => setEditing(blank)}><Plus className="h-4 w-4 mr-1" /> New Item</Button>
+        <div className="flex gap-2">
+          <input
+            id="catalog-csv"
+            type="file"
+            accept=".csv"
+            className="hidden"
+            onChange={async (e) => {
+              const file = e.target.files?.[0];
+              if (!file) return;
+              const rows = parseCsv(await file.text());
+              if (rows.length === 0) return toast.error('No rows found');
+              const payload = rows.map(r => ({
+                type: r.type || 'part',
+                sku: r.sku || null,
+                name: r.name,
+                description: r.description || null,
+                category: r.category || null,
+                vendor: r.vendor || null,
+                cost: parseFloat(r.cost || '0') || 0,
+                unit_price: parseFloat(r.unit_price || r.price || '0') || 0,
+                track_inventory: ['true', 'yes', '1'].includes((r.track_inventory || '').toLowerCase()),
+                on_hand: parseInt(r.on_hand || '0') || 0,
+                reorder_point: parseInt(r.reorder_point || '0') || 0,
+                is_active: true,
+              })).filter(p => p.name);
+              const { error } = await supabase.from('catalog_items').insert(payload as any);
+              if (error) return toast.error(error.message);
+              toast.success(`Imported ${payload.length} items`);
+              (e.target as HTMLInputElement).value = '';
+              load();
+            }}
+          />
+          <Button variant="outline" onClick={() => document.getElementById('catalog-csv')?.click()}>
+            <Upload className="h-4 w-4 mr-1" /> Import CSV
+          </Button>
+          <Button onClick={() => setEditing(blank)}><Plus className="h-4 w-4 mr-1" /> New Item</Button>
+        </div>
       </div>
 
       <Card>
