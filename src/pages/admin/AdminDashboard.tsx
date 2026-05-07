@@ -91,7 +91,10 @@ const AdminDashboard = () => {
 
         <Tabs defaultValue="customers" className="space-y-4">
           <TabsList className="flex flex-wrap h-auto">
+            <TabsTrigger value="reports"><BarChart3 className="h-4 w-4 mr-1.5" /> Reports</TabsTrigger>
+            <TabsTrigger value="kanban"><KanbanSquare className="h-4 w-4 mr-1.5" /> Job Board</TabsTrigger>
             <TabsTrigger value="customers"><Users className="h-4 w-4 mr-1.5" /> Customers</TabsTrigger>
+            <TabsTrigger value="garage"><Car className="h-4 w-4 mr-1.5" /> Garage</TabsTrigger>
             <TabsTrigger value="memberships"><CreditCard className="h-4 w-4 mr-1.5" /> Memberships</TabsTrigger>
             <TabsTrigger value="appointments"><Calendar className="h-4 w-4 mr-1.5" /> Appointments</TabsTrigger>
             <TabsTrigger value="service"><ClipboardList className="h-4 w-4 mr-1.5" /> Service Records</TabsTrigger>
@@ -99,13 +102,18 @@ const AdminDashboard = () => {
             <TabsTrigger value="inspections"><ClipboardCheck className="h-4 w-4 mr-1.5" /> Inspections</TabsTrigger>
             <TabsTrigger value="invoices"><Receipt className="h-4 w-4 mr-1.5" /> Invoices</TabsTrigger>
             <TabsTrigger value="catalog"><Package className="h-4 w-4 mr-1.5" /> Catalog</TabsTrigger>
+            <TabsTrigger value="time"><Clock className="h-4 w-4 mr-1.5" /> Time</TabsTrigger>
+            <TabsTrigger value="sms"><MessageSquare className="h-4 w-4 mr-1.5" /> SMS</TabsTrigger>
             <TabsTrigger value="financing"><FileText className="h-4 w-4 mr-1.5" /> Financing</TabsTrigger>
             <TabsTrigger value="warranty"><ShieldCheck className="h-4 w-4 mr-1.5" /> Warranty</TabsTrigger>
             <TabsTrigger value="emails"><Mail className="h-4 w-4 mr-1.5" /> Emails</TabsTrigger>
             <TabsTrigger value="settings"><Settings className="h-4 w-4 mr-1.5" /> Settings</TabsTrigger>
           </TabsList>
 
+          <TabsContent value="reports"><AdminReports /></TabsContent>
+          <TabsContent value="kanban"><AdminKanban /></TabsContent>
           <TabsContent value="customers"><AdminCustomers /></TabsContent>
+          <TabsContent value="garage"><AdminGarage /></TabsContent>
           <TabsContent value="memberships"><AdminMemberships /></TabsContent>
           <TabsContent value="appointments"><AdminAppointments /></TabsContent>
           <TabsContent value="service"><AdminServiceRecords /></TabsContent>
@@ -113,6 +121,8 @@ const AdminDashboard = () => {
           <TabsContent value="inspections"><AdminInspections /></TabsContent>
           <TabsContent value="invoices"><AdminInvoices /></TabsContent>
           <TabsContent value="catalog"><AdminCatalog /></TabsContent>
+          <TabsContent value="time"><AdminTimeTracking /></TabsContent>
+          <TabsContent value="sms"><AdminSMS /></TabsContent>
           <TabsContent value="financing">
             <FinancingContractsTable data={contracts} onRefresh={reloadFinancing} />
           </TabsContent>
