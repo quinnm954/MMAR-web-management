@@ -81,7 +81,7 @@ const TechInspections = () => {
     setLoading(true);
     const [i, a] = await Promise.all([
       supabase.from("inspections")
-        .select("*, vehicle:vehicles(year, make, model)")
+        .select("*")
         .eq("technician_id", user.id)
         .order("created_at", { ascending: false }),
       supabase.from("appointments")
@@ -89,14 +89,21 @@ const TechInspections = () => {
         .eq("assigned_technician_id", user.id)
         .in("status", ["scheduled", "in_progress"]),
     ]);
-    const list = (i.data ?? []) as Inspection[];
-    const ids = Array.from(new Set(list.map((x) => x.customer_id)));
-    if (ids.length) {
-      const { data: profs } = await supabase.from("profiles").select("id, full_name, email").in("id", ids);
-      const map: Record<string, { full_name: string | null; email: string | null }> = {};
-      (profs ?? []).forEach((p) => { map[p.id] = { full_name: p.full_name, email: p.email }; });
-      list.forEach((x) => { x.customer = map[x.customer_id] ?? null; });
-    }
+    const list = ((i.data ?? []) as unknown) as Inspection[];
+    const custIds = Array.from(new Set(list.map((x) => x.customer_id)));
+    const vehIds = Array.from(new Set(list.map((x) => x.vehicle_id).filter(Boolean)));
+    const [profsRes, vehsRes] = await Promise.all([
+      custIds.length ? supabase.from("profiles").select("id, full_name, email").in("id", custIds) : Promise.resolve({ data: [] as any[] }),
+      vehIds.length ? supabase.from("vehicles").select("id, year, make, model").in("id", vehIds) : Promise.resolve({ data: [] as any[] }),
+    ]);
+    const profMap: Record<string, { full_name: string | null; email: string | null }> = {};
+    (profsRes.data ?? []).forEach((p: any) => { profMap[p.id] = { full_name: p.full_name, email: p.email }; });
+    const vehMap: Record<string, { year: number | null; make: string | null; model: string | null }> = {};
+    (vehsRes.data ?? []).forEach((v: any) => { vehMap[v.id] = { year: v.year, make: v.make, model: v.model }; });
+    list.forEach((x) => {
+      x.customer = profMap[x.customer_id] ?? null;
+      x.vehicle = vehMap[x.vehicle_id] ?? null;
+    });
     setInspections(list);
     setAppts((a.data ?? []) as Appt[]);
     setLoading(false);
