@@ -88,6 +88,8 @@ const App = () => (
             />
             <Route path="/unsubscribe" element={<Unsubscribe />} />
             <Route path="/tech" element={<TechProtectedRoute><TechDashboard /></TechProtectedRoute>} />
+            <Route path="/estimate/:token" element={<EstimateApproval />} />
+            <Route path="/inspection/:token" element={<InspectionReport />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="/:landingSlug" element={<LocalLanding />} />
             <Route path="*" element={<NotFound />} />
