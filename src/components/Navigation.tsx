@@ -190,7 +190,7 @@ const Navigation = () => {
               <Link to="/memberships" onClick={close} className="text-accent hover:text-accent/80 font-semibold py-3 px-2 rounded-lg">Memberships</Link>
               <Link to="/contact" onClick={close} className="text-foreground hover:text-primary font-medium py-3 px-2 rounded-lg">Contact</Link>
               <Link to={user ? "/portal/dashboard" : "/portal/login"} onClick={close} className="text-foreground hover:text-primary font-medium py-3 px-2 rounded-lg flex items-center gap-2">
-                <User className="w-4 h-4" /> {user ? "Garage Ace Portal" : "Customer Sign In"}
+                <User className="w-4 h-4" /> {user ? "MMAR Care Portal" : "Customer Sign In"}
               </Link>
 
               <Button variant="hero" size="lg" asChild className="mt-3 min-h-[48px]">

@@ -61,7 +61,7 @@ const PortalSignup = () => {
               <Wrench className="h-6 w-6 text-primary" />
             </div>
             <CardTitle className="text-2xl">Create your account</CardTitle>
-            <CardDescription>Join Garage Ace by MMAR</CardDescription>
+            <CardDescription>Join MMAR Care</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <Button onClick={handleGoogle} disabled={busy} variant="outline" className="w-full">

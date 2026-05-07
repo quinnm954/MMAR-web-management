@@ -71,7 +71,7 @@ const Memberships = () => {
           <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-accent/5" aria-hidden />
           <div className="container mx-auto max-w-5xl text-center relative">
             <Badge variant="outline" className="mb-4 border-primary/30 text-primary">
-              Garage Ace Memberships
+              MMAR Care Memberships
             </Badge>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
               Stress-Free Vehicle Maintenance{" "}

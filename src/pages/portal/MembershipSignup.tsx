@@ -42,7 +42,7 @@ const MembershipSignup = () => {
   const [data, setData] = useState<WizardData>({ vehicle: {} });
 
   useEffect(() => {
-    document.title = "Join Garage Ace Membership | MMAR";
+    document.title = "Join MMAR Care Membership | MMAR";
   }, []);
 
   // If signed in, skip account step
@@ -70,7 +70,7 @@ const MembershipSignup = () => {
         <div className="container mx-auto max-w-2xl">
           <div className="text-center mb-6">
             <div className="inline-flex items-center gap-2 text-sm text-primary font-semibold mb-2">
-              <Wrench className="h-4 w-4" /> Garage Ace Membership
+              <Wrench className="h-4 w-4" /> MMAR Care Membership
             </div>
             <h1 className="text-3xl font-bold">Join MMAR</h1>
             <p className="text-muted-foreground">Step {step + 1} of {STEPS.length} — {STEPS[step]}</p>
