@@ -201,6 +201,19 @@ const AdminCatalog = () => {
               <div><Label>Vendor</Label><Input value={editing.vendor ?? ''} onChange={e => setEditing({ ...editing, vendor: e.target.value })} /></div>
               <div><Label>Unit Price ($)</Label><Input type="number" step="0.01" value={editing.unit_price ?? 0} onChange={e => setEditing({ ...editing, unit_price: parseFloat(e.target.value) || 0 })} /></div>
               <div><Label>Cost ($)</Label><Input type="number" step="0.01" value={editing.cost ?? 0} onChange={e => setEditing({ ...editing, cost: parseFloat(e.target.value) || 0 })} /></div>
+              <div className="col-span-2 flex flex-wrap gap-2 -mt-1">
+                <span className="text-xs text-muted-foreground self-center">Auto-markup from cost:</span>
+                {[1.4, 1.5, 1.75, 2.0].map(m => (
+                  <Button key={m} type="button" size="sm" variant="outline" onClick={() => setEditing({ ...editing, unit_price: Number(((editing.cost ?? 0) * m).toFixed(2)) })}>
+                    <Calculator className="h-3 w-3 mr-1" /> {Math.round((m - 1) * 100)}%
+                  </Button>
+                ))}
+                {(editing.cost ?? 0) > 0 && (editing.unit_price ?? 0) > 0 && (
+                  <span className="text-xs self-center text-muted-foreground">
+                    Margin: {Math.round((((editing.unit_price ?? 0) - (editing.cost ?? 0)) / (editing.unit_price ?? 1)) * 100)}%
+                  </span>
+                )}
+              </div>
               {editing.type === 'labor' && (
                 <div className="col-span-2"><Label>Standard Labor Hours</Label><Input type="number" step="0.1" value={editing.labor_hours ?? 0} onChange={e => setEditing({ ...editing, labor_hours: parseFloat(e.target.value) || 0 })} /></div>
               )}
