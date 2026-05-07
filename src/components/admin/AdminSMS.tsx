@@ -45,7 +45,17 @@ export default function AdminSMS() {
       .select('*')
       .eq('thread_id', threadId)
       .order('created_at', { ascending: true });
-    setMessages(data ?? []);
+    const msgs = data ?? [];
+    setMessages(msgs);
+    const ids = Array.from(new Set(msgs.map((m: any) => m.invoice_id).filter(Boolean)));
+    if (ids.length) {
+      const { data: invs } = await supabase.from('invoices').select('id, invoice_number, total, amount_paid, status').in('id', ids);
+      const map: Record<string, any> = {};
+      (invs ?? []).forEach((i: any) => { map[i.id] = i; });
+      setInvoicesById(map);
+    } else {
+      setInvoicesById({});
+    }
     await supabase.from('sms_threads').update({ unread_count: 0 }).eq('id', threadId);
   };
 
