@@ -16,6 +16,7 @@ interface Membership {
   oil_changes_used: number;
   agreement_pdf_url: string | null;
   agreement_signed_at: string | null;
+  cancellation_requested_at: string | null;
   plan: { name: string; tagline: string | null; monthly_price: number; deposit_amount: number; features: string[]; included_oil_changes_yearly: number | null } | null;
   vehicle: { year: number | null; make: string | null; model: string | null; trim: string | null } | null;
 }
@@ -36,7 +37,7 @@ const PortalMembership = () => {
     if (!user) return;
     supabase
       .from("memberships")
-      .select("id, status, start_date, next_billing_date, oil_changes_used, agreement_pdf_url, agreement_signed_at, plan:membership_plans(name, tagline, monthly_price, deposit_amount, features, included_oil_changes_yearly), vehicle:vehicles(year, make, model, trim)")
+      .select("id, status, start_date, next_billing_date, oil_changes_used, agreement_pdf_url, agreement_signed_at, cancellation_requested_at, plan:membership_plans(name, tagline, monthly_price, deposit_amount, features, included_oil_changes_yearly), vehicle:vehicles(year, make, model, trim)")
       .eq("customer_id", user.id)
       .order("created_at", { ascending: false })
       .then(({ data }) => {
