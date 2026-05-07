@@ -25,14 +25,13 @@ Deno.serve(async (req) => {
     const { membership_id } = await req.json();
     if (!membership_id) throw new Error("membership_id required");
 
-    // Fetch membership + plan with service role to bypass RLS issues
     const admin = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
     const { data: membership, error: mErr } = await admin
       .from("memberships")
-      .select("id, customer_id, plan_id, status, plan:membership_plans(name, stripe_price_id, deposit_amount)")
+      .select("id, customer_id, status, plan:membership_plans(name, stripe_price_id, deposit_amount)")
       .eq("id", membership_id)
       .single();
     if (mErr || !membership) throw new Error("Membership not found");
@@ -45,11 +44,11 @@ Deno.serve(async (req) => {
       apiVersion: "2024-11-20.acacia",
     });
 
-    // Reuse Stripe customer if exists
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });
     const customerId = customers.data[0]?.id;
 
     const origin = req.headers.get("origin") || "https://shop-flow-home.lovable.app";
+    const depositCents = Math.round(Number(plan.deposit_amount || 0) * 100);
 
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
@@ -58,33 +57,30 @@ Deno.serve(async (req) => {
       line_items: [{ price: plan.stripe_price_id, quantity: 1 }],
       subscription_data: {
         metadata: { membership_id, customer_id: user.id },
+        ...(depositCents > 0 && {
+          add_invoice_items: [
+            {
+              quantity: 1,
+              price_data: {
+                currency: "usd",
+                unit_amount: depositCents,
+                product_data: { name: `${plan.name} — Membership Deposit (non-refundable)` },
+              },
+            },
+          ],
+        }),
       },
-      ...(plan.deposit_amount > 0 && {
-        // Add deposit as one-time fee on first invoice
-        // Using add_invoice_items requires inline price_data
-      }),
-      metadata: {
-        membership_id,
-        customer_id: user.id,
-        deposit_amount: String(plan.deposit_amount || 0),
-        plan_name: plan.name,
-      },
+      metadata: { membership_id, customer_id: user.id, plan_name: plan.name },
       success_url: `${origin}/portal/dashboard?membership=success`,
       cancel_url: `${origin}/portal/membership-signup?canceled=1`,
     });
 
-    // Add deposit as a one-time invoice item to the first invoice
-    if (plan.deposit_amount > 0) {
-      // We can't use add_invoice_items in subscription mode without an existing price.
-      // Instead use subscription_data.add_invoice_items with price_data:
-      // Re-create session with that field included.
+    if (customerId) {
+      await admin
+        .from("memberships")
+        .update({ stripe_customer_id: customerId })
+        .eq("id", membership_id);
     }
-
-    // Save session reference
-    await admin
-      .from("memberships")
-      .update({ stripe_customer_id: customerId || null })
-      .eq("id", membership_id);
 
     return new Response(JSON.stringify({ url: session.url }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
