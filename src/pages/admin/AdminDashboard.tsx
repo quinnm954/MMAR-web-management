@@ -4,7 +4,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { LogOut, FileText, ShieldCheck, Users, CreditCard, Calendar, ClipboardList, Receipt, Wrench, Mail, FileSpreadsheet, ClipboardCheck, Package, Settings, KanbanSquare, Clock, BarChart3, MessageSquare, Car, AlertTriangle, FileDown } from 'lucide-react';
+import { LogOut, FileText, ShieldCheck, Users, CreditCard, Calendar, ClipboardList, Receipt, Wrench, Mail, FileSpreadsheet, ClipboardCheck, Package, Settings, KanbanSquare, Clock, BarChart3, MessageSquare, Car, AlertTriangle, FileDown, Activity } from 'lucide-react';
 import FinancingContractsTable from '@/components/admin/FinancingContractsTable';
 import WarrantyTable from '@/components/admin/WarrantyTable';
 import AdminCustomers from '@/components/admin/AdminCustomers';
@@ -110,6 +110,7 @@ const AdminDashboard = () => {
             <TabsTrigger value="invoices"><Receipt className="h-4 w-4 mr-1.5" /> Invoices</TabsTrigger>
             <TabsTrigger value="catalog"><Package className="h-4 w-4 mr-1.5" /> Catalog</TabsTrigger>
             <TabsTrigger value="time"><Clock className="h-4 w-4 mr-1.5" /> Time</TabsTrigger>
+            <TabsTrigger value="productivity"><Activity className="h-4 w-4 mr-1.5" /> Productivity</TabsTrigger>
             <TabsTrigger value="sms"><MessageSquare className="h-4 w-4 mr-1.5" /> SMS</TabsTrigger>
             <TabsTrigger value="declined"><AlertTriangle className="h-4 w-4 mr-1.5" /> Declined</TabsTrigger>
             <TabsTrigger value="quickbooks"><FileDown className="h-4 w-4 mr-1.5" /> QuickBooks</TabsTrigger>
@@ -133,6 +134,7 @@ const AdminDashboard = () => {
           <TabsContent value="invoices"><AdminInvoices /></TabsContent>
           <TabsContent value="catalog"><AdminCatalog /></TabsContent>
           <TabsContent value="time"><AdminTimeTracking /></TabsContent>
+          <TabsContent value="productivity"><AdminTechProductivity /></TabsContent>
           <TabsContent value="sms"><AdminSMS /></TabsContent>
           <TabsContent value="declined"><AdminDeclinedWork /></TabsContent>
           <TabsContent value="quickbooks"><AdminQuickBooksExport /></TabsContent>
