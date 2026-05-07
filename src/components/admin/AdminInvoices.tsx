@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
-import { Loader2, Plus, Receipt, MessageSquare } from "lucide-react";
+import { Loader2, Plus, Receipt, MessageSquare, Link2 } from "lucide-react";
 import { toast } from "sonner";
 
 interface Customer { id: string; full_name: string | null; email: string | null }
@@ -121,6 +121,23 @@ const AdminInvoices = () => {
     toast.success(`Payment link sent to ${(data as any)?.phone}`);
   };
 
+  const [copyingId, setCopyingId] = useState<string | null>(null);
+  const copyPaymentLink = async (invoiceId: string) => {
+    setCopyingId(invoiceId);
+    const { data, error } = await supabase.functions.invoke("send-invoice-payment-link", { body: { invoice_id: invoiceId, copy_only: true } });
+    setCopyingId(null);
+    const respErr = (data as any)?.error || error?.message;
+    if (respErr) return toast.error(respErr);
+    const url = (data as any)?.url;
+    if (!url) return toast.error("No link returned");
+    try {
+      await navigator.clipboard.writeText(url);
+      toast.success("Payment link copied");
+    } catch {
+      window.prompt("Copy payment link:", url);
+    }
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -176,16 +193,28 @@ const AdminInvoices = () => {
                     {i.amount_paid > 0 && <div className="text-xs text-muted-foreground">Paid ${i.amount_paid.toFixed(2)}</div>}
                   </div>
                   {i.status !== "paid" && i.status !== "void" && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => sendPaymentLink(i.id)}
-                      disabled={textingId === i.id}
-                      title="Text payment link to customer"
-                    >
-                      {textingId === i.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <MessageSquare className="h-3 w-3 mr-1" />}
-                      Text-to-Pay
-                    </Button>
+                    <>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => sendPaymentLink(i.id)}
+                        disabled={textingId === i.id}
+                        title="Send / resend payment link via SMS"
+                      >
+                        {textingId === i.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <MessageSquare className="h-3 w-3 mr-1" />}
+                        Resend SMS
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => copyPaymentLink(i.id)}
+                        disabled={copyingId === i.id}
+                        title="Copy payment link to clipboard"
+                      >
+                        {copyingId === i.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Link2 className="h-3 w-3 mr-1" />}
+                        Copy Link
+                      </Button>
+                    </>
                   )}
                   <Select value={i.status} onValueChange={(v) => updateStatus(i.id, v)}>
                     <SelectTrigger className="h-8 w-28 text-xs"><SelectValue /></SelectTrigger>
