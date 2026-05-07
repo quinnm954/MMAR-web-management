@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Helmet } from "react-helmet";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -55,17 +54,15 @@ const Memberships = () => {
       .then(({ data }) => setPlans((data as Plan[]) ?? []));
   }, []);
 
+  useEffect(() => {
+    document.title = "Mobile Mechanic Maintenance Plans | Mike's Mobile Auto Repair";
+    const metaDesc = document.querySelector('meta[name="description"]');
+    const desc = "Join MMAR's mobile maintenance membership plans in Fort Myers and Lehigh Acres Florida. Mobile oil changes, inspections, memberships, and recurring vehicle maintenance.";
+    if (metaDesc) metaDesc.setAttribute("content", desc);
+  }, []);
+
   return (
     <>
-      <Helmet>
-        <title>Mobile Mechanic Maintenance Plans | Mike's Mobile Auto Repair</title>
-        <meta
-          name="description"
-          content="Join MMAR's mobile maintenance membership plans in Fort Myers and Lehigh Acres Florida. Mobile oil changes, inspections, memberships, and recurring vehicle maintenance."
-        />
-        <link rel="canonical" href="https://mikesmobileautorepair.com/memberships" />
-      </Helmet>
-
       <div className="min-h-screen bg-background">
         <Navigation />
 
