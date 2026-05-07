@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Menu, X, ChevronDown, Phone } from "lucide-react";
+import { Menu, X, ChevronDown, Phone, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link, NavLink } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 import mmarLogo from "@/assets/mmar-logo.jpeg";
 import {
   DropdownMenu,
@@ -42,6 +43,7 @@ const RESOURCES = [
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { user } = useAuth();
   const close = () => setIsOpen(false);
 
   return (
@@ -106,11 +108,21 @@ const Navigation = () => {
               </DropdownMenuContent>
             </DropdownMenu>
 
+            <NavLink to="/memberships" className={({ isActive }) => `px-3 py-2 font-medium transition-colors ${isActive ? "text-accent" : "text-accent/80 hover:text-accent"}`}>
+              Memberships
+            </NavLink>
+
             <NavLink to="/contact" className={({ isActive }) => `px-3 py-2 font-medium transition-colors ${isActive ? "text-primary" : "text-muted-foreground hover:text-primary"}`}>
               Contact
             </NavLink>
 
-            <Button variant="hero" size="default" asChild className="ml-2">
+            <Button variant="outline" size="sm" asChild>
+              <Link to={user ? "/portal/dashboard" : "/portal/login"}>
+                <User className="w-4 h-4 mr-1" /> {user ? "Portal" : "Sign In"}
+              </Link>
+            </Button>
+
+            <Button variant="hero" size="default" asChild>
               <a href="tel:8135017572">
                 <Phone className="w-4 h-4 mr-1" /> Call Now
               </a>
@@ -175,7 +187,11 @@ const Navigation = () => {
                 </AccordionItem>
               </Accordion>
 
+              <Link to="/memberships" onClick={close} className="text-accent hover:text-accent/80 font-semibold py-3 px-2 rounded-lg">Memberships</Link>
               <Link to="/contact" onClick={close} className="text-foreground hover:text-primary font-medium py-3 px-2 rounded-lg">Contact</Link>
+              <Link to={user ? "/portal/dashboard" : "/portal/login"} onClick={close} className="text-foreground hover:text-primary font-medium py-3 px-2 rounded-lg flex items-center gap-2">
+                <User className="w-4 h-4" /> {user ? "Garage Ace Portal" : "Customer Sign In"}
+              </Link>
 
               <Button variant="hero" size="lg" asChild className="mt-3 min-h-[48px]">
                 <a href="tel:8135017572" onClick={close}>

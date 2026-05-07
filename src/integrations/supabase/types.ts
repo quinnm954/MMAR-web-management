@@ -14,6 +14,126 @@ export type Database = {
   }
   public: {
     Tables: {
+      ach_authorizations: {
+        Row: {
+          account_holder_name: string
+          account_last4: string | null
+          authorization_text: string
+          authorized_amount: number | null
+          bank_name: string | null
+          created_at: string
+          customer_id: string
+          id: string
+          ip_address: string | null
+          revoked_at: string | null
+          routing_last4: string | null
+          signature_image: string | null
+          signed_at: string
+          status: string
+          user_agent: string | null
+        }
+        Insert: {
+          account_holder_name: string
+          account_last4?: string | null
+          authorization_text: string
+          authorized_amount?: number | null
+          bank_name?: string | null
+          created_at?: string
+          customer_id: string
+          id?: string
+          ip_address?: string | null
+          revoked_at?: string | null
+          routing_last4?: string | null
+          signature_image?: string | null
+          signed_at?: string
+          status?: string
+          user_agent?: string | null
+        }
+        Update: {
+          account_holder_name?: string
+          account_last4?: string | null
+          authorization_text?: string
+          authorized_amount?: number | null
+          bank_name?: string | null
+          created_at?: string
+          customer_id?: string
+          id?: string
+          ip_address?: string | null
+          revoked_at?: string | null
+          routing_last4?: string | null
+          signature_image?: string | null
+          signed_at?: string
+          status?: string
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
+      appointments: {
+        Row: {
+          created_at: string
+          customer_id: string
+          description: string | null
+          id: string
+          membership_id: string | null
+          requested_date: string | null
+          requested_time_window: string | null
+          scheduled_at: string | null
+          service_address: string | null
+          service_type: string
+          status: string
+          technician_notes: string | null
+          updated_at: string
+          vehicle_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          customer_id: string
+          description?: string | null
+          id?: string
+          membership_id?: string | null
+          requested_date?: string | null
+          requested_time_window?: string | null
+          scheduled_at?: string | null
+          service_address?: string | null
+          service_type: string
+          status?: string
+          technician_notes?: string | null
+          updated_at?: string
+          vehicle_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          customer_id?: string
+          description?: string | null
+          id?: string
+          membership_id?: string | null
+          requested_date?: string | null
+          requested_time_window?: string | null
+          scheduled_at?: string | null
+          service_address?: string | null
+          service_type?: string
+          status?: string
+          technician_notes?: string | null
+          updated_at?: string
+          vehicle_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointments_membership_id_fkey"
+            columns: ["membership_id"]
+            isOneToOne: false
+            referencedRelation: "memberships"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointments_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       blog_comments: {
         Row: {
           author_email: string
@@ -137,6 +257,229 @@ export type Database = {
         }
         Relationships: []
       }
+      invoices: {
+        Row: {
+          amount_paid: number
+          created_at: string
+          customer_id: string
+          due_date: string | null
+          id: string
+          invoice_number: string | null
+          line_items: Json
+          membership_id: string | null
+          paid_at: string | null
+          pdf_url: string | null
+          service_record_id: string | null
+          status: string
+          subtotal: number
+          tax: number
+          total: number
+          updated_at: string
+        }
+        Insert: {
+          amount_paid?: number
+          created_at?: string
+          customer_id: string
+          due_date?: string | null
+          id?: string
+          invoice_number?: string | null
+          line_items?: Json
+          membership_id?: string | null
+          paid_at?: string | null
+          pdf_url?: string | null
+          service_record_id?: string | null
+          status?: string
+          subtotal?: number
+          tax?: number
+          total?: number
+          updated_at?: string
+        }
+        Update: {
+          amount_paid?: number
+          created_at?: string
+          customer_id?: string
+          due_date?: string | null
+          id?: string
+          invoice_number?: string | null
+          line_items?: Json
+          membership_id?: string | null
+          paid_at?: string | null
+          pdf_url?: string | null
+          service_record_id?: string | null
+          status?: string
+          subtotal?: number
+          tax?: number
+          total?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoices_membership_id_fkey"
+            columns: ["membership_id"]
+            isOneToOne: false
+            referencedRelation: "memberships"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoices_service_record_id_fkey"
+            columns: ["service_record_id"]
+            isOneToOne: false
+            referencedRelation: "service_records"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      membership_plans: {
+        Row: {
+          badge: string | null
+          created_at: string
+          deposit_amount: number
+          features: Json
+          id: string
+          included_oil_changes_yearly: number | null
+          included_oil_quarts: number | null
+          is_active: boolean
+          labor_discount_pct: number | null
+          monthly_price: number
+          name: string
+          slug: string
+          sort_order: number
+          tagline: string | null
+          total_at_signup: number
+          updated_at: string
+        }
+        Insert: {
+          badge?: string | null
+          created_at?: string
+          deposit_amount: number
+          features?: Json
+          id?: string
+          included_oil_changes_yearly?: number | null
+          included_oil_quarts?: number | null
+          is_active?: boolean
+          labor_discount_pct?: number | null
+          monthly_price: number
+          name: string
+          slug: string
+          sort_order?: number
+          tagline?: string | null
+          total_at_signup: number
+          updated_at?: string
+        }
+        Update: {
+          badge?: string | null
+          created_at?: string
+          deposit_amount?: number
+          features?: Json
+          id?: string
+          included_oil_changes_yearly?: number | null
+          included_oil_quarts?: number | null
+          is_active?: boolean
+          labor_discount_pct?: number | null
+          monthly_price?: number
+          name?: string
+          slug?: string
+          sort_order?: number
+          tagline?: string | null
+          total_at_signup?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      memberships: {
+        Row: {
+          ach_authorization_id: string | null
+          agreement_pdf_url: string | null
+          agreement_signed_at: string | null
+          cancellation_requested_at: string | null
+          cancelled_at: string | null
+          created_at: string
+          customer_id: string
+          deposit_paid: boolean
+          deposit_paid_at: string | null
+          id: string
+          ip_address: string | null
+          next_billing_date: string | null
+          notes: string | null
+          oil_changes_used: number
+          plan_id: string
+          signature_image: string | null
+          start_date: string | null
+          status: string
+          updated_at: string
+          user_agent: string | null
+          vehicle_id: string
+        }
+        Insert: {
+          ach_authorization_id?: string | null
+          agreement_pdf_url?: string | null
+          agreement_signed_at?: string | null
+          cancellation_requested_at?: string | null
+          cancelled_at?: string | null
+          created_at?: string
+          customer_id: string
+          deposit_paid?: boolean
+          deposit_paid_at?: string | null
+          id?: string
+          ip_address?: string | null
+          next_billing_date?: string | null
+          notes?: string | null
+          oil_changes_used?: number
+          plan_id: string
+          signature_image?: string | null
+          start_date?: string | null
+          status?: string
+          updated_at?: string
+          user_agent?: string | null
+          vehicle_id: string
+        }
+        Update: {
+          ach_authorization_id?: string | null
+          agreement_pdf_url?: string | null
+          agreement_signed_at?: string | null
+          cancellation_requested_at?: string | null
+          cancelled_at?: string | null
+          created_at?: string
+          customer_id?: string
+          deposit_paid?: boolean
+          deposit_paid_at?: string | null
+          id?: string
+          ip_address?: string | null
+          next_billing_date?: string | null
+          notes?: string | null
+          oil_changes_used?: number
+          plan_id?: string
+          signature_image?: string | null
+          start_date?: string | null
+          status?: string
+          updated_at?: string
+          user_agent?: string | null
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "memberships_ach_authorization_id_fkey"
+            columns: ["ach_authorization_id"]
+            isOneToOne: false
+            referencedRelation: "ach_authorizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "memberships_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "membership_plans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "memberships_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
@@ -160,6 +503,132 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      service_recommendations: {
+        Row: {
+          created_at: string
+          customer_id: string
+          due_date: string | null
+          due_mileage: number | null
+          estimated_cost: number | null
+          id: string
+          priority: string
+          recommendation: string
+          service_record_id: string | null
+          status: string
+          updated_at: string
+          vehicle_id: string
+        }
+        Insert: {
+          created_at?: string
+          customer_id: string
+          due_date?: string | null
+          due_mileage?: number | null
+          estimated_cost?: number | null
+          id?: string
+          priority?: string
+          recommendation: string
+          service_record_id?: string | null
+          status?: string
+          updated_at?: string
+          vehicle_id: string
+        }
+        Update: {
+          created_at?: string
+          customer_id?: string
+          due_date?: string | null
+          due_mileage?: number | null
+          estimated_cost?: number | null
+          id?: string
+          priority?: string
+          recommendation?: string
+          service_record_id?: string | null
+          status?: string
+          updated_at?: string
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_recommendations_service_record_id_fkey"
+            columns: ["service_record_id"]
+            isOneToOne: false
+            referencedRelation: "service_records"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "service_recommendations_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      service_records: {
+        Row: {
+          appointment_id: string | null
+          created_at: string
+          customer_id: string
+          id: string
+          invoice_total: number | null
+          labor_performed: string | null
+          mileage_at_service: number | null
+          parts_used: Json | null
+          photo_urls: Json | null
+          service_date: string
+          service_type: string
+          technician_notes: string | null
+          updated_at: string
+          vehicle_id: string
+        }
+        Insert: {
+          appointment_id?: string | null
+          created_at?: string
+          customer_id: string
+          id?: string
+          invoice_total?: number | null
+          labor_performed?: string | null
+          mileage_at_service?: number | null
+          parts_used?: Json | null
+          photo_urls?: Json | null
+          service_date: string
+          service_type: string
+          technician_notes?: string | null
+          updated_at?: string
+          vehicle_id: string
+        }
+        Update: {
+          appointment_id?: string | null
+          created_at?: string
+          customer_id?: string
+          id?: string
+          invoice_total?: number | null
+          labor_performed?: string | null
+          mileage_at_service?: number | null
+          parts_used?: Json | null
+          photo_urls?: Json | null
+          service_date?: string
+          service_type?: string
+          technician_notes?: string | null
+          updated_at?: string
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_records_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "service_records_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       social_cache: {
         Row: {
@@ -239,6 +708,69 @@ export type Database = {
         }
         Relationships: []
       }
+      vehicles: {
+        Row: {
+          color: string | null
+          created_at: string
+          current_mileage: number | null
+          engine: string | null
+          id: string
+          is_active: boolean
+          license_plate: string | null
+          make: string | null
+          model: string | null
+          notes: string | null
+          oil_capacity_qts: number | null
+          oil_filter_part: string | null
+          oil_viscosity: string | null
+          owner_id: string
+          trim: string | null
+          updated_at: string
+          vin: string | null
+          year: number | null
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          current_mileage?: number | null
+          engine?: string | null
+          id?: string
+          is_active?: boolean
+          license_plate?: string | null
+          make?: string | null
+          model?: string | null
+          notes?: string | null
+          oil_capacity_qts?: number | null
+          oil_filter_part?: string | null
+          oil_viscosity?: string | null
+          owner_id: string
+          trim?: string | null
+          updated_at?: string
+          vin?: string | null
+          year?: number | null
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          current_mileage?: number | null
+          engine?: string | null
+          id?: string
+          is_active?: boolean
+          license_plate?: string | null
+          make?: string | null
+          model?: string | null
+          notes?: string | null
+          oil_capacity_qts?: number | null
+          oil_filter_part?: string | null
+          oil_viscosity?: string | null
+          owner_id?: string
+          trim?: string | null
+          updated_at?: string
+          vin?: string | null
+          year?: number | null
+        }
+        Relationships: []
+      }
       warranty_acknowledgments: {
         Row: {
           created_at: string
@@ -292,7 +824,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "user"
+      app_role: "admin" | "user" | "customer"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -420,7 +952,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "user"],
+      app_role: ["admin", "user", "customer"],
     },
   },
 } as const
