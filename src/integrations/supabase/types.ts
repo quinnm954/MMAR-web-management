@@ -71,16 +71,19 @@ export type Database = {
       appointments: {
         Row: {
           assigned_technician_id: string | null
+          board_column: string
           created_at: string
           customer_id: string
           description: string | null
           id: string
           membership_id: string | null
+          priority: string
           requested_date: string | null
           requested_time_window: string | null
           scheduled_at: string | null
           service_address: string | null
           service_type: string
+          sort_order: number
           status: string
           technician_notes: string | null
           updated_at: string
@@ -88,16 +91,19 @@ export type Database = {
         }
         Insert: {
           assigned_technician_id?: string | null
+          board_column?: string
           created_at?: string
           customer_id: string
           description?: string | null
           id?: string
           membership_id?: string | null
+          priority?: string
           requested_date?: string | null
           requested_time_window?: string | null
           scheduled_at?: string | null
           service_address?: string | null
           service_type: string
+          sort_order?: number
           status?: string
           technician_notes?: string | null
           updated_at?: string
@@ -105,16 +111,19 @@ export type Database = {
         }
         Update: {
           assigned_technician_id?: string | null
+          board_column?: string
           created_at?: string
           customer_id?: string
           description?: string | null
           id?: string
           membership_id?: string | null
+          priority?: string
           requested_date?: string | null
           requested_time_window?: string | null
           scheduled_at?: string | null
           service_address?: string | null
           service_type?: string
+          sort_order?: number
           status?: string
           technician_notes?: string | null
           updated_at?: string
@@ -1016,6 +1025,83 @@ export type Database = {
         }
         Relationships: []
       }
+      sms_messages: {
+        Row: {
+          body: string
+          created_at: string
+          direction: string
+          id: string
+          media_urls: Json
+          sent_by: string | null
+          status: string | null
+          thread_id: string
+          twilio_sid: string | null
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          direction: string
+          id?: string
+          media_urls?: Json
+          sent_by?: string | null
+          status?: string | null
+          thread_id: string
+          twilio_sid?: string | null
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          direction?: string
+          id?: string
+          media_urls?: Json
+          sent_by?: string | null
+          status?: string | null
+          thread_id?: string
+          twilio_sid?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sms_messages_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "sms_threads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sms_threads: {
+        Row: {
+          created_at: string
+          customer_id: string | null
+          id: string
+          last_message_at: string
+          last_message_preview: string | null
+          phone: string
+          unread_count: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          customer_id?: string | null
+          id?: string
+          last_message_at?: string
+          last_message_preview?: string | null
+          phone: string
+          unread_count?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          customer_id?: string | null
+          id?: string
+          last_message_at?: string
+          last_message_preview?: string | null
+          phone?: string
+          unread_count?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       social_cache: {
         Row: {
           fetched_at: string
@@ -1094,6 +1180,42 @@ export type Database = {
           updated_at?: string
           video_id?: string
           video_url?: string
+        }
+        Relationships: []
+      }
+      time_entries: {
+        Row: {
+          appointment_id: string
+          clock_in: string
+          clock_out: string | null
+          created_at: string
+          duration_minutes: number | null
+          id: string
+          notes: string | null
+          technician_id: string
+          updated_at: string
+        }
+        Insert: {
+          appointment_id: string
+          clock_in?: string
+          clock_out?: string | null
+          created_at?: string
+          duration_minutes?: number | null
+          id?: string
+          notes?: string | null
+          technician_id: string
+          updated_at?: string
+        }
+        Update: {
+          appointment_id?: string
+          clock_in?: string
+          clock_out?: string | null
+          created_at?: string
+          duration_minutes?: number | null
+          id?: string
+          notes?: string | null
+          technician_id?: string
+          updated_at?: string
         }
         Relationships: []
       }
