@@ -101,6 +101,7 @@ const AdminDashboard = () => {
             <FinancingContractsTable data={contracts} onRefresh={reloadFinancing} />
           </TabsContent>
           <TabsContent value="warranty"><WarrantyTable data={warranties} onRefresh={reloadWarranty} /></TabsContent>
+          <TabsContent value="emails"><AdminEmails /></TabsContent>
         </Tabs>
       </main>
     </div>
