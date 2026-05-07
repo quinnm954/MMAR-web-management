@@ -32,7 +32,7 @@ export interface WizardData {
   membershipId?: string;
 }
 
-const STEPS = ["Account", "Vehicle", "Plan", "Payment", "Agreement"] as const;
+const STEPS = ["Account", "Vehicle", "Plan", "Agreement"] as const;
 
 const MembershipSignup = () => {
   const { user, isLoading } = useAuth();
@@ -99,14 +99,12 @@ const MembershipSignup = () => {
                   defaultPlanSlug={params.get("plan")}
                 />
               )}
-              {step === 3 && <StepACH data={data} setData={setData} onNext={next} onBack={back} />}
-              {step === 4 && (
+              {step === 3 && (
                 <StepAgreement
                   data={data}
                   setData={setData}
                   onComplete={() => {
-                    toast.success("Membership activated!");
-                    navigate("/portal/dashboard");
+                    toast.success("Membership created! Redirecting to checkout…");
                   }}
                   onBack={back}
                 />
