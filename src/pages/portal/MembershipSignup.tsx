@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
 import Navigation from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -11,7 +10,6 @@ import { Loader2, Wrench } from "lucide-react";
 import StepAccount from "@/components/portal/wizard/StepAccount";
 import StepVehicle from "@/components/portal/wizard/StepVehicle";
 import StepPlan from "@/components/portal/wizard/StepPlan";
-import StepACH from "@/components/portal/wizard/StepACH";
 import StepAgreement from "@/components/portal/wizard/StepAgreement";
 
 export interface WizardData {
@@ -32,7 +30,7 @@ export interface WizardData {
   membershipId?: string;
 }
 
-const STEPS = ["Account", "Vehicle", "Plan", "Payment", "Agreement"] as const;
+const STEPS = ["Account", "Vehicle", "Plan", "Agreement"] as const;
 
 const MembershipSignup = () => {
   const { user, isLoading } = useAuth();
@@ -99,14 +97,12 @@ const MembershipSignup = () => {
                   defaultPlanSlug={params.get("plan")}
                 />
               )}
-              {step === 3 && <StepACH data={data} setData={setData} onNext={next} onBack={back} />}
-              {step === 4 && (
+              {step === 3 && (
                 <StepAgreement
                   data={data}
                   setData={setData}
                   onComplete={() => {
-                    toast.success("Membership activated!");
-                    navigate("/portal/dashboard");
+                    toast.success("Membership created! Redirecting to checkout…");
                   }}
                   onBack={back}
                 />

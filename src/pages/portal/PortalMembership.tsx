@@ -58,6 +58,15 @@ const PortalMembership = () => {
     window.location.reload();
   };
 
+  const openPortal = async () => {
+    const { data, error } = await supabase.functions.invoke("customer-portal");
+    if (error || !data?.url) {
+      alert(error?.message || "Could not open billing portal");
+      return;
+    }
+    window.location.href = data.url;
+  };
+
   return (
     <PortalLayout>
       <div className="flex items-center justify-between mb-6">
@@ -126,6 +135,11 @@ const PortalMembership = () => {
                     {m.agreement_pdf_url && (
                       <Button variant="outline" size="sm" onClick={() => downloadPdf(m.agreement_pdf_url!)}>
                         <FileText className="h-4 w-4 mr-1" /> View Agreement
+                      </Button>
+                    )}
+                    {m.status === "active" && (
+                      <Button variant="outline" size="sm" onClick={openPortal}>
+                        <CreditCard className="h-4 w-4 mr-1" /> Manage Billing
                       </Button>
                     )}
                     {m.status === "active" && !m.cancellation_requested_at && (
