@@ -6,7 +6,8 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
-import { Send, MessageSquare } from 'lucide-react';
+import { Send, MessageSquare, Receipt } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export default function AdminSMS() {
   const [threads, setThreads] = useState<any[]>([]);
