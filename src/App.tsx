@@ -29,6 +29,11 @@ import PortalLogin from "./pages/portal/PortalLogin";
 import PortalSignup from "./pages/portal/PortalSignup";
 import PortalDashboard from "./pages/portal/PortalDashboard";
 import MembershipSignup from "./pages/portal/MembershipSignup";
+import PortalVehicles from "./pages/portal/PortalVehicles";
+import PortalMembership from "./pages/portal/PortalMembership";
+import PortalAppointments from "./pages/portal/PortalAppointments";
+import PortalServiceHistory from "./pages/portal/PortalServiceHistory";
+import PortalInvoices from "./pages/portal/PortalInvoices";
 import CustomerProtectedRoute from "./components/portal/CustomerProtectedRoute";
 import NotFound from "./pages/NotFound";
 
@@ -62,14 +67,12 @@ const App = () => (
             <Route path="/portal/login" element={<PortalLogin />} />
             <Route path="/portal/signup" element={<PortalSignup />} />
             <Route path="/portal/membership-signup" element={<MembershipSignup />} />
-            <Route
-              path="/portal/dashboard"
-              element={
-                <CustomerProtectedRoute>
-                  <PortalDashboard />
-                </CustomerProtectedRoute>
-              }
-            />
+            <Route path="/portal/dashboard" element={<CustomerProtectedRoute><PortalDashboard /></CustomerProtectedRoute>} />
+            <Route path="/portal/vehicles" element={<CustomerProtectedRoute><PortalVehicles /></CustomerProtectedRoute>} />
+            <Route path="/portal/membership" element={<CustomerProtectedRoute><PortalMembership /></CustomerProtectedRoute>} />
+            <Route path="/portal/appointments" element={<CustomerProtectedRoute><PortalAppointments /></CustomerProtectedRoute>} />
+            <Route path="/portal/service-history" element={<CustomerProtectedRoute><PortalServiceHistory /></CustomerProtectedRoute>} />
+            <Route path="/portal/invoices" element={<CustomerProtectedRoute><PortalInvoices /></CustomerProtectedRoute>} />
             <Route
               path="/admin/dashboard"
               element={
