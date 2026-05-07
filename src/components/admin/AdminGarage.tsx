@@ -4,6 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Car, Wrench, FileText, ClipboardCheck, Receipt } from 'lucide-react';
+import VinDecoder from './VinDecoder';
+import { toast } from 'sonner';
 
 export default function AdminGarage() {
   const [vehicles, setVehicles] = useState<any[]>([]);
@@ -67,7 +69,11 @@ export default function AdminGarage() {
           ))}
         </div>
       </div>
-      <div className="md:col-span-2">
+      <div className="md:col-span-2 space-y-3">
+        <VinDecoder onApply={(d) => {
+          navigator.clipboard?.writeText(JSON.stringify(d, null, 2));
+          toast.success('Copied decoded data to clipboard');
+        }} />
         {!selected ? (
           <Card><CardContent className="p-6 text-sm text-muted-foreground">Select a vehicle to view timeline.</CardContent></Card>
         ) : (

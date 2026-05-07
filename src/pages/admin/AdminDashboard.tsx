@@ -4,7 +4,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { LogOut, FileText, ShieldCheck, Users, CreditCard, Calendar, ClipboardList, Receipt, Wrench, Mail, FileSpreadsheet, ClipboardCheck, Package, Settings, KanbanSquare, Clock, BarChart3, MessageSquare, Car } from 'lucide-react';
+import { LogOut, FileText, ShieldCheck, Users, CreditCard, Calendar, ClipboardList, Receipt, Wrench, Mail, FileSpreadsheet, ClipboardCheck, Package, Settings, KanbanSquare, Clock, BarChart3, MessageSquare, Car, AlertTriangle, FileDown } from 'lucide-react';
 import FinancingContractsTable from '@/components/admin/FinancingContractsTable';
 import WarrantyTable from '@/components/admin/WarrantyTable';
 import AdminCustomers from '@/components/admin/AdminCustomers';
@@ -22,6 +22,8 @@ import AdminTimeTracking from '@/components/admin/AdminTimeTracking';
 import AdminReports from '@/components/admin/AdminReports';
 import AdminSMS from '@/components/admin/AdminSMS';
 import AdminGarage from '@/components/admin/AdminGarage';
+import AdminDeclinedWork from '@/components/admin/AdminDeclinedWork';
+import AdminQuickBooksExport from '@/components/admin/AdminQuickBooksExport';
 import { supabase } from '@/integrations/supabase/client';
 import mmarLogo from '@/assets/mmar-logo.jpeg';
 
@@ -104,6 +106,8 @@ const AdminDashboard = () => {
             <TabsTrigger value="catalog"><Package className="h-4 w-4 mr-1.5" /> Catalog</TabsTrigger>
             <TabsTrigger value="time"><Clock className="h-4 w-4 mr-1.5" /> Time</TabsTrigger>
             <TabsTrigger value="sms"><MessageSquare className="h-4 w-4 mr-1.5" /> SMS</TabsTrigger>
+            <TabsTrigger value="declined"><AlertTriangle className="h-4 w-4 mr-1.5" /> Declined</TabsTrigger>
+            <TabsTrigger value="quickbooks"><FileDown className="h-4 w-4 mr-1.5" /> QuickBooks</TabsTrigger>
             <TabsTrigger value="financing"><FileText className="h-4 w-4 mr-1.5" /> Financing</TabsTrigger>
             <TabsTrigger value="warranty"><ShieldCheck className="h-4 w-4 mr-1.5" /> Warranty</TabsTrigger>
             <TabsTrigger value="emails"><Mail className="h-4 w-4 mr-1.5" /> Emails</TabsTrigger>
@@ -123,6 +127,8 @@ const AdminDashboard = () => {
           <TabsContent value="catalog"><AdminCatalog /></TabsContent>
           <TabsContent value="time"><AdminTimeTracking /></TabsContent>
           <TabsContent value="sms"><AdminSMS /></TabsContent>
+          <TabsContent value="declined"><AdminDeclinedWork /></TabsContent>
+          <TabsContent value="quickbooks"><AdminQuickBooksExport /></TabsContent>
           <TabsContent value="financing">
             <FinancingContractsTable data={contracts} onRefresh={reloadFinancing} />
           </TabsContent>

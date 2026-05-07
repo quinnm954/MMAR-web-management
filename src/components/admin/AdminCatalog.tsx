@@ -9,8 +9,18 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
-import { Plus, Pencil, AlertCircle } from 'lucide-react';
+import { Plus, Pencil, AlertCircle, Upload, Calculator } from 'lucide-react';
 import { toast } from 'sonner';
+
+const parseCsv = (text: string): Record<string, string>[] => {
+  const lines = text.split(/\r?\n/).filter(Boolean);
+  if (lines.length < 2) return [];
+  const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+  return lines.slice(1).map(line => {
+    const cells = line.match(/("([^"]|"")*"|[^,]*)(,|$)/g)?.map(c => c.replace(/,$/, '').replace(/^"|"$/g, '').replace(/""/g, '"').trim()) ?? [];
+    return Object.fromEntries(headers.map((h, i) => [h, cells[i] ?? '']));
+  });
+};
 
 interface CatalogItem {
   id: string;
@@ -84,7 +94,43 @@ const AdminCatalog = () => {
             </Button>
           ))}
         </div>
-        <Button onClick={() => setEditing(blank)}><Plus className="h-4 w-4 mr-1" /> New Item</Button>
+        <div className="flex gap-2">
+          <input
+            id="catalog-csv"
+            type="file"
+            accept=".csv"
+            className="hidden"
+            onChange={async (e) => {
+              const file = e.target.files?.[0];
+              if (!file) return;
+              const rows = parseCsv(await file.text());
+              if (rows.length === 0) return toast.error('No rows found');
+              const payload = rows.map(r => ({
+                type: r.type || 'part',
+                sku: r.sku || null,
+                name: r.name,
+                description: r.description || null,
+                category: r.category || null,
+                vendor: r.vendor || null,
+                cost: parseFloat(r.cost || '0') || 0,
+                unit_price: parseFloat(r.unit_price || r.price || '0') || 0,
+                track_inventory: ['true', 'yes', '1'].includes((r.track_inventory || '').toLowerCase()),
+                on_hand: parseInt(r.on_hand || '0') || 0,
+                reorder_point: parseInt(r.reorder_point || '0') || 0,
+                is_active: true,
+              })).filter(p => p.name);
+              const { error } = await supabase.from('catalog_items').insert(payload as any);
+              if (error) return toast.error(error.message);
+              toast.success(`Imported ${payload.length} items`);
+              (e.target as HTMLInputElement).value = '';
+              load();
+            }}
+          />
+          <Button variant="outline" onClick={() => document.getElementById('catalog-csv')?.click()}>
+            <Upload className="h-4 w-4 mr-1" /> Import CSV
+          </Button>
+          <Button onClick={() => setEditing(blank)}><Plus className="h-4 w-4 mr-1" /> New Item</Button>
+        </div>
       </div>
 
       <Card>
@@ -155,6 +201,19 @@ const AdminCatalog = () => {
               <div><Label>Vendor</Label><Input value={editing.vendor ?? ''} onChange={e => setEditing({ ...editing, vendor: e.target.value })} /></div>
               <div><Label>Unit Price ($)</Label><Input type="number" step="0.01" value={editing.unit_price ?? 0} onChange={e => setEditing({ ...editing, unit_price: parseFloat(e.target.value) || 0 })} /></div>
               <div><Label>Cost ($)</Label><Input type="number" step="0.01" value={editing.cost ?? 0} onChange={e => setEditing({ ...editing, cost: parseFloat(e.target.value) || 0 })} /></div>
+              <div className="col-span-2 flex flex-wrap gap-2 -mt-1">
+                <span className="text-xs text-muted-foreground self-center">Auto-markup from cost:</span>
+                {[1.4, 1.5, 1.75, 2.0].map(m => (
+                  <Button key={m} type="button" size="sm" variant="outline" onClick={() => setEditing({ ...editing, unit_price: Number(((editing.cost ?? 0) * m).toFixed(2)) })}>
+                    <Calculator className="h-3 w-3 mr-1" /> {Math.round((m - 1) * 100)}%
+                  </Button>
+                ))}
+                {(editing.cost ?? 0) > 0 && (editing.unit_price ?? 0) > 0 && (
+                  <span className="text-xs self-center text-muted-foreground">
+                    Margin: {Math.round((((editing.unit_price ?? 0) - (editing.cost ?? 0)) / (editing.unit_price ?? 1)) * 100)}%
+                  </span>
+                )}
+              </div>
               {editing.type === 'labor' && (
                 <div className="col-span-2"><Label>Standard Labor Hours</Label><Input type="number" step="0.1" value={editing.labor_hours ?? 0} onChange={e => setEditing({ ...editing, labor_hours: parseFloat(e.target.value) || 0 })} /></div>
               )}
