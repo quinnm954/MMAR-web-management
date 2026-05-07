@@ -5,9 +5,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Loader2, Car, User, ClipboardCheck, FileSpreadsheet, Receipt, Wrench, Clock, ExternalLink } from "lucide-react";
+import { Loader2, Car, User, ClipboardCheck, FileSpreadsheet, Receipt, Wrench, Clock, ExternalLink, Paperclip } from "lucide-react";
 import { Link } from "react-router-dom";
 import { format } from "date-fns";
+import ROAttachments from "./ROAttachments";
 
 interface Props {
   appointmentId: string | null;
@@ -227,6 +228,11 @@ export default function RepairOrderDetail({ appointmentId, open, onClose }: Prop
                   </div>
                 </Row>
               ))}
+            </Section>
+
+            {/* Attachments */}
+            <Section icon={Paperclip} title="Documents & Photos">
+              <ROAttachments appointmentId={appt.id} />
             </Section>
           </div>
         )}

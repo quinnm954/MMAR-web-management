@@ -4,7 +4,9 @@ import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { LogOut, FileText, ShieldCheck, Users, CreditCard, Calendar, ClipboardList, Receipt, Wrench, Mail, FileSpreadsheet, ClipboardCheck, Package, Settings, KanbanSquare, Clock, BarChart3, MessageSquare, Car, AlertTriangle, FileDown, Activity } from 'lucide-react';
+import { LogOut, FileText, ShieldCheck, Users, CreditCard, Calendar, ClipboardList, Receipt, Wrench, Mail, FileSpreadsheet, ClipboardCheck, Package, Settings, KanbanSquare, Clock, BarChart3, MessageSquare, Car, AlertTriangle, FileDown, Activity, History } from 'lucide-react';
+import AdminAuditLog from '@/components/admin/AdminAuditLog';
+import AdminRoles from '@/components/admin/AdminRoles';
 import FinancingContractsTable from '@/components/admin/FinancingContractsTable';
 import WarrantyTable from '@/components/admin/WarrantyTable';
 import AdminCustomers from '@/components/admin/AdminCustomers';
@@ -117,6 +119,8 @@ const AdminDashboard = () => {
             <TabsTrigger value="financing"><FileText className="h-4 w-4 mr-1.5" /> Financing</TabsTrigger>
             <TabsTrigger value="warranty"><ShieldCheck className="h-4 w-4 mr-1.5" /> Warranty</TabsTrigger>
             <TabsTrigger value="emails"><Mail className="h-4 w-4 mr-1.5" /> Emails</TabsTrigger>
+            <TabsTrigger value="audit"><History className="h-4 w-4 mr-1.5" /> Audit Log</TabsTrigger>
+            <TabsTrigger value="roles"><ShieldCheck className="h-4 w-4 mr-1.5" /> Roles</TabsTrigger>
             <TabsTrigger value="settings"><Settings className="h-4 w-4 mr-1.5" /> Settings</TabsTrigger>
           </TabsList>
 
@@ -143,6 +147,8 @@ const AdminDashboard = () => {
           </TabsContent>
           <TabsContent value="warranty"><WarrantyTable data={warranties} onRefresh={reloadWarranty} /></TabsContent>
           <TabsContent value="emails"><AdminEmails /></TabsContent>
+          <TabsContent value="audit"><AdminAuditLog /></TabsContent>
+          <TabsContent value="roles"><AdminRoles /></TabsContent>
           <TabsContent value="settings"><AdminShopSettings /></TabsContent>
         </Tabs>
       </main>

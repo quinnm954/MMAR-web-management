@@ -146,6 +146,45 @@ export type Database = {
           },
         ]
       }
+      audit_logs: {
+        Row: {
+          action: string
+          actor_email: string | null
+          actor_id: string | null
+          after_data: Json | null
+          before_data: Json | null
+          changed_fields: string[] | null
+          created_at: string
+          id: string
+          record_id: string | null
+          table_name: string
+        }
+        Insert: {
+          action: string
+          actor_email?: string | null
+          actor_id?: string | null
+          after_data?: Json | null
+          before_data?: Json | null
+          changed_fields?: string[] | null
+          created_at?: string
+          id?: string
+          record_id?: string | null
+          table_name: string
+        }
+        Update: {
+          action?: string
+          actor_email?: string | null
+          actor_id?: string | null
+          after_data?: Json | null
+          before_data?: Json | null
+          changed_fields?: string[] | null
+          created_at?: string
+          id?: string
+          record_id?: string | null
+          table_name?: string
+        }
+        Relationships: []
+      }
       blog_comments: {
         Row: {
           author_email: string
@@ -878,6 +917,45 @@ export type Database = {
         }
         Relationships: []
       }
+      ro_attachments: {
+        Row: {
+          appointment_id: string
+          category: string
+          created_at: string
+          file_name: string
+          file_path: string
+          id: string
+          mime_type: string | null
+          notes: string | null
+          size_bytes: number | null
+          uploaded_by: string | null
+        }
+        Insert: {
+          appointment_id: string
+          category?: string
+          created_at?: string
+          file_name: string
+          file_path: string
+          id?: string
+          mime_type?: string | null
+          notes?: string | null
+          size_bytes?: number | null
+          uploaded_by?: string | null
+        }
+        Update: {
+          appointment_id?: string
+          category?: string
+          created_at?: string
+          file_name?: string
+          file_path?: string
+          id?: string
+          mime_type?: string | null
+          notes?: string | null
+          size_bytes?: number | null
+          uploaded_by?: string | null
+        }
+        Relationships: []
+      }
       service_recommendations: {
         Row: {
           created_at: string
@@ -1410,6 +1488,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_staff: { Args: { _user_id: string }; Returns: boolean }
       move_to_dlq: {
         Args: {
           dlq_name: string
@@ -1429,7 +1508,14 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "user" | "customer" | "technician"
+      app_role:
+        | "admin"
+        | "user"
+        | "customer"
+        | "technician"
+        | "service_advisor"
+        | "parts"
+        | "manager"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1557,7 +1643,15 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "user", "customer", "technician"],
+      app_role: [
+        "admin",
+        "user",
+        "customer",
+        "technician",
+        "service_advisor",
+        "parts",
+        "manager",
+      ],
     },
   },
 } as const
