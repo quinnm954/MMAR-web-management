@@ -40,6 +40,9 @@ Deno.serve(async (req) => {
     if (event.type === "checkout.session.completed") {
       const session = event.data.object as Stripe.Checkout.Session;
       const invoiceId = session.metadata?.invoice_id;
+      const membershipId = session.metadata?.membership_id;
+
+      // One-off invoice payment
       if (invoiceId && session.payment_status === "paid") {
         const amount = (session.amount_total || 0) / 100;
         await admin
@@ -52,6 +55,48 @@ Deno.serve(async (req) => {
           })
           .eq("id", invoiceId);
         console.log("Invoice paid", invoiceId);
+      }
+
+      // Membership subscription checkout completed
+      if (membershipId && session.mode === "subscription") {
+        await admin
+          .from("memberships")
+          .update({
+            status: "active",
+            stripe_customer_id: session.customer as string,
+            stripe_subscription_id: session.subscription as string,
+            deposit_paid: true,
+            deposit_paid_at: new Date().toISOString(),
+          })
+          .eq("id", membershipId);
+        console.log("Membership activated", membershipId);
+      }
+    }
+
+    if (event.type === "customer.subscription.updated" || event.type === "customer.subscription.deleted") {
+      const sub = event.data.object as Stripe.Subscription;
+      const status = event.type === "customer.subscription.deleted" ? "cancelled" : sub.status;
+      await admin
+        .from("memberships")
+        .update({
+          status,
+          current_period_end: sub.current_period_end ? new Date(sub.current_period_end * 1000).toISOString() : null,
+          ...(status === "cancelled" && { cancelled_at: new Date().toISOString() }),
+        })
+        .eq("stripe_subscription_id", sub.id);
+    }
+
+    if (event.type === "invoice.payment_succeeded") {
+      const inv = event.data.object as Stripe.Invoice;
+      if (inv.subscription) {
+        await admin
+          .from("memberships")
+          .update({
+            next_billing_date: inv.lines.data[0]?.period?.end
+              ? new Date(inv.lines.data[0].period.end * 1000).toISOString().slice(0, 10)
+              : null,
+          })
+          .eq("stripe_subscription_id", inv.subscription as string);
       }
     }
 
