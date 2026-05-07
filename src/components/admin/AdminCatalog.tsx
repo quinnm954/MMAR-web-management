@@ -9,8 +9,18 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
-import { Plus, Pencil, AlertCircle } from 'lucide-react';
+import { Plus, Pencil, AlertCircle, Upload, Calculator } from 'lucide-react';
 import { toast } from 'sonner';
+
+const parseCsv = (text: string): Record<string, string>[] => {
+  const lines = text.split(/\r?\n/).filter(Boolean);
+  if (lines.length < 2) return [];
+  const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+  return lines.slice(1).map(line => {
+    const cells = line.match(/("([^"]|"")*"|[^,]*)(,|$)/g)?.map(c => c.replace(/,$/, '').replace(/^"|"$/g, '').replace(/""/g, '"').trim()) ?? [];
+    return Object.fromEntries(headers.map((h, i) => [h, cells[i] ?? '']));
+  });
+};
 
 interface CatalogItem {
   id: string;
