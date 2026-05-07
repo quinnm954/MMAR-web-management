@@ -4,7 +4,7 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { useSeo } from "@/lib/useSeo";
 
-const GMB_CID = "14149143066125974421";
+const GMB_CID = "4273245475534037331";
 // Direct "write a review" deep link via the place CID. This opens the
 // Google review composer for our Google Business Profile.
 const REVIEW_URL = `https://search.google.com/local/writereview?placeid=&cid=${GMB_CID}`;
