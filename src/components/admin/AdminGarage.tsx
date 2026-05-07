@@ -67,7 +67,11 @@ export default function AdminGarage() {
           ))}
         </div>
       </div>
-      <div className="md:col-span-2">
+      <div className="md:col-span-2 space-y-3">
+        <VinDecoder onApply={(d) => {
+          navigator.clipboard?.writeText(JSON.stringify(d, null, 2));
+          toast.success('Copied decoded data to clipboard');
+        }} />
         {!selected ? (
           <Card><CardContent className="p-6 text-sm text-muted-foreground">Select a vehicle to view timeline.</CardContent></Card>
         ) : (
