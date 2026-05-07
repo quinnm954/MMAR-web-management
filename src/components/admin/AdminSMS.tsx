@@ -6,7 +6,8 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
-import { Send, MessageSquare } from 'lucide-react';
+import { Send, MessageSquare, Receipt } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export default function AdminSMS() {
   const [threads, setThreads] = useState<any[]>([]);
@@ -15,10 +16,12 @@ export default function AdminSMS() {
   const [body, setBody] = useState('');
   const [newPhone, setNewPhone] = useState('');
 
+  const [invoicesById, setInvoicesById] = useState<Record<string, any>>({});
+
   const loadThreads = async () => {
     const { data } = await supabase
       .from('sms_threads')
-      .select('*, profiles:customer_id(full_name, email)')
+      .select('*, profiles:customer_id(full_name, email), last_invoice:last_invoice_id(id, invoice_number, total, amount_paid, status)')
       .order('last_message_at', { ascending: false });
     setThreads(data ?? []);
   };
@@ -42,7 +45,17 @@ export default function AdminSMS() {
       .select('*')
       .eq('thread_id', threadId)
       .order('created_at', { ascending: true });
-    setMessages(data ?? []);
+    const msgs = data ?? [];
+    setMessages(msgs);
+    const ids = Array.from(new Set(msgs.map((m: any) => m.invoice_id).filter(Boolean)));
+    if (ids.length) {
+      const { data: invs } = await supabase.from('invoices').select('id, invoice_number, total, amount_paid, status').in('id', ids);
+      const map: Record<string, any> = {};
+      (invs ?? []).forEach((i: any) => { map[i.id] = i; });
+      setInvoicesById(map);
+    } else {
+      setInvoicesById({});
+    }
     await supabase.from('sms_threads').update({ unread_count: 0 }).eq('id', threadId);
   };
 
@@ -95,6 +108,13 @@ export default function AdminSMS() {
                 {t.unread_count > 0 && <Badge>{t.unread_count}</Badge>}
               </div>
               <div className="text-xs text-muted-foreground truncate">{t.last_message_preview}</div>
+              {t.last_invoice && (
+                <div className="mt-1 flex items-center gap-1 text-[10px] text-primary">
+                  <Receipt className="h-3 w-3" />
+                  <span className="font-mono">{t.last_invoice.invoice_number}</span>
+                  <span className="text-muted-foreground">· ${Number(t.last_invoice.total - t.last_invoice.amount_paid).toFixed(2)} {t.last_invoice.status}</span>
+                </div>
+              )}
             </button>
           ))}
           {threads.length === 0 && <p className="text-xs text-muted-foreground p-2">No conversations yet.</p>}
@@ -109,16 +129,31 @@ export default function AdminSMS() {
             <CardHeader className="pb-2">
               <CardTitle className="text-sm">{active.profiles?.full_name || active.phone}</CardTitle>
               <p className="text-xs text-muted-foreground">{active.phone}</p>
+              {active.last_invoice && (
+                <Link to="/admin?tab=invoices" className="inline-flex items-center gap-1 text-xs text-primary hover:underline mt-1">
+                  <Receipt className="h-3 w-3" /> Linked invoice {active.last_invoice.invoice_number} · ${Number(active.last_invoice.total - active.last_invoice.amount_paid).toFixed(2)} {active.last_invoice.status}
+                </Link>
+              )}
             </CardHeader>
             <CardContent className="flex-1 overflow-y-auto space-y-2">
-              {messages.map(m => (
-                <div key={m.id} className={`flex ${m.direction === 'outbound' ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`rounded-lg px-3 py-2 max-w-[70%] text-sm ${m.direction === 'outbound' ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
-                    <div>{m.body}</div>
-                    <div className="text-[10px] opacity-70 mt-0.5">{new Date(m.created_at).toLocaleString()}</div>
+              {messages.map(m => {
+                const inv = m.invoice_id ? invoicesById[m.invoice_id] : null;
+                return (
+                  <div key={m.id} className={`flex ${m.direction === 'outbound' ? 'justify-end' : 'justify-start'}`}>
+                    <div className={`rounded-lg px-3 py-2 max-w-[70%] text-sm ${m.direction === 'outbound' ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
+                      <div className="whitespace-pre-wrap">{m.body}</div>
+                      <div className="text-[10px] opacity-70 mt-0.5 flex items-center gap-2">
+                        <span>{new Date(m.created_at).toLocaleString()}</span>
+                        {inv && (
+                          <span className="inline-flex items-center gap-1 font-mono">
+                            <Receipt className="h-3 w-3" />{inv.invoice_number}
+                          </span>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </CardContent>
             <div className="border-t p-2 flex gap-2">
               <Textarea value={body} onChange={e => setBody(e.target.value)} placeholder="Type a message..." className="min-h-[44px] resize-none" />

@@ -40,6 +40,7 @@ const AdminInvoices = () => {
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [repliesByInvoice, setRepliesByInvoice] = useState<Record<string, Array<{ id: string; body: string; created_at: string; phone: string }>>>({});
   const [form, setForm] = useState({
     customer_id: "",
     invoice_number: "",
@@ -61,10 +62,38 @@ const AdminInvoices = () => {
     list.forEach((r) => { r.customer = byId[r.customer_id] ?? null; });
     setInvoices(list);
     setCustomers(profs);
+
+    // Load inbound SMS replies linked to these invoices
+    const ids = list.map((l) => l.id);
+    if (ids.length) {
+      const { data: msgs } = await supabase
+        .from("sms_messages")
+        .select("id, body, created_at, invoice_id, thread_id, direction, sms_threads:thread_id(phone)")
+        .in("invoice_id", ids)
+        .eq("direction", "inbound")
+        .order("created_at", { ascending: false });
+      const map: Record<string, any[]> = {};
+      (msgs ?? []).forEach((m: any) => {
+        if (!m.invoice_id) return;
+        (map[m.invoice_id] = map[m.invoice_id] || []).push({
+          id: m.id, body: m.body, created_at: m.created_at, phone: m.sms_threads?.phone || "",
+        });
+      });
+      setRepliesByInvoice(map);
+    } else {
+      setRepliesByInvoice({});
+    }
     setLoading(false);
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+    const ch = supabase
+      .channel("invoices-sms")
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "sms_messages" }, () => load())
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, []);
 
   const save = async () => {
     if (!form.customer_id || !form.subtotal) return toast.error("Customer and subtotal required");
@@ -176,55 +205,61 @@ const AdminInvoices = () => {
         <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
       ) : (
         <div className="space-y-2">
-          {invoices.map((i) => (
+          {invoices.map((i) => {
+            const replies = repliesByInvoice[i.id] || [];
+            return (
             <Card key={i.id} className="border-border/50">
-              <CardContent className="p-4 flex flex-wrap items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <Receipt className="h-5 w-5 text-primary" />
-                  <div>
-                    <div className="font-mono text-sm">{i.invoice_number}</div>
-                    <div className="text-xs text-muted-foreground">{i.customer?.full_name || i.customer?.email}</div>
-                    <div className="text-[10px] text-muted-foreground">{new Date(i.created_at).toLocaleDateString()}{i.due_date && ` • Due ${i.due_date}`}</div>
+              <CardContent className="p-4 space-y-3">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <Receipt className="h-5 w-5 text-primary" />
+                    <div>
+                      <div className="font-mono text-sm">{i.invoice_number}</div>
+                      <div className="text-xs text-muted-foreground">{i.customer?.full_name || i.customer?.email}</div>
+                      <div className="text-[10px] text-muted-foreground">{new Date(i.created_at).toLocaleDateString()}{i.due_date && ` • Due ${i.due_date}`}</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="text-right">
+                      <div className="font-bold">${i.total.toFixed(2)}</div>
+                      {i.amount_paid > 0 && <div className="text-xs text-muted-foreground">Paid ${i.amount_paid.toFixed(2)}</div>}
+                    </div>
+                    {i.status !== "paid" && i.status !== "void" && (
+                      <>
+                        <Button size="sm" variant="outline" onClick={() => sendPaymentLink(i.id)} disabled={textingId === i.id} title="Send / resend payment link via SMS">
+                          {textingId === i.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <MessageSquare className="h-3 w-3 mr-1" />}
+                          Resend SMS
+                        </Button>
+                        <Button size="sm" variant="ghost" onClick={() => copyPaymentLink(i.id)} disabled={copyingId === i.id} title="Copy payment link to clipboard">
+                          {copyingId === i.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Link2 className="h-3 w-3 mr-1" />}
+                          Copy Link
+                        </Button>
+                      </>
+                    )}
+                    <Select value={i.status} onValueChange={(v) => updateStatus(i.id, v)}>
+                      <SelectTrigger className="h-8 w-28 text-xs"><SelectValue /></SelectTrigger>
+                      <SelectContent>{STATUSES.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
+                    </Select>
+                    <Badge className={statusColor(i.status)}>{i.status}</Badge>
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
-                  <div className="text-right">
-                    <div className="font-bold">${i.total.toFixed(2)}</div>
-                    {i.amount_paid > 0 && <div className="text-xs text-muted-foreground">Paid ${i.amount_paid.toFixed(2)}</div>}
+                {replies.length > 0 && (
+                  <div className="rounded-md border border-border/50 bg-muted/30 p-2 space-y-1">
+                    <div className="flex items-center gap-1 text-[11px] font-semibold text-primary">
+                      <MessageSquare className="h-3 w-3" /> {replies.length} customer {replies.length === 1 ? "reply" : "replies"}
+                    </div>
+                    {replies.slice(0, 3).map((r) => (
+                      <div key={r.id} className="text-xs">
+                        <span className="text-muted-foreground">{new Date(r.created_at).toLocaleString()} · {r.phone}: </span>
+                        <span>{r.body}</span>
+                      </div>
+                    ))}
                   </div>
-                  {i.status !== "paid" && i.status !== "void" && (
-                    <>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => sendPaymentLink(i.id)}
-                        disabled={textingId === i.id}
-                        title="Send / resend payment link via SMS"
-                      >
-                        {textingId === i.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <MessageSquare className="h-3 w-3 mr-1" />}
-                        Resend SMS
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => copyPaymentLink(i.id)}
-                        disabled={copyingId === i.id}
-                        title="Copy payment link to clipboard"
-                      >
-                        {copyingId === i.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Link2 className="h-3 w-3 mr-1" />}
-                        Copy Link
-                      </Button>
-                    </>
-                  )}
-                  <Select value={i.status} onValueChange={(v) => updateStatus(i.id, v)}>
-                    <SelectTrigger className="h-8 w-28 text-xs"><SelectValue /></SelectTrigger>
-                    <SelectContent>{STATUSES.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
-                  </Select>
-                  <Badge className={statusColor(i.status)}>{i.status}</Badge>
-                </div>
+                )}
               </CardContent>
             </Card>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
