@@ -5,7 +5,8 @@ import PortalLayout from "@/components/portal/PortalLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Receipt, Loader2, FileText } from "lucide-react";
+import { Receipt, Loader2, FileText, CreditCard } from "lucide-react";
+import { toast } from "sonner";
 
 interface Invoice {
   id: string;
@@ -50,6 +51,28 @@ const PortalInvoices = () => {
     const { data } = await supabase.storage.from("signatures").createSignedUrl(path, 60);
     if (data?.signedUrl) window.open(data.signedUrl, "_blank");
   };
+
+  const [paying, setPaying] = useState<string | null>(null);
+  const payInvoice = async (id: string) => {
+    setPaying(id);
+    try {
+      const { data, error } = await supabase.functions.invoke("create-invoice-checkout", {
+        body: { invoice_id: id },
+      });
+      if (error) throw error;
+      if (data?.url) window.location.href = data.url;
+      else throw new Error("No checkout URL returned");
+    } catch (e: any) {
+      toast.error(e?.message || "Could not start checkout");
+      setPaying(null);
+    }
+  };
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("paid") === "1") toast.success("Payment received — thank you!");
+    if (params.get("canceled") === "1") toast.info("Checkout canceled.");
+  }, []);
 
   const totalDue = invoices.filter((i) => i.status !== "paid").reduce((sum, i) => sum + (i.total - i.amount_paid), 0);
 
@@ -104,6 +127,12 @@ const PortalInvoices = () => {
                       <div className="text-xs text-muted-foreground">Paid ${i.amount_paid.toFixed(2)}</div>
                     )}
                   </div>
+                  {i.status !== "paid" && (
+                    <Button size="sm" onClick={() => payInvoice(i.id)} disabled={paying === i.id}>
+                      {paying === i.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <CreditCard className="h-4 w-4 mr-1" />}
+                      Pay
+                    </Button>
+                  )}
                   {i.pdf_url && (
                     <Button size="sm" variant="outline" onClick={() => downloadPdf(i.pdf_url!)}>
                       <FileText className="h-4 w-4" />
