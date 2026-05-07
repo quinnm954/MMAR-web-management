@@ -121,6 +121,23 @@ const AdminInvoices = () => {
     toast.success(`Payment link sent to ${(data as any)?.phone}`);
   };
 
+  const [copyingId, setCopyingId] = useState<string | null>(null);
+  const copyPaymentLink = async (invoiceId: string) => {
+    setCopyingId(invoiceId);
+    const { data, error } = await supabase.functions.invoke("send-invoice-payment-link", { body: { invoice_id: invoiceId, copy_only: true } });
+    setCopyingId(null);
+    const respErr = (data as any)?.error || error?.message;
+    if (respErr) return toast.error(respErr);
+    const url = (data as any)?.url;
+    if (!url) return toast.error("No link returned");
+    try {
+      await navigator.clipboard.writeText(url);
+      toast.success("Payment link copied");
+    } catch {
+      window.prompt("Copy payment link:", url);
+    }
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
