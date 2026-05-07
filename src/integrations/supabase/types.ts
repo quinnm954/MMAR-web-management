@@ -167,6 +167,66 @@ export type Database = {
         }
         Relationships: []
       }
+      catalog_items: {
+        Row: {
+          category: string | null
+          cost: number | null
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          labor_hours: number | null
+          location: string | null
+          name: string
+          on_hand: number | null
+          reorder_point: number | null
+          sku: string | null
+          track_inventory: boolean
+          type: string
+          unit_price: number
+          updated_at: string
+          vendor: string | null
+        }
+        Insert: {
+          category?: string | null
+          cost?: number | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          labor_hours?: number | null
+          location?: string | null
+          name: string
+          on_hand?: number | null
+          reorder_point?: number | null
+          sku?: string | null
+          track_inventory?: boolean
+          type?: string
+          unit_price?: number
+          updated_at?: string
+          vendor?: string | null
+        }
+        Update: {
+          category?: string | null
+          cost?: number | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          labor_hours?: number | null
+          location?: string | null
+          name?: string
+          on_hand?: number | null
+          reorder_point?: number | null
+          sku?: string | null
+          track_inventory?: boolean
+          type?: string
+          unit_price?: number
+          updated_at?: string
+          vendor?: string | null
+        }
+        Relationships: []
+      }
       email_send_log: {
         Row: {
           created_at: string
@@ -251,6 +311,78 @@ export type Database = {
           id?: string
           token?: string
           used_at?: string | null
+        }
+        Relationships: []
+      }
+      estimates: {
+        Row: {
+          appointment_id: string | null
+          approval_token: string | null
+          approved_at: string | null
+          converted_to_invoice_id: string | null
+          created_at: string
+          customer_id: string
+          decline_reason: string | null
+          declined_at: string | null
+          estimate_number: string | null
+          id: string
+          line_items: Json
+          notes: string | null
+          sent_at: string | null
+          shop_supplies: number
+          status: string
+          subtotal: number
+          tax: number
+          total: number
+          updated_at: string
+          valid_until: string | null
+          vehicle_id: string | null
+        }
+        Insert: {
+          appointment_id?: string | null
+          approval_token?: string | null
+          approved_at?: string | null
+          converted_to_invoice_id?: string | null
+          created_at?: string
+          customer_id: string
+          decline_reason?: string | null
+          declined_at?: string | null
+          estimate_number?: string | null
+          id?: string
+          line_items?: Json
+          notes?: string | null
+          sent_at?: string | null
+          shop_supplies?: number
+          status?: string
+          subtotal?: number
+          tax?: number
+          total?: number
+          updated_at?: string
+          valid_until?: string | null
+          vehicle_id?: string | null
+        }
+        Update: {
+          appointment_id?: string | null
+          approval_token?: string | null
+          approved_at?: string | null
+          converted_to_invoice_id?: string | null
+          created_at?: string
+          customer_id?: string
+          decline_reason?: string | null
+          declined_at?: string | null
+          estimate_number?: string | null
+          id?: string
+          line_items?: Json
+          notes?: string | null
+          sent_at?: string | null
+          shop_supplies?: number
+          status?: string
+          subtotal?: number
+          tax?: number
+          total?: number
+          updated_at?: string
+          valid_until?: string | null
+          vehicle_id?: string | null
         }
         Relationships: []
       }
@@ -347,6 +479,98 @@ export type Database = {
         }
         Relationships: []
       }
+      inspection_items: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          inspection_id: string
+          item_name: string
+          notes: string | null
+          photo_urls: Json
+          sort_order: number
+          status: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          id?: string
+          inspection_id: string
+          item_name: string
+          notes?: string | null
+          photo_urls?: Json
+          sort_order?: number
+          status?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          inspection_id?: string
+          item_name?: string
+          notes?: string | null
+          photo_urls?: Json
+          sort_order?: number
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inspection_items_inspection_id_fkey"
+            columns: ["inspection_id"]
+            isOneToOne: false
+            referencedRelation: "inspections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      inspections: {
+        Row: {
+          appointment_id: string | null
+          completed_at: string | null
+          created_at: string
+          customer_id: string
+          id: string
+          mileage: number | null
+          sent_at: string | null
+          share_token: string | null
+          status: string
+          summary_notes: string | null
+          technician_id: string | null
+          updated_at: string
+          vehicle_id: string
+        }
+        Insert: {
+          appointment_id?: string | null
+          completed_at?: string | null
+          created_at?: string
+          customer_id: string
+          id?: string
+          mileage?: number | null
+          sent_at?: string | null
+          share_token?: string | null
+          status?: string
+          summary_notes?: string | null
+          technician_id?: string | null
+          updated_at?: string
+          vehicle_id: string
+        }
+        Update: {
+          appointment_id?: string | null
+          completed_at?: string | null
+          created_at?: string
+          customer_id?: string
+          id?: string
+          mileage?: number | null
+          sent_at?: string | null
+          share_token?: string | null
+          status?: string
+          summary_notes?: string | null
+          technician_id?: string | null
+          updated_at?: string
+          vehicle_id?: string
+        }
+        Relationships: []
+      }
       invoices: {
         Row: {
           amount_paid: number
@@ -424,6 +648,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      labor_rates: {
+        Row: {
+          created_at: string
+          hourly_rate: number
+          id: string
+          is_active: boolean
+          is_default: boolean
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          hourly_rate: number
+          id?: string
+          is_active?: boolean
+          is_default?: boolean
+          name: string
+        }
+        Update: {
+          created_at?: string
+          hourly_rate?: number
+          id?: string
+          is_active?: boolean
+          is_default?: boolean
+          name?: string
+        }
+        Relationships: []
       }
       membership_plans: {
         Row: {
@@ -737,6 +988,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      shop_settings: {
+        Row: {
+          estimate_valid_days: number
+          id: number
+          shop_supplies_max: number
+          shop_supplies_pct: number
+          tax_rate: number
+          updated_at: string
+        }
+        Insert: {
+          estimate_valid_days?: number
+          id?: number
+          shop_supplies_max?: number
+          shop_supplies_pct?: number
+          tax_rate?: number
+          updated_at?: string
+        }
+        Update: {
+          estimate_valid_days?: number
+          id?: number
+          shop_supplies_max?: number
+          shop_supplies_pct?: number
+          tax_rate?: number
+          updated_at?: string
+        }
+        Relationships: []
       }
       social_cache: {
         Row: {
