@@ -271,6 +271,8 @@ export type Database = {
           pdf_url: string | null
           service_record_id: string | null
           status: string
+          stripe_payment_intent_id: string | null
+          stripe_session_id: string | null
           subtotal: number
           tax: number
           total: number
@@ -289,6 +291,8 @@ export type Database = {
           pdf_url?: string | null
           service_record_id?: string | null
           status?: string
+          stripe_payment_intent_id?: string | null
+          stripe_session_id?: string | null
           subtotal?: number
           tax?: number
           total?: number
@@ -307,6 +311,8 @@ export type Database = {
           pdf_url?: string | null
           service_record_id?: string | null
           status?: string
+          stripe_payment_intent_id?: string | null
+          stripe_session_id?: string | null
           subtotal?: number
           tax?: number
           total?: number
