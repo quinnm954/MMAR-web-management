@@ -40,7 +40,7 @@ const PortalLayout = ({ children }: { children: ReactNode }) => {
           <img src={mmarLogo} alt="MMAR" className="h-10 w-auto rounded" />
           <div>
             <div className="font-bold text-sm flex items-center gap-1.5">
-              <Wrench className="h-3.5 w-3.5 text-primary" /> Garage Ace
+              <Wrench className="h-3.5 w-3.5 text-primary" /> MMAR Care
             </div>
             <div className="text-xs text-muted-foreground">Powered by MMAR</div>
           </div>

@@ -79,7 +79,7 @@ Deno.serve(async (req) => {
 
     doc.setFont("helvetica", "bold");
     doc.setFontSize(18);
-    doc.text("Garage Ace Membership Agreement", margin, y);
+    doc.text("MMAR Care Membership Agreement", margin, y);
     y += lineH * 1.5;
 
     doc.setFont("helvetica", "normal");

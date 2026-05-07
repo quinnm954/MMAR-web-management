@@ -31,7 +31,7 @@ const StepACH = ({ data, setData, onNext, onBack }: Props) => {
   const [saving, setSaving] = useState(false);
 
   const authText =
-    "I authorize Mike's Mobile Auto Repair (MMAR), operating Garage Ace, to electronically debit my bank account via ACH for the recurring monthly membership fee, applicable deposits, and any service charges I authorize. This authorization remains in effect until I revoke it in writing with at least 7 business days notice.";
+    "I authorize Mike's Mobile Auto Repair (MMAR), operating MMAR Care, to electronically debit my bank account via ACH for the recurring monthly membership fee, applicable deposits, and any service charges I authorize. This authorization remains in effect until I revoke it in writing with at least 7 business days notice.";
 
   const handleSubmit = async () => {
     if (!user) return toast.error("Please sign in");

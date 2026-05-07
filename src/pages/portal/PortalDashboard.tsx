@@ -34,7 +34,7 @@ const PortalDashboard = () => {
     <PortalLayout>
       <div className="mb-8">
         <h1 className="text-3xl font-bold tracking-tight">Welcome{name ? `, ${name.split(" ")[0]}` : ""}</h1>
-        <p className="text-muted-foreground mt-1">Here's your Garage Ace overview.</p>
+        <p className="text-muted-foreground mt-1">Here's your MMAR Care overview.</p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">

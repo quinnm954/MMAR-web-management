@@ -52,7 +52,7 @@ const PortalLogin = () => {
             <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-2">
               <Wrench className="h-6 w-6 text-primary" />
             </div>
-            <CardTitle className="text-2xl">Garage Ace Portal</CardTitle>
+            <CardTitle className="text-2xl">MMAR Care Portal</CardTitle>
             <CardDescription>Sign in to your MMAR account</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
