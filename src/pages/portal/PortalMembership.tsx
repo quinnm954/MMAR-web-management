@@ -128,6 +128,11 @@ const PortalMembership = () => {
                         <FileText className="h-4 w-4 mr-1" /> View Agreement
                       </Button>
                     )}
+                    {m.status === "active" && (
+                      <Button variant="outline" size="sm" onClick={openPortal}>
+                        <CreditCard className="h-4 w-4 mr-1" /> Manage Billing
+                      </Button>
+                    )}
                     {m.status === "active" && !m.cancellation_requested_at && (
                       <Button variant="ghost" size="sm" onClick={() => handleCancel(m.id)}>
                         Request Cancellation
