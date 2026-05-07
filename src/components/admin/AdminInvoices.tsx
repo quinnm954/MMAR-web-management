@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
-import { Loader2, Plus, Receipt, MessageSquare } from "lucide-react";
+import { Loader2, Plus, Receipt, MessageSquare, Link2 } from "lucide-react";
 import { toast } from "sonner";
 
 interface Customer { id: string; full_name: string | null; email: string | null }
