@@ -57,6 +57,17 @@ export default function AdminTechProductivity() {
         srByAppt.set(r.appointment_id, arr);
       });
 
+      // Approved estimates linked to these appts -> sum labor_hours from line items
+      const { data: ests } = apptIds.length
+        ? await supabase.from("estimates").select("appointment_id,line_items,status").in("appointment_id", apptIds).in("status", ["approved","converted"])
+        : { data: [] as any[] };
+      const billedHrsByAppt = new Map<string, number>();
+      (ests || []).forEach((e: any) => {
+        const lis = Array.isArray(e.line_items) ? e.line_items : [];
+        const hrs = lis.reduce((s: number, l: any) => s + (Number(l.labor_hours) || 0) * (Number(l.quantity) || 1), 0);
+        billedHrsByAppt.set(e.appointment_id, (billedHrsByAppt.get(e.appointment_id) || 0) + hrs);
+      });
+
       const stats = (profs || []).map((p: any) => {
         const techEntries = (entries || []).filter((e: any) => e.technician_id === p.id);
         const clockedMin = techEntries.reduce((s: number, e: any) => s + (e.duration_minutes || 0), 0);
@@ -67,9 +78,10 @@ export default function AdminTechProductivity() {
           const recs = srByAppt.get(a.id) || [];
           return sum + recs.reduce((s: number, r: any) => s + Number(r.invoice_total || 0), 0);
         }, 0);
-        // Simple billed-hours estimate: completed jobs * average 1.5h, replace if you track per-job hours later
-        const estimatedBilledHours = completed * 1.5;
-        const efficiency = clockedHours > 0 ? (estimatedBilledHours / clockedHours) * 100 : 0;
+        // Real billed hours from per-line labor_hours on approved estimates
+        let billedHours = techAppts.reduce((sum: number, a: any) => sum + (billedHrsByAppt.get(a.id) || 0), 0);
+        if (billedHours === 0) billedHours = completed * 1.5; // fallback when not yet tracked
+        const efficiency = clockedHours > 0 ? (billedHours / clockedHours) * 100 : 0;
         const avgRevenuePerHour = clockedHours > 0 ? revenue / clockedHours : 0;
         return {
           id: p.id,
@@ -78,7 +90,7 @@ export default function AdminTechProductivity() {
           completed,
           totalAppts: techAppts.length,
           revenue,
-          estimatedBilledHours,
+          billedHours,
           efficiency,
           avgRevenuePerHour,
         };
