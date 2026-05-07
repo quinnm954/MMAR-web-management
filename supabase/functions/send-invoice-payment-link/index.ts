@@ -38,6 +38,7 @@ Deno.serve(async (req) => {
     const body = await req.json().catch(() => ({}));
     const invoiceId: string | undefined = body?.invoice_id;
     let phone: string | undefined = body?.phone;
+    const copyOnly: boolean = body?.copy_only === true;
     if (!invoiceId) {
       return new Response(JSON.stringify({ error: "invoice_id required" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
