@@ -8,10 +8,10 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Loader2, Calendar, MapPin, Wrench, LogOut } from "lucide-react";
+import { Loader2, Calendar, MapPin, Wrench } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
-import { useNavigate } from "react-router-dom";
+import TechLayout from "@/components/tech/TechLayout";
 
 interface Appt {
   id: string;
@@ -38,8 +38,7 @@ const statusColor = (s: string) => {
 };
 
 const TechDashboard = () => {
-  const { user, signOut } = useAuth();
-  const navigate = useNavigate();
+  const { user } = useAuth();
   const [rows, setRows] = useState<Appt[]>([]);
   const [loading, setLoading] = useState(true);
   const [logOpen, setLogOpen] = useState<Appt | null>(null);
@@ -124,20 +123,8 @@ const TechDashboard = () => {
   };
 
   return (
-    <main className="min-h-screen bg-background">
-      <header className="border-b border-border bg-card">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold text-foreground">Technician Portal</h1>
-            <p className="text-xs text-muted-foreground">Mike's Mobile Auto Repair</p>
-          </div>
-          <Button variant="ghost" size="sm" onClick={async () => { await signOut(); navigate("/"); }}>
-            <LogOut className="h-4 w-4 mr-1" /> Sign out
-          </Button>
-        </div>
-      </header>
-
-      <div className="container mx-auto px-4 py-6 space-y-3">
+    <TechLayout>
+      <div className="space-y-3">
         <h2 className="text-lg font-bold">My Assigned Jobs</h2>
 
         {loading ? (
