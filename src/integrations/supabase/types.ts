@@ -70,6 +70,7 @@ export type Database = {
       }
       appointments: {
         Row: {
+          assigned_technician_id: string | null
           created_at: string
           customer_id: string
           description: string | null
@@ -86,6 +87,7 @@ export type Database = {
           vehicle_id: string | null
         }
         Insert: {
+          assigned_technician_id?: string | null
           created_at?: string
           customer_id: string
           description?: string | null
@@ -102,6 +104,7 @@ export type Database = {
           vehicle_id?: string | null
         }
         Update: {
+          assigned_technician_id?: string | null
           created_at?: string
           customer_id?: string
           description?: string | null
