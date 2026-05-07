@@ -1073,6 +1073,7 @@ export type Database = {
           created_at: string
           direction: string
           id: string
+          invoice_id: string | null
           media_urls: Json
           sent_by: string | null
           status: string | null
@@ -1084,6 +1085,7 @@ export type Database = {
           created_at?: string
           direction: string
           id?: string
+          invoice_id?: string | null
           media_urls?: Json
           sent_by?: string | null
           status?: string | null
@@ -1095,6 +1097,7 @@ export type Database = {
           created_at?: string
           direction?: string
           id?: string
+          invoice_id?: string | null
           media_urls?: Json
           sent_by?: string | null
           status?: string | null
@@ -1116,6 +1119,7 @@ export type Database = {
           created_at: string
           customer_id: string | null
           id: string
+          last_invoice_id: string | null
           last_message_at: string
           last_message_preview: string | null
           phone: string
@@ -1126,6 +1130,7 @@ export type Database = {
           created_at?: string
           customer_id?: string | null
           id?: string
+          last_invoice_id?: string | null
           last_message_at?: string
           last_message_preview?: string | null
           phone: string
@@ -1136,6 +1141,7 @@ export type Database = {
           created_at?: string
           customer_id?: string | null
           id?: string
+          last_invoice_id?: string | null
           last_message_at?: string
           last_message_preview?: string | null
           phone?: string
