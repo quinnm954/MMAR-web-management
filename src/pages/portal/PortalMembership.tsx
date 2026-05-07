@@ -58,6 +58,15 @@ const PortalMembership = () => {
     window.location.reload();
   };
 
+  const openPortal = async () => {
+    const { data, error } = await supabase.functions.invoke("customer-portal");
+    if (error || !data?.url) {
+      alert(error?.message || "Could not open billing portal");
+      return;
+    }
+    window.location.href = data.url;
+  };
+
   return (
     <PortalLayout>
       <div className="flex items-center justify-between mb-6">
