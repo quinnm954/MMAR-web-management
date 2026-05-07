@@ -43,7 +43,7 @@ const StepAgreement = ({ data, setData, onComplete, onBack }: Props) => {
   }, [data.planId]);
 
   const handleSubmit = async () => {
-    if (!user || !data.planId || !data.vehicleId || !data.achAuthId)
+    if (!user || !data.planId || !data.vehicleId)
       return toast.error("Missing data — please complete previous steps");
     if (!agreed) return toast.error("Please accept the membership agreement");
     if (!signature) return toast.error("Please sign the agreement");
@@ -60,7 +60,7 @@ const StepAgreement = ({ data, setData, onComplete, onBack }: Props) => {
         customer_id: user.id,
         vehicle_id: data.vehicleId,
         plan_id: data.planId,
-        ach_authorization_id: data.achAuthId,
+        ach_authorization_id: data.achAuthId || null,
         status: "pending",
         start_date: startDate,
         next_billing_date: nextBilling.toISOString().slice(0, 10),
@@ -77,17 +77,21 @@ const StepAgreement = ({ data, setData, onComplete, onBack }: Props) => {
 
     setData({ ...data, membershipId: membership.id });
 
-    // Generate PDF (best-effort — membership is already saved)
-    try {
-      await supabase.functions.invoke("generate-membership-agreement", {
-        body: { membership_id: membership.id },
-      });
-    } catch (e) {
-      console.error("PDF generation failed", e);
-    }
+    // Generate PDF in the background
+    supabase.functions
+      .invoke("generate-membership-agreement", { body: { membership_id: membership.id } })
+      .catch((e) => console.error("PDF generation failed", e));
 
-    setSubmitting(false);
-    onComplete();
+    // Start Stripe Checkout for subscription + deposit
+    const { data: checkout, error: cErr } = await supabase.functions.invoke(
+      "create-membership-checkout",
+      { body: { membership_id: membership.id } }
+    );
+    if (cErr || !checkout?.url) {
+      setSubmitting(false);
+      return toast.error(cErr?.message || "Could not start checkout");
+    }
+    window.location.href = checkout.url;
   };
 
   if (!plan) return <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>;
