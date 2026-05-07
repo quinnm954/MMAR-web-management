@@ -13,10 +13,14 @@ import { template as appointmentConfirmed } from './appointment-confirmed.tsx'
 import { template as serviceCompleted } from './service-completed.tsx'
 import { template as invoiceIssued } from './invoice-issued.tsx'
 import { template as membershipWelcome } from './membership-welcome.tsx'
+import { template as estimateReady } from './estimate-ready.tsx'
+import { template as inspectionReady } from './inspection-ready.tsx'
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   'appointment-confirmed': appointmentConfirmed,
   'service-completed': serviceCompleted,
   'invoice-issued': invoiceIssued,
   'membership-welcome': membershipWelcome,
+  'estimate-ready': estimateReady,
+  'inspection-ready': inspectionReady,
 }

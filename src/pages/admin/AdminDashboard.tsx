@@ -4,7 +4,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { LogOut, FileText, ShieldCheck, Users, CreditCard, Calendar, ClipboardList, Receipt, Wrench, Mail } from 'lucide-react';
+import { LogOut, FileText, ShieldCheck, Users, CreditCard, Calendar, ClipboardList, Receipt, Wrench, Mail, FileSpreadsheet, ClipboardCheck, Package, Settings } from 'lucide-react';
 import FinancingContractsTable from '@/components/admin/FinancingContractsTable';
 import WarrantyTable from '@/components/admin/WarrantyTable';
 import AdminCustomers from '@/components/admin/AdminCustomers';
@@ -13,6 +13,10 @@ import AdminAppointments from '@/components/admin/AdminAppointments';
 import AdminServiceRecords from '@/components/admin/AdminServiceRecords';
 import AdminInvoices from '@/components/admin/AdminInvoices';
 import AdminEmails from '@/components/admin/AdminEmails';
+import AdminEstimates from '@/components/admin/AdminEstimates';
+import AdminInspections from '@/components/admin/AdminInspections';
+import AdminCatalog from '@/components/admin/AdminCatalog';
+import AdminShopSettings from '@/components/admin/AdminShopSettings';
 import { supabase } from '@/integrations/supabase/client';
 import mmarLogo from '@/assets/mmar-logo.jpeg';
 
@@ -86,22 +90,30 @@ const AdminDashboard = () => {
             <TabsTrigger value="memberships"><CreditCard className="h-4 w-4 mr-1.5" /> Memberships</TabsTrigger>
             <TabsTrigger value="appointments"><Calendar className="h-4 w-4 mr-1.5" /> Appointments</TabsTrigger>
             <TabsTrigger value="service"><ClipboardList className="h-4 w-4 mr-1.5" /> Service Records</TabsTrigger>
+            <TabsTrigger value="estimates"><FileSpreadsheet className="h-4 w-4 mr-1.5" /> Estimates</TabsTrigger>
+            <TabsTrigger value="inspections"><ClipboardCheck className="h-4 w-4 mr-1.5" /> Inspections</TabsTrigger>
             <TabsTrigger value="invoices"><Receipt className="h-4 w-4 mr-1.5" /> Invoices</TabsTrigger>
+            <TabsTrigger value="catalog"><Package className="h-4 w-4 mr-1.5" /> Catalog</TabsTrigger>
             <TabsTrigger value="financing"><FileText className="h-4 w-4 mr-1.5" /> Financing</TabsTrigger>
             <TabsTrigger value="warranty"><ShieldCheck className="h-4 w-4 mr-1.5" /> Warranty</TabsTrigger>
             <TabsTrigger value="emails"><Mail className="h-4 w-4 mr-1.5" /> Emails</TabsTrigger>
+            <TabsTrigger value="settings"><Settings className="h-4 w-4 mr-1.5" /> Settings</TabsTrigger>
           </TabsList>
 
           <TabsContent value="customers"><AdminCustomers /></TabsContent>
           <TabsContent value="memberships"><AdminMemberships /></TabsContent>
           <TabsContent value="appointments"><AdminAppointments /></TabsContent>
           <TabsContent value="service"><AdminServiceRecords /></TabsContent>
+          <TabsContent value="estimates"><AdminEstimates /></TabsContent>
+          <TabsContent value="inspections"><AdminInspections /></TabsContent>
           <TabsContent value="invoices"><AdminInvoices /></TabsContent>
+          <TabsContent value="catalog"><AdminCatalog /></TabsContent>
           <TabsContent value="financing">
             <FinancingContractsTable data={contracts} onRefresh={reloadFinancing} />
           </TabsContent>
           <TabsContent value="warranty"><WarrantyTable data={warranties} onRefresh={reloadWarranty} /></TabsContent>
           <TabsContent value="emails"><AdminEmails /></TabsContent>
+          <TabsContent value="settings"><AdminShopSettings /></TabsContent>
         </Tabs>
       </main>
     </div>

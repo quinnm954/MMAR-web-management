@@ -39,6 +39,8 @@ import NotFound from "./pages/NotFound";
 import Unsubscribe from "./pages/Unsubscribe";
 import TechDashboard from "./pages/tech/TechDashboard";
 import TechProtectedRoute from "./components/tech/TechProtectedRoute";
+import EstimateApproval from "./pages/EstimateApproval";
+import InspectionReport from "./pages/InspectionReport";
 
 const queryClient = new QueryClient();
 
@@ -86,6 +88,8 @@ const App = () => (
             />
             <Route path="/unsubscribe" element={<Unsubscribe />} />
             <Route path="/tech" element={<TechProtectedRoute><TechDashboard /></TechProtectedRoute>} />
+            <Route path="/estimate/:token" element={<EstimateApproval />} />
+            <Route path="/inspection/:token" element={<InspectionReport />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="/:landingSlug" element={<LocalLanding />} />
             <Route path="*" element={<NotFound />} />
