@@ -998,6 +998,42 @@ export type Database = {
           },
         ]
       }
+      service_reminders_sent: {
+        Row: {
+          customer_id: string
+          error: string | null
+          id: string
+          message: string | null
+          phone: string | null
+          reference_id: string
+          reminder_type: string
+          sent_at: string
+          status: string
+        }
+        Insert: {
+          customer_id: string
+          error?: string | null
+          id?: string
+          message?: string | null
+          phone?: string | null
+          reference_id: string
+          reminder_type: string
+          sent_at?: string
+          status?: string
+        }
+        Update: {
+          customer_id?: string
+          error?: string | null
+          id?: string
+          message?: string | null
+          phone?: string | null
+          reference_id?: string
+          reminder_type?: string
+          sent_at?: string
+          status?: string
+        }
+        Relationships: []
+      }
       shop_settings: {
         Row: {
           estimate_valid_days: number
