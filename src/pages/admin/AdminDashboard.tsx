@@ -12,6 +12,7 @@ import AdminMemberships from '@/components/admin/AdminMemberships';
 import AdminAppointments from '@/components/admin/AdminAppointments';
 import AdminServiceRecords from '@/components/admin/AdminServiceRecords';
 import AdminInvoices from '@/components/admin/AdminInvoices';
+import AdminEmails from '@/components/admin/AdminEmails';
 import { supabase } from '@/integrations/supabase/client';
 import mmarLogo from '@/assets/mmar-logo.jpeg';
 
