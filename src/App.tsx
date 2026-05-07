@@ -29,6 +29,11 @@ import PortalLogin from "./pages/portal/PortalLogin";
 import PortalSignup from "./pages/portal/PortalSignup";
 import PortalDashboard from "./pages/portal/PortalDashboard";
 import MembershipSignup from "./pages/portal/MembershipSignup";
+import PortalVehicles from "./pages/portal/PortalVehicles";
+import PortalMembership from "./pages/portal/PortalMembership";
+import PortalAppointments from "./pages/portal/PortalAppointments";
+import PortalServiceHistory from "./pages/portal/PortalServiceHistory";
+import PortalInvoices from "./pages/portal/PortalInvoices";
 import CustomerProtectedRoute from "./components/portal/CustomerProtectedRoute";
 import NotFound from "./pages/NotFound";
 
