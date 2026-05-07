@@ -19,15 +19,24 @@ const AdminDashboard = () => {
   const { signOut, user } = useAuth();
   const [stats, setStats] = useState({ customers: 0, activeMemberships: 0, openAppointments: 0, unpaidInvoices: 0 });
   const [contracts, setContracts] = useState<any[]>([]);
+  const [warranties, setWarranties] = useState<any[]>([]);
+
+  const reloadFinancing = async () => {
+    const { data } = await supabase.from('financing_contracts').select('*').order('created_at', { ascending: false });
+    setContracts(data ?? []);
+  };
+  const reloadWarranty = async () => {
+    const { data } = await supabase.from('warranty_acknowledgments').select('*').order('created_at', { ascending: false });
+    setWarranties(data ?? []);
+  };
 
   useEffect(() => {
     (async () => {
-      const [c, m, a, i, fc] = await Promise.all([
+      const [c, m, a, i] = await Promise.all([
         supabase.from('profiles').select('id', { count: 'exact', head: true }),
         supabase.from('memberships').select('id', { count: 'exact', head: true }).eq('status', 'active'),
         supabase.from('appointments').select('id', { count: 'exact', head: true }).in('status', ['requested', 'scheduled', 'in_progress']),
         supabase.from('invoices').select('id', { count: 'exact', head: true }).in('status', ['unpaid', 'partial', 'overdue']),
-        supabase.from('financing_contracts').select('*').order('created_at', { ascending: false }),
       ]);
       setStats({
         customers: c.count ?? 0,
@@ -35,7 +44,8 @@ const AdminDashboard = () => {
         openAppointments: a.count ?? 0,
         unpaidInvoices: i.count ?? 0,
       });
-      setContracts(fc.data ?? []);
+      reloadFinancing();
+      reloadWarranty();
     })();
   }, []);
 
@@ -86,12 +96,9 @@ const AdminDashboard = () => {
           <TabsContent value="service"><AdminServiceRecords /></TabsContent>
           <TabsContent value="invoices"><AdminInvoices /></TabsContent>
           <TabsContent value="financing">
-            <FinancingContractsTable data={contracts} onRefresh={async () => {
-              const { data } = await supabase.from('financing_contracts').select('*').order('created_at', { ascending: false });
-              setContracts(data ?? []);
-            }} />
+            <FinancingContractsTable data={contracts} onRefresh={reloadFinancing} />
           </TabsContent>
-          <TabsContent value="warranty"><WarrantyTable /></TabsContent>
+          <TabsContent value="warranty"><WarrantyTable data={warranties} onRefresh={reloadWarranty} /></TabsContent>
         </Tabs>
       </main>
     </div>
