@@ -108,6 +108,13 @@ export default function AdminSMS() {
                 {t.unread_count > 0 && <Badge>{t.unread_count}</Badge>}
               </div>
               <div className="text-xs text-muted-foreground truncate">{t.last_message_preview}</div>
+              {t.last_invoice && (
+                <div className="mt-1 flex items-center gap-1 text-[10px] text-primary">
+                  <Receipt className="h-3 w-3" />
+                  <span className="font-mono">{t.last_invoice.invoice_number}</span>
+                  <span className="text-muted-foreground">· ${Number(t.last_invoice.total - t.last_invoice.amount_paid).toFixed(2)} {t.last_invoice.status}</span>
+                </div>
+              )}
             </button>
           ))}
           {threads.length === 0 && <p className="text-xs text-muted-foreground p-2">No conversations yet.</p>}
