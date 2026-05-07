@@ -52,7 +52,7 @@ const AdminEstimates = () => {
       supabase.from('catalog_items').select('*').eq('is_active', true).order('name'),
       supabase.from('shop_settings').select('*').eq('id', 1).single(),
     ]);
-    setEstimates((e.data ?? []) as Estimate[]);
+    setEstimates(((e.data ?? []) as any[]).map(d => ({ ...d, line_items: d.line_items || [] })) as Estimate[]);
     setCustomers(c.data ?? []);
     setVehicles(v.data ?? []);
     setCatalog(ca.data ?? []);
