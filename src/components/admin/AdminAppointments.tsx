@@ -56,9 +56,30 @@ const AdminAppointments = () => {
   useEffect(() => { load(); }, []);
 
   const update = async (id: string, patch: Record<string, unknown>) => {
+    const row = rows.find((r) => r.id === id);
     const { error } = await supabase.from("appointments").update(patch).eq("id", id);
     if (error) return toast.error(error.message);
     toast.success("Updated");
+
+    // Trigger appointment-confirmed email when transitioning to scheduled
+    const becameScheduled =
+      (patch.status === "scheduled" && row?.status !== "scheduled") ||
+      (patch.scheduled_at && row?.status === "requested");
+    if (becameScheduled && row?.customer?.email) {
+      const { sendNotification } = await import("@/lib/notify");
+      const when = (patch.scheduled_at as string) || row.scheduled_at || row.requested_date || "";
+      sendNotification({
+        templateName: "appointment-confirmed",
+        recipientEmail: row.customer.email,
+        idempotencyKey: `appt-confirmed-${id}-${when}`,
+        templateData: {
+          customerName: row.customer.full_name || undefined,
+          appointmentDate: when ? new Date(when).toLocaleString() : (row.requested_date ?? undefined),
+          serviceType: row.service_type,
+          vehicle: row.vehicle ? `${row.vehicle.year ?? ""} ${row.vehicle.make ?? ""} ${row.vehicle.model ?? ""}`.trim() : undefined,
+        },
+      });
+    }
     load();
   };
 
