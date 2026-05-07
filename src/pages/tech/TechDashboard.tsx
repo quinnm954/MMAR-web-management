@@ -198,7 +198,7 @@ const TechDashboard = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </main>
+    </TechLayout>
   );
 };
 
