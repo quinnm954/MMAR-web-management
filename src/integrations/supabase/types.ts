@@ -339,6 +339,8 @@ export type Database = {
           notes: string | null
           sent_at: string | null
           shop_supplies: number
+          signature_image: string | null
+          signed_at: string | null
           status: string
           subtotal: number
           tax: number
@@ -362,6 +364,8 @@ export type Database = {
           notes?: string | null
           sent_at?: string | null
           shop_supplies?: number
+          signature_image?: string | null
+          signed_at?: string | null
           status?: string
           subtotal?: number
           tax?: number
@@ -385,6 +389,8 @@ export type Database = {
           notes?: string | null
           sent_at?: string | null
           shop_supplies?: number
+          signature_image?: string | null
+          signed_at?: string | null
           status?: string
           subtotal?: number
           tax?: number
