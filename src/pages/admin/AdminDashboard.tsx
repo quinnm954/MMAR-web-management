@@ -22,6 +22,8 @@ import AdminTimeTracking from '@/components/admin/AdminTimeTracking';
 import AdminReports from '@/components/admin/AdminReports';
 import AdminSMS from '@/components/admin/AdminSMS';
 import AdminGarage from '@/components/admin/AdminGarage';
+import AdminDeclinedWork from '@/components/admin/AdminDeclinedWork';
+import AdminQuickBooksExport from '@/components/admin/AdminQuickBooksExport';
 import { supabase } from '@/integrations/supabase/client';
 import mmarLogo from '@/assets/mmar-logo.jpeg';
 
