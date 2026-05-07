@@ -13,7 +13,7 @@ import { Plus, Pencil, Send, Trash2, Copy, ExternalLink } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 
-interface LineItem { description: string; quantity: number; unit_price: number; amount: number; catalog_item_id?: string; }
+interface LineItem { description: string; quantity: number; unit_price: number; amount: number; catalog_item_id?: string; labor_hours?: number; }
 interface Estimate {
   id: string;
   customer_id: string;
@@ -82,8 +82,8 @@ const AdminEstimates = () => {
   const addLine = (catalogId?: string) => {
     const item = catalog.find(c => c.id === catalogId);
     const line: LineItem = item
-      ? { description: item.name, quantity: 1, unit_price: Number(item.unit_price), amount: Number(item.unit_price), catalog_item_id: item.id }
-      : { description: '', quantity: 1, unit_price: 0, amount: 0 };
+      ? { description: item.name, quantity: 1, unit_price: Number(item.unit_price), amount: Number(item.unit_price), catalog_item_id: item.id, labor_hours: Number(item.labor_hours) || 0 }
+      : { description: '', quantity: 1, unit_price: 0, amount: 0, labor_hours: 0 };
     updateLines([...(editing.line_items || []), line]);
   };
 
@@ -233,6 +233,7 @@ const AdminEstimates = () => {
                       <TableRow>
                         <TableHead>Description</TableHead>
                         <TableHead className="w-20">Qty</TableHead>
+                        <TableHead className="w-20">Hrs</TableHead>
                         <TableHead className="w-28">Unit Price</TableHead>
                         <TableHead className="w-24 text-right">Amount</TableHead>
                         <TableHead className="w-12"></TableHead>
@@ -243,6 +244,7 @@ const AdminEstimates = () => {
                         <TableRow key={i}>
                           <TableCell><Input value={l.description} onChange={e => updateLine(i, { description: e.target.value })} /></TableCell>
                           <TableCell><Input type="number" step="0.5" value={l.quantity} onChange={e => updateLine(i, { quantity: parseFloat(e.target.value) || 0 })} /></TableCell>
+                          <TableCell><Input type="number" step="0.1" value={l.labor_hours ?? 0} onChange={e => updateLine(i, { labor_hours: parseFloat(e.target.value) || 0 })} title="Billable labor hours" /></TableCell>
                           <TableCell><Input type="number" step="0.01" value={l.unit_price} onChange={e => updateLine(i, { unit_price: parseFloat(e.target.value) || 0 })} /></TableCell>
                           <TableCell className="text-right">${l.amount.toFixed(2)}</TableCell>
                           <TableCell><Button size="icon" variant="ghost" onClick={() => removeLine(i)}><Trash2 className="h-4 w-4" /></Button></TableCell>
