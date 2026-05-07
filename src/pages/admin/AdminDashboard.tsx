@@ -2,133 +2,114 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { LogOut, FileText, RefreshCw, Loader2 } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { LogOut, FileText, ShieldCheck, Users, CreditCard, Calendar, ClipboardList, Receipt, Wrench } from 'lucide-react';
 import FinancingContractsTable from '@/components/admin/FinancingContractsTable';
+import WarrantyTable from '@/components/admin/WarrantyTable';
+import AdminCustomers from '@/components/admin/AdminCustomers';
+import AdminMemberships from '@/components/admin/AdminMemberships';
+import AdminAppointments from '@/components/admin/AdminAppointments';
+import AdminServiceRecords from '@/components/admin/AdminServiceRecords';
+import AdminInvoices from '@/components/admin/AdminInvoices';
 import { supabase } from '@/integrations/supabase/client';
 import mmarLogo from '@/assets/mmar-logo.jpeg';
 
-interface FinancingContract {
-  id: string;
-  client_name: string;
-  client_address: string;
-  client_contact: string;
-  agreement_date: string;
-  vehicle_info: string | null;
-  service_description: string | null;
-  total_service_price: number;
-  first_payment_date: string;
-  down_payment: number;
-  principal: number;
-  interest: number;
-  total_financed: number;
-  monthly_payment: number;
-  client_signature_url: string | null;
-  client_signed_at: string | null;
-  provider_signature_url: string | null;
-  provider_signed_at: string | null;
-  status: string;
-  created_at: string;
-}
-
 const AdminDashboard = () => {
   const { signOut, user } = useAuth();
-  const [contracts, setContracts] = useState<FinancingContract[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isRefreshing, setIsRefreshing] = useState(false);
-
-  const fetchContracts = async (showRefreshing = false) => {
-    if (showRefreshing) setIsRefreshing(true);
-    
-    try {
-      const { data, error } = await supabase
-        .from('financing_contracts')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setContracts(data || []);
-    } catch (error) {
-      console.error('Error fetching contracts:', error);
-    } finally {
-      setIsLoading(false);
-      setIsRefreshing(false);
-    }
-  };
+  const [stats, setStats] = useState({ customers: 0, activeMemberships: 0, openAppointments: 0, unpaidInvoices: 0 });
+  const [contracts, setContracts] = useState<any[]>([]);
 
   useEffect(() => {
-    fetchContracts();
+    (async () => {
+      const [c, m, a, i, fc] = await Promise.all([
+        supabase.from('profiles').select('id', { count: 'exact', head: true }),
+        supabase.from('memberships').select('id', { count: 'exact', head: true }).eq('status', 'active'),
+        supabase.from('appointments').select('id', { count: 'exact', head: true }).in('status', ['requested', 'scheduled', 'in_progress']),
+        supabase.from('invoices').select('id', { count: 'exact', head: true }).in('status', ['unpaid', 'partial', 'overdue']),
+        supabase.from('financing_contracts').select('*').order('created_at', { ascending: false }),
+      ]);
+      setStats({
+        customers: c.count ?? 0,
+        activeMemberships: m.count ?? 0,
+        openAppointments: a.count ?? 0,
+        unpaidInvoices: i.count ?? 0,
+      });
+      setContracts(fc.data ?? []);
+    })();
   }, []);
-
-  const handleLogout = async () => {
-    await signOut();
-  };
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
       <header className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link to="/">
-              <img
-                src={mmarLogo}
-                alt="MMAR Logo"
-                className="h-12 w-12 rounded-full object-cover border border-primary"
-              />
+              <img src={mmarLogo} alt="MMAR" className="h-12 w-12 rounded-full object-cover border border-primary" />
             </Link>
             <div>
-              <h1 className="text-xl font-display text-foreground">Admin Dashboard</h1>
+              <h1 className="text-xl font-display flex items-center gap-2">
+                <Wrench className="h-5 w-5 text-primary" /> MMAR Care Admin
+              </h1>
               <p className="text-sm text-muted-foreground">{user?.email}</p>
             </div>
           </div>
-          <Button variant="outline" onClick={handleLogout}>
-            <LogOut className="mr-2 h-4 w-4" />
-            Sign Out
+          <Button variant="outline" onClick={() => signOut()}>
+            <LogOut className="mr-2 h-4 w-4" /> Sign Out
           </Button>
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
-        <Card className="glass-card border-border">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <div>
-              <CardTitle className="flex items-center gap-2">
-                <FileText className="h-5 w-5" />
-                Financing Contracts
-              </CardTitle>
-              <CardDescription>
-                View and manage all financing contracts. Total: {contracts.length} records
-              </CardDescription>
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => fetchContracts(true)}
-              disabled={isRefreshing}
-            >
-              {isRefreshing ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <RefreshCw className="h-4 w-4" />
-              )}
-              <span className="ml-2">Refresh</span>
-            </Button>
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <div className="flex items-center justify-center py-8">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-              </div>
-            ) : (
-              <FinancingContractsTable data={contracts} onRefresh={() => fetchContracts(true)} />
-            )}
-          </CardContent>
-        </Card>
+      <main className="container mx-auto px-4 py-8 space-y-6">
+        {/* Stats */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <StatCard icon={Users} label="Customers" value={stats.customers} />
+          <StatCard icon={CreditCard} label="Active Memberships" value={stats.activeMemberships} accent />
+          <StatCard icon={Calendar} label="Open Appointments" value={stats.openAppointments} />
+          <StatCard icon={Receipt} label="Unpaid Invoices" value={stats.unpaidInvoices} />
+        </div>
+
+        <Tabs defaultValue="customers" className="space-y-4">
+          <TabsList className="flex flex-wrap h-auto">
+            <TabsTrigger value="customers"><Users className="h-4 w-4 mr-1.5" /> Customers</TabsTrigger>
+            <TabsTrigger value="memberships"><CreditCard className="h-4 w-4 mr-1.5" /> Memberships</TabsTrigger>
+            <TabsTrigger value="appointments"><Calendar className="h-4 w-4 mr-1.5" /> Appointments</TabsTrigger>
+            <TabsTrigger value="service"><ClipboardList className="h-4 w-4 mr-1.5" /> Service Records</TabsTrigger>
+            <TabsTrigger value="invoices"><Receipt className="h-4 w-4 mr-1.5" /> Invoices</TabsTrigger>
+            <TabsTrigger value="financing"><FileText className="h-4 w-4 mr-1.5" /> Financing</TabsTrigger>
+            <TabsTrigger value="warranty"><ShieldCheck className="h-4 w-4 mr-1.5" /> Warranty</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="customers"><AdminCustomers /></TabsContent>
+          <TabsContent value="memberships"><AdminMemberships /></TabsContent>
+          <TabsContent value="appointments"><AdminAppointments /></TabsContent>
+          <TabsContent value="service"><AdminServiceRecords /></TabsContent>
+          <TabsContent value="invoices"><AdminInvoices /></TabsContent>
+          <TabsContent value="financing">
+            <FinancingContractsTable data={contracts} onRefresh={async () => {
+              const { data } = await supabase.from('financing_contracts').select('*').order('created_at', { ascending: false });
+              setContracts(data ?? []);
+            }} />
+          </TabsContent>
+          <TabsContent value="warranty"><WarrantyTable /></TabsContent>
+        </Tabs>
       </main>
     </div>
   );
 };
+
+const StatCard = ({ icon: Icon, label, value, accent }: { icon: typeof Users; label: string; value: number; accent?: boolean }) => (
+  <Card className={accent ? "border-primary/30 bg-primary/5" : "border-border/50"}>
+    <CardContent className="p-4 flex items-center gap-3">
+      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${accent ? "bg-primary/15" : "bg-muted"}`}>
+        <Icon className={`h-5 w-5 ${accent ? "text-primary" : "text-muted-foreground"}`} />
+      </div>
+      <div>
+        <div className="text-2xl font-bold">{value}</div>
+        <div className="text-xs text-muted-foreground">{label}</div>
+      </div>
+    </CardContent>
+  </Card>
+);
 
 export default AdminDashboard;
