@@ -193,16 +193,28 @@ const AdminInvoices = () => {
                     {i.amount_paid > 0 && <div className="text-xs text-muted-foreground">Paid ${i.amount_paid.toFixed(2)}</div>}
                   </div>
                   {i.status !== "paid" && i.status !== "void" && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => sendPaymentLink(i.id)}
-                      disabled={textingId === i.id}
-                      title="Text payment link to customer"
-                    >
-                      {textingId === i.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <MessageSquare className="h-3 w-3 mr-1" />}
-                      Text-to-Pay
-                    </Button>
+                    <>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => sendPaymentLink(i.id)}
+                        disabled={textingId === i.id}
+                        title="Send / resend payment link via SMS"
+                      >
+                        {textingId === i.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <MessageSquare className="h-3 w-3 mr-1" />}
+                        Resend SMS
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => copyPaymentLink(i.id)}
+                        disabled={copyingId === i.id}
+                        title="Copy payment link to clipboard"
+                      >
+                        {copyingId === i.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Link2 className="h-3 w-3 mr-1" />}
+                        Copy Link
+                      </Button>
+                    </>
                   )}
                   <Select value={i.status} onValueChange={(v) => updateStatus(i.id, v)}>
                     <SelectTrigger className="h-8 w-28 text-xs"><SelectValue /></SelectTrigger>
