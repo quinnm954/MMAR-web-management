@@ -115,7 +115,7 @@ const StepAgreement = ({ data, setData, onComplete, onBack }: Props) => {
           <div><span className="text-muted-foreground">Vehicle:</span> {vehicleStr}</div>
           <div><span className="text-muted-foreground">Plan:</span> {plan.name}</div>
           <div><span className="text-muted-foreground">Monthly:</span> ${plan.monthly_price.toFixed(2)}</div>
-          <div><span className="text-muted-foreground">Deposit:</span> ${plan.deposit_amount.toFixed(2)} (refundable)</div>
+          <div><span className="text-muted-foreground">Deposit:</span> ${plan.deposit_amount.toFixed(2)} (non-refundable)</div>
           <div><span className="text-muted-foreground">Due Today:</span> ${plan.total_at_signup.toFixed(2)}</div>
         </div>
 
@@ -125,7 +125,7 @@ const StepAgreement = ({ data, setData, onComplete, onBack }: Props) => {
           <li>Services are by appointment, subject to technician availability.</li>
           <li>Oil exceeding included quantity, specialty oils/filters, oversized or diesel vehicles may incur additional charges.</li>
           <li>Membership may be cancelled in writing after 3 months. Outstanding balances for services rendered remain payable.</li>
-          <li>Deposit is refundable upon cancellation in good standing, less any outstanding balance.</li>
+          <li>Deposit is non-refundable.</li>
           <li>This agreement is governed by the laws of the State of Florida.</li>
         </ol>
       </div>

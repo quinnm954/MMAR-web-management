@@ -128,7 +128,7 @@ Deno.serve(async (req) => {
       "3. Services are by appointment, subject to technician availability.",
       "4. Oil exceeding included quantity, specialty oils/filters, oversized or diesel vehicles may incur additional charges.",
       "5. Membership may be cancelled in writing after 3 months. Outstanding balances remain payable.",
-      "6. Deposit is refundable upon cancellation in good standing, less any outstanding balance.",
+      "6. Deposit is non-refundable.",
       "7. Governed by the laws of the State of Florida.",
     ];
     for (const t of terms) {
