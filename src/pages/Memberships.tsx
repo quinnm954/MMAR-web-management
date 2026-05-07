@@ -88,7 +88,7 @@ const Memberships = () => {
                 <a href="#plans">View Membership Plans</a>
               </Button>
               <Button variant="outline" size="lg" asChild>
-                <Link to="/portal/signup">Become A Member</Link>
+                <Link to="/portal/membership-signup">Become A Member</Link>
               </Button>
             </div>
             <div className="flex flex-wrap justify-center gap-2 mt-8 text-sm">
@@ -166,7 +166,7 @@ const Memberships = () => {
                       className="w-full"
                       asChild
                     >
-                      <Link to={`/portal/signup?plan=${plan.slug}`}>Choose {plan.name}</Link>
+                      <Link to={`/portal/membership-signup?plan=${plan.slug}`}>Choose {plan.name}</Link>
                     </Button>
                   </CardContent>
                 </Card>
