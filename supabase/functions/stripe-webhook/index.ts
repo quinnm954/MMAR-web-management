@@ -70,6 +70,41 @@ Deno.serve(async (req) => {
           })
           .eq("id", membershipId);
         console.log("Membership activated", membershipId);
+
+        // Send membership welcome email
+        try {
+          const { data: m } = await admin
+            .from("memberships")
+            .select("customer_id, plan:membership_plans(name)")
+            .eq("id", membershipId)
+            .maybeSingle();
+          if (m?.customer_id) {
+            const { data: prof } = await admin
+              .from("profiles")
+              .select("email, full_name")
+              .eq("id", m.customer_id)
+              .maybeSingle();
+            const planName = (m as any).plan?.name as string | undefined;
+            if (prof?.email) {
+              await admin.functions.invoke("send-transactional-email", {
+                body: {
+                  templateName: "membership-welcome",
+                  recipientEmail: prof.email,
+                  idempotencyKey: `membership-welcome-${membershipId}`,
+                  templateData: {
+                    customerName: prof.full_name || undefined,
+                    planName,
+                    portalUrl: `${new URL(req.url).origin.replace(/functions.*/, "")}`.includes("supabase")
+                      ? "https://shop-flow-home.lovable.app/portal"
+                      : "https://shop-flow-home.lovable.app/portal",
+                  },
+                },
+              });
+            }
+          }
+        } catch (e) {
+          console.warn("welcome email failed", e);
+        }
       }
     }
 
