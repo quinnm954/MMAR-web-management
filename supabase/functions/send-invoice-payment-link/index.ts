@@ -161,10 +161,13 @@ Deno.serve(async (req) => {
         body: msg,
         twilio_sid: twData.sid,
         status: twData.status,
+        invoice_id: invoice.id,
       });
       await admin.from("sms_threads").update({
         last_message_preview: msg.slice(0, 120),
         last_message_at: new Date().toISOString(),
+        last_invoice_id: invoice.id,
+        customer_id: invoice.customer_id,
       }).eq("id", threadId);
     }
 
