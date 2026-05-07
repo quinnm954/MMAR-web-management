@@ -59,23 +59,25 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ error: "Nothing due" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    // Look up phone if not provided
+    // Look up phone if not provided (skip when copy_only)
     let threadId: string | null = null;
-    if (!phone) {
-      const { data: thread } = await admin
-        .from("sms_threads")
-        .select("id, phone")
-        .eq("customer_id", invoice.customer_id)
-        .order("updated_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
-      if (thread) {
-        phone = thread.phone;
-        threadId = thread.id;
+    if (!copyOnly) {
+      if (!phone) {
+        const { data: thread } = await admin
+          .from("sms_threads")
+          .select("id, phone")
+          .eq("customer_id", invoice.customer_id)
+          .order("updated_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        if (thread) {
+          phone = thread.phone;
+          threadId = thread.id;
+        }
       }
-    }
-    if (!phone) {
-      return new Response(JSON.stringify({ error: "No phone number on file. Please provide one." }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      if (!phone) {
+        return new Response(JSON.stringify({ error: "No phone number on file. Please provide one." }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
     }
 
     // Customer profile (for email + name)
