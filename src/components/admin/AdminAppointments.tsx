@@ -164,6 +164,7 @@ const AdminAppointments = () => {
                   defaultValue={r.technician_notes ?? ""}
                   onBlur={(e) => e.target.value !== (r.technician_notes ?? "") && update(r.id, { technician_notes: e.target.value })}
                 />
+              </div>
             </div>
             <div className="pt-2 border-t border-border">
               <label className="text-xs text-muted-foreground">Assigned technician</label>
