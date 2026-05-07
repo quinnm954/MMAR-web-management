@@ -40,6 +40,7 @@ const AdminInvoices = () => {
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [repliesByInvoice, setRepliesByInvoice] = useState<Record<string, Array<{ id: string; body: string; created_at: string; phone: string }>>>({});
   const [form, setForm] = useState({
     customer_id: "",
     invoice_number: "",
@@ -61,10 +62,38 @@ const AdminInvoices = () => {
     list.forEach((r) => { r.customer = byId[r.customer_id] ?? null; });
     setInvoices(list);
     setCustomers(profs);
+
+    // Load inbound SMS replies linked to these invoices
+    const ids = list.map((l) => l.id);
+    if (ids.length) {
+      const { data: msgs } = await supabase
+        .from("sms_messages")
+        .select("id, body, created_at, invoice_id, thread_id, direction, sms_threads:thread_id(phone)")
+        .in("invoice_id", ids)
+        .eq("direction", "inbound")
+        .order("created_at", { ascending: false });
+      const map: Record<string, any[]> = {};
+      (msgs ?? []).forEach((m: any) => {
+        if (!m.invoice_id) return;
+        (map[m.invoice_id] = map[m.invoice_id] || []).push({
+          id: m.id, body: m.body, created_at: m.created_at, phone: m.sms_threads?.phone || "",
+        });
+      });
+      setRepliesByInvoice(map);
+    } else {
+      setRepliesByInvoice({});
+    }
     setLoading(false);
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+    const ch = supabase
+      .channel("invoices-sms")
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "sms_messages" }, () => load())
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, []);
 
   const save = async () => {
     if (!form.customer_id || !form.subtotal) return toast.error("Customer and subtotal required");
