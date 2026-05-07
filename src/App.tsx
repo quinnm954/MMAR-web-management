@@ -36,6 +36,7 @@ import PortalServiceHistory from "./pages/portal/PortalServiceHistory";
 import PortalInvoices from "./pages/portal/PortalInvoices";
 import CustomerProtectedRoute from "./components/portal/CustomerProtectedRoute";
 import NotFound from "./pages/NotFound";
+import Unsubscribe from "./pages/Unsubscribe";
 
 const queryClient = new QueryClient();
 
@@ -81,6 +82,7 @@ const App = () => (
                 </ProtectedRoute>
               }
             />
+            <Route path="/unsubscribe" element={<Unsubscribe />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="/:landingSlug" element={<LocalLanding />} />
             <Route path="*" element={<NotFound />} />
