@@ -89,6 +89,7 @@ const AdminDashboard = () => {
             <TabsTrigger value="invoices"><Receipt className="h-4 w-4 mr-1.5" /> Invoices</TabsTrigger>
             <TabsTrigger value="financing"><FileText className="h-4 w-4 mr-1.5" /> Financing</TabsTrigger>
             <TabsTrigger value="warranty"><ShieldCheck className="h-4 w-4 mr-1.5" /> Warranty</TabsTrigger>
+            <TabsTrigger value="emails"><Mail className="h-4 w-4 mr-1.5" /> Emails</TabsTrigger>
           </TabsList>
 
           <TabsContent value="customers"><AdminCustomers /></TabsContent>
