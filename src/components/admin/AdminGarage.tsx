@@ -4,6 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Car, Wrench, FileText, ClipboardCheck, Receipt } from 'lucide-react';
+import VinDecoder from './VinDecoder';
+import { toast } from 'sonner';
 
 export default function AdminGarage() {
   const [vehicles, setVehicles] = useState<any[]>([]);
