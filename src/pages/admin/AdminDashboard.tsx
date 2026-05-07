@@ -90,22 +90,30 @@ const AdminDashboard = () => {
             <TabsTrigger value="memberships"><CreditCard className="h-4 w-4 mr-1.5" /> Memberships</TabsTrigger>
             <TabsTrigger value="appointments"><Calendar className="h-4 w-4 mr-1.5" /> Appointments</TabsTrigger>
             <TabsTrigger value="service"><ClipboardList className="h-4 w-4 mr-1.5" /> Service Records</TabsTrigger>
+            <TabsTrigger value="estimates"><FileSpreadsheet className="h-4 w-4 mr-1.5" /> Estimates</TabsTrigger>
+            <TabsTrigger value="inspections"><ClipboardCheck className="h-4 w-4 mr-1.5" /> Inspections</TabsTrigger>
             <TabsTrigger value="invoices"><Receipt className="h-4 w-4 mr-1.5" /> Invoices</TabsTrigger>
+            <TabsTrigger value="catalog"><Package className="h-4 w-4 mr-1.5" /> Catalog</TabsTrigger>
             <TabsTrigger value="financing"><FileText className="h-4 w-4 mr-1.5" /> Financing</TabsTrigger>
             <TabsTrigger value="warranty"><ShieldCheck className="h-4 w-4 mr-1.5" /> Warranty</TabsTrigger>
             <TabsTrigger value="emails"><Mail className="h-4 w-4 mr-1.5" /> Emails</TabsTrigger>
+            <TabsTrigger value="settings"><Settings className="h-4 w-4 mr-1.5" /> Settings</TabsTrigger>
           </TabsList>
 
           <TabsContent value="customers"><AdminCustomers /></TabsContent>
           <TabsContent value="memberships"><AdminMemberships /></TabsContent>
           <TabsContent value="appointments"><AdminAppointments /></TabsContent>
           <TabsContent value="service"><AdminServiceRecords /></TabsContent>
+          <TabsContent value="estimates"><AdminEstimates /></TabsContent>
+          <TabsContent value="inspections"><AdminInspections /></TabsContent>
           <TabsContent value="invoices"><AdminInvoices /></TabsContent>
+          <TabsContent value="catalog"><AdminCatalog /></TabsContent>
           <TabsContent value="financing">
             <FinancingContractsTable data={contracts} onRefresh={reloadFinancing} />
           </TabsContent>
           <TabsContent value="warranty"><WarrantyTable data={warranties} onRefresh={reloadWarranty} /></TabsContent>
           <TabsContent value="emails"><AdminEmails /></TabsContent>
+          <TabsContent value="settings"><AdminShopSettings /></TabsContent>
         </Tabs>
       </main>
     </div>
