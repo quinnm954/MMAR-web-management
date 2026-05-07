@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
 import Navigation from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -11,7 +10,6 @@ import { Loader2, Wrench } from "lucide-react";
 import StepAccount from "@/components/portal/wizard/StepAccount";
 import StepVehicle from "@/components/portal/wizard/StepVehicle";
 import StepPlan from "@/components/portal/wizard/StepPlan";
-import StepACH from "@/components/portal/wizard/StepACH";
 import StepAgreement from "@/components/portal/wizard/StepAgreement";
 
 export interface WizardData {
