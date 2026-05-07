@@ -16,10 +16,12 @@ export default function AdminSMS() {
   const [body, setBody] = useState('');
   const [newPhone, setNewPhone] = useState('');
 
+  const [invoicesById, setInvoicesById] = useState<Record<string, any>>({});
+
   const loadThreads = async () => {
     const { data } = await supabase
       .from('sms_threads')
-      .select('*, profiles:customer_id(full_name, email)')
+      .select('*, profiles:customer_id(full_name, email), last_invoice:last_invoice_id(id, invoice_number, total, amount_paid, status)')
       .order('last_message_at', { ascending: false });
     setThreads(data ?? []);
   };
