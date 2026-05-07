@@ -24,6 +24,11 @@ import Reviews from "./pages/Reviews";
 import ReviewLanding from "./pages/ReviewLanding";
 import ContactPage from "./pages/ContactPage";
 import InstallApp from "./pages/InstallApp";
+import Memberships from "./pages/Memberships";
+import PortalLogin from "./pages/portal/PortalLogin";
+import PortalSignup from "./pages/portal/PortalSignup";
+import PortalDashboard from "./pages/portal/PortalDashboard";
+import CustomerProtectedRoute from "./components/portal/CustomerProtectedRoute";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -52,6 +57,17 @@ const App = () => (
             <Route path="/blog/tag/:tag" element={<BlogTag />} />
             <Route path="/blog/:slug" element={<BlogPost />} />
             <Route path="/admin/login" element={<AdminLogin />} />
+            <Route path="/memberships" element={<Memberships />} />
+            <Route path="/portal/login" element={<PortalLogin />} />
+            <Route path="/portal/signup" element={<PortalSignup />} />
+            <Route
+              path="/portal/dashboard"
+              element={
+                <CustomerProtectedRoute>
+                  <PortalDashboard />
+                </CustomerProtectedRoute>
+              }
+            />
             <Route
               path="/admin/dashboard"
               element={
