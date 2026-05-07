@@ -350,6 +350,7 @@ export type Database = {
           name: string
           slug: string
           sort_order: number
+          stripe_price_id: string | null
           tagline: string | null
           total_at_signup: number
           updated_at: string
@@ -368,6 +369,7 @@ export type Database = {
           name: string
           slug: string
           sort_order?: number
+          stripe_price_id?: string | null
           tagline?: string | null
           total_at_signup: number
           updated_at?: string
@@ -386,6 +388,7 @@ export type Database = {
           name?: string
           slug?: string
           sort_order?: number
+          stripe_price_id?: string | null
           tagline?: string | null
           total_at_signup?: number
           updated_at?: string
@@ -400,6 +403,7 @@ export type Database = {
           cancellation_requested_at: string | null
           cancelled_at: string | null
           created_at: string
+          current_period_end: string | null
           customer_id: string
           deposit_paid: boolean
           deposit_paid_at: string | null
@@ -412,6 +416,8 @@ export type Database = {
           signature_image: string | null
           start_date: string | null
           status: string
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
           updated_at: string
           user_agent: string | null
           vehicle_id: string
@@ -423,6 +429,7 @@ export type Database = {
           cancellation_requested_at?: string | null
           cancelled_at?: string | null
           created_at?: string
+          current_period_end?: string | null
           customer_id: string
           deposit_paid?: boolean
           deposit_paid_at?: string | null
@@ -435,6 +442,8 @@ export type Database = {
           signature_image?: string | null
           start_date?: string | null
           status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
           updated_at?: string
           user_agent?: string | null
           vehicle_id: string
@@ -446,6 +455,7 @@ export type Database = {
           cancellation_requested_at?: string | null
           cancelled_at?: string | null
           created_at?: string
+          current_period_end?: string | null
           customer_id?: string
           deposit_paid?: boolean
           deposit_paid_at?: string | null
@@ -458,6 +468,8 @@ export type Database = {
           signature_image?: string | null
           start_date?: string | null
           status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
           updated_at?: string
           user_agent?: string | null
           vehicle_id?: string
