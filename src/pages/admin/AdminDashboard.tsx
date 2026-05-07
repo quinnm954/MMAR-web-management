@@ -26,6 +26,7 @@ import AdminDeclinedWork from '@/components/admin/AdminDeclinedWork';
 import AdminQuickBooksExport from '@/components/admin/AdminQuickBooksExport';
 import AdminRepairOrders from '@/components/admin/AdminRepairOrders';
 import AdminCalendar from '@/components/admin/AdminCalendar';
+import AdminTechProductivity from '@/components/admin/AdminTechProductivity';
 import { supabase } from '@/integrations/supabase/client';
 import mmarLogo from '@/assets/mmar-logo.jpeg';
 
