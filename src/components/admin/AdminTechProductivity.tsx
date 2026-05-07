@@ -145,13 +145,13 @@ export default function AdminTechProductivity() {
                     <div className="font-medium">{r.name}</div>
                     <div className="text-sm text-muted-foreground">${r.revenue.toFixed(0)}</div>
                   </div>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+                  <div className="grid grid-cols-2 md:grid-cols-5 gap-2 text-xs">
                     <Cell label="Clocked" value={`${r.clockedHours.toFixed(1)} hrs`} />
+                    <Cell label="Billed" value={`${r.billedHours.toFixed(1)} hrs`} />
                     <Cell label="Jobs" value={`${r.completed} / ${r.totalAppts}`} />
                     <Cell label="Efficiency" value={`${r.efficiency.toFixed(0)}%`} accent={r.efficiency >= 80} />
                     <Cell label="$ / hr" value={`$${r.avgRevenuePerHour.toFixed(0)}`} />
                   </div>
-                  {/* Efficiency bar */}
                   <div className="mt-2 h-1.5 rounded-full bg-muted overflow-hidden">
                     <div
                       className={r.efficiency >= 80 ? "h-full bg-primary" : r.efficiency >= 50 ? "h-full bg-accent" : "h-full bg-destructive"}
@@ -162,7 +162,7 @@ export default function AdminTechProductivity() {
               ))}
             </div>
             <p className="text-xs text-muted-foreground mt-4">
-              Efficiency = estimated billed hrs (completed jobs × 1.5h avg) ÷ clocked hrs. Add per-job labor hours to refine this calculation.
+              Efficiency = sum of per-line labor hours on approved estimates ÷ clocked hrs. Falls back to 1.5h/job for legacy jobs without tracked hours.
             </p>
           </>
         )}
