@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
-import { Loader2, Plus, Receipt } from "lucide-react";
+import { Loader2, Plus, Receipt, MessageSquare } from "lucide-react";
 import { toast } from "sonner";
 
 interface Customer { id: string; full_name: string | null; email: string | null }
@@ -98,6 +98,29 @@ const AdminInvoices = () => {
 
   const totalDue = invoices.filter((i) => i.status !== "paid" && i.status !== "void").reduce((s, i) => s + (i.total - i.amount_paid), 0);
 
+  const [textingId, setTextingId] = useState<string | null>(null);
+
+  const sendPaymentLink = async (invoiceId: string) => {
+    setTextingId(invoiceId);
+    const { data, error } = await supabase.functions.invoke("send-invoice-payment-link", { body: { invoice_id: invoiceId } });
+    setTextingId(null);
+    const respErr = (data as any)?.error || error?.message;
+    if (respErr) {
+      if (String(respErr).includes("No phone")) {
+        const entered = window.prompt("No phone on file. Enter customer's mobile number (E.164, e.g. +18135017572):");
+        if (!entered) return;
+        setTextingId(invoiceId);
+        const r = await supabase.functions.invoke("send-invoice-payment-link", { body: { invoice_id: invoiceId, phone: entered } });
+        setTextingId(null);
+        const e2 = (r.data as any)?.error || r.error?.message;
+        if (e2) return toast.error(e2);
+        return toast.success(`Payment link sent to ${entered}`);
+      }
+      return toast.error(respErr);
+    }
+    toast.success(`Payment link sent to ${(data as any)?.phone}`);
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -152,6 +175,18 @@ const AdminInvoices = () => {
                     <div className="font-bold">${i.total.toFixed(2)}</div>
                     {i.amount_paid > 0 && <div className="text-xs text-muted-foreground">Paid ${i.amount_paid.toFixed(2)}</div>}
                   </div>
+                  {i.status !== "paid" && i.status !== "void" && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => sendPaymentLink(i.id)}
+                      disabled={textingId === i.id}
+                      title="Text payment link to customer"
+                    >
+                      {textingId === i.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <MessageSquare className="h-3 w-3 mr-1" />}
+                      Text-to-Pay
+                    </Button>
+                  )}
                   <Select value={i.status} onValueChange={(v) => updateStatus(i.id, v)}>
                     <SelectTrigger className="h-8 w-28 text-xs"><SelectValue /></SelectTrigger>
                     <SelectContent>{STATUSES.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
