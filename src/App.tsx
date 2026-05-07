@@ -39,6 +39,8 @@ import NotFound from "./pages/NotFound";
 import Unsubscribe from "./pages/Unsubscribe";
 import TechDashboard from "./pages/tech/TechDashboard";
 import TechProtectedRoute from "./components/tech/TechProtectedRoute";
+import EstimateApproval from "./pages/EstimateApproval";
+import InspectionReport from "./pages/InspectionReport";
 
 const queryClient = new QueryClient();
 
