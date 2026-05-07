@@ -19,9 +19,13 @@ interface Row {
   status: string;
   customer_id: string;
   technician_notes: string | null;
+  assigned_technician_id: string | null;
   customer: { full_name: string | null; email: string | null } | null;
   vehicle: { year: number | null; make: string | null; model: string | null } | null;
 }
+
+interface Tech { user_id: string; full_name: string | null; email: string | null }
+
 
 const STATUSES = ["requested", "scheduled", "in_progress", "completed", "cancelled"];
 
@@ -34,6 +38,7 @@ const statusColor = (s: string) => {
 
 const AdminAppointments = () => {
   const [rows, setRows] = useState<Row[]>([]);
+  const [techs, setTechs] = useState<Tech[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
 
@@ -41,7 +46,7 @@ const AdminAppointments = () => {
     setLoading(true);
     const { data } = await supabase
       .from("appointments")
-      .select("id, service_type, description, service_address, requested_date, requested_time_window, scheduled_at, status, customer_id, technician_notes, vehicle:vehicles(year, make, model)")
+      .select("id, service_type, description, service_address, requested_date, requested_time_window, scheduled_at, status, customer_id, technician_notes, assigned_technician_id, vehicle:vehicles(year, make, model)")
       .order("requested_date", { ascending: false, nullsFirst: false });
     const list = (data as unknown as Row[]) ?? [];
     const ids = Array.from(new Set(list.map((r) => r.customer_id)));
@@ -49,6 +54,17 @@ const AdminAppointments = () => {
     const byId: Record<string, { full_name: string | null; email: string | null }> = {};
     (profs ?? []).forEach((p) => { byId[p.id] = { full_name: p.full_name, email: p.email }; });
     list.forEach((r) => { r.customer = byId[r.customer_id] ?? null; });
+
+    // Load technicians
+    const { data: techRoles } = await supabase.from("user_roles").select("user_id").eq("role", "technician");
+    const techIds = (techRoles ?? []).map((t) => t.user_id);
+    if (techIds.length) {
+      const { data: techProfs } = await supabase.from("profiles").select("id, full_name, email").in("id", techIds);
+      setTechs((techProfs ?? []).map((p) => ({ user_id: p.id, full_name: p.full_name, email: p.email })));
+    } else {
+      setTechs([]);
+    }
+
     setRows(list);
     setLoading(false);
   };
