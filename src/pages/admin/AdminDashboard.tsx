@@ -25,6 +25,7 @@ import AdminGarage from '@/components/admin/AdminGarage';
 import AdminDeclinedWork from '@/components/admin/AdminDeclinedWork';
 import AdminQuickBooksExport from '@/components/admin/AdminQuickBooksExport';
 import AdminRepairOrders from '@/components/admin/AdminRepairOrders';
+import AdminCalendar from '@/components/admin/AdminCalendar';
 import { supabase } from '@/integrations/supabase/client';
 import mmarLogo from '@/assets/mmar-logo.jpeg';
 
@@ -96,6 +97,7 @@ const AdminDashboard = () => {
           <TabsList className="flex flex-wrap h-auto">
             <TabsTrigger value="reports"><BarChart3 className="h-4 w-4 mr-1.5" /> Reports</TabsTrigger>
             <TabsTrigger value="kanban"><KanbanSquare className="h-4 w-4 mr-1.5" /> Job Board</TabsTrigger>
+            <TabsTrigger value="calendar"><Calendar className="h-4 w-4 mr-1.5" /> Calendar</TabsTrigger>
             <TabsTrigger value="ros"><Wrench className="h-4 w-4 mr-1.5" /> Repair Orders</TabsTrigger>
             <TabsTrigger value="customers"><Users className="h-4 w-4 mr-1.5" /> Customers</TabsTrigger>
             <TabsTrigger value="garage"><Car className="h-4 w-4 mr-1.5" /> Garage</TabsTrigger>
@@ -118,6 +120,7 @@ const AdminDashboard = () => {
 
           <TabsContent value="reports"><AdminReports /></TabsContent>
           <TabsContent value="kanban"><AdminKanban /></TabsContent>
+          <TabsContent value="calendar"><AdminCalendar /></TabsContent>
           <TabsContent value="ros"><AdminRepairOrders /></TabsContent>
           <TabsContent value="customers"><AdminCustomers /></TabsContent>
           <TabsContent value="garage"><AdminGarage /></TabsContent>
