@@ -38,7 +38,7 @@ const RULES = [
   { q: "Immediate Activation", a: "Benefits activate immediately after payment and signed agreement completion." },
   { q: "Additional Oil Charges", a: "Oil exceeding included quantities billed separately." },
   { q: "Scheduling Policy", a: "Services are by appointment and subject to availability." },
-  { q: "Membership Deposit", a: "A refundable 3-month deposit is collected to allow immediate activation and protect against abuse or unpaid balances." },
+  { q: "Membership Deposit", a: "A non-refundable 3-month deposit is collected to allow immediate activation and protect against abuse or unpaid balances." },
   { q: "Cancellation Policy", a: "Membership may be canceled after the first 3 months. Remaining balances may apply if services rendered exceed payments received." },
 ];
 
@@ -147,7 +147,7 @@ const Memberships = () => {
                         <span className="text-muted-foreground">/mo</span>
                       </div>
                       <div className="text-xs text-muted-foreground mt-2 space-y-0.5">
-                        <div>Deposit: ${plan.deposit_amount.toFixed(2)} (refundable)</div>
+                        <div>Deposit: ${plan.deposit_amount.toFixed(2)} (non-refundable)</div>
                         <div className="font-semibold text-foreground">Due at signup: ${plan.total_at_signup.toFixed(2)}</div>
                       </div>
                     </div>
