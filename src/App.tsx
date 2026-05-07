@@ -41,6 +41,7 @@ import TechDashboard from "./pages/tech/TechDashboard";
 import TechProtectedRoute from "./components/tech/TechProtectedRoute";
 import EstimateApproval from "./pages/EstimateApproval";
 import InspectionReport from "./pages/InspectionReport";
+import Login from "./pages/Login";
 
 const queryClient = new QueryClient();
 
@@ -90,6 +91,7 @@ const App = () => (
             <Route path="/tech" element={<TechProtectedRoute><TechDashboard /></TechProtectedRoute>} />
             <Route path="/estimate/:token" element={<EstimateApproval />} />
             <Route path="/inspection/:token" element={<InspectionReport />} />
+            <Route path="/login" element={<Login />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="/:landingSlug" element={<LocalLanding />} />
             <Route path="*" element={<NotFound />} />
