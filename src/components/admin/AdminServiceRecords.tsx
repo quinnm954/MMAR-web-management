@@ -70,7 +70,7 @@ const AdminServiceRecords = () => {
   const save = async () => {
     if (!form.customer_id || !form.vehicle_id || !form.service_type) return toast.error("Customer, vehicle, and service type are required");
     setSaving(true);
-    const { error } = await supabase.from("service_records").insert({
+    const { data: inserted, error } = await supabase.from("service_records").insert({
       customer_id: form.customer_id,
       vehicle_id: form.vehicle_id,
       service_date: form.service_date,
@@ -79,10 +79,55 @@ const AdminServiceRecords = () => {
       labor_performed: form.labor_performed || null,
       technician_notes: form.technician_notes || null,
       invoice_total: form.invoice_total ? parseFloat(form.invoice_total) : null,
-    });
+    }).select("id").single();
     setSaving(false);
     if (error) return toast.error(error.message);
     toast.success("Service record logged");
+
+    // Customer info for emails
+    const customer = customers.find((c) => c.id === form.customer_id);
+    const vehicle = vehicles.find((v) => v.id === form.vehicle_id);
+    const vehicleStr = vehicle ? `${vehicle.year ?? ""} ${vehicle.make ?? ""} ${vehicle.model ?? ""}`.trim() : undefined;
+
+    if (customer?.email && inserted?.id) {
+      const { sendNotification } = await import("@/lib/notify");
+      // Service completed email
+      sendNotification({
+        templateName: "service-completed",
+        recipientEmail: customer.email,
+        idempotencyKey: `service-done-${inserted.id}`,
+        templateData: {
+          customerName: customer.full_name || undefined,
+          serviceType: form.service_type,
+          vehicle: vehicleStr,
+          notes: form.technician_notes || undefined,
+        },
+      });
+
+      // Invoice issued email — invoice was auto-created by DB trigger
+      if (form.invoice_total && parseFloat(form.invoice_total) > 0) {
+        const { data: inv } = await supabase
+          .from("invoices")
+          .select("id, invoice_number, total, due_date")
+          .eq("service_record_id", inserted.id)
+          .maybeSingle();
+        if (inv) {
+          sendNotification({
+            templateName: "invoice-issued",
+            recipientEmail: customer.email,
+            idempotencyKey: `invoice-issued-${inv.id}`,
+            templateData: {
+              customerName: customer.full_name || undefined,
+              invoiceNumber: inv.invoice_number,
+              total: `$${Number(inv.total).toFixed(2)}`,
+              dueDate: inv.due_date,
+              invoiceUrl: `${window.location.origin}/portal/invoices`,
+            },
+          });
+        }
+      }
+    }
+
     setOpen(false);
     setForm({ customer_id: "", vehicle_id: "", service_date: new Date().toISOString().slice(0, 10), service_type: "", mileage_at_service: "", labor_performed: "", technician_notes: "", invoice_total: "" });
     load();

@@ -37,6 +37,8 @@ import PortalInvoices from "./pages/portal/PortalInvoices";
 import CustomerProtectedRoute from "./components/portal/CustomerProtectedRoute";
 import NotFound from "./pages/NotFound";
 import Unsubscribe from "./pages/Unsubscribe";
+import TechDashboard from "./pages/tech/TechDashboard";
+import TechProtectedRoute from "./components/tech/TechProtectedRoute";
 
 const queryClient = new QueryClient();
 
@@ -83,6 +85,7 @@ const App = () => (
               }
             />
             <Route path="/unsubscribe" element={<Unsubscribe />} />
+            <Route path="/tech" element={<TechProtectedRoute><TechDashboard /></TechProtectedRoute>} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="/:landingSlug" element={<LocalLanding />} />
             <Route path="*" element={<NotFound />} />

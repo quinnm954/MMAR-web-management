@@ -19,9 +19,13 @@ interface Row {
   status: string;
   customer_id: string;
   technician_notes: string | null;
+  assigned_technician_id: string | null;
   customer: { full_name: string | null; email: string | null } | null;
   vehicle: { year: number | null; make: string | null; model: string | null } | null;
 }
+
+interface Tech { user_id: string; full_name: string | null; email: string | null }
+
 
 const STATUSES = ["requested", "scheduled", "in_progress", "completed", "cancelled"];
 
@@ -34,6 +38,7 @@ const statusColor = (s: string) => {
 
 const AdminAppointments = () => {
   const [rows, setRows] = useState<Row[]>([]);
+  const [techs, setTechs] = useState<Tech[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
 
@@ -41,7 +46,7 @@ const AdminAppointments = () => {
     setLoading(true);
     const { data } = await supabase
       .from("appointments")
-      .select("id, service_type, description, service_address, requested_date, requested_time_window, scheduled_at, status, customer_id, technician_notes, vehicle:vehicles(year, make, model)")
+      .select("id, service_type, description, service_address, requested_date, requested_time_window, scheduled_at, status, customer_id, technician_notes, assigned_technician_id, vehicle:vehicles(year, make, model)")
       .order("requested_date", { ascending: false, nullsFirst: false });
     const list = (data as unknown as Row[]) ?? [];
     const ids = Array.from(new Set(list.map((r) => r.customer_id)));
@@ -49,6 +54,17 @@ const AdminAppointments = () => {
     const byId: Record<string, { full_name: string | null; email: string | null }> = {};
     (profs ?? []).forEach((p) => { byId[p.id] = { full_name: p.full_name, email: p.email }; });
     list.forEach((r) => { r.customer = byId[r.customer_id] ?? null; });
+
+    // Load technicians
+    const { data: techRoles } = await supabase.from("user_roles").select("user_id").eq("role", "technician");
+    const techIds = (techRoles ?? []).map((t) => t.user_id);
+    if (techIds.length) {
+      const { data: techProfs } = await supabase.from("profiles").select("id, full_name, email").in("id", techIds);
+      setTechs((techProfs ?? []).map((p) => ({ user_id: p.id, full_name: p.full_name, email: p.email })));
+    } else {
+      setTechs([]);
+    }
+
     setRows(list);
     setLoading(false);
   };
@@ -56,9 +72,30 @@ const AdminAppointments = () => {
   useEffect(() => { load(); }, []);
 
   const update = async (id: string, patch: Record<string, unknown>) => {
+    const row = rows.find((r) => r.id === id);
     const { error } = await supabase.from("appointments").update(patch).eq("id", id);
     if (error) return toast.error(error.message);
     toast.success("Updated");
+
+    // Trigger appointment-confirmed email when transitioning to scheduled
+    const becameScheduled =
+      (patch.status === "scheduled" && row?.status !== "scheduled") ||
+      (patch.scheduled_at && row?.status === "requested");
+    if (becameScheduled && row?.customer?.email) {
+      const { sendNotification } = await import("@/lib/notify");
+      const when = (patch.scheduled_at as string) || row.scheduled_at || row.requested_date || "";
+      sendNotification({
+        templateName: "appointment-confirmed",
+        recipientEmail: row.customer.email,
+        idempotencyKey: `appt-confirmed-${id}-${when}`,
+        templateData: {
+          customerName: row.customer.full_name || undefined,
+          appointmentDate: when ? new Date(when).toLocaleString() : (row.requested_date ?? undefined),
+          serviceType: row.service_type,
+          vehicle: row.vehicle ? `${row.vehicle.year ?? ""} ${row.vehicle.make ?? ""} ${row.vehicle.model ?? ""}`.trim() : undefined,
+        },
+      });
+    }
     load();
   };
 
@@ -128,6 +165,19 @@ const AdminAppointments = () => {
                   onBlur={(e) => e.target.value !== (r.technician_notes ?? "") && update(r.id, { technician_notes: e.target.value })}
                 />
               </div>
+            </div>
+            <div className="pt-2 border-t border-border">
+              <label className="text-xs text-muted-foreground">Assigned technician</label>
+              <Select
+                value={r.assigned_technician_id ?? "unassigned"}
+                onValueChange={(v) => update(r.id, { assigned_technician_id: v === "unassigned" ? null : v })}
+              >
+                <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="unassigned">Unassigned</SelectItem>
+                  {techs.map((t) => <SelectItem key={t.user_id} value={t.user_id}>{t.full_name || t.email}</SelectItem>)}
+                </SelectContent>
+              </Select>
             </div>
           </CardContent>
         </Card>
