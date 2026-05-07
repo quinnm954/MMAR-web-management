@@ -107,15 +107,25 @@ Deno.serve(async (req) => {
 
     await admin.from("invoices").update({ stripe_session_id: session.id }).eq("id", invoice.id);
 
+    // Build message preview
+    const greeting = profile?.full_name ? `Hi ${profile.full_name.split(" ")[0]}, ` : "";
+    const msg = `${SHOP_NAME}: ${greeting}your invoice ${invoice.invoice_number || ""} for $${due.toFixed(2)} is ready. Pay securely: ${session.url}`;
+
+    if (copyOnly) {
+      return new Response(JSON.stringify({ ok: true, url: session.url, message: msg }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     // Find / create thread for outbound logging
     if (!threadId) {
-      const { data: existing } = await admin.from("sms_threads").select("id").eq("phone", phone).maybeSingle();
+      const { data: existing } = await admin.from("sms_threads").select("id").eq("phone", phone!).maybeSingle();
       if (existing) {
         threadId = existing.id;
       } else {
         const { data: created } = await admin
           .from("sms_threads")
-          .insert({ phone, customer_id: invoice.customer_id, last_message_preview: "Payment link sent" })
+          .insert({ phone: phone!, customer_id: invoice.customer_id, last_message_preview: "Payment link sent" })
           .select("id")
           .single();
         threadId = created?.id || null;
@@ -123,9 +133,6 @@ Deno.serve(async (req) => {
     }
 
     // Send SMS via Twilio gateway
-    const greeting = profile?.full_name ? `Hi ${profile.full_name.split(" ")[0]}, ` : "";
-    const msg = `${SHOP_NAME}: ${greeting}your invoice ${invoice.invoice_number || ""} for $${due.toFixed(2)} is ready. Pay securely: ${session.url}`;
-
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     const TWILIO_API_KEY = Deno.env.get("TWILIO_API_KEY");
     const TWILIO_FROM = Deno.env.get("TWILIO_FROM_NUMBER");
@@ -140,7 +147,7 @@ Deno.serve(async (req) => {
         "X-Connection-Api-Key": TWILIO_API_KEY,
         "Content-Type": "application/x-www-form-urlencoded",
       },
-      body: new URLSearchParams({ To: phone, From: TWILIO_FROM, Body: msg }),
+      body: new URLSearchParams({ To: phone!, From: TWILIO_FROM, Body: msg }),
     });
     const twData = await tw.json();
     if (!tw.ok) {
