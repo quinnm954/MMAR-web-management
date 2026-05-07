@@ -41,6 +41,7 @@ import TechDashboard from "./pages/tech/TechDashboard";
 import TechProtectedRoute from "./components/tech/TechProtectedRoute";
 import EstimateApproval from "./pages/EstimateApproval";
 import InspectionReport from "./pages/InspectionReport";
+import Login from "./pages/Login";
 
 const queryClient = new QueryClient();
 
