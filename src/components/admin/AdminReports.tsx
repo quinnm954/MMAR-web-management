@@ -17,6 +17,8 @@ type InvoiceRow = {
   customer_id: string;
   service_record_id: string | null;
   line_items: LineItem[];
+  stripe_session_id: string | null;
+  stripe_payment_intent_id: string | null;
 };
 
 type ProfitRow = {
