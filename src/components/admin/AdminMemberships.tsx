@@ -15,8 +15,9 @@ interface Row {
   oil_changes_used: number;
   cancellation_requested_at: string | null;
   customer_id: string;
+  deposit_paid: boolean;
   customer: { full_name: string | null; email: string | null } | null;
-  plan: { name: string; monthly_price: number } | null;
+  plan: { name: string; monthly_price: number; stripe_price_id: string | null } | null;
   vehicle: { year: number | null; make: string | null; model: string | null } | null;
 }
 
