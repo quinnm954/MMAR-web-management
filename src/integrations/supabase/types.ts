@@ -429,6 +429,54 @@ export type Database = {
         }
         Relationships: []
       }
+      employees: {
+        Row: {
+          created_at: string
+          email: string | null
+          employee_type: string
+          full_name: string
+          hourly_rate: number
+          id: string
+          is_active: boolean
+          notes: string | null
+          pay_basis: string
+          phone: string | null
+          salary_amount: number | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          employee_type?: string
+          full_name: string
+          hourly_rate?: number
+          id?: string
+          is_active?: boolean
+          notes?: string | null
+          pay_basis?: string
+          phone?: string | null
+          salary_amount?: number | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          employee_type?: string
+          full_name?: string
+          hourly_rate?: number
+          id?: string
+          is_active?: boolean
+          notes?: string | null
+          pay_basis?: string
+          phone?: string | null
+          salary_amount?: number | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       estimate_decision_logs: {
         Row: {
           actor_id: string | null
