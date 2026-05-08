@@ -108,6 +108,13 @@ export default function AdminEmployees() {
           setSaving(false);
           return;
         }
+        if (!TYPE_TO_ROLE[form.employee_type]) {
+          toast.error(
+            `Type "${form.employee_type}" has no login role. Pick one of: ${Object.keys(TYPE_TO_ROLE).join(', ')}.`
+          );
+          setSaving(false);
+          return;
+        }
         const { data, error } = await supabase.functions.invoke('admin-create-employee-user', {
           body: {
             email: form.email.trim(),
