@@ -31,6 +31,8 @@ const EstimateApproval = () => {
   const [decisions, setDecisions] = useState<Record<number, 'approved' | 'declined'>>({});
   const [reason, setReason] = useState('');
   const [signature, setSignature] = useState<string | null>(null);
+  const [requestedDate, setRequestedDate] = useState<Date | undefined>();
+  const [timeWindow, setTimeWindow] = useState<string>(TIME_WINDOWS[0]);
 
   useEffect(() => {
     (async () => {
