@@ -58,17 +58,25 @@ Deno.serve(async (req) => {
     if (!email) throw new Error("Email required");
     if (!role) throw new Error(`No role mapping for type "${employeeType}"`);
 
-    // If a user with that email already exists, reuse them
+    // Helper: find an auth user by email (paginated, case-insensitive)
+    const findUserByEmail = async (target: string) => {
+      const perPage = 1000;
+      for (let page = 1; page <= 20; page++) {
+        const { data, error } = await admin.auth.admin.listUsers({ page, perPage });
+        if (error) throw error;
+        const hit = data.users.find((u) => (u.email ?? "").toLowerCase() === target);
+        if (hit) return hit;
+        if (data.users.length < perPage) return null;
+      }
+      return null;
+    };
+
+    // If a user with that email already exists, reuse them. Otherwise create.
     let userId: string | null = null;
-    const { data: existing } = await admin.auth.admin.listUsers();
-    const found = existing?.users.find((u) => u.email?.toLowerCase() === email);
-    if (found) {
-      userId = found.id;
-      // Re-flag must_set_password so they're prompted again
-      await admin.auth.admin.updateUserById(found.id, {
-        user_metadata: { ...(found.user_metadata ?? {}), must_set_password: true, full_name: fullName || found.user_metadata?.full_name },
-      });
-    } else {
+    let reused = false;
+    let existing = await findUserByEmail(email);
+
+    if (!existing) {
       const tempPassword = crypto.randomUUID() + "Aa1!";
       const { data: created, error: createErr } = await admin.auth.admin.createUser({
         email,
@@ -76,8 +84,32 @@ Deno.serve(async (req) => {
         email_confirm: true,
         user_metadata: { full_name: fullName, must_set_password: true },
       });
-      if (createErr) throw createErr;
-      userId = created.user!.id;
+      if (createErr) {
+        // Race: another request created the user between lookup and create
+        const msg = (createErr.message || "").toLowerCase();
+        if (msg.includes("already") || msg.includes("registered") || msg.includes("exists")) {
+          existing = await findUserByEmail(email);
+          if (!existing) throw createErr;
+        } else {
+          throw createErr;
+        }
+      } else {
+        userId = created.user!.id;
+      }
+    }
+
+    if (existing && !userId) {
+      reused = true;
+      userId = existing.id;
+      // Re-flag must_set_password and merge metadata without clobbering other fields
+      const meta = (existing.user_metadata ?? {}) as Record<string, unknown>;
+      await admin.auth.admin.updateUserById(existing.id, {
+        user_metadata: {
+          ...meta,
+          must_set_password: true,
+          full_name: fullName || (meta.full_name as string | undefined),
+        },
+      });
     }
 
     // Assign role (ignore conflict)
@@ -91,7 +123,7 @@ Deno.serve(async (req) => {
     // Ensure profile exists
     await admin.from("profiles").upsert({ id: userId, email, full_name: fullName });
 
-    return new Response(JSON.stringify({ user_id: userId, role }), {
+    return new Response(JSON.stringify({ user_id: userId, role, reused }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e: any) {
