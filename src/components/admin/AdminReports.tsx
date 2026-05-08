@@ -382,14 +382,14 @@ export default function AdminReports() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {profitRows.length === 0 ? (
+              {filteredRows.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={13} className="text-center text-muted-foreground py-6">
-                    No paid invoices in this window.
+                    {profitRows.length === 0 ? 'No paid invoices in this window.' : 'No invoices for this technician.'}
                   </TableCell>
                 </TableRow>
               ) : (
-                profitRows.map((r) => (
+                filteredRows.map((r) => (
                   <TableRow key={r.id}>
                     <TableCell className="font-mono text-xs">{r.invoice_number ?? r.id.slice(0, 8)}</TableCell>
                     <TableCell className="text-xs">{r.date}</TableCell>
