@@ -340,6 +340,8 @@ const FinancingContract = () => {
 
       const { error } = await supabase.functions.invoke('submit-financing-contract', {
         body: {
+          customer_id: linkedCustomerId,
+          estimate_id: linkedEstimateId,
           client_name: formData.clientName,
           client_address: formData.clientAddress,
           client_contact: formData.clientContact,
