@@ -275,7 +275,7 @@ const EstimateApproval = () => {
                 : `By signing, you authorize Mike's Mobile Auto Repair to perform the approved work.`}
             </p>
           </div>
-          <Button onClick={submit} disabled={working || !signature || (!allDeclined && !requestedDate)} className="w-full" variant="hero">
+          <Button onClick={() => submit()} disabled={working || !signature || (!allDeclined && !requestedDate)} className="w-full" variant="hero">
             {working ? <Loader2 className="h-4 w-4 animate-spin" /> : allDeclined ? <><XCircle className="h-4 w-4 mr-1" /> Decline All</> : <><CheckCircle2 className="h-4 w-4 mr-1" /> Sign &amp; Approve</>}
           </Button>
           {!allDeclined && (
