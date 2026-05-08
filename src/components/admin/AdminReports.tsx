@@ -357,7 +357,10 @@ export default function AdminReports() {
                       {fmt(r.grossProfit)}
                     </TableCell>
                     <TableCell className="text-right">{fmt(r.employeeCost)}</TableCell>
-                    <TableCell className="text-right">{fmt(r.stripeFee)}</TableCell>
+                    <TableCell className="text-right" title={r.stripeFeeIsActual ? 'Actual fee from Stripe' : 'Estimated (not yet synced)'}>
+                      {fmt(r.stripeFee)}
+                      {!r.stripeFeeIsActual && r.stripeFee > 0 && <span className="text-muted-foreground ml-1">~</span>}
+                    </TableCell>
                     <TableCell className={`text-right font-semibold ${r.netProfit < 0 ? 'text-destructive' : 'text-primary'}`}>
                       {fmt(r.netProfit)}
                     </TableCell>
