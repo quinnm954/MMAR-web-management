@@ -299,10 +299,11 @@ export default function RepairOrderDetail({ appointmentId, open, onClose }: Prop
   );
 }
 
-const Section = ({ icon: Icon, title, children }: any) => (
+const Section = ({ icon: Icon, title, action, children }: any) => (
   <Card>
-    <CardHeader className="pb-2">
+    <CardHeader className="pb-2 flex-row items-center justify-between space-y-0">
       <CardTitle className="text-sm flex items-center gap-2"><Icon className="h-4 w-4" /> {title}</CardTitle>
+      {action}
     </CardHeader>
     <CardContent className="space-y-1">{children}</CardContent>
   </Card>
