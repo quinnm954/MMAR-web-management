@@ -5,7 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Loader2, Car, User, ClipboardCheck, FileSpreadsheet, Receipt, Wrench, Clock, ExternalLink, Paperclip, FileCheck } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Loader2, Car, User, ClipboardCheck, FileSpreadsheet, Receipt, Wrench, Clock, ExternalLink, Paperclip, FileCheck, UserCog, History } from "lucide-react";
 import { Link } from "react-router-dom";
 import { format } from "date-fns";
 import { toast } from "sonner";
@@ -28,6 +29,10 @@ export default function RepairOrderDetail({ appointmentId, open, onClose }: Prop
   const [services, setServices] = useState<any[]>([]);
   const [invoices, setInvoices] = useState<any[]>([]);
   const [timeEntries, setTimeEntries] = useState<any[]>([]);
+  const [techs, setTechs] = useState<{ id: string; name: string }[]>([]);
+  const [techMap, setTechMap] = useState<Record<string, string>>({});
+  const [assignHistory, setAssignHistory] = useState<any[]>([]);
+  const [savingTech, setSavingTech] = useState(false);
 
   useEffect(() => {
     if (!appointmentId || !open) return;
@@ -62,6 +67,39 @@ export default function RepairOrderDetail({ appointmentId, open, onClose }: Prop
         } else {
           setInvoices([]);
         }
+
+        // Load technicians (any user with technician role) for the assignment picker
+        const { data: techRoles } = await supabase
+          .from("user_roles")
+          .select("user_id")
+          .eq("role", "technician");
+        const techIds = Array.from(new Set((techRoles || []).map((t: any) => t.user_id)));
+        if (techIds.length) {
+          const { data: techProfs } = await supabase
+            .from("profiles")
+            .select("id, full_name, email")
+            .in("id", techIds);
+          const list = (techProfs || []).map((p: any) => ({ id: p.id, name: p.full_name || p.email || p.id.slice(0, 8) }));
+          setTechs(list);
+          setTechMap(Object.fromEntries(list.map((t) => [t.id, t.name])));
+        } else {
+          setTechs([]);
+          setTechMap({});
+        }
+
+        // Assignment history from audit logs
+        const { data: logs } = await supabase
+          .from("audit_logs")
+          .select("id, actor_email, before_data, after_data, changed_fields, created_at")
+          .eq("table_name", "appointments")
+          .eq("record_id", a.id)
+          .order("created_at", { ascending: false })
+          .limit(50);
+        const techLogs = (logs || []).filter((l: any) =>
+          (l.changed_fields || []).includes("assigned_technician_id") ||
+          (!l.before_data && l.after_data?.assigned_technician_id)
+        );
+        setAssignHistory(techLogs);
       }
       setLoading(false);
     })();
@@ -87,6 +125,28 @@ export default function RepairOrderDetail({ appointmentId, open, onClose }: Prop
       const { data: inv2 } = await supabase.from("invoices").select("*").in("service_record_id", srIds);
       setInvoices(inv2 || []);
     }
+  };
+
+  const assignTech = async (techId: string | null) => {
+    if (!appt) return;
+    setSavingTech(true);
+    const { error } = await supabase
+      .from("appointments")
+      .update({ assigned_technician_id: techId })
+      .eq("id", appt.id);
+    setSavingTech(false);
+    if (error) return toast.error(error.message);
+    toast.success(techId ? "Technician assigned" : "Technician unassigned");
+    setAppt({ ...appt, assigned_technician_id: techId });
+    // refresh history
+    const { data: logs } = await supabase
+      .from("audit_logs")
+      .select("id, actor_email, before_data, after_data, changed_fields, created_at")
+      .eq("table_name", "appointments")
+      .eq("record_id", appt.id)
+      .order("created_at", { ascending: false })
+      .limit(50);
+    setAssignHistory((logs || []).filter((l: any) => (l.changed_fields || []).includes("assigned_technician_id")));
   };
 
   const issueInvoice = async () => {
@@ -180,6 +240,64 @@ export default function RepairOrderDetail({ appointmentId, open, onClose }: Prop
                     <div className="text-xs uppercase text-muted-foreground mb-1">Tech notes</div>
                     <div>{appt.technician_notes}</div>
                   </>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Technician assignment */}
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm flex items-center gap-2"><UserCog className="h-4 w-4" /> Assigned Technician</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <Select
+                    value={appt.assigned_technician_id ?? "unassigned"}
+                    onValueChange={(v) => assignTech(v === "unassigned" ? null : v)}
+                    disabled={savingTech}
+                  >
+                    <SelectTrigger className="w-full sm:w-[280px]">
+                      <SelectValue placeholder="Select technician" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="unassigned">— Unassigned —</SelectItem>
+                      {techs.map((t) => (
+                        <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {savingTech && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
+                  {appt.assigned_technician_id && (
+                    <Badge variant="secondary" className="text-xs">
+                      Currently: {techMap[appt.assigned_technician_id] || appt.assigned_technician_id.slice(0, 8)}
+                    </Badge>
+                  )}
+                </div>
+
+                {assignHistory.length > 0 && (
+                  <div>
+                    <div className="text-xs uppercase tracking-wider text-muted-foreground flex items-center gap-1 mb-1">
+                      <History className="h-3 w-3" /> Assignment history
+                    </div>
+                    <ul className="space-y-1 text-xs">
+                      {assignHistory.map((h) => {
+                        const before = h.before_data?.assigned_technician_id;
+                        const after = h.after_data?.assigned_technician_id;
+                        return (
+                          <li key={h.id} className="flex items-center justify-between border-b border-border/40 py-1 last:border-0 gap-2">
+                            <span>
+                              <span className="text-muted-foreground">{before ? (techMap[before] || before.slice(0, 8)) : "—"}</span>
+                              {" → "}
+                              <span className="font-medium">{after ? (techMap[after] || after.slice(0, 8)) : "—"}</span>
+                            </span>
+                            <span className="text-muted-foreground text-right">
+                              {h.actor_email || "system"} · {format(new Date(h.created_at), "MMM d, p")}
+                            </span>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
                 )}
               </CardContent>
             </Card>
