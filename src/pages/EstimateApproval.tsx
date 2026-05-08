@@ -36,6 +36,7 @@ const EstimateApproval = () => {
   const [timeWindow, setTimeWindow] = useState<string>(TIME_WINDOWS[0]);
   const [editing, setEditing] = useState(false);
   const [decisionLogs, setDecisionLogs] = useState<any[]>([]);
+  const [financingChoice, setFinancingChoice] = useState<'yes' | 'no' | null>(null);
 
   useEffect(() => {
     (async () => {
