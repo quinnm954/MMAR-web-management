@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { MapPin, Phone, MessageCircle, Wrench } from "lucide-react";
+import { MapPin, Phone, MessageCircle, Wrench, User } from "lucide-react";
 import { Link } from "react-router-dom";
 import heroBanner from "@/assets/hero-banner.jpg";
 import { trackConversion } from "@/lib/gtag";
