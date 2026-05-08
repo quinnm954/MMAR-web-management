@@ -126,6 +126,10 @@ const Navigation = () => {
               </DropdownMenuContent>
             </DropdownMenu>
 
+            <NavLink to="/mmar-care" className={({ isActive }) => `px-3 py-2 font-medium transition-colors ${isActive ? "text-primary" : "text-muted-foreground hover:text-primary"}`}>
+              MMAR Care
+            </NavLink>
+
             <NavLink to="/memberships" className={({ isActive }) => `px-3 py-2 font-medium transition-colors ${isActive ? "text-accent" : "text-accent/80 hover:text-accent"}`}>
               Memberships
             </NavLink>
@@ -157,8 +161,8 @@ const Navigation = () => {
               </DropdownMenu>
             ) : (
               <Button variant="outline" size="sm" asChild>
-                <Link to="/login">
-                  <User className="w-4 h-4 mr-1" /> Sign In
+                <Link to="/mmar-care">
+                  <User className="w-4 h-4 mr-1" /> MMAR Care
                 </Link>
               </Button>
             )}
@@ -228,6 +232,9 @@ const Navigation = () => {
                 </AccordionItem>
               </Accordion>
 
+              <Link to="/mmar-care" onClick={close} className="text-foreground hover:text-primary font-semibold py-3 px-2 rounded-lg flex items-center gap-2">
+                <User className="w-4 h-4" /> MMAR Care
+              </Link>
               <Link to="/memberships" onClick={close} className="text-accent hover:text-accent/80 font-semibold py-3 px-2 rounded-lg">Memberships</Link>
               <Link to="/contact" onClick={close} className="text-foreground hover:text-primary font-medium py-3 px-2 rounded-lg">Contact</Link>
               {user ? (
@@ -245,9 +252,14 @@ const Navigation = () => {
                   </button>
                 </>
               ) : (
-                <Link to="/login" onClick={close} className="text-foreground hover:text-primary font-medium py-3 px-2 rounded-lg flex items-center gap-2">
-                  <User className="w-4 h-4" /> Sign In (Customer / Employee / Admin)
-                </Link>
+                <>
+                  <Link to="/mmar-care" onClick={close} className="text-foreground hover:text-primary font-medium py-3 px-2 rounded-lg flex items-center gap-2">
+                    <User className="w-4 h-4" /> MMAR Care Sign In
+                  </Link>
+                  <Link to="/login" onClick={close} className="text-muted-foreground hover:text-primary text-sm py-2 px-2 rounded-lg">
+                    Employee / Admin sign-in
+                  </Link>
+                </>
               )}
 
               <Button variant="hero" size="lg" asChild className="mt-3 min-h-[48px]">

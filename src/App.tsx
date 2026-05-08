@@ -50,6 +50,7 @@ import InspectionReport from "./pages/InspectionReport";
 import Login from "./pages/Login";
 import SetPassword from "./pages/SetPassword";
 import SharedCustomerSummary from "./pages/SharedCustomerSummary";
+import MmarCare from "./pages/MmarCare";
 
 const queryClient = new QueryClient();
 
@@ -78,6 +79,7 @@ const App = () => (
             <Route path="/blog/:slug" element={<BlogPost />} />
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/memberships" element={<Memberships />} />
+            <Route path="/mmar-care" element={<MmarCare />} />
             <Route path="/portal/login" element={<PortalLogin />} />
             <Route path="/portal/signup" element={<PortalSignup />} />
             <Route path="/portal/membership-signup" element={<MembershipSignup />} />
