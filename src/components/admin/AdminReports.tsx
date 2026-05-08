@@ -98,8 +98,13 @@ export default function AdminReports() {
 
       // Employee map by user_id
       const employees = (employeesRes.data ?? []) as any[];
+      // Key by both auth user_id AND employees.id so we resolve the tech regardless
+      // of which identifier the appointment/time entry stored.
       const empByUser = new Map<string, any>();
-      employees.forEach((e) => { if (e.user_id) empByUser.set(e.user_id, e); });
+      employees.forEach((e) => {
+        if (e.user_id) empByUser.set(e.user_id, e);
+        if (e.id) empByUser.set(e.id, e);
+      });
 
       // Parts revenue/cost
       let partsRevenue = 0;
