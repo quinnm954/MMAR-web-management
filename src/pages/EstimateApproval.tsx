@@ -329,8 +329,13 @@ const EstimateApproval = () => {
             </Button>
           )}
           <Button variant="outline" size="sm" onClick={() => setEditing(true)}>
-            Change my decision
+            Change my decision / decline items
           </Button>
+          {est.status !== 'declined' && (
+            <p className="text-[11px] text-muted-foreground text-center max-w-xs">
+              Need to decline the whole estimate or just some services? Tap above to update each line.
+            </p>
+          )}
           {isCustomer && redirectIn !== null && redirectIn > 0 && (
             <p className="text-xs text-muted-foreground">Redirecting in {redirectIn}s…</p>
           )}
