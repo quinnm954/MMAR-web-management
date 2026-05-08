@@ -135,8 +135,8 @@ export default function AdminReports() {
       );
       const apptIds = Array.from(new Set(Array.from(apptByService.values()).filter(Boolean))) as string[];
 
-      // Appointments → tech assignment + estimate labor hours
-      const apptInfo = new Map<string, { tech: string | null; laborHours: number }>();
+      // Appointments → tech assignment, paid (estimate) labor hours, clocked hours
+      const apptInfo = new Map<string, { tech: string | null; paidHours: number; clockedHours: number }>();
       if (apptIds.length) {
         const [apRes, estRes, teRes] = await Promise.all([
           supabase.from('appointments').select('id, assigned_technician_id').in('id', apptIds),
@@ -144,29 +144,23 @@ export default function AdminReports() {
           supabase.from('time_entries').select('appointment_id, duration_minutes, technician_id').in('appointment_id', apptIds),
         ]);
         (apRes.data ?? []).forEach((a: any) => {
-          apptInfo.set(a.id, { tech: a.assigned_technician_id, laborHours: 0 });
+          apptInfo.set(a.id, { tech: a.assigned_technician_id, paidHours: 0, clockedHours: 0 });
         });
-        // Sum labor_hours from estimates per appointment
+        // Sum labor_hours from estimates per appointment (what the customer paid for)
         (estRes.data ?? []).forEach((e: any) => {
           const items = Array.isArray(e.line_items) ? e.line_items : [];
           const hrs = items.reduce((s: number, li: any) => s + (Number(li.labor_hours) || 0), 0);
-          const cur = apptInfo.get(e.appointment_id) ?? { tech: null, laborHours: 0 };
-          cur.laborHours += hrs;
+          const cur = apptInfo.get(e.appointment_id) ?? { tech: null, paidHours: 0, clockedHours: 0 };
+          cur.paidHours += hrs;
           apptInfo.set(e.appointment_id, cur);
         });
-        // Fallback to clock time when estimate has no labor_hours
-        const clockByAppt = new Map<string, { minutes: number; tech: string | null }>();
+        // Sum clocked time per appointment (performance only)
         (teRes.data ?? []).forEach((t: any) => {
-          const cur = clockByAppt.get(t.appointment_id) ?? { minutes: 0, tech: null };
-          cur.minutes += Number(t.duration_minutes || 0);
+          const cur = apptInfo.get(t.appointment_id) ?? { tech: null, paidHours: 0, clockedHours: 0 };
+          cur.clockedHours += Number(t.duration_minutes || 0) / 60;
+          // Fall back to clocked tech only if no assigned tech on the RO
           if (!cur.tech) cur.tech = t.technician_id;
-          clockByAppt.set(t.appointment_id, cur);
-        });
-        clockByAppt.forEach((v, k) => {
-          const cur = apptInfo.get(k) ?? { tech: null, laborHours: 0 };
-          if (cur.laborHours === 0) cur.laborHours = v.minutes / 60;
-          if (!cur.tech) cur.tech = v.tech;
-          apptInfo.set(k, cur);
+          apptInfo.set(t.appointment_id, cur);
         });
       }
 
@@ -179,10 +173,13 @@ export default function AdminReports() {
         }, 0);
         const apptId = inv.service_record_id ? apptByService.get(inv.service_record_id) : undefined;
         const info = apptId ? apptInfo.get(apptId) : undefined;
-        const laborHours = info?.laborHours ?? 0;
+        const paidLaborHours = info?.paidHours ?? 0;
+        const clockedHours = info?.clockedHours ?? 0;
+        const varianceHours = clockedHours - paidLaborHours;
         const tech = info?.tech ? empByUser.get(info.tech) : null;
         const techRate = tech?.hourly_rate != null ? Number(tech.hourly_rate) : rate;
-        const employeeCost = laborHours * techRate;
+        // Pay technicians on PAID labor hours (from the estimate), not clocked time
+        const employeeCost = paidLaborHours * techRate;
         const revenueRow = Number(inv.total || 0);
         const hasStripe = Boolean(inv.stripe_session_id || inv.stripe_payment_intent_id);
         const isPaid = inv.status === 'paid';
@@ -199,7 +196,9 @@ export default function AdminReports() {
           date: new Date(inv.created_at).toLocaleDateString(),
           customer: cust?.full_name || cust?.email || '—',
           technician: tech?.full_name ?? (info?.tech ? 'Unassigned employee' : '—'),
-          laborHours,
+          paidLaborHours,
+          clockedHours,
+          varianceHours,
           revenue: revenueRow,
           cogs,
           employeeCost,
@@ -211,7 +210,7 @@ export default function AdminReports() {
       });
       setProfitRows(rows);
 
-      const totalLaborHrs = rows.reduce((s, r) => s + r.laborHours, 0);
+      const totalLaborHrs = rows.reduce((s, r) => s + r.paidLaborHours, 0);
 
       setData({
         revenue30: revenue,
