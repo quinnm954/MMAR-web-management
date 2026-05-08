@@ -203,6 +203,9 @@ const AdminServiceRecords = () => {
                 {r.labor_performed && <p className="text-sm mt-2">{r.labor_performed}</p>}
                 {r.technician_notes && <p className="text-xs italic text-muted-foreground mt-1">"{r.technician_notes}"</p>}
                 {r.invoice_total != null && <Badge variant="secondary" className="mt-2">${r.invoice_total.toFixed(2)}</Badge>}
+                <div className="flex justify-end mt-2">
+                  <DeleteButton table="service_records" id={r.id} onDeleted={load} />
+                </div>
               </CardContent>
             </Card>
           ))}
