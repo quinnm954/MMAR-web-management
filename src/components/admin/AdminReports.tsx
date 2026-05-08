@@ -22,6 +22,8 @@ type InvoiceRow = {
   line_items: LineItem[];
   stripe_session_id: string | null;
   stripe_payment_intent_id: string | null;
+  stripe_fee: number | null;
+  stripe_fee_synced_at: string | null;
 };
 
 type ProfitRow = {
@@ -35,12 +37,13 @@ type ProfitRow = {
   cogs: number;
   employeeCost: number;
   stripeFee: number;
+  stripeFeeIsActual: boolean;
   grossProfit: number;
   netProfit: number;
 };
 
-// Stripe US standard card fee: 2.9% + $0.30 per successful charge
-const stripeFeeFor = (amount: number, paid: boolean, hasStripe: boolean) => {
+// Estimated fallback when actual Stripe fee hasn't been synced yet (US card: 2.9% + $0.30)
+const estimatedStripeFee = (amount: number, paid: boolean, hasStripe: boolean) => {
   if (!paid || !hasStripe || amount <= 0) return 0;
   return amount * 0.029 + 0.3;
 };
