@@ -352,6 +352,14 @@ export default function AdminReports() {
         <KPI label="Stripe Fees" value={fmt(totals.stripeFee)} />
         <KPI label="Net Profit" value={fmt(totals.netProfit)} />
       </div>
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+        <KPI label={`Paid Labor Hrs${techFilter !== 'all' ? ` · ${techFilter}` : ''}`} value={perfTotals.paidH.toFixed(2)} />
+        <KPI label="Clocked Hrs" value={perfTotals.clockedH.toFixed(2)} />
+        <KPI
+          label={perfTotals.variance > 0 ? 'Over Paid Time' : perfTotals.variance < 0 ? 'Under Paid Time' : 'On Target'}
+          value={`${perfTotals.variance > 0 ? '+' : ''}${perfTotals.variance.toFixed(2)} hrs`}
+        />
+      </div>
 
       <Card>
         <CardContent className="p-0 overflow-x-auto">
