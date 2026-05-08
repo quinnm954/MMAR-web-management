@@ -1728,16 +1728,29 @@ export type Database = {
           read_ct: number
         }[]
       }
-      submit_estimate_decision: {
-        Args: {
-          _decline_reason: string
-          _line_items: Json
-          _signature: string
-          _status: string
-          _token: string
-        }
-        Returns: Json
-      }
+      submit_estimate_decision:
+        | {
+            Args: {
+              _decline_reason: string
+              _line_items: Json
+              _signature: string
+              _status: string
+              _token: string
+            }
+            Returns: Json
+          }
+        | {
+            Args: {
+              _decline_reason: string
+              _line_items: Json
+              _requested_date?: string
+              _requested_time_window?: string
+              _signature: string
+              _status: string
+              _token: string
+            }
+            Returns: Json
+          }
     }
     Enums: {
       app_role:
