@@ -231,7 +231,12 @@ const AdminEstimates = () => {
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-end">
+      <div className="flex justify-end gap-2">
+        <input ref={fileRef} type="file" accept="application/pdf" className="hidden" onChange={e => e.target.files?.[0] && importPdf(e.target.files[0])} />
+        <Button variant="outline" onClick={() => fileRef.current?.click()} disabled={importing}>
+          {importing ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Upload className="h-4 w-4 mr-1" />}
+          Import PDF Quote
+        </Button>
         <Button onClick={newEstimate}><Plus className="h-4 w-4 mr-1" /> New Estimate</Button>
       </div>
 
