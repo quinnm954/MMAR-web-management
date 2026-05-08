@@ -161,8 +161,8 @@ const Navigation = () => {
               </DropdownMenu>
             ) : (
               <Button variant="outline" size="sm" asChild>
-                <Link to="/login">
-                  <User className="w-4 h-4 mr-1" /> Sign In
+                <Link to="/mmar-care">
+                  <User className="w-4 h-4 mr-1" /> MMAR Care
                 </Link>
               </Button>
             )}
