@@ -32,7 +32,9 @@ type ProfitRow = {
   date: string;
   customer: string;
   technician: string;
-  laborHours: number;
+  paidLaborHours: number;   // billed to customer on the estimate
+  clockedHours: number;     // actual time clocked by tech (performance)
+  varianceHours: number;    // clocked - paid (positive = over paid time)
   revenue: number;
   cogs: number;
   employeeCost: number;
