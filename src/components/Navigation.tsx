@@ -164,16 +164,9 @@ const Navigation = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" asChild>
-                  <Link to="/mmar-care">
-                    <User className="w-4 h-4 mr-1" /> MMAR Care
-                  </Link>
-                </Button>
-                <Link to="/login" className="text-xs text-muted-foreground hover:text-primary underline-offset-2 hover:underline">
-                  Staff sign-in
-                </Link>
-              </div>
+              <Link to="/login" className="text-xs text-muted-foreground hover:text-primary underline-offset-2 hover:underline">
+                Staff sign-in
+              </Link>
             )}
 
             <Button variant="hero" size="default" asChild>
@@ -262,14 +255,9 @@ const Navigation = () => {
                   </button>
                 </>
               ) : (
-                <>
-                  <Link to="/mmar-care" onClick={close} className="text-foreground hover:text-primary font-medium py-3 px-2 rounded-lg flex items-center gap-2">
-                    <User className="w-4 h-4" /> MMAR Care Sign In
-                  </Link>
-                  <Link to="/login" onClick={close} className="text-muted-foreground hover:text-primary text-sm py-2 px-2 rounded-lg">
-                    Employee / Admin sign-in
-                  </Link>
-                </>
+                <Link to="/login" onClick={close} className="text-muted-foreground hover:text-primary text-sm py-2 px-2 rounded-lg">
+                  Employee / Admin sign-in
+                </Link>
               )}
 
               <Button variant="hero" size="lg" asChild className="mt-3 min-h-[48px]">
