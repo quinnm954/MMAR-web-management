@@ -192,6 +192,7 @@ const AdminEstimates = () => {
     setEditing({
       status: 'draft',
       customer_id: matchedCustomer?.id ?? null,
+      customer_phone: ex.customer_phone || null,
       vehicle_id: matchedVehicle?.id ?? null,
       line_items: lines,
       subtotal, shop_supplies: shop, tax, total: subtotal + shop + tax,
