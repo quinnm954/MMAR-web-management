@@ -2,7 +2,7 @@ import { Phone, Mail, Star, MapPin, Image as ImageIcon } from "lucide-react";
 import mmarLogo from "@/assets/mmar-logo.jpeg";
 import { trackConversion } from "@/lib/gtag";
 
-const GMB_CID = "4273245475534037331";
+const GMB_CID = "12463376982965951252";
 const GMB_URL = `https://www.google.com/maps?cid=${GMB_CID}`;
 
 const Contact = () => {
