@@ -353,7 +353,11 @@ export default function AdminReports() {
                     <TableCell className="text-xs">{r.date}</TableCell>
                     <TableCell className="text-xs">{r.customer}</TableCell>
                     <TableCell className="text-xs">{r.technician}</TableCell>
-                    <TableCell className="text-right">{r.laborHours.toFixed(2)}</TableCell>
+                    <TableCell className="text-right">{r.paidLaborHours.toFixed(2)}</TableCell>
+                    <TableCell className="text-right text-muted-foreground">{r.clockedHours.toFixed(2)}</TableCell>
+                    <TableCell className={`text-right font-medium ${r.varianceHours > 0 ? 'text-destructive' : r.varianceHours < 0 ? 'text-primary' : 'text-muted-foreground'}`} title={r.varianceHours > 0 ? 'Tech took longer than billed (over paid time)' : r.varianceHours < 0 ? 'Tech finished faster than billed (under paid time)' : 'On target'}>
+                      {r.varianceHours > 0 ? '+' : ''}{r.varianceHours.toFixed(2)}
+                    </TableCell>
                     <TableCell className="text-right">{fmt(r.revenue)}</TableCell>
                     <TableCell className="text-right">{fmt(r.cogs)}</TableCell>
                     <TableCell className={`text-right ${r.grossProfit < 0 ? 'text-destructive' : ''}`}>
