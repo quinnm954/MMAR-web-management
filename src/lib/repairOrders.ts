@@ -1,6 +1,14 @@
 import { supabase } from '@/integrations/supabase/client';
 
-export type LineItem = { description: string; quantity: number; unit_price: number; amount: number };
+export type LineItem = {
+  description: string;
+  quantity: number;
+  unit_price: number;
+  amount: number;
+  kind?: 'part' | 'labor' | 'fee';
+  unit_cost?: number;
+  labor_hours?: number;
+};
 
 /**
  * Move an approved estimate's appointment into active Repair Order state.
