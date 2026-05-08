@@ -5,10 +5,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Loader2, Car, User, ClipboardCheck, FileSpreadsheet, Receipt, Wrench, Clock, ExternalLink, Paperclip } from "lucide-react";
+import { Loader2, Car, User, ClipboardCheck, FileSpreadsheet, Receipt, Wrench, Clock, ExternalLink, Paperclip, FileCheck } from "lucide-react";
 import { Link } from "react-router-dom";
 import { format } from "date-fns";
+import { toast } from "sonner";
 import ROAttachments from "./ROAttachments";
+import { generateInvoiceForRepairOrder } from "@/lib/repairOrders";
 
 interface Props {
   appointmentId: string | null;
@@ -71,6 +73,45 @@ export default function RepairOrderDetail({ appointmentId, open, onClose }: Prop
   const totalLaborMinutes = timeEntries.reduce((s, t) => s + (t.duration_minutes || 0), 0);
   const totalInvoiced = invoices.reduce((s, i) => s + Number(i.total || 0), 0);
   const totalPaid = invoices.reduce((s, i) => s + Number(i.amount_paid || 0), 0);
+  const approvedEstimate = estimates.find((e: any) => e.status === 'approved' || e.status === 'partially_approved' || e.status === 'converted');
+  const [issuing, setIssuing] = useState(false);
+
+  const reload = async () => {
+    if (!appointmentId) return;
+    const { data: a } = await supabase.from("appointments").select("*").eq("id", appointmentId).maybeSingle();
+    setAppt(a);
+    const { data: sr } = await supabase.from("service_records").select("*").eq("appointment_id", appointmentId).order("created_at", { ascending: false });
+    setServices(sr || []);
+    const srIds = (sr || []).map((r: any) => r.id);
+    if (srIds.length) {
+      const { data: inv2 } = await supabase.from("invoices").select("*").in("service_record_id", srIds);
+      setInvoices(inv2 || []);
+    }
+  };
+
+  const issueInvoice = async () => {
+    if (!appt || !approvedEstimate) return;
+    const approvedLines = (approvedEstimate.line_items || []).filter((l: any) => l.status !== 'declined');
+    const total = approvedLines.reduce((s: number, l: any) => s + Number(l.amount || (Number(l.quantity) * Number(l.unit_price))), 0);
+    setIssuing(true);
+    try {
+      await generateInvoiceForRepairOrder({
+        appointmentId: appt.id,
+        customerId: appt.customer_id,
+        vehicleId: appt.vehicle_id,
+        serviceType: appt.service_type,
+        approvedLineItems: approvedLines,
+        invoiceTotal: total,
+        mileage: vehicle?.current_mileage ?? null,
+      });
+      toast.success('Invoice issued');
+      await reload();
+    } catch (e: any) {
+      toast.error(e.message || 'Could not issue invoice');
+    } finally {
+      setIssuing(false);
+    }
+  };
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
