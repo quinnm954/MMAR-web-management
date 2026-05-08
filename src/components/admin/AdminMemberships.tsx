@@ -38,7 +38,7 @@ const AdminMemberships = () => {
     setLoading(true);
     const { data } = await supabase
       .from("memberships")
-      .select("id, status, start_date, next_billing_date, oil_changes_used, cancellation_requested_at, customer_id, plan:membership_plans(name, monthly_price), vehicle:vehicles(year, make, model)")
+      .select("id, status, start_date, next_billing_date, oil_changes_used, cancellation_requested_at, customer_id, deposit_paid, plan:membership_plans(name, monthly_price, stripe_price_id), vehicle:vehicles(year, make, model)")
       .order("created_at", { ascending: false });
 
     const list = (data as unknown as Row[]) ?? [];
