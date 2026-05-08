@@ -35,6 +35,7 @@ import PortalAppointments from "./pages/portal/PortalAppointments";
 import PortalServiceHistory from "./pages/portal/PortalServiceHistory";
 import PortalInvoices from "./pages/portal/PortalInvoices";
 import PortalInvoiceDetail from "./pages/portal/PortalInvoiceDetail";
+import PortalEstimates from "./pages/portal/PortalEstimates";
 import PortalRepairOrders from "./pages/portal/PortalRepairOrders";
 import CustomerProtectedRoute from "./components/portal/CustomerProtectedRoute";
 import NotFound from "./pages/NotFound";
