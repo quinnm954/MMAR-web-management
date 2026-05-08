@@ -33,6 +33,33 @@ const statusColor = (s: string) => {
 const AdminMemberships = () => {
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
+  const [linkBusy, setLinkBusy] = useState<string | null>(null);
+
+  const generateLink = async (
+    membershipId: string,
+    kind: "membership_deposit" | "membership_subscription",
+    sendSms: boolean,
+  ) => {
+    const key = `${membershipId}:${kind}:${sendSms}`;
+    setLinkBusy(key);
+    try {
+      const { data, error } = await supabase.functions.invoke("create-payment-link", {
+        body: { kind, reference_id: membershipId, send_sms: sendSms },
+      });
+      if (error || (data as any)?.error) throw new Error(error?.message || (data as any)?.error);
+      const url = (data as any).url as string;
+      if (sendSms) {
+        toast.success("Payment link texted to customer");
+      } else {
+        await navigator.clipboard.writeText(url).catch(() => {});
+        window.prompt("Copy payment link:", url);
+      }
+    } catch (e: any) {
+      toast.error(e.message || "Failed to generate link");
+    } finally {
+      setLinkBusy(null);
+    }
+  };
 
   const load = async () => {
     setLoading(true);
