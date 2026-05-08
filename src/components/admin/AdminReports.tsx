@@ -29,8 +29,15 @@ type ProfitRow = {
   revenue: number;
   cogs: number;
   employeeCost: number;
+  stripeFee: number;
   grossProfit: number;
   netProfit: number;
+};
+
+// Stripe US standard card fee: 2.9% + $0.30 per successful charge
+const stripeFeeFor = (amount: number, paid: boolean, hasStripe: boolean) => {
+  if (!paid || !hasStripe || amount <= 0) return 0;
+  return amount * 0.029 + 0.3;
 };
 
 export default function AdminReports() {
