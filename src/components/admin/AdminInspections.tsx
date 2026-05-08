@@ -9,8 +9,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Copy, ExternalLink, Trash2, Camera, Send } from 'lucide-react';
+import { Plus, Copy, ExternalLink, Trash2, Camera, Share2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { shareLink } from '@/lib/share';
 
 const DEFAULT_TEMPLATE = [
   { category: 'Under Hood', items: ['Engine oil level', 'Coolant level', 'Brake fluid', 'Power steering fluid', 'Battery & terminals', 'Belts & hoses', 'Air filter'] },
@@ -114,21 +115,14 @@ const AdminInspections = () => {
 
   const send = async (insp: Inspection) => {
     const customer = customers.find(c => c.id === insp.customer_id);
-    if (!customer?.email) return toast.error('Customer has no email');
+    const url = `${window.location.origin}/inspection/${insp.share_token}`;
     await supabase.from('inspections').update({ status: 'sent', sent_at: new Date().toISOString() }).eq('id', insp.id);
-    await supabase.functions.invoke('send-transactional-email', {
-      body: {
-        templateName: 'inspection-ready',
-        recipientEmail: customer.email,
-        idempotencyKey: `inspection-sent-${insp.id}`,
-        templateData: {
-          name: customer.full_name || 'Customer',
-          vehicle: vehicleLabel(insp.vehicle_id),
-          reportUrl: `${window.location.origin}/inspection/${insp.share_token}`,
-        },
-      },
+    await shareLink({
+      url,
+      title: `Inspection report — ${vehicleLabel(insp.vehicle_id)}`,
+      text: `${customer?.full_name || 'Customer'}, here is your inspection report from MMAR Care:`,
+      copyToastMessage: 'Inspection link copied — share with the customer',
     });
-    toast.success('Inspection sent');
     load();
   };
 
@@ -168,7 +162,7 @@ const AdminInspections = () => {
                     <div className="flex gap-1">
                       <Button size="icon" variant="ghost" onClick={() => copyLink(i.share_token)}><Copy className="h-4 w-4" /></Button>
                       <Button size="icon" variant="ghost" onClick={() => window.open(`/inspection/${i.share_token}`, '_blank')}><ExternalLink className="h-4 w-4" /></Button>
-                      {i.status !== 'sent' && <Button size="icon" variant="ghost" onClick={() => send(i)}><Send className="h-4 w-4" /></Button>}
+                      <Button size="icon" variant="ghost" title="Share" onClick={() => send(i)}><Share2 className="h-4 w-4" /></Button>
                       <Button size="sm" variant="ghost" onClick={() => openExisting(i)}>Edit</Button>
                     </div>
                   </TableCell>

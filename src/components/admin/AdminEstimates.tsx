@@ -9,9 +9,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Pencil, Send, Trash2, Copy, ExternalLink } from 'lucide-react';
+import { Plus, Pencil, Share2, Trash2, Copy, ExternalLink } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
+import { shareLink } from '@/lib/share';
 
 interface LineItem { description: string; quantity: number; unit_price: number; amount: number; catalog_item_id?: string; labor_hours?: number; }
 interface Estimate {
@@ -114,22 +115,14 @@ const AdminEstimates = () => {
 
   const send = async (est: Estimate) => {
     const customer = customers.find(c => c.id === est.customer_id);
-    if (!customer?.email) return toast.error('Customer has no email');
+    const url = `${window.location.origin}/estimate/${est.approval_token}`;
     await supabase.from('estimates').update({ status: 'sent', sent_at: new Date().toISOString() }).eq('id', est.id);
-    await supabase.functions.invoke('send-transactional-email', {
-      body: {
-        templateName: 'estimate-ready',
-        recipientEmail: customer.email,
-        idempotencyKey: `estimate-sent-${est.id}`,
-        templateData: {
-          name: customer.full_name || 'Customer',
-          estimateNumber: est.estimate_number,
-          total: Number(est.total).toFixed(2),
-          approvalUrl: `${window.location.origin}/estimate/${est.approval_token}`,
-        },
-      },
+    await shareLink({
+      url,
+      title: `Estimate ${est.estimate_number ?? ''}`.trim(),
+      text: `${customer?.full_name || 'Customer'}, here is your estimate from MMAR Care for $${Number(est.total).toFixed(2)}:`,
+      copyToastMessage: 'Estimate link copied — share with the customer',
     });
-    toast.success('Estimate sent');
     load();
   };
 
@@ -171,9 +164,7 @@ const AdminEstimates = () => {
                     <div className="flex gap-1">
                       <Button size="icon" variant="ghost" onClick={() => copyLink(e.approval_token)} title="Copy approval link"><Copy className="h-4 w-4" /></Button>
                       <Button size="icon" variant="ghost" onClick={() => window.open(`/estimate/${e.approval_token}`, '_blank')}><ExternalLink className="h-4 w-4" /></Button>
-                      {e.status === 'draft' && (
-                        <Button size="icon" variant="ghost" onClick={() => send(e)} title="Send"><Send className="h-4 w-4" /></Button>
-                      )}
+                      <Button size="icon" variant="ghost" onClick={() => send(e)} title="Share"><Share2 className="h-4 w-4" /></Button>
                       <Button size="icon" variant="ghost" onClick={() => setEditing(e)}><Pencil className="h-4 w-4" /></Button>
                     </div>
                   </TableCell>
