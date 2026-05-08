@@ -16,7 +16,11 @@ const CustomerProtectedRoute = ({ children }: { children: ReactNode }) => {
   }
 
   if (!user) {
-    return <Navigate to={`/portal/login?redirect=${encodeURIComponent(location.pathname)}`} replace />;
+    return <Navigate to={`/login?redirect=${encodeURIComponent(location.pathname)}`} replace />;
+  }
+
+  if ((user.user_metadata as any)?.must_set_password && location.pathname !== "/set-password") {
+    return <Navigate to="/set-password" replace />;
   }
 
   return <>{children}</>;

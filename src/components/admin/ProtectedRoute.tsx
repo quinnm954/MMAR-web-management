@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth, AppRole } from '@/hooks/useAuth';
 import { Loader2 } from 'lucide-react';
 
@@ -11,6 +11,7 @@ interface ProtectedRouteProps {
 
 const ProtectedRoute = ({ children, requireAdmin = true, allowedRoles }: ProtectedRouteProps) => {
   const { user, isAdmin, isManager, hasAnyRole, isLoading } = useAuth();
+  const location = useLocation();
 
   if (isLoading) {
     return (
@@ -21,7 +22,11 @@ const ProtectedRoute = ({ children, requireAdmin = true, allowedRoles }: Protect
   }
 
   if (!user) {
-    return <Navigate to="/admin/login" replace />;
+    return <Navigate to="/login" replace />;
+  }
+
+  if ((user.user_metadata as any)?.must_set_password && location.pathname !== "/set-password") {
+    return <Navigate to="/set-password" replace />;
   }
 
   // Default behavior: admin or manager can access. If allowedRoles passed, use it.

@@ -48,6 +48,7 @@ import TechProtectedRoute from "./components/tech/TechProtectedRoute";
 import EstimateApproval from "./pages/EstimateApproval";
 import InspectionReport from "./pages/InspectionReport";
 import Login from "./pages/Login";
+import SetPassword from "./pages/SetPassword";
 import SharedCustomerSummary from "./pages/SharedCustomerSummary";
 
 const queryClient = new QueryClient();
@@ -105,6 +106,7 @@ const App = () => (
             <Route path="/estimate/:token" element={<EstimateApproval />} />
             <Route path="/inspection/:token" element={<InspectionReport />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/set-password" element={<SetPassword />} />
             <Route path="/share/:token" element={<SharedCustomerSummary />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="/:landingSlug" element={<LocalLanding />} />
