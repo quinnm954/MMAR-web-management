@@ -60,24 +60,23 @@ const EstimateApproval = () => {
     const updatedLines = lines.map((l, i) => ({ ...l, status: decisions[i] }));
     const status = allDeclined ? 'declined' : anyApproved && lines.some((_, i) => decisions[i] === 'declined') ? 'partially_approved' : 'approved';
 
-    const update: any = {
+    const { error } = await supabase.rpc('submit_estimate_decision', {
+      _token: token!,
+      _line_items: updatedLines,
+      _status: status,
+      _signature: signature,
+      _decline_reason: status === 'declined' || (status === 'partially_approved' && reason) ? (reason || null) : null,
+    });
+    setWorking(false);
+    if (error) return toast.error('Could not submit. Please contact us.');
+    setEst({
+      ...est,
       line_items: updatedLines,
       signature_image: signature,
       signed_at: new Date().toISOString(),
       status,
-    };
-    if (status === 'declined') {
-      update.declined_at = new Date().toISOString();
-      update.decline_reason = reason || null;
-    } else {
-      update.approved_at = new Date().toISOString();
-      if (status === 'partially_approved' && reason) update.decline_reason = reason;
-    }
-
-    const { error } = await supabase.from('estimates').update(update).eq('id', est.id);
-    setWorking(false);
-    if (error) return toast.error('Could not submit. Please contact us.');
-    setEst({ ...est, ...update });
+      ...(status === 'declined' ? { declined_at: new Date().toISOString(), decline_reason: reason || null } : { approved_at: new Date().toISOString() }),
+    });
     toast.success(status === 'declined' ? 'Response recorded' : 'Estimate signed!');
 
     // If signed in as the customer, auto-redirect back to portal
