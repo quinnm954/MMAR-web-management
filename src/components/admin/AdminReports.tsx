@@ -297,6 +297,18 @@ export default function AdminReports() {
               className="w-24 h-9"
             />
           </div>
+          <div>
+            <Label className="text-xs">Technician</Label>
+            <Select value={techFilter} onValueChange={setTechFilter}>
+              <SelectTrigger className="w-48 h-9"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All technicians</SelectItem>
+                {techOptions.map((t) => (
+                  <SelectItem key={t} value={t}>{t}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
           <Button
             type="button"
             variant="outline"
