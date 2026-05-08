@@ -9,10 +9,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Pencil, Share2, Trash2, Copy, ExternalLink } from 'lucide-react';
+import { Plus, Pencil, Share2, Trash2, Copy, ExternalLink, Wrench } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { shareLink } from '@/lib/share';
+import { startRepairOrderFromEstimate } from '@/lib/repairOrders';
 
 interface LineItem { description: string; quantity: number; unit_price: number; amount: number; catalog_item_id?: string; labor_hours?: number; }
 interface Estimate {
@@ -26,6 +27,7 @@ interface Estimate {
   notes: string | null;
   valid_until: string | null;
   approval_token: string;
+  appointment_id: string | null;
   created_at: string;
 }
 
@@ -131,6 +133,16 @@ const AdminEstimates = () => {
     toast.success('Link copied');
   };
 
+  const startRO = async (est: Estimate) => {
+    try {
+      await startRepairOrderFromEstimate(est);
+      toast.success('Repair Order started — moved to In Progress');
+      load();
+    } catch (e: any) {
+      toast.error(e.message || 'Could not start Repair Order');
+    }
+  };
+
   const customerVehicles = editing?.customer_id ? vehicles.filter(v => v.owner_id === editing.customer_id) : [];
 
   return (
@@ -165,6 +177,9 @@ const AdminEstimates = () => {
                       <Button size="icon" variant="ghost" onClick={() => copyLink(e.approval_token)} title="Copy approval link"><Copy className="h-4 w-4" /></Button>
                       <Button size="icon" variant="ghost" onClick={() => window.open(`/estimate/${e.approval_token}`, '_blank')}><ExternalLink className="h-4 w-4" /></Button>
                       <Button size="icon" variant="ghost" onClick={() => send(e)} title="Share"><Share2 className="h-4 w-4" /></Button>
+                      {(e.status === 'approved' || e.status === 'partially_approved') && (
+                        <Button size="icon" variant="ghost" onClick={() => startRO(e)} title="Start Repair Order"><Wrench className="h-4 w-4 text-primary" /></Button>
+                      )}
                       <Button size="icon" variant="ghost" onClick={() => setEditing(e)}><Pencil className="h-4 w-4" /></Button>
                     </div>
                   </TableCell>
