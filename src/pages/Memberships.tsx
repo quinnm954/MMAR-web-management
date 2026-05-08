@@ -11,8 +11,29 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
-import { Check, MapPin, Clock, Wrench, ClipboardList } from "lucide-react";
+import {
+  Check,
+  MapPin,
+  Clock,
+  Wrench,
+  ClipboardList,
+  Truck,
+  Phone,
+  MessageSquare,
+  Fuel,
+  Car,
+  Zap,
+  ShieldCheck,
+} from "lucide-react";
 
 interface Plan {
   id: string;
