@@ -429,6 +429,45 @@ export type Database = {
         }
         Relationships: []
       }
+      estimate_decision_logs: {
+        Row: {
+          actor_id: string | null
+          created_at: string
+          decline_reason: string | null
+          estimate_id: string
+          id: string
+          line_items: Json
+          requested_date: string | null
+          requested_time_window: string | null
+          signature_image: string | null
+          status: string
+        }
+        Insert: {
+          actor_id?: string | null
+          created_at?: string
+          decline_reason?: string | null
+          estimate_id: string
+          id?: string
+          line_items?: Json
+          requested_date?: string | null
+          requested_time_window?: string | null
+          signature_image?: string | null
+          status: string
+        }
+        Update: {
+          actor_id?: string | null
+          created_at?: string
+          decline_reason?: string | null
+          estimate_id?: string
+          id?: string
+          line_items?: Json
+          requested_date?: string | null
+          requested_time_window?: string | null
+          signature_image?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
       estimates: {
         Row: {
           appointment_id: string | null
