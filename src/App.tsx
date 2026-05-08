@@ -37,6 +37,7 @@ import PortalInvoices from "./pages/portal/PortalInvoices";
 import PortalInvoiceDetail from "./pages/portal/PortalInvoiceDetail";
 import PortalEstimates from "./pages/portal/PortalEstimates";
 import PortalRepairOrders from "./pages/portal/PortalRepairOrders";
+import PortalFinancing from "./pages/portal/PortalFinancing";
 import CustomerProtectedRoute from "./components/portal/CustomerProtectedRoute";
 import NotFound from "./pages/NotFound";
 import Unsubscribe from "./pages/Unsubscribe";
