@@ -171,6 +171,25 @@ const Blog = () => {
             </a>
           </div>
 
+          {/* Featured topic: MMAR Care */}
+          <div className="mb-8 glass-card rounded-xl p-5 md:p-6 border border-gold/40 bg-gold/5">
+            <div className="flex items-center gap-2 mb-2 text-xs uppercase tracking-widest text-gold">
+              <Tag className="w-4 h-4" /> New Topic
+            </div>
+            <h2 className="font-display text-lg md:text-2xl text-foreground mb-2">
+              MMAR Care — Membership & Customer Portal
+            </h2>
+            <p className="text-muted-foreground text-sm md:text-base mb-3">
+              Browse every article about our free customer portal, membership plans, and fleet program.
+            </p>
+            <Link
+              to="/blog/tag/mmar-care"
+              className="inline-flex items-center gap-1 text-primary text-sm font-semibold hover:underline"
+            >
+              View MMAR Care articles <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+
           {/* Tag cloud */}
           <div className="mb-8">
             <div className="flex items-center gap-2 mb-3 text-muted-foreground">
