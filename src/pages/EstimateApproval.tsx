@@ -1,15 +1,22 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { format } from 'date-fns';
 
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
-import { CheckCircle2, XCircle, Loader2 } from 'lucide-react';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { CalendarIcon, CheckCircle2, XCircle, Loader2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import SignaturePad from '@/components/SignaturePad';
 import BrandedDocLayout from '@/components/BrandedDocLayout';
+
+const TIME_WINDOWS = ['Morning (8a–12p)', 'Afternoon (12p–4p)', 'Evening (4p–7p)'];
 
 const EstimateApproval = () => {
   const { token } = useParams();
