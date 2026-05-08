@@ -1338,6 +1338,7 @@ export type Database = {
         Row: {
           estimate_valid_days: number
           id: number
+          labor_cost_per_hour: number
           shop_supplies_max: number
           shop_supplies_pct: number
           tax_rate: number
@@ -1346,6 +1347,7 @@ export type Database = {
         Insert: {
           estimate_valid_days?: number
           id?: number
+          labor_cost_per_hour?: number
           shop_supplies_max?: number
           shop_supplies_pct?: number
           tax_rate?: number
@@ -1354,6 +1356,7 @@ export type Database = {
         Update: {
           estimate_valid_days?: number
           id?: number
+          labor_cost_per_hour?: number
           shop_supplies_max?: number
           shop_supplies_pct?: number
           tax_rate?: number
@@ -1623,6 +1626,60 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      vehicle_parts_catalog: {
+        Row: {
+          created_at: string
+          customer_id: string | null
+          id: string
+          invoice_id: string | null
+          labor_description: string | null
+          labor_hours: number | null
+          part_name: string
+          performed_at: string
+          quantity: number
+          service_record_id: string | null
+          sku: string | null
+          unit_cost: number
+          unit_price: number
+          vehicle_id: string | null
+          vin: string
+        }
+        Insert: {
+          created_at?: string
+          customer_id?: string | null
+          id?: string
+          invoice_id?: string | null
+          labor_description?: string | null
+          labor_hours?: number | null
+          part_name: string
+          performed_at?: string
+          quantity?: number
+          service_record_id?: string | null
+          sku?: string | null
+          unit_cost?: number
+          unit_price?: number
+          vehicle_id?: string | null
+          vin: string
+        }
+        Update: {
+          created_at?: string
+          customer_id?: string | null
+          id?: string
+          invoice_id?: string | null
+          labor_description?: string | null
+          labor_hours?: number | null
+          part_name?: string
+          performed_at?: string
+          quantity?: number
+          service_record_id?: string | null
+          sku?: string | null
+          unit_cost?: number
+          unit_price?: number
+          vehicle_id?: string | null
+          vin?: string
         }
         Relationships: []
       }

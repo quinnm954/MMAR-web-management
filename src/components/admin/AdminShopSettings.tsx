@@ -68,6 +68,10 @@ const AdminShopSettings = () => {
           <div><Label>Estimate Valid Days</Label>
             <Input type="number" value={settings.estimate_valid_days} onChange={e => setSettings({ ...settings, estimate_valid_days: parseInt(e.target.value) || 14 })} />
           </div>
+          <div><Label>Employee Labor Cost ($/hr)</Label>
+            <Input type="number" step="0.01" value={settings.labor_cost_per_hour ?? 35} onChange={e => setSettings({ ...settings, labor_cost_per_hour: parseFloat(e.target.value) || 0 })} />
+            <p className="text-xs text-muted-foreground mt-1">Used in profit reports to estimate employee cost per invoice.</p>
+          </div>
           <div className="col-span-2"><Button onClick={saveSettings}>Save Settings</Button></div>
         </CardContent>
       </Card>

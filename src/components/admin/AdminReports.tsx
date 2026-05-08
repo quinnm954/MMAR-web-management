@@ -1,8 +1,36 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 type LineItem = { quantity?: number; unit_price?: number; unit_cost?: number; amount?: number; kind?: string };
+
+type InvoiceRow = {
+  id: string;
+  invoice_number: string | null;
+  total: number;
+  subtotal: number;
+  status: string;
+  created_at: string;
+  customer_id: string;
+  service_record_id: string | null;
+  line_items: LineItem[];
+};
+
+type ProfitRow = {
+  id: string;
+  invoice_number: string | null;
+  date: string;
+  customer: string;
+  revenue: number;
+  cogs: number;
+  laborMinutes: number;
+  employeeCost: number;
+  grossProfit: number;
+  netProfit: number;
+};
 
 export default function AdminReports() {
   const [data, setData] = useState({
@@ -19,25 +47,40 @@ export default function AdminReports() {
     partsMarginPct: 0,
   });
 
+  const [profitRows, setProfitRows] = useState<ProfitRow[]>([]);
+  const [laborRate, setLaborRate] = useState<number>(35);
+  const [days, setDays] = useState<number>(30);
+
   useEffect(() => {
     (async () => {
-      const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
-      const [inv, completed, members, ests, hours] = await Promise.all([
-        supabase.from('invoices').select('total, status, line_items').gte('created_at', since),
+      const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
+
+      const [inv, completed, members, ests, hours, settings] = await Promise.all([
+        supabase
+          .from('invoices')
+          .select('id, invoice_number, total, subtotal, status, created_at, customer_id, service_record_id, line_items')
+          .gte('created_at', since)
+          .order('created_at', { ascending: false }),
         supabase.from('appointments').select('id', { count: 'exact', head: true }).eq('status', 'completed').gte('created_at', since),
         supabase.from('memberships').select('id', { count: 'exact', head: true }).eq('status', 'active'),
         supabase.from('estimates').select('id', { count: 'exact', head: true }).eq('status', 'sent'),
         supabase.from('time_entries').select('duration_minutes').gte('clock_in', since),
+        supabase.from('shop_settings').select('labor_cost_per_hour').eq('id', 1).single(),
       ]);
-      const paid = (inv.data ?? []).filter((i: any) => i.status === 'paid');
-      const revenue = paid.reduce((s, i: any) => s + Number(i.total || 0), 0);
+
+      const allInvoices = ((inv.data ?? []) as any[]) as InvoiceRow[];
+      const paid = allInvoices.filter((i) => i.status === 'paid');
+      const revenue = paid.reduce((s, i) => s + Number(i.total || 0), 0);
       const totalMin = (hours.data ?? []).reduce((s, e) => s + (e.duration_minutes || 0), 0);
 
-      // Parts cost & margin from paid invoice line_items (only lines tagged kind=part with unit_cost)
+      const rate = Number((settings.data as any)?.labor_cost_per_hour ?? 35);
+      setLaborRate(rate);
+
+      // Parts revenue/cost across paid invoices
       let partsRevenue = 0;
       let partsCost = 0;
-      for (const i of paid as any[]) {
-        const items: LineItem[] = Array.isArray(i.line_items) ? i.line_items : [];
+      for (const i of paid) {
+        const items = Array.isArray(i.line_items) ? i.line_items : [];
         for (const li of items) {
           if (li.kind !== 'part') continue;
           const qty = Number(li.quantity ?? 1);
@@ -51,6 +94,67 @@ export default function AdminReports() {
       }
       const partsMargin = partsRevenue - partsCost;
       const partsMarginPct = partsRevenue > 0 ? (partsMargin / partsRevenue) * 100 : 0;
+
+      // Per-invoice profit table
+      const customerIds = Array.from(new Set(paid.map((p) => p.customer_id).filter(Boolean)));
+      const serviceIds = paid.map((p) => p.service_record_id).filter(Boolean) as string[];
+
+      const [profilesRes, srRes] = await Promise.all([
+        customerIds.length
+          ? supabase.from('profiles').select('id, full_name, email').in('id', customerIds)
+          : Promise.resolve({ data: [] as any[] }),
+        serviceIds.length
+          ? supabase.from('service_records').select('id, appointment_id').in('id', serviceIds)
+          : Promise.resolve({ data: [] as any[] }),
+      ]);
+      const customerMap = new Map<string, any>((profilesRes.data ?? []).map((p: any) => [p.id, p]));
+      const apptByService = new Map<string, string>(
+        (srRes.data ?? []).map((r: any) => [r.id, r.appointment_id]),
+      );
+      const apptIds = Array.from(new Set(Array.from(apptByService.values()).filter(Boolean))) as string[];
+      const minutesByAppt = new Map<string, number>();
+      if (apptIds.length) {
+        const { data: te } = await supabase
+          .from('time_entries')
+          .select('appointment_id, duration_minutes')
+          .in('appointment_id', apptIds);
+        (te ?? []).forEach((row: any) => {
+          if (!row.appointment_id) return;
+          minutesByAppt.set(
+            row.appointment_id,
+            (minutesByAppt.get(row.appointment_id) ?? 0) + Number(row.duration_minutes || 0),
+          );
+        });
+      }
+
+      const rows: ProfitRow[] = paid.map((inv) => {
+        const items = Array.isArray(inv.line_items) ? inv.line_items : [];
+        const cogs = items.reduce((s, li) => {
+          const qty = Number(li.quantity ?? 1);
+          const cost = Number(li.unit_cost ?? 0);
+          return s + qty * cost;
+        }, 0);
+        const apptId = inv.service_record_id ? apptByService.get(inv.service_record_id) : undefined;
+        const minutes = apptId ? (minutesByAppt.get(apptId) ?? 0) : 0;
+        const employeeCost = (minutes / 60) * rate;
+        const revenueRow = Number(inv.total || 0);
+        const grossProfit = revenueRow - cogs;
+        const netProfit = grossProfit - employeeCost;
+        const cust = customerMap.get(inv.customer_id);
+        return {
+          id: inv.id,
+          invoice_number: inv.invoice_number,
+          date: new Date(inv.created_at).toLocaleDateString(),
+          customer: cust?.full_name || cust?.email || '—',
+          revenue: revenueRow,
+          cogs,
+          laborMinutes: minutes,
+          employeeCost,
+          grossProfit,
+          netProfit,
+        };
+      });
+      setProfitRows(rows);
 
       setData({
         revenue30: revenue,
@@ -66,13 +170,42 @@ export default function AdminReports() {
         partsMarginPct,
       });
     })();
-  }, []);
+  }, [days]);
 
-  const fmt = (n: number) => '$' + n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const fmt = (n: number) =>
+    '$' + n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+  const totals = useMemo(() => {
+    return profitRows.reduce(
+      (acc, r) => {
+        acc.revenue += r.revenue;
+        acc.cogs += r.cogs;
+        acc.employeeCost += r.employeeCost;
+        acc.grossProfit += r.grossProfit;
+        acc.netProfit += r.netProfit;
+        return acc;
+      },
+      { revenue: 0, cogs: 0, employeeCost: 0, grossProfit: 0, netProfit: 0 },
+    );
+  }, [profitRows]);
 
   return (
     <div className="space-y-4">
-      <h2 className="font-display text-xl">Last 30 Days</h2>
+      <div className="flex items-end justify-between flex-wrap gap-3">
+        <h2 className="font-display text-xl">Last {days} Days</h2>
+        <div className="flex items-end gap-2">
+          <div>
+            <Label className="text-xs">Window (days)</Label>
+            <Input
+              type="number"
+              value={days}
+              onChange={(e) => setDays(Math.max(1, parseInt(e.target.value) || 30))}
+              className="w-24 h-9"
+            />
+          </div>
+        </div>
+      </div>
+
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <KPI label="Revenue" value={fmt(data.revenue30)} />
         <KPI label="Avg Repair Order" value={fmt(data.aro)} />
@@ -83,10 +216,70 @@ export default function AdminReports() {
         <KPI label="Tech Hours" value={String(data.techHours)} />
       </div>
 
-      <h2 className="font-display text-xl pt-2">Parts Profitability (paid invoices, 30d)</h2>
+      <h2 className="font-display text-xl pt-2">Profit by Invoice (paid)</h2>
       <p className="text-xs text-muted-foreground -mt-2">
-        Cost is recovered from imported PDF quotes by dividing the marked-up price by 1.30 (30% markup).
-        Manually entered parts contribute only when a unit cost is set.
+        Gross profit = revenue − parts cost (COGS from line item unit_cost). Net profit = gross profit − employee cost
+        (technician clock time × ${laborRate.toFixed(2)}/hr from shop settings).
+      </p>
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+        <KPI label="Total Revenue" value={fmt(totals.revenue)} />
+        <KPI label="Total COGS" value={fmt(totals.cogs)} />
+        <KPI label="Employee Cost" value={fmt(totals.employeeCost)} />
+        <KPI label="Gross Profit" value={fmt(totals.grossProfit)} />
+        <KPI label="Net Profit" value={fmt(totals.netProfit)} />
+      </div>
+
+      <Card>
+        <CardContent className="p-0 overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Invoice</TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead>Customer</TableHead>
+                <TableHead className="text-right">Revenue</TableHead>
+                <TableHead className="text-right">COGS</TableHead>
+                <TableHead className="text-right">Labor (hrs)</TableHead>
+                <TableHead className="text-right">Employee Cost</TableHead>
+                <TableHead className="text-right">Gross Profit</TableHead>
+                <TableHead className="text-right">Net Profit</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {profitRows.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={9} className="text-center text-muted-foreground py-6">
+                    No paid invoices in this window.
+                  </TableCell>
+                </TableRow>
+              ) : (
+                profitRows.map((r) => (
+                  <TableRow key={r.id}>
+                    <TableCell className="font-mono text-xs">{r.invoice_number ?? r.id.slice(0, 8)}</TableCell>
+                    <TableCell className="text-xs">{r.date}</TableCell>
+                    <TableCell className="text-xs">{r.customer}</TableCell>
+                    <TableCell className="text-right">{fmt(r.revenue)}</TableCell>
+                    <TableCell className="text-right">{fmt(r.cogs)}</TableCell>
+                    <TableCell className="text-right">{(r.laborMinutes / 60).toFixed(2)}</TableCell>
+                    <TableCell className="text-right">{fmt(r.employeeCost)}</TableCell>
+                    <TableCell className={`text-right ${r.grossProfit < 0 ? 'text-destructive' : ''}`}>
+                      {fmt(r.grossProfit)}
+                    </TableCell>
+                    <TableCell className={`text-right font-semibold ${r.netProfit < 0 ? 'text-destructive' : 'text-primary'}`}>
+                      {fmt(r.netProfit)}
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      <h2 className="font-display text-xl pt-2">Parts Profitability (paid invoices)</h2>
+      <p className="text-xs text-muted-foreground -mt-2">
+        Cost is recovered from imported PDF quotes by dividing the marked-up price by 1.30 (30% markup). Manually entered
+        parts contribute only when a unit cost is set.
       </p>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <KPI label="Parts Revenue" value={fmt(data.partsRevenue)} />
@@ -100,7 +293,11 @@ export default function AdminReports() {
 
 const KPI = ({ label, value }: { label: string; value: string }) => (
   <Card>
-    <CardHeader className="pb-1"><CardTitle className="text-xs text-muted-foreground font-normal">{label}</CardTitle></CardHeader>
-    <CardContent><div className="text-2xl font-bold">{value}</div></CardContent>
+    <CardHeader className="pb-1">
+      <CardTitle className="text-xs text-muted-foreground font-normal">{label}</CardTitle>
+    </CardHeader>
+    <CardContent>
+      <div className="text-2xl font-bold">{value}</div>
+    </CardContent>
   </Card>
 );
