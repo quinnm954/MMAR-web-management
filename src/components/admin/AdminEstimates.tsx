@@ -9,10 +9,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Pencil, Share2, Trash2, Copy, ExternalLink } from 'lucide-react';
+import { Plus, Pencil, Share2, Trash2, Copy, ExternalLink, Wrench } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { shareLink } from '@/lib/share';
+import { startRepairOrderFromEstimate } from '@/lib/repairOrders';
 
 interface LineItem { description: string; quantity: number; unit_price: number; amount: number; catalog_item_id?: string; labor_hours?: number; }
 interface Estimate {
