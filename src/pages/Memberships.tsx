@@ -151,7 +151,7 @@ const Memberships = () => {
                 <a href="#plans">View Membership Plans</a>
               </Button>
               <Button variant="outline" size="lg" asChild>
-                <Link to="/portal/membership-signup">Become A Member</Link>
+                <a href="#fleet">Fleet Plans (5+ Vehicles)</a>
               </Button>
             </div>
             <div className="flex flex-wrap justify-center gap-2 mt-8 text-sm">
