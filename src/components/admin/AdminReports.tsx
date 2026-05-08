@@ -74,7 +74,7 @@ export default function AdminReports() {
       const [inv, completed, members, ests, settings, employeesRes] = await Promise.all([
         supabase
           .from('invoices')
-          .select('id, invoice_number, total, subtotal, status, created_at, customer_id, service_record_id, line_items, stripe_session_id, stripe_payment_intent_id')
+          .select('id, invoice_number, total, subtotal, status, created_at, customer_id, service_record_id, line_items, stripe_session_id, stripe_payment_intent_id, stripe_fee, stripe_fee_synced_at')
           .gte('created_at', since)
           .order('created_at', { ascending: false }),
         supabase.from('appointments').select('id', { count: 'exact', head: true }).eq('status', 'completed').gte('created_at', since),
