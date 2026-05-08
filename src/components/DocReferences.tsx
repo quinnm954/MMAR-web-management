@@ -8,9 +8,20 @@ interface Props {
   financingHref?: string;
   /** Hide the financing section entirely (e.g., for paid receipts). */
   hideFinancing?: boolean;
+  /** Optional estimate id to pass through to the warranty page so it can show the linked summary. */
+  estimateId?: string;
+  /** Optional public approval token to pass through (used when viewer isn't authenticated). */
+  estimateToken?: string;
 }
 
-const DocReferences = ({ financingHref, hideFinancing }: Props) => {
+const DocReferences = ({ financingHref, hideFinancing, estimateId, estimateToken }: Props) => {
+  const ctxQuery = estimateToken
+    ? `?token=${encodeURIComponent(estimateToken)}`
+    : estimateId
+    ? `?estimate=${encodeURIComponent(estimateId)}`
+    : "";
+  const warrantyHref = `/warranty-policy${ctxQuery}`;
+  const financingFallbackHref = `/financing-contract${ctxQuery}`;
   return (
     <div className="mt-8 print:hidden">
       <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">Programs &amp; Policies</div>
