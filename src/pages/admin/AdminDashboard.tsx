@@ -31,9 +31,17 @@ import AdminCalendar from '@/components/admin/AdminCalendar';
 import AdminTechProductivity from '@/components/admin/AdminTechProductivity';
 import { supabase } from '@/integrations/supabase/client';
 import mmarLogo from '@/assets/mmar-logo.jpeg';
+import type { AppRole } from '@/hooks/useAuth';
+
+type TabDef = { value: string; label: string; icon: any; roles: AppRole[]; content: JSX.Element };
+
+const ALL: AppRole[] = ['admin', 'manager', 'service_advisor', 'technician', 'parts'];
+const ADMIN_ONLY: AppRole[] = ['admin', 'manager'];
+const ADVISOR: AppRole[] = ['admin', 'manager', 'service_advisor'];
+const PARTS: AppRole[] = ['admin', 'manager', 'parts'];
 
 const AdminDashboard = () => {
-  const { signOut, user } = useAuth();
+  const { signOut, user, hasAnyRole, roles } = useAuth();
   const [stats, setStats] = useState({ customers: 0, activeMemberships: 0, openAppointments: 0, unpaidInvoices: 0 });
   const [contracts, setContracts] = useState<any[]>([]);
   const [warranties, setWarranties] = useState<any[]>([]);
@@ -96,61 +104,56 @@ const AdminDashboard = () => {
           <StatCard icon={Receipt} label="Unpaid Invoices" value={stats.unpaidInvoices} />
         </div>
 
-        <Tabs defaultValue="customers" className="space-y-4">
-          <TabsList className="flex flex-wrap h-auto">
-            <TabsTrigger value="reports"><BarChart3 className="h-4 w-4 mr-1.5" /> Reports</TabsTrigger>
-            <TabsTrigger value="kanban"><KanbanSquare className="h-4 w-4 mr-1.5" /> Job Board</TabsTrigger>
-            <TabsTrigger value="calendar"><Calendar className="h-4 w-4 mr-1.5" /> Calendar</TabsTrigger>
-            <TabsTrigger value="ros"><Wrench className="h-4 w-4 mr-1.5" /> Repair Orders</TabsTrigger>
-            <TabsTrigger value="customers"><Users className="h-4 w-4 mr-1.5" /> Customers</TabsTrigger>
-            <TabsTrigger value="garage"><Car className="h-4 w-4 mr-1.5" /> Garage</TabsTrigger>
-            <TabsTrigger value="memberships"><CreditCard className="h-4 w-4 mr-1.5" /> Memberships</TabsTrigger>
-            <TabsTrigger value="appointments"><Calendar className="h-4 w-4 mr-1.5" /> Appointments</TabsTrigger>
-            <TabsTrigger value="service"><ClipboardList className="h-4 w-4 mr-1.5" /> Service Records</TabsTrigger>
-            <TabsTrigger value="estimates"><FileSpreadsheet className="h-4 w-4 mr-1.5" /> Estimates</TabsTrigger>
-            <TabsTrigger value="inspections"><ClipboardCheck className="h-4 w-4 mr-1.5" /> Inspections</TabsTrigger>
-            <TabsTrigger value="invoices"><Receipt className="h-4 w-4 mr-1.5" /> Invoices</TabsTrigger>
-            <TabsTrigger value="catalog"><Package className="h-4 w-4 mr-1.5" /> Catalog</TabsTrigger>
-            <TabsTrigger value="time"><Clock className="h-4 w-4 mr-1.5" /> Time</TabsTrigger>
-            <TabsTrigger value="productivity"><Activity className="h-4 w-4 mr-1.5" /> Productivity</TabsTrigger>
-            <TabsTrigger value="sms"><MessageSquare className="h-4 w-4 mr-1.5" /> SMS</TabsTrigger>
-            <TabsTrigger value="declined"><AlertTriangle className="h-4 w-4 mr-1.5" /> Declined</TabsTrigger>
-            <TabsTrigger value="quickbooks"><FileDown className="h-4 w-4 mr-1.5" /> QuickBooks</TabsTrigger>
-            <TabsTrigger value="financing"><FileText className="h-4 w-4 mr-1.5" /> Financing</TabsTrigger>
-            <TabsTrigger value="warranty"><ShieldCheck className="h-4 w-4 mr-1.5" /> Warranty</TabsTrigger>
-            <TabsTrigger value="emails"><Mail className="h-4 w-4 mr-1.5" /> Emails</TabsTrigger>
-            <TabsTrigger value="audit"><History className="h-4 w-4 mr-1.5" /> Audit Log</TabsTrigger>
-            <TabsTrigger value="roles"><ShieldCheck className="h-4 w-4 mr-1.5" /> Roles</TabsTrigger>
-            <TabsTrigger value="settings"><Settings className="h-4 w-4 mr-1.5" /> Settings</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="reports"><AdminReports /></TabsContent>
-          <TabsContent value="kanban"><AdminKanban /></TabsContent>
-          <TabsContent value="calendar"><AdminCalendar /></TabsContent>
-          <TabsContent value="ros"><AdminRepairOrders /></TabsContent>
-          <TabsContent value="customers"><AdminCustomers /></TabsContent>
-          <TabsContent value="garage"><AdminGarage /></TabsContent>
-          <TabsContent value="memberships"><AdminMemberships /></TabsContent>
-          <TabsContent value="appointments"><AdminAppointments /></TabsContent>
-          <TabsContent value="service"><AdminServiceRecords /></TabsContent>
-          <TabsContent value="estimates"><AdminEstimates /></TabsContent>
-          <TabsContent value="inspections"><AdminInspections /></TabsContent>
-          <TabsContent value="invoices"><AdminInvoices /></TabsContent>
-          <TabsContent value="catalog"><AdminCatalog /></TabsContent>
-          <TabsContent value="time"><AdminTimeTracking /></TabsContent>
-          <TabsContent value="productivity"><AdminTechProductivity /></TabsContent>
-          <TabsContent value="sms"><AdminSMS /></TabsContent>
-          <TabsContent value="declined"><AdminDeclinedWork /></TabsContent>
-          <TabsContent value="quickbooks"><AdminQuickBooksExport /></TabsContent>
-          <TabsContent value="financing">
-            <FinancingContractsTable data={contracts} onRefresh={reloadFinancing} />
-          </TabsContent>
-          <TabsContent value="warranty"><WarrantyTable data={warranties} onRefresh={reloadWarranty} /></TabsContent>
-          <TabsContent value="emails"><AdminEmails /></TabsContent>
-          <TabsContent value="audit"><AdminAuditLog /></TabsContent>
-          <TabsContent value="roles"><AdminRoles /></TabsContent>
-          <TabsContent value="settings"><AdminShopSettings /></TabsContent>
-        </Tabs>
+        {(() => {
+          const tabs: TabDef[] = [
+            { value: 'reports', label: 'Reports', icon: BarChart3, roles: ADMIN_ONLY, content: <AdminReports /> },
+            { value: 'kanban', label: 'Job Board', icon: KanbanSquare, roles: ALL, content: <AdminKanban /> },
+            { value: 'calendar', label: 'Calendar', icon: Calendar, roles: ALL, content: <AdminCalendar /> },
+            { value: 'ros', label: 'Repair Orders', icon: Wrench, roles: ALL, content: <AdminRepairOrders /> },
+            { value: 'customers', label: 'Customers', icon: Users, roles: ADVISOR, content: <AdminCustomers /> },
+            { value: 'garage', label: 'Garage', icon: Car, roles: ADVISOR, content: <AdminGarage /> },
+            { value: 'memberships', label: 'Memberships', icon: CreditCard, roles: ADVISOR, content: <AdminMemberships /> },
+            { value: 'appointments', label: 'Appointments', icon: Calendar, roles: ADVISOR, content: <AdminAppointments /> },
+            { value: 'service', label: 'Service Records', icon: ClipboardList, roles: ADVISOR, content: <AdminServiceRecords /> },
+            { value: 'estimates', label: 'Estimates', icon: FileSpreadsheet, roles: ADVISOR, content: <AdminEstimates /> },
+            { value: 'inspections', label: 'Inspections', icon: ClipboardCheck, roles: ALL, content: <AdminInspections /> },
+            { value: 'invoices', label: 'Invoices', icon: Receipt, roles: ADVISOR, content: <AdminInvoices /> },
+            { value: 'catalog', label: 'Catalog', icon: Package, roles: PARTS, content: <AdminCatalog /> },
+            { value: 'time', label: 'Time', icon: Clock, roles: ADMIN_ONLY, content: <AdminTimeTracking /> },
+            { value: 'productivity', label: 'Productivity', icon: Activity, roles: ADMIN_ONLY, content: <AdminTechProductivity /> },
+            { value: 'sms', label: 'SMS', icon: MessageSquare, roles: ADVISOR, content: <AdminSMS /> },
+            { value: 'declined', label: 'Declined', icon: AlertTriangle, roles: ADVISOR, content: <AdminDeclinedWork /> },
+            { value: 'quickbooks', label: 'QuickBooks', icon: FileDown, roles: ADMIN_ONLY, content: <AdminQuickBooksExport /> },
+            { value: 'financing', label: 'Financing', icon: FileText, roles: ADMIN_ONLY, content: <FinancingContractsTable data={contracts} onRefresh={reloadFinancing} /> },
+            { value: 'warranty', label: 'Warranty', icon: ShieldCheck, roles: ADMIN_ONLY, content: <WarrantyTable data={warranties} onRefresh={reloadWarranty} /> },
+            { value: 'emails', label: 'Emails', icon: Mail, roles: ADMIN_ONLY, content: <AdminEmails /> },
+            { value: 'audit', label: 'Audit Log', icon: History, roles: ADMIN_ONLY, content: <AdminAuditLog /> },
+            { value: 'roles', label: 'Roles', icon: ShieldCheck, roles: ADMIN_ONLY, content: <AdminRoles /> },
+            { value: 'settings', label: 'Settings', icon: Settings, roles: ADMIN_ONLY, content: <AdminShopSettings /> },
+          ];
+          const visible = tabs.filter(t => hasAnyRole(t.roles));
+          if (visible.length === 0) {
+            return <p className="text-sm text-muted-foreground">No sections available for your role ({roles.join(', ') || 'none'}).</p>;
+          }
+          const defaultTab = visible.find(t => t.value === 'customers')?.value ?? visible[0].value;
+          return (
+            <Tabs defaultValue={defaultTab} className="space-y-4">
+              <TabsList className="flex flex-wrap h-auto">
+                {visible.map(t => {
+                  const Icon = t.icon;
+                  return (
+                    <TabsTrigger key={t.value} value={t.value}>
+                      <Icon className="h-4 w-4 mr-1.5" /> {t.label}
+                    </TabsTrigger>
+                  );
+                })}
+              </TabsList>
+              {visible.map(t => (
+                <TabsContent key={t.value} value={t.value}>{t.content}</TabsContent>
+              ))}
+            </Tabs>
+          );
+        })()}
       </main>
     </div>
   );
