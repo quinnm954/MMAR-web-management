@@ -148,7 +148,7 @@ const EstimateApproval = () => {
         )}
       </div>
 
-      {!submitted && (
+      {!locked && (
         <p className="text-sm text-muted-foreground mb-3">
           Check the items you'd like us to perform. Uncheck any you'd like to decline, then sign below.
         </p>
