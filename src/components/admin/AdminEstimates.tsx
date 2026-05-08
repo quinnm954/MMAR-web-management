@@ -47,6 +47,8 @@ const AdminEstimates = () => {
   const [catalog, setCatalog] = useState<any[]>([]);
   const [settings, setSettings] = useState<any>(null);
   const [editing, setEditing] = useState<any | null>(null);
+  const [importing, setImporting] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
 
   const load = async () => {
     const [e, c, v, ca, s] = await Promise.all([
