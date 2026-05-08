@@ -5,14 +5,34 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import RepairOrderDetail from './RepairOrderDetail';
 
+// Columns flow left → right in the actual workshop lifecycle.
+// `status` is the appointment status written when an admin manually drags a card here.
 const COLUMNS = [
   { id: 'inbox', label: 'New / Inbox', status: 'requested' },
   { id: 'scheduled', label: 'Scheduled', status: 'scheduled' },
+  { id: 'awaiting_approval', label: 'Awaiting Approval', status: 'awaiting_approval' },
   { id: 'in_progress', label: 'In Progress', status: 'in_progress' },
-  { id: 'awaiting_approval', label: 'Awaiting Approval', status: 'in_progress' },
-  { id: 'ready_for_invoice', label: 'Ready to Invoice', status: 'in_progress' },
+  { id: 'ready_for_invoice', label: 'Ready to Invoice', status: 'ready_for_invoice' },
   { id: 'completed', label: 'Completed', status: 'completed' },
-];
+] as const;
+
+type ColId = typeof COLUMNS[number]['id'];
+
+// Derive the natural column from related records, so cards flow automatically
+// as estimates get sent / approved, service records are logged, and invoices are paid.
+function deriveColumn(job: any): ColId {
+  const inv = job.invoice;
+  const est = job.estimate;
+  const sr = job.service_record;
+
+  if (inv?.status === 'paid' || job.status === 'completed') return 'completed';
+  if (inv) return 'ready_for_invoice';
+  if (sr) return 'ready_for_invoice';
+  if (est && (est.status === 'approved' || est.status === 'partially_approved')) return 'in_progress';
+  if (est && (est.status === 'sent' || est.status === 'pending_approval')) return 'awaiting_approval';
+  if (job.scheduled_at) return 'scheduled';
+  return 'inbox';
+}
 
 export default function AdminKanban() {
   const [jobs, setJobs] = useState<any[]>([]);
@@ -25,14 +45,16 @@ export default function AdminKanban() {
       .select('id, service_type, customer_id, vehicle_id, scheduled_at, board_column, priority, status, profiles:customer_id(full_name, email), vehicle:vehicles(year, make, model)')
       .order('sort_order', { ascending: true });
     const ids = (appts ?? []).map((a: any) => a.id);
-    let estByAppt: Record<string, any> = {};
-    let invByAppt: Record<string, any> = {};
+    const estByAppt: Record<string, any> = {};
+    const invByAppt: Record<string, any> = {};
+    const srByAppt: Record<string, any> = {};
     if (ids.length) {
       const [{ data: ests }, { data: srs }] = await Promise.all([
         supabase.from('estimates').select('id, appointment_id, status, total').in('appointment_id', ids),
         supabase.from('service_records').select('id, appointment_id').in('appointment_id', ids),
       ]);
       (ests ?? []).forEach((e: any) => { estByAppt[e.appointment_id] = e; });
+      (srs ?? []).forEach((s: any) => { srByAppt[s.appointment_id] = s; });
       const srIds = (srs ?? []).map((s: any) => s.id);
       let invs: any[] = [];
       if (srIds.length) {
@@ -46,25 +68,46 @@ export default function AdminKanban() {
         if (aid) invByAppt[aid] = i;
       });
     }
-    setJobs((appts ?? []).map((a: any) => ({ ...a, estimate: estByAppt[a.id], invoice: invByAppt[a.id] })));
+    setJobs((appts ?? []).map((a: any) => ({
+      ...a,
+      estimate: estByAppt[a.id],
+      service_record: srByAppt[a.id],
+      invoice: invByAppt[a.id],
+    })));
   };
 
   useEffect(() => { load(); }, []);
 
-  const moveTo = async (id: string, colId: string) => {
+  // Realtime: re-derive columns whenever any related record changes.
+  useEffect(() => {
+    const channel = supabase
+      .channel('kanban-flow')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'appointments' }, () => load())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'estimates' }, () => load())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'service_records' }, () => load())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'invoices' }, () => load())
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, []);
+
+  const moveTo = async (id: string, colId: ColId) => {
     const col = COLUMNS.find(c => c.id === colId);
     if (!col) return;
     const patch: any = { board_column: colId, status: col.status };
-    const { error } = await supabase.from('appointments').update(patch).eq('id', id);
-    if (error) return toast.error(error.message);
+    // Optimistic
     setJobs(j => j.map(x => x.id === id ? { ...x, ...patch } : x));
+    const { error } = await supabase.from('appointments').update(patch).eq('id', id);
+    if (error) {
+      toast.error(error.message);
+      load();
+    }
   };
 
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-3">
         {COLUMNS.map(col => {
-          const items = jobs.filter(j => (j.board_column || 'inbox') === col.id);
+          const items = jobs.filter(j => deriveColumn(j) === col.id);
           return (
             <div
               key={col.id}
@@ -103,7 +146,7 @@ export default function AdminKanban() {
                         </div>
                       )}
                       {job.scheduled_at && (
-                        <div className="text-[11px]">{new Date(job.scheduled_at).toLocaleDateString()}</div>
+                        <div className="text-[11px]">{new Date(job.scheduled_at).toLocaleString()}</div>
                       )}
                       <div className="flex flex-wrap gap-1 pt-1">
                         {job.estimate && (
