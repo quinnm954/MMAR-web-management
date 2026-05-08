@@ -584,7 +584,9 @@ export type Database = {
           client_signature_url: string | null
           client_signed_at: string | null
           created_at: string
+          customer_id: string | null
           down_payment: number
+          estimate_id: string | null
           first_payment_date: string
           id: string
           initial_default_consequences: string | null
@@ -614,7 +616,9 @@ export type Database = {
           client_signature_url?: string | null
           client_signed_at?: string | null
           created_at?: string
+          customer_id?: string | null
           down_payment: number
+          estimate_id?: string | null
           first_payment_date: string
           id?: string
           initial_default_consequences?: string | null
@@ -644,7 +648,9 @@ export type Database = {
           client_signature_url?: string | null
           client_signed_at?: string | null
           created_at?: string
+          customer_id?: string | null
           down_payment?: number
+          estimate_id?: string | null
           first_payment_date?: string
           id?: string
           initial_default_consequences?: string | null
