@@ -808,6 +808,7 @@ export type Database = {
           paid_at: string | null
           pdf_url: string | null
           service_record_id: string | null
+          shop_supplies: number
           status: string
           stripe_payment_intent_id: string | null
           stripe_session_id: string | null
@@ -828,6 +829,7 @@ export type Database = {
           paid_at?: string | null
           pdf_url?: string | null
           service_record_id?: string | null
+          shop_supplies?: number
           status?: string
           stripe_payment_intent_id?: string | null
           stripe_session_id?: string | null
@@ -848,6 +850,7 @@ export type Database = {
           paid_at?: string | null
           pdf_url?: string | null
           service_record_id?: string | null
+          shop_supplies?: number
           status?: string
           stripe_payment_intent_id?: string | null
           stripe_session_id?: string | null
