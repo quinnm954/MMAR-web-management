@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2, MapPin, Calendar } from "lucide-react";
 import { toast } from "sonner";
+import DeleteButton from "@/components/admin/DeleteButton";
 
 interface Row {
   id: string;
