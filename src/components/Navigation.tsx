@@ -232,6 +232,9 @@ const Navigation = () => {
                 </AccordionItem>
               </Accordion>
 
+              <Link to="/mmar-care" onClick={close} className="text-foreground hover:text-primary font-semibold py-3 px-2 rounded-lg flex items-center gap-2">
+                <User className="w-4 h-4" /> MMAR Care
+              </Link>
               <Link to="/memberships" onClick={close} className="text-accent hover:text-accent/80 font-semibold py-3 px-2 rounded-lg">Memberships</Link>
               <Link to="/contact" onClick={close} className="text-foreground hover:text-primary font-medium py-3 px-2 rounded-lg">Contact</Link>
               {user ? (
