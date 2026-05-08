@@ -43,8 +43,26 @@ const RESOURCES = [
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { user } = useAuth();
+  const { user, roles, signOut } = useAuth();
+  const navigate = useNavigate();
   const close = () => setIsOpen(false);
+
+  const portalHome = roles.includes("admin")
+    ? "/admin/dashboard"
+    : roles.some((r) => ["technician", "service_advisor", "manager", "parts"].includes(r))
+      ? "/tech"
+      : "/portal/dashboard";
+  const portalLabel = roles.includes("admin")
+    ? "Admin"
+    : roles.some((r) => ["technician", "service_advisor", "manager", "parts"].includes(r))
+      ? "Staff Portal"
+      : "MMAR Care Portal";
+
+  const handleSignOut = async () => {
+    close();
+    await signOut();
+    navigate("/", { replace: true });
+  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border safe-area-inset">
