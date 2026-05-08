@@ -42,8 +42,9 @@ const PortalSignup = () => {
 
   const handleGoogle = async () => {
     setBusy(true);
+    try { sessionStorage.setItem("postLoginRedirect", "/portal/dashboard"); } catch {}
     const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin + "/portal/dashboard",
+      redirect_uri: window.location.origin,
     });
     if (result.error) {
       toast.error("Google sign-up failed");
