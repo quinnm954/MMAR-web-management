@@ -86,6 +86,8 @@ export type Database = {
           id: string
           membership_id: string | null
           priority: string
+          reminder_sent_24h: boolean
+          reminder_sent_2h: boolean
           requested_date: string | null
           requested_time_window: string | null
           scheduled_at: string | null
@@ -106,6 +108,8 @@ export type Database = {
           id?: string
           membership_id?: string | null
           priority?: string
+          reminder_sent_24h?: boolean
+          reminder_sent_2h?: boolean
           requested_date?: string | null
           requested_time_window?: string | null
           scheduled_at?: string | null
@@ -126,6 +130,8 @@ export type Database = {
           id?: string
           membership_id?: string | null
           priority?: string
+          reminder_sent_24h?: boolean
+          reminder_sent_2h?: boolean
           requested_date?: string | null
           requested_time_window?: string | null
           scheduled_at?: string | null
@@ -341,6 +347,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      device_tokens: {
+        Row: {
+          created_at: string
+          id: string
+          last_seen_at: string
+          platform: string
+          token: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          last_seen_at?: string
+          platform: string
+          token: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          last_seen_at?: string
+          platform?: string
+          token?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       email_send_log: {
         Row: {
@@ -1169,6 +1205,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      notification_preferences: {
+        Row: {
+          appointment_reminders: boolean
+          created_at: string
+          push_enabled: boolean
+          sms_enabled: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          appointment_reminders?: boolean
+          created_at?: string
+          push_enabled?: boolean
+          sms_enabled?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          appointment_reminders?: boolean
+          created_at?: string
+          push_enabled?: boolean
+          sms_enabled?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       profiles: {
         Row: {

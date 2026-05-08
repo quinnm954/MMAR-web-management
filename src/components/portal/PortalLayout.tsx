@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { useNativePushRegistration } from "@/hooks/useNativePushRegistration";
 import { Button } from "@/components/ui/button";
 import {
   LayoutDashboard,
@@ -30,6 +31,7 @@ const navItems = [
 const PortalLayout = ({ children }: { children: ReactNode }) => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  useNativePushRegistration();
 
   const handleSignOut = async () => {
     await signOut();

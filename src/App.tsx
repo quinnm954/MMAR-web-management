@@ -52,6 +52,7 @@ import SetPassword from "./pages/SetPassword";
 import SharedCustomerSummary from "./pages/SharedCustomerSummary";
 import MmarCare from "./pages/MmarCare";
 import Fleet from "./pages/Fleet";
+import NativeBoot from "./components/NativeBoot";
 
 const queryClient = new QueryClient();
 
@@ -62,6 +63,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
+          <NativeBoot />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/financing-contract" element={<FinancingContract />} />
