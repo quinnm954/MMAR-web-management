@@ -280,6 +280,41 @@ export default function RepairOrderDetail({ appointmentId, open, onClose }: Prop
               </CardContent>
             </Card>
 
+            {/* Schedule */}
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm flex items-center gap-2"><Clock className="h-4 w-4" /> Schedule</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="text-xs text-muted-foreground">
+                  Customer requested:{" "}
+                  <span className="text-foreground font-medium">
+                    {appt.requested_date ? format(new Date(appt.requested_date + "T00:00:00"), "EEE, MMM d, yyyy") : "No preferred date"}
+                  </span>
+                  {appt.requested_time_window && <span className="ml-1">· {appt.requested_time_window}</span>}
+                </div>
+                <div className="flex flex-col sm:flex-row gap-2 sm:items-end">
+                  <div className="flex-1">
+                    <label className="text-xs text-muted-foreground mb-1 block">Scheduled date &amp; time</label>
+                    <input
+                      type="datetime-local"
+                      value={scheduleInput}
+                      onChange={(e) => setScheduleInput(e.target.value)}
+                      className="w-full bg-background border border-input rounded-md px-3 py-2 text-sm"
+                    />
+                  </div>
+                  <Button onClick={saveSchedule} disabled={savingSchedule || !scheduleInput}>
+                    {savingSchedule ? <Loader2 className="h-4 w-4 animate-spin" /> : appt.scheduled_at ? "Update schedule" : "Schedule RO"}
+                  </Button>
+                </div>
+                {appt.scheduled_at && (
+                  <div className="text-xs text-muted-foreground">
+                    Currently scheduled for <span className="text-foreground font-medium">{format(new Date(appt.scheduled_at), "EEE, MMM d, yyyy 'at' p")}</span>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
             {/* Technician assignment */}
             <Card>
               <CardHeader className="pb-2">
