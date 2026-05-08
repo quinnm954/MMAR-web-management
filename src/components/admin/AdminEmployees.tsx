@@ -112,7 +112,11 @@ export default function AdminEmployees() {
           return;
         }
         linkedUserId = (data as any).user_id;
-        toast.success('Login created — they will be prompted to set a password on first sign-in');
+        toast.success(
+          (data as any).reused
+            ? 'Existing account linked — they will be prompted to set a new password on next sign-in'
+            : 'Login created — they will be prompted to set a password on first sign-in'
+        );
       }
 
       const payload: any = {
