@@ -33,6 +33,8 @@ const EstimateApproval = () => {
   const [signature, setSignature] = useState<string | null>(null);
   const [requestedDate, setRequestedDate] = useState<Date | undefined>();
   const [timeWindow, setTimeWindow] = useState<string>(TIME_WINDOWS[0]);
+  const [editing, setEditing] = useState(false);
+  const [decisionLogs, setDecisionLogs] = useState<any[]>([]);
 
   useEffect(() => {
     (async () => {
@@ -42,6 +44,7 @@ const EstimateApproval = () => {
       setEst(data);
       setCustomer((payload as any)?.customer ?? null);
       setVehicle((payload as any)?.vehicle ?? null);
+      setDecisionLogs(((payload as any)?.decision_logs as any[]) ?? []);
       // Pre-fill decisions: existing line.status, otherwise 'approved'
       if (data?.line_items) {
         const init: Record<number, 'approved' | 'declined'> = {};
