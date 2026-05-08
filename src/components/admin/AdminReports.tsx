@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { Loader2, RefreshCw } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 type LineItem = { quantity?: number; unit_price?: number; unit_cost?: number; amount?: number; kind?: string; labor_hours?: number };
 
@@ -68,6 +69,7 @@ export default function AdminReports() {
   const [profitRows, setProfitRows] = useState<ProfitRow[]>([]);
   const [defaultRate, setDefaultRate] = useState<number>(35);
   const [days, setDays] = useState<number>(30);
+  const [techFilter, setTechFilter] = useState<string>('all');
 
   const [syncing, setSyncing] = useState(false);
 
@@ -249,8 +251,25 @@ export default function AdminReports() {
   const fmt = (n: number) =>
     '$' + n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
+  const techOptions = useMemo(() => {
+    const set = new Set<string>();
+    profitRows.forEach((r) => { if (r.technician && r.technician !== '—') set.add(r.technician); });
+    return Array.from(set).sort();
+  }, [profitRows]);
+
+  const filteredRows = useMemo(
+    () => (techFilter === 'all' ? profitRows : profitRows.filter((r) => r.technician === techFilter)),
+    [profitRows, techFilter],
+  );
+
+  const perfTotals = useMemo(() => {
+    const paidH = filteredRows.reduce((s, r) => s + r.paidLaborHours, 0);
+    const clockedH = filteredRows.reduce((s, r) => s + r.clockedHours, 0);
+    return { paidH, clockedH, variance: clockedH - paidH };
+  }, [filteredRows]);
+
   const totals = useMemo(() => {
-    return profitRows.reduce(
+    return filteredRows.reduce(
       (acc, r) => {
         acc.revenue += r.revenue;
         acc.cogs += r.cogs;
@@ -262,7 +281,7 @@ export default function AdminReports() {
       },
       { revenue: 0, cogs: 0, employeeCost: 0, stripeFee: 0, grossProfit: 0, netProfit: 0 },
     );
-  }, [profitRows]);
+  }, [filteredRows]);
 
   return (
     <div className="space-y-4">
@@ -277,6 +296,18 @@ export default function AdminReports() {
               onChange={(e) => setDays(Math.max(1, parseInt(e.target.value) || 30))}
               className="w-24 h-9"
             />
+          </div>
+          <div>
+            <Label className="text-xs">Technician</Label>
+            <Select value={techFilter} onValueChange={setTechFilter}>
+              <SelectTrigger className="w-48 h-9"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All technicians</SelectItem>
+                {techOptions.map((t) => (
+                  <SelectItem key={t} value={t}>{t}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <Button
             type="button"
@@ -321,6 +352,14 @@ export default function AdminReports() {
         <KPI label="Stripe Fees" value={fmt(totals.stripeFee)} />
         <KPI label="Net Profit" value={fmt(totals.netProfit)} />
       </div>
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+        <KPI label={`Paid Labor Hrs${techFilter !== 'all' ? ` · ${techFilter}` : ''}`} value={perfTotals.paidH.toFixed(2)} />
+        <KPI label="Clocked Hrs" value={perfTotals.clockedH.toFixed(2)} />
+        <KPI
+          label={perfTotals.variance > 0 ? 'Over Paid Time' : perfTotals.variance < 0 ? 'Under Paid Time' : 'On Target'}
+          value={`${perfTotals.variance > 0 ? '+' : ''}${perfTotals.variance.toFixed(2)} hrs`}
+        />
+      </div>
 
       <Card>
         <CardContent className="p-0 overflow-x-auto">
@@ -343,14 +382,14 @@ export default function AdminReports() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {profitRows.length === 0 ? (
+              {filteredRows.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={13} className="text-center text-muted-foreground py-6">
-                    No paid invoices in this window.
+                    {profitRows.length === 0 ? 'No paid invoices in this window.' : 'No invoices for this technician.'}
                   </TableCell>
                 </TableRow>
               ) : (
-                profitRows.map((r) => (
+                filteredRows.map((r) => (
                   <TableRow key={r.id}>
                     <TableCell className="font-mono text-xs">{r.invoice_number ?? r.id.slice(0, 8)}</TableCell>
                     <TableCell className="text-xs">{r.date}</TableCell>
