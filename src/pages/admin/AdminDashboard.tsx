@@ -30,6 +30,8 @@ import AdminQuickBooksExport from '@/components/admin/AdminQuickBooksExport';
 import AdminRepairOrders from '@/components/admin/AdminRepairOrders';
 import AdminCalendar from '@/components/admin/AdminCalendar';
 import AdminTechProductivity from '@/components/admin/AdminTechProductivity';
+import AdminShifts from '@/components/admin/AdminShifts';
+import AdminTechLaborPay from '@/components/admin/AdminTechLaborPay';
 import { supabase } from '@/integrations/supabase/client';
 import mmarLogo from '@/assets/mmar-logo.jpeg';
 import type { AppRole } from '@/hooks/useAuth';
