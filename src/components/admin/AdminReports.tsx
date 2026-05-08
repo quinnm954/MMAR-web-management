@@ -1,9 +1,12 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
+import { Loader2, RefreshCw } from 'lucide-react';
 
 type LineItem = { quantity?: number; unit_price?: number; unit_cost?: number; amount?: number; kind?: string; labor_hours?: number };
 
@@ -19,6 +22,8 @@ type InvoiceRow = {
   line_items: LineItem[];
   stripe_session_id: string | null;
   stripe_payment_intent_id: string | null;
+  stripe_fee: number | null;
+  stripe_fee_synced_at: string | null;
 };
 
 type ProfitRow = {
@@ -32,12 +37,13 @@ type ProfitRow = {
   cogs: number;
   employeeCost: number;
   stripeFee: number;
+  stripeFeeIsActual: boolean;
   grossProfit: number;
   netProfit: number;
 };
 
-// Stripe US standard card fee: 2.9% + $0.30 per successful charge
-const stripeFeeFor = (amount: number, paid: boolean, hasStripe: boolean) => {
+// Estimated fallback when actual Stripe fee hasn't been synced yet (US card: 2.9% + $0.30)
+const estimatedStripeFee = (amount: number, paid: boolean, hasStripe: boolean) => {
   if (!paid || !hasStripe || amount <= 0) return 0;
   return amount * 0.029 + 0.3;
 };
@@ -61,14 +67,15 @@ export default function AdminReports() {
   const [defaultRate, setDefaultRate] = useState<number>(35);
   const [days, setDays] = useState<number>(30);
 
-  useEffect(() => {
-    (async () => {
+  const [syncing, setSyncing] = useState(false);
+
+  const load = useCallback(async () => {
       const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
 
       const [inv, completed, members, ests, settings, employeesRes] = await Promise.all([
         supabase
           .from('invoices')
-          .select('id, invoice_number, total, subtotal, status, created_at, customer_id, service_record_id, line_items, stripe_session_id, stripe_payment_intent_id')
+          .select('id, invoice_number, total, subtotal, status, created_at, customer_id, service_record_id, line_items, stripe_session_id, stripe_payment_intent_id, stripe_fee, stripe_fee_synced_at')
           .gte('created_at', since)
           .order('created_at', { ascending: false }),
         supabase.from('appointments').select('id', { count: 'exact', head: true }).eq('status', 'completed').gte('created_at', since),
@@ -176,7 +183,11 @@ export default function AdminReports() {
         const employeeCost = laborHours * techRate;
         const revenueRow = Number(inv.total || 0);
         const hasStripe = Boolean(inv.stripe_session_id || inv.stripe_payment_intent_id);
-        const stripeFee = stripeFeeFor(revenueRow, inv.status === 'paid', hasStripe);
+        const isPaid = inv.status === 'paid';
+        const actualFee = inv.stripe_fee != null ? Number(inv.stripe_fee) : null;
+        const stripeFee = actualFee != null
+          ? actualFee
+          : estimatedStripeFee(revenueRow, isPaid, hasStripe);
         const grossProfit = revenueRow - cogs;
         const netProfit = grossProfit - employeeCost - stripeFee;
         const cust = customerMap.get(inv.customer_id);
@@ -191,6 +202,7 @@ export default function AdminReports() {
           cogs,
           employeeCost,
           stripeFee,
+          stripeFeeIsActual: actualFee != null,
           grossProfit,
           netProfit,
         };
@@ -212,8 +224,26 @@ export default function AdminReports() {
         partsMargin,
         partsMarginPct,
       });
-    })();
   }, [days]);
+
+  useEffect(() => { load(); }, [load]);
+
+  const syncStripeFees = async (force = false) => {
+    setSyncing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('sync-stripe-fees', {
+        body: { days: Math.max(days, 90), force },
+      });
+      if (error) throw error;
+      const d = data as { synced: number; skipped: number; scanned: number };
+      toast.success(`Synced ${d.synced} of ${d.scanned} invoices${d.skipped ? ` (${d.skipped} skipped)` : ''}`);
+      await load();
+    } catch (e: any) {
+      toast.error(e?.message || 'Failed to sync Stripe fees');
+    } finally {
+      setSyncing(false);
+    }
+  };
 
   const fmt = (n: number) =>
     '$' + n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -247,6 +277,17 @@ export default function AdminReports() {
               className="w-24 h-9"
             />
           </div>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            disabled={syncing}
+            onClick={() => syncStripeFees(false)}
+            title="Pull actual Stripe processing fees for paid invoices"
+          >
+            {syncing ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <RefreshCw className="h-4 w-4 mr-2" />}
+            Sync Stripe fees
+          </Button>
         </div>
       </div>
 
@@ -265,7 +306,8 @@ export default function AdminReports() {
         Gross profit = gross revenue − cost of goods. Net profit = gross profit − cost of employees − Stripe fees.
         Employee cost uses each technician's per-employee hourly rate from the Employees tab × labor hours billed on the
         estimate. Falls back to clock time and the default rate (${defaultRate.toFixed(2)}/hr) when no employee record
-        exists. Stripe fees are estimated at 2.9% + $0.30 per paid invoice processed through Stripe.
+        exists. Stripe fees use the actual amount Stripe charged per payment when synced; otherwise an estimate of
+        2.9% + $0.30 is used as a fallback. Click "Sync Stripe fees" to refresh actual amounts.
       </p>
       <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
         <KPI label="Gross Revenue" value={fmt(totals.revenue)} />
@@ -315,7 +357,10 @@ export default function AdminReports() {
                       {fmt(r.grossProfit)}
                     </TableCell>
                     <TableCell className="text-right">{fmt(r.employeeCost)}</TableCell>
-                    <TableCell className="text-right">{fmt(r.stripeFee)}</TableCell>
+                    <TableCell className="text-right" title={r.stripeFeeIsActual ? 'Actual fee from Stripe' : 'Estimated (not yet synced)'}>
+                      {fmt(r.stripeFee)}
+                      {!r.stripeFeeIsActual && r.stripeFee > 0 && <span className="text-muted-foreground ml-1">~</span>}
+                    </TableCell>
                     <TableCell className={`text-right font-semibold ${r.netProfit < 0 ? 'text-destructive' : 'text-primary'}`}>
                       {fmt(r.netProfit)}
                     </TableCell>
