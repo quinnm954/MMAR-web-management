@@ -269,14 +269,35 @@ const EstimateApproval = () => {
           {est.status === 'declined' && <span className="text-muted-foreground">This estimate was declined.</span>}
         </div>
       )}
-      {submitted && est.status !== 'declined' && (
+      {locked && (
         <div className="mt-4 flex flex-col items-center gap-2">
-          <Button asChild>
-            <Link to="/portal/estimates">Return to your portal</Link>
+          {est.status !== 'declined' && (
+            <Button asChild>
+              <Link to="/portal/estimates">Return to your portal</Link>
+            </Button>
+          )}
+          <Button variant="outline" size="sm" onClick={() => setEditing(true)}>
+            Change my decision
           </Button>
           {isCustomer && redirectIn !== null && redirectIn > 0 && (
             <p className="text-xs text-muted-foreground">Redirecting in {redirectIn}s…</p>
           )}
+        </div>
+      )}
+
+      {decisionLogs.length > 0 && (
+        <div className="mt-6 pt-4 border-t border-border">
+          <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2">Decision history</div>
+          <ul className="space-y-1.5 text-xs">
+            {decisionLogs.map((l) => (
+              <li key={l.id} className="flex flex-wrap items-center gap-2 text-muted-foreground">
+                <span className="font-mono">{new Date(l.created_at).toLocaleString()}</span>
+                <Badge variant="outline" className="uppercase text-[10px]">{l.status.replace('_', ' ')}</Badge>
+                {l.requested_date && <span>· requested {l.requested_date}{l.requested_time_window ? ` (${l.requested_time_window})` : ''}</span>}
+                {l.decline_reason && <span className="italic">· "{l.decline_reason}"</span>}
+              </li>
+            ))}
+          </ul>
         </div>
       )}
     </BrandedDocLayout>
