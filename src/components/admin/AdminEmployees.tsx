@@ -28,6 +28,15 @@ type Employee = {
 };
 
 const TYPES = ['technician', 'service_advisor', 'manager', 'parts', 'admin', 'other'];
+// Maps employee_type -> app_role enum value. Types not in this map cannot
+// have a login account provisioned (no corresponding role exists).
+const TYPE_TO_ROLE: Record<string, string> = {
+  technician: 'technician',
+  service_advisor: 'service_advisor',
+  manager: 'manager',
+  parts: 'parts',
+  admin: 'admin',
+};
 const PAY_BASIS = [
   { value: 'labor_hours', label: 'Per Labor Hour (from estimate)' },
   { value: 'hourly_clock', label: 'Hourly (clock in/out)' },
