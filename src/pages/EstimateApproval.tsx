@@ -83,6 +83,22 @@ const EstimateApproval = () => {
     if (error) return toast.error('Could not submit. Please contact us.');
     setEst({ ...est, ...update });
     toast.success(status === 'declined' ? 'Response recorded' : 'Estimate signed!');
+
+    // If signed in as the customer, auto-redirect back to portal
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user && user.id === est.customer_id) {
+      setIsCustomer(true);
+      let n = 5;
+      setRedirectIn(n);
+      const iv = setInterval(() => {
+        n -= 1;
+        setRedirectIn(n);
+        if (n <= 0) {
+          clearInterval(iv);
+          navigate('/portal/estimates');
+        }
+      }, 1000);
+    }
   };
 
   if (loading) return <div className="min-h-screen flex items-center justify-center"><Loader2 className="animate-spin" /></div>;
