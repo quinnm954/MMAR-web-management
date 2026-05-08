@@ -91,7 +91,6 @@ const AdminEstimates = () => {
       const ex = data?.extracted;
       if (!ex) throw new Error('Nothing extracted');
 
-      // Try to match an existing customer by email (case-insensitive)
       let matchedCustomer: any = null;
       if (ex.customer_email) {
         matchedCustomer = customers.find(c => c.email?.toLowerCase() === ex.customer_email.toLowerCase());
@@ -101,15 +100,13 @@ const AdminEstimates = () => {
       }
 
       let matchedVehicle: any = null;
-      if (matchedCustomer) {
+      if (matchedCustomer && ex.vehicle_make && ex.vehicle_model) {
         const vs = vehicles.filter(v => v.owner_id === matchedCustomer.id);
-        if (ex.vehicle_make && ex.vehicle_model) {
-          matchedVehicle = vs.find(v =>
-            v.make?.toLowerCase() === ex.vehicle_make.toLowerCase() &&
-            v.model?.toLowerCase() === ex.vehicle_model.toLowerCase() &&
-            (!ex.vehicle_year || v.year === ex.vehicle_year)
-          );
-        }
+        matchedVehicle = vs.find(v =>
+          v.make?.toLowerCase() === ex.vehicle_make.toLowerCase() &&
+          v.model?.toLowerCase() === ex.vehicle_model.toLowerCase() &&
+          (!ex.vehicle_year || v.year === ex.vehicle_year)
+        );
       }
 
       const lines: LineItem[] = (ex.line_items || []).map((li: any) => ({
@@ -120,39 +117,43 @@ const AdminEstimates = () => {
         labor_hours: Number(li.labor_hours) || 0,
       }));
 
-      const subtotal = lines.reduce((s, i) => s + i.amount, 0);
-      const shop = Math.min(subtotal * (settings?.shop_supplies_pct ?? 0.05), settings?.shop_supplies_max ?? 50);
-      const tax = (subtotal + shop) * (settings?.tax_rate ?? 0.07);
-      const valid_until = settings ? new Date(Date.now() + (settings.estimate_valid_days || 14) * 86400000).toISOString().slice(0, 10) : null;
-
-      const notesParts: string[] = [];
-      if (ex.notes) notesParts.push(ex.notes);
-      if (!matchedCustomer && ex.customer_name) {
-        notesParts.push(`Imported customer: ${ex.customer_name}${ex.customer_email ? ' / ' + ex.customer_email : ''}${ex.customer_phone ? ' / ' + ex.customer_phone : ''}`);
-      }
-      if (!matchedVehicle && (ex.vehicle_make || ex.vehicle_model)) {
-        notesParts.push(`Imported vehicle: ${ex.vehicle_year ?? ''} ${ex.vehicle_make ?? ''} ${ex.vehicle_model ?? ''}${ex.vehicle_vin ? ' VIN ' + ex.vehicle_vin : ''}`.trim());
-      }
-
-      setEditing({
-        status: 'draft',
-        customer_id: matchedCustomer?.id ?? null,
-        vehicle_id: matchedVehicle?.id ?? null,
-        line_items: lines,
-        subtotal,
-        shop_supplies: shop,
-        tax,
-        total: subtotal + shop + tax,
-        notes: notesParts.join('\n') || null,
-        valid_until,
-      });
-      toast.success(matchedCustomer ? 'PDF imported — review and save' : 'PDF imported — pick a customer to save');
+      setPreview({ extracted: ex, matchedCustomer, matchedVehicle, lines });
     } catch (e: any) {
       toast.error(e.message || 'Could not parse PDF');
     } finally {
       setImporting(false);
       if (fileRef.current) fileRef.current.value = '';
     }
+  };
+
+  const confirmImport = () => {
+    if (!preview) return;
+    const { extracted: ex, matchedCustomer, matchedVehicle, lines } = preview;
+    const subtotal = lines.reduce((s: number, i: LineItem) => s + i.amount, 0);
+    const shop = Math.min(subtotal * (settings?.shop_supplies_pct ?? 0.05), settings?.shop_supplies_max ?? 50);
+    const tax = (subtotal + shop) * (settings?.tax_rate ?? 0.07);
+    const valid_until = settings ? new Date(Date.now() + (settings.estimate_valid_days || 14) * 86400000).toISOString().slice(0, 10) : null;
+
+    const notesParts: string[] = [];
+    if (ex.notes) notesParts.push(ex.notes);
+    if (!matchedCustomer && ex.customer_name) {
+      notesParts.push(`Imported customer: ${ex.customer_name}${ex.customer_email ? ' / ' + ex.customer_email : ''}${ex.customer_phone ? ' / ' + ex.customer_phone : ''}`);
+    }
+    if (!matchedVehicle && (ex.vehicle_make || ex.vehicle_model)) {
+      notesParts.push(`Imported vehicle: ${ex.vehicle_year ?? ''} ${ex.vehicle_make ?? ''} ${ex.vehicle_model ?? ''}${ex.vehicle_vin ? ' VIN ' + ex.vehicle_vin : ''}`.trim());
+    }
+
+    setEditing({
+      status: 'draft',
+      customer_id: matchedCustomer?.id ?? null,
+      vehicle_id: matchedVehicle?.id ?? null,
+      line_items: lines,
+      subtotal, shop_supplies: shop, tax, total: subtotal + shop + tax,
+      notes: notesParts.join('\n') || null,
+      valid_until,
+    });
+    setPreview(null);
+    toast.success(matchedCustomer ? 'Review and save the estimate' : 'Pick a customer to save');
   };
 
   const recalc = (li: LineItem[]) => {
