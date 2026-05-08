@@ -182,7 +182,11 @@ export default function AdminReports() {
         const employeeCost = laborHours * techRate;
         const revenueRow = Number(inv.total || 0);
         const hasStripe = Boolean(inv.stripe_session_id || inv.stripe_payment_intent_id);
-        const stripeFee = stripeFeeFor(revenueRow, inv.status === 'paid', hasStripe);
+        const isPaid = inv.status === 'paid';
+        const actualFee = inv.stripe_fee != null ? Number(inv.stripe_fee) : null;
+        const stripeFee = actualFee != null
+          ? actualFee
+          : estimatedStripeFee(revenueRow, isPaid, hasStripe);
         const grossProfit = revenueRow - cogs;
         const netProfit = grossProfit - employeeCost - stripeFee;
         const cust = customerMap.get(inv.customer_id);
@@ -197,6 +201,7 @@ export default function AdminReports() {
           cogs,
           employeeCost,
           stripeFee,
+          stripeFeeIsActual: actualFee != null,
           grossProfit,
           netProfit,
         };
