@@ -4,7 +4,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { LogOut, FileText, ShieldCheck, Users, CreditCard, Calendar, ClipboardList, Receipt, Wrench, Mail, FileSpreadsheet, ClipboardCheck, Package, Settings, KanbanSquare, Clock, BarChart3, MessageSquare, Car, AlertTriangle, FileDown, Activity, History } from 'lucide-react';
+import { LogOut, FileText, ShieldCheck, Users, CreditCard, Calendar, ClipboardList, Receipt, Wrench, Mail, FileSpreadsheet, ClipboardCheck, Package, Settings, KanbanSquare, Clock, BarChart3, Share2, Car, AlertTriangle, FileDown, Activity, History } from 'lucide-react';
 import AdminAuditLog from '@/components/admin/AdminAuditLog';
 import AdminRoles from '@/components/admin/AdminRoles';
 import FinancingContractsTable from '@/components/admin/FinancingContractsTable';
@@ -22,7 +22,7 @@ import AdminShopSettings from '@/components/admin/AdminShopSettings';
 import AdminKanban from '@/components/admin/AdminKanban';
 import AdminTimeTracking from '@/components/admin/AdminTimeTracking';
 import AdminReports from '@/components/admin/AdminReports';
-import AdminSMS from '@/components/admin/AdminSMS';
+import AdminCustomerShare from '@/components/admin/AdminCustomerShare';
 import AdminGarage from '@/components/admin/AdminGarage';
 import AdminDeclinedWork from '@/components/admin/AdminDeclinedWork';
 import AdminQuickBooksExport from '@/components/admin/AdminQuickBooksExport';
@@ -121,7 +121,7 @@ const AdminDashboard = () => {
             { value: 'catalog', label: 'Catalog', icon: Package, roles: PARTS, content: <AdminCatalog /> },
             { value: 'time', label: 'Time', icon: Clock, roles: ADMIN_ONLY, content: <AdminTimeTracking /> },
             { value: 'productivity', label: 'Productivity', icon: Activity, roles: ADMIN_ONLY, content: <AdminTechProductivity /> },
-            { value: 'sms', label: 'SMS', icon: MessageSquare, roles: ADVISOR, content: <AdminSMS /> },
+            { value: 'share', label: 'Share', icon: Share2, roles: ADVISOR, content: <AdminCustomerShare /> },
             { value: 'declined', label: 'Declined', icon: AlertTriangle, roles: ADVISOR, content: <AdminDeclinedWork /> },
             { value: 'quickbooks', label: 'QuickBooks', icon: FileDown, roles: ADMIN_ONLY, content: <AdminQuickBooksExport /> },
             { value: 'financing', label: 'Financing', icon: FileText, roles: ADMIN_ONLY, content: <FinancingContractsTable data={contracts} onRefresh={reloadFinancing} /> },
