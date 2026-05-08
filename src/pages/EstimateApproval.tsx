@@ -93,7 +93,11 @@ const EstimateApproval = () => {
       status,
       ...(status === 'declined' ? { declined_at: new Date().toISOString(), decline_reason: reason || null } : { approved_at: new Date().toISOString() }),
     });
-    toast.success(status === 'declined' ? 'Response recorded' : 'Estimate signed!');
+    toast.success(status === 'declined' ? 'Response recorded' : editing ? 'Decision updated!' : 'Estimate signed!');
+    setEditing(false);
+    // Refresh decision history
+    const { data: refreshed } = await supabase.rpc('get_estimate_by_token', { _token: token! });
+    setDecisionLogs(((refreshed as any)?.decision_logs as any[]) ?? []);
 
     // If signed in as the customer, auto-redirect back to portal
     const { data: { user } } = await supabase.auth.getUser();
