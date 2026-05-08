@@ -51,6 +51,7 @@ import Login from "./pages/Login";
 import SetPassword from "./pages/SetPassword";
 import SharedCustomerSummary from "./pages/SharedCustomerSummary";
 import MmarCare from "./pages/MmarCare";
+import Fleet from "./pages/Fleet";
 
 const queryClient = new QueryClient();
 
