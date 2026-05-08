@@ -16,7 +16,8 @@ import { format } from 'date-fns';
 import { shareLink } from '@/lib/share';
 import { startRepairOrderFromEstimate } from '@/lib/repairOrders';
 
-interface LineItem { description: string; quantity: number; unit_price: number; amount: number; catalog_item_id?: string; labor_hours?: number; }
+interface LineItem { description: string; quantity: number; unit_price: number; amount: number; catalog_item_id?: string; labor_hours?: number; kind?: 'part' | 'labor' | 'fee'; unit_cost?: number; }
+const PARTS_MARKUP = 1.30; // Imported PDF parts arrive already marked up 30% — divide to recover cost
 interface Estimate {
   id: string;
   customer_id: string;
