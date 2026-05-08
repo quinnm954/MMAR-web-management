@@ -220,7 +220,34 @@ const FinancingContractsTable = ({ data, onRefresh }: FinancingContractsTablePro
                     {format(new Date(contract.agreement_date), 'MMM d, yyyy')}
                   </TableCell>
                   <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
+                    <div className="flex justify-end gap-1 flex-wrap">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        title="Copy down-payment link"
+                        disabled={linkBusy?.startsWith(contract.id)}
+                        onClick={() => generateLink(contract, 'financing_down_payment', false)}
+                      >
+                        <LinkIcon className="h-3.5 w-3.5 mr-1" />Down
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        title="Copy monthly payment link"
+                        disabled={linkBusy?.startsWith(contract.id)}
+                        onClick={() => generateLink(contract, 'financing_monthly', false)}
+                      >
+                        <LinkIcon className="h-3.5 w-3.5 mr-1" />Monthly
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        title="Text monthly payment link to customer"
+                        disabled={linkBusy?.startsWith(contract.id)}
+                        onClick={() => generateLink(contract, 'financing_monthly', true)}
+                      >
+                        <MessageSquare className="h-4 w-4" />
+                      </Button>
                       <Button
                         variant="ghost"
                         size="sm"
