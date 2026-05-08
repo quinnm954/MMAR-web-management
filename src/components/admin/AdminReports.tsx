@@ -288,15 +288,16 @@ export default function AdminReports() {
                 <TableHead className="text-right">Labor (hrs)</TableHead>
                 <TableHead className="text-right">Revenue</TableHead>
                 <TableHead className="text-right">COGS</TableHead>
-                <TableHead className="text-right">Employee Cost</TableHead>
                 <TableHead className="text-right">Gross Profit</TableHead>
+                <TableHead className="text-right">Employee Cost</TableHead>
+                <TableHead className="text-right">Stripe Fees</TableHead>
                 <TableHead className="text-right">Net Profit</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {profitRows.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={10} className="text-center text-muted-foreground py-6">
+                  <TableCell colSpan={11} className="text-center text-muted-foreground py-6">
                     No paid invoices in this window.
                   </TableCell>
                 </TableRow>
@@ -310,10 +311,11 @@ export default function AdminReports() {
                     <TableCell className="text-right">{r.laborHours.toFixed(2)}</TableCell>
                     <TableCell className="text-right">{fmt(r.revenue)}</TableCell>
                     <TableCell className="text-right">{fmt(r.cogs)}</TableCell>
-                    <TableCell className="text-right">{fmt(r.employeeCost)}</TableCell>
                     <TableCell className={`text-right ${r.grossProfit < 0 ? 'text-destructive' : ''}`}>
                       {fmt(r.grossProfit)}
                     </TableCell>
+                    <TableCell className="text-right">{fmt(r.employeeCost)}</TableCell>
+                    <TableCell className="text-right">{fmt(r.stripeFee)}</TableCell>
                     <TableCell className={`text-right font-semibold ${r.netProfit < 0 ? 'text-destructive' : 'text-primary'}`}>
                       {fmt(r.netProfit)}
                     </TableCell>
