@@ -48,6 +48,7 @@ const AdminEstimates = () => {
   const [settings, setSettings] = useState<any>(null);
   const [editing, setEditing] = useState<any | null>(null);
   const [importing, setImporting] = useState(false);
+  const [preview, setPreview] = useState<any | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const load = async () => {
@@ -90,7 +91,6 @@ const AdminEstimates = () => {
       const ex = data?.extracted;
       if (!ex) throw new Error('Nothing extracted');
 
-      // Try to match an existing customer by email (case-insensitive)
       let matchedCustomer: any = null;
       if (ex.customer_email) {
         matchedCustomer = customers.find(c => c.email?.toLowerCase() === ex.customer_email.toLowerCase());
@@ -100,15 +100,13 @@ const AdminEstimates = () => {
       }
 
       let matchedVehicle: any = null;
-      if (matchedCustomer) {
+      if (matchedCustomer && ex.vehicle_make && ex.vehicle_model) {
         const vs = vehicles.filter(v => v.owner_id === matchedCustomer.id);
-        if (ex.vehicle_make && ex.vehicle_model) {
-          matchedVehicle = vs.find(v =>
-            v.make?.toLowerCase() === ex.vehicle_make.toLowerCase() &&
-            v.model?.toLowerCase() === ex.vehicle_model.toLowerCase() &&
-            (!ex.vehicle_year || v.year === ex.vehicle_year)
-          );
-        }
+        matchedVehicle = vs.find(v =>
+          v.make?.toLowerCase() === ex.vehicle_make.toLowerCase() &&
+          v.model?.toLowerCase() === ex.vehicle_model.toLowerCase() &&
+          (!ex.vehicle_year || v.year === ex.vehicle_year)
+        );
       }
 
       const lines: LineItem[] = (ex.line_items || []).map((li: any) => ({
@@ -119,39 +117,43 @@ const AdminEstimates = () => {
         labor_hours: Number(li.labor_hours) || 0,
       }));
 
-      const subtotal = lines.reduce((s, i) => s + i.amount, 0);
-      const shop = Math.min(subtotal * (settings?.shop_supplies_pct ?? 0.05), settings?.shop_supplies_max ?? 50);
-      const tax = (subtotal + shop) * (settings?.tax_rate ?? 0.07);
-      const valid_until = settings ? new Date(Date.now() + (settings.estimate_valid_days || 14) * 86400000).toISOString().slice(0, 10) : null;
-
-      const notesParts: string[] = [];
-      if (ex.notes) notesParts.push(ex.notes);
-      if (!matchedCustomer && ex.customer_name) {
-        notesParts.push(`Imported customer: ${ex.customer_name}${ex.customer_email ? ' / ' + ex.customer_email : ''}${ex.customer_phone ? ' / ' + ex.customer_phone : ''}`);
-      }
-      if (!matchedVehicle && (ex.vehicle_make || ex.vehicle_model)) {
-        notesParts.push(`Imported vehicle: ${ex.vehicle_year ?? ''} ${ex.vehicle_make ?? ''} ${ex.vehicle_model ?? ''}${ex.vehicle_vin ? ' VIN ' + ex.vehicle_vin : ''}`.trim());
-      }
-
-      setEditing({
-        status: 'draft',
-        customer_id: matchedCustomer?.id ?? null,
-        vehicle_id: matchedVehicle?.id ?? null,
-        line_items: lines,
-        subtotal,
-        shop_supplies: shop,
-        tax,
-        total: subtotal + shop + tax,
-        notes: notesParts.join('\n') || null,
-        valid_until,
-      });
-      toast.success(matchedCustomer ? 'PDF imported — review and save' : 'PDF imported — pick a customer to save');
+      setPreview({ extracted: ex, matchedCustomer, matchedVehicle, lines });
     } catch (e: any) {
       toast.error(e.message || 'Could not parse PDF');
     } finally {
       setImporting(false);
       if (fileRef.current) fileRef.current.value = '';
     }
+  };
+
+  const confirmImport = () => {
+    if (!preview) return;
+    const { extracted: ex, matchedCustomer, matchedVehicle, lines } = preview;
+    const subtotal = lines.reduce((s: number, i: LineItem) => s + i.amount, 0);
+    const shop = Math.min(subtotal * (settings?.shop_supplies_pct ?? 0.05), settings?.shop_supplies_max ?? 50);
+    const tax = (subtotal + shop) * (settings?.tax_rate ?? 0.07);
+    const valid_until = settings ? new Date(Date.now() + (settings.estimate_valid_days || 14) * 86400000).toISOString().slice(0, 10) : null;
+
+    const notesParts: string[] = [];
+    if (ex.notes) notesParts.push(ex.notes);
+    if (!matchedCustomer && ex.customer_name) {
+      notesParts.push(`Imported customer: ${ex.customer_name}${ex.customer_email ? ' / ' + ex.customer_email : ''}${ex.customer_phone ? ' / ' + ex.customer_phone : ''}`);
+    }
+    if (!matchedVehicle && (ex.vehicle_make || ex.vehicle_model)) {
+      notesParts.push(`Imported vehicle: ${ex.vehicle_year ?? ''} ${ex.vehicle_make ?? ''} ${ex.vehicle_model ?? ''}${ex.vehicle_vin ? ' VIN ' + ex.vehicle_vin : ''}`.trim());
+    }
+
+    setEditing({
+      status: 'draft',
+      customer_id: matchedCustomer?.id ?? null,
+      vehicle_id: matchedVehicle?.id ?? null,
+      line_items: lines,
+      subtotal, shop_supplies: shop, tax, total: subtotal + shop + tax,
+      notes: notesParts.join('\n') || null,
+      valid_until,
+    });
+    setPreview(null);
+    toast.success(matchedCustomer ? 'Review and save the estimate' : 'Pick a customer to save');
   };
 
   const recalc = (li: LineItem[]) => {
@@ -363,6 +365,95 @@ const AdminEstimates = () => {
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditing(null)}>Cancel</Button>
             <Button onClick={save}>Save</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!preview} onOpenChange={o => !o && setPreview(null)}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader><DialogTitle>Confirm Imported Quote</DialogTitle></DialogHeader>
+          {preview && (
+            <div className="space-y-4 text-sm">
+              <div>
+                <div className="font-semibold mb-1">Customer</div>
+                {preview.matchedCustomer ? (
+                  <div className="flex items-center gap-2">
+                    <Badge className="bg-green-500/15 text-green-600 border-green-500/30" variant="outline">Matched</Badge>
+                    <span>{preview.matchedCustomer.full_name || preview.matchedCustomer.email}</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <Badge className="bg-yellow-500/15 text-yellow-700 border-yellow-500/30" variant="outline">New</Badge>
+                    <span className="text-muted-foreground">
+                      {preview.extracted.customer_name || '—'}
+                      {preview.extracted.customer_email ? ` · ${preview.extracted.customer_email}` : ''}
+                      {preview.extracted.customer_phone ? ` · ${preview.extracted.customer_phone}` : ''}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <div className="font-semibold mb-1">Vehicle</div>
+                {preview.matchedVehicle ? (
+                  <div className="flex items-center gap-2">
+                    <Badge className="bg-green-500/15 text-green-600 border-green-500/30" variant="outline">Matched</Badge>
+                    <span>{preview.matchedVehicle.year} {preview.matchedVehicle.make} {preview.matchedVehicle.model}</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <Badge className="bg-yellow-500/15 text-yellow-700 border-yellow-500/30" variant="outline">{preview.matchedCustomer ? 'New' : 'Unmatched'}</Badge>
+                    <span className="text-muted-foreground">
+                      {preview.extracted.vehicle_year ?? ''} {preview.extracted.vehicle_make ?? ''} {preview.extracted.vehicle_model ?? '—'}
+                      {preview.extracted.vehicle_vin ? ` · VIN ${preview.extracted.vehicle_vin}` : ''}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <div className="font-semibold mb-1">Line Items ({preview.lines.length})</div>
+                <div className="border rounded">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Description</TableHead>
+                        <TableHead className="w-16 text-right">Qty</TableHead>
+                        <TableHead className="w-24 text-right">Unit</TableHead>
+                        <TableHead className="w-24 text-right">Amount</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {preview.lines.map((l: LineItem, i: number) => (
+                        <TableRow key={i}>
+                          <TableCell>{l.description}</TableCell>
+                          <TableCell className="text-right">{l.quantity}</TableCell>
+                          <TableCell className="text-right">${l.unit_price.toFixed(2)}</TableCell>
+                          <TableCell className="text-right">${l.amount.toFixed(2)}</TableCell>
+                        </TableRow>
+                      ))}
+                      {preview.lines.length === 0 && (
+                        <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground py-4">No items extracted</TableCell></TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
+                </div>
+                <div className="text-right font-semibold mt-2">
+                  Subtotal: ${preview.lines.reduce((s: number, i: LineItem) => s + i.amount, 0).toFixed(2)}
+                </div>
+              </div>
+
+              {preview.extracted.notes && (
+                <div>
+                  <div className="font-semibold mb-1">Notes</div>
+                  <div className="text-muted-foreground whitespace-pre-wrap">{preview.extracted.notes}</div>
+                </div>
+              )}
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setPreview(null)}>Cancel</Button>
+            <Button onClick={confirmImport}>Confirm & Open Editor</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
