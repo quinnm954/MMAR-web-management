@@ -164,16 +164,9 @@ const Navigation = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" asChild>
-                  <Link to="/mmar-care">
-                    <User className="w-4 h-4 mr-1" /> MMAR Care
-                  </Link>
-                </Button>
-                <Link to="/login" className="text-xs text-muted-foreground hover:text-primary underline-offset-2 hover:underline">
-                  Staff sign-in
-                </Link>
-              </div>
+              <Link to="/login" className="text-xs text-muted-foreground hover:text-primary underline-offset-2 hover:underline">
+                Staff sign-in
+              </Link>
             )}
 
             <Button variant="hero" size="default" asChild>
