@@ -67,14 +67,22 @@ const EstimateApproval = () => {
   const allDeclined = lines.length > 0 && lines.every((_, i) => decisions[i] === 'declined');
   const anyApproved = lines.some((_, i) => decisions[i] === 'approved');
 
-  const submit = async () => {
+  const getAllDeclinedDecisions = () => {
+    const all: Record<number, 'declined'> = {};
+    lines.forEach((_, i) => (all[i] = 'declined'));
+    return all;
+  };
+
+  const submit = async (decisionOverride = decisions) => {
     if (!signature) return toast.error('Please sign to confirm your decision');
-    const willApprove = !allDeclined;
+    const nextAllDeclined = lines.length > 0 && lines.every((_, i) => decisionOverride[i] === 'declined');
+    const nextAnyApproved = lines.some((_, i) => decisionOverride[i] === 'approved');
+    const willApprove = !nextAllDeclined;
     if (willApprove && !requestedDate) return toast.error('Please select a preferred service date');
     setWorking(true);
 
-    const updatedLines = lines.map((l, i) => ({ ...l, status: decisions[i] }));
-    const status = allDeclined ? 'declined' : anyApproved && lines.some((_, i) => decisions[i] === 'declined') ? 'partially_approved' : 'approved';
+    const updatedLines = lines.map((l, i) => ({ ...l, status: decisionOverride[i] }));
+    const status = nextAllDeclined ? 'declined' : nextAnyApproved && lines.some((_, i) => decisionOverride[i] === 'declined') ? 'partially_approved' : 'approved';
 
     const { error } = await supabase.rpc('submit_estimate_decision', {
       _token: token!,
@@ -116,6 +124,17 @@ const EstimateApproval = () => {
         }
       }, 1000);
     }
+  };
+
+  const declineEntireEstimate = () => {
+    const all = getAllDeclinedDecisions();
+    setDecisions(all);
+    setRequestedDate(undefined);
+    if (!signature) {
+      toast.message('All items marked declined. Please sign, then submit the decline.');
+      return;
+    }
+    submit(all);
   };
 
   if (loading) return <div className="min-h-screen flex items-center justify-center"><Loader2 className="animate-spin" /></div>;
@@ -168,7 +187,7 @@ const EstimateApproval = () => {
             <label
               key={i}
               className={`flex items-start gap-3 p-3 rounded border transition-colors cursor-pointer ${
-                submitted ? 'cursor-default' : approved ? 'border-primary/50 bg-primary/5' : 'border-border bg-muted/20 opacity-60'
+                locked ? 'cursor-default' : approved ? 'border-primary/50 bg-primary/5' : 'border-border bg-muted/20 opacity-60'
               }`}
             >
               <Checkbox
@@ -250,9 +269,13 @@ const EstimateApproval = () => {
           <div>
             <div className="text-sm font-medium mb-2">Authorization Signature</div>
             <SignaturePad onChange={setSignature} />
-            <p className="text-[11px] text-muted-foreground mt-1">By signing, you authorize {`Mike's Mobile Auto Repair`} to perform the approved work.</p>
+            <p className="text-[11px] text-muted-foreground mt-1">
+              {allDeclined
+                ? 'By signing, you confirm your decision to decline this estimate.'
+                : `By signing, you authorize Mike's Mobile Auto Repair to perform the approved work.`}
+            </p>
           </div>
-          <Button onClick={submit} disabled={working || !signature || (!allDeclined && !requestedDate)} className="w-full" variant="hero">
+          <Button onClick={() => submit()} disabled={working || !signature || (!allDeclined && !requestedDate)} className="w-full" variant="hero">
             {working ? <Loader2 className="h-4 w-4 animate-spin" /> : allDeclined ? <><XCircle className="h-4 w-4 mr-1" /> Decline All</> : <><CheckCircle2 className="h-4 w-4 mr-1" /> Sign &amp; Approve</>}
           </Button>
           {!allDeclined && (
@@ -260,12 +283,7 @@ const EstimateApproval = () => {
               type="button"
               variant="outline"
               className="w-full text-destructive hover:text-destructive"
-              onClick={() => {
-                const all: Record<number, 'declined'> = {};
-                lines.forEach((_, i) => (all[i] = 'declined'));
-                setDecisions(all);
-                setRequestedDate(undefined);
-              }}
+              onClick={declineEntireEstimate}
             >
               <XCircle className="h-4 w-4 mr-1" /> Decline entire estimate
             </Button>
