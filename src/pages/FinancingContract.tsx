@@ -10,6 +10,7 @@ import mmarLogo from "@/assets/mmar-logo.jpeg";
 import SignaturePad from "@/components/financing/SignaturePad";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import EstimateSummaryCard from "@/components/EstimateSummaryCard";
 
 interface EditableContractData {
   clientName: string;
@@ -490,6 +491,11 @@ const FinancingContract = () => {
           <ArrowLeft className="w-4 h-4" />
           Back to Home
         </Link>
+
+        {/* Linked estimate summary (when ?estimate= or ?token= present) */}
+        <div className="print:hidden mb-6">
+          <EstimateSummaryCard />
+        </div>
 
         {/* Form Inputs - Hidden in print */}
         <div className="print:hidden space-y-6 mb-8">
