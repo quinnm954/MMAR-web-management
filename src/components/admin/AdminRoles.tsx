@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2, ShieldCheck, UserPlus, X, Search } from "lucide-react";
 import { toast } from "sonner";
+import { useAuth } from "@/hooks/useAuth";
 
 const ALL_ROLES = ["admin", "manager", "service_advisor", "technician", "parts", "customer"] as const;
 type Role = typeof ALL_ROLES[number];
