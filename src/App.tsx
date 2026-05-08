@@ -51,6 +51,7 @@ import Login from "./pages/Login";
 import SetPassword from "./pages/SetPassword";
 import SharedCustomerSummary from "./pages/SharedCustomerSummary";
 import MmarCare from "./pages/MmarCare";
+import Fleet from "./pages/Fleet";
 
 const queryClient = new QueryClient();
 
@@ -80,6 +81,7 @@ const App = () => (
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/memberships" element={<Memberships />} />
             <Route path="/mmar-care" element={<MmarCare />} />
+            <Route path="/fleet" element={<Fleet />} />
             <Route path="/portal/login" element={<PortalLogin />} />
             <Route path="/portal/signup" element={<PortalSignup />} />
             <Route path="/portal/membership-signup" element={<MembershipSignup />} />

@@ -134,6 +134,10 @@ const Navigation = () => {
               Memberships
             </NavLink>
 
+            <NavLink to="/fleet" className={({ isActive }) => `px-3 py-2 font-medium transition-colors ${isActive ? "text-primary" : "text-muted-foreground hover:text-primary"}`}>
+              Fleet
+            </NavLink>
+
             <NavLink to="/contact" className={({ isActive }) => `px-3 py-2 font-medium transition-colors ${isActive ? "text-primary" : "text-muted-foreground hover:text-primary"}`}>
               Contact
             </NavLink>
@@ -236,6 +240,7 @@ const Navigation = () => {
                 <User className="w-4 h-4" /> MMAR Care
               </Link>
               <Link to="/memberships" onClick={close} className="text-accent hover:text-accent/80 font-semibold py-3 px-2 rounded-lg">Memberships</Link>
+              <Link to="/fleet" onClick={close} className="text-foreground hover:text-primary font-medium py-3 px-2 rounded-lg">Fleet (5+ Vehicles)</Link>
               <Link to="/contact" onClick={close} className="text-foreground hover:text-primary font-medium py-3 px-2 rounded-lg">Contact</Link>
               {user ? (
                 <>
