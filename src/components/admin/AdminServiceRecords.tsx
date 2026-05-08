@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Loader2, Plus, Wrench } from "lucide-react";
 import { toast } from "sonner";
+import DeleteButton from "@/components/admin/DeleteButton";
 
 interface Customer { id: string; full_name: string | null; email: string | null }
 interface Vehicle { id: string; owner_id: string; year: number | null; make: string | null; model: string | null }
