@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2, MapPin, Calendar } from "lucide-react";
 import { toast } from "sonner";
+import DeleteButton from "@/components/admin/DeleteButton";
 
 interface Row {
   id: string;
@@ -178,6 +179,14 @@ const AdminAppointments = () => {
                   {techs.map((t) => <SelectItem key={t.user_id} value={t.user_id}>{t.full_name || t.email}</SelectItem>)}
                 </SelectContent>
               </Select>
+            </div>
+            <div className="flex justify-end pt-2 border-t border-border">
+              <DeleteButton
+                table="appointments"
+                id={r.id}
+                description="Delete this appointment? Linked service records and invoices will remain."
+                onDeleted={load}
+              />
             </div>
           </CardContent>
         </Card>

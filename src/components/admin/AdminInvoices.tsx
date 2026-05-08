@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Loader2, Plus, Receipt, MessageSquare, Link2, Share2, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { shareLink } from "@/lib/share";
+import DeleteButton from "@/components/admin/DeleteButton";
 
 interface Customer { id: string; full_name: string | null; email: string | null }
 interface Invoice {
@@ -241,6 +242,13 @@ const AdminInvoices = () => {
                       <SelectContent>{STATUSES.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
                     </Select>
                     <Badge className={statusColor(i.status)}>{i.status}</Badge>
+                    <DeleteButton
+                      table="invoices"
+                      id={i.id}
+                      size="icon"
+                      description={`Delete invoice ${i.invoice_number ?? ""}? This will not refund any payments.`}
+                      onDeleted={load}
+                    />
                   </div>
                 </div>
                 {replies.length > 0 && (
