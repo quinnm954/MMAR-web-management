@@ -1,27 +1,25 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth";
+import { Link } from "react-router-dom";
 import { lovable } from "@/integrations/lovable";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Loader2, Wrench } from "lucide-react";
+import { Loader2, Wrench, MailCheck } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import { z } from "zod";
 
 const schema = z.object({
   fullName: z.string().trim().min(2).max(100),
   email: z.string().trim().email().max(255),
-  password: z.string().min(8).max(72),
 });
 
 const PortalSignup = () => {
-  const [form, setForm] = useState({ fullName: "", email: "", password: "" });
+  const [form, setForm] = useState({ fullName: "", email: "" });
   const [busy, setBusy] = useState(false);
-  const { signUp } = useAuth();
-  const navigate = useNavigate();
+  const [sent, setSent] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,13 +29,25 @@ const PortalSignup = () => {
       return;
     }
     setBusy(true);
-    const { error } = await signUp(form.email, form.password, form.fullName);
+    // Passwordless signup: send a magic link. The user sets a password after first login.
+    const { error } = await supabase.auth.signInWithOtp({
+      email: form.email,
+      options: {
+        emailRedirectTo: `${window.location.origin}/portal/dashboard`,
+        shouldCreateUser: true,
+        data: {
+          full_name: form.fullName,
+          must_set_password: true,
+        },
+      },
+    });
     setBusy(false);
-    if (error) toast.error(error.message);
-    else {
-      toast.success("Account created! Check your email to verify.");
-      navigate("/portal/login");
+    if (error) {
+      toast.error(error.message);
+      return;
     }
+    setSent(true);
+    toast.success("Check your email for a sign-in link");
   };
 
   const handleGoogle = async () => {
@@ -62,36 +72,53 @@ const PortalSignup = () => {
               <Wrench className="h-6 w-6 text-primary" />
             </div>
             <CardTitle className="text-2xl">Create your account</CardTitle>
-            <CardDescription>Join MMAR Care</CardDescription>
+            <CardDescription>
+              Join MMAR Care — no password needed to sign up. We'll email you a secure link, and you'll set a password on your first sign-in.
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <Button onClick={handleGoogle} disabled={busy} variant="outline" className="w-full">
-              Continue with Google
-            </Button>
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center"><span className="w-full border-t" /></div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-card px-2 text-muted-foreground">or</span>
+            {sent ? (
+              <div className="text-center space-y-3 py-6">
+                <div className="mx-auto w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center">
+                  <MailCheck className="h-6 w-6 text-accent" />
+                </div>
+                <h3 className="font-semibold">Check your inbox</h3>
+                <p className="text-sm text-muted-foreground">
+                  We sent a sign-in link to <span className="font-medium text-foreground">{form.email}</span>. Open it to finish creating your account — you'll choose a password after the first sign-in.
+                </p>
+                <Button variant="outline" onClick={() => setSent(false)} className="w-full">
+                  Use a different email
+                </Button>
               </div>
-            </div>
-            <form onSubmit={handleSubmit} className="space-y-3">
-              <div>
-                <Label htmlFor="fullName">Full Name</Label>
-                <Input id="fullName" required value={form.fullName} onChange={(e) => setForm({ ...form, fullName: e.target.value })} />
-              </div>
-              <div>
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
-              </div>
-              <div>
-                <Label htmlFor="password">Password</Label>
-                <Input id="password" type="password" minLength={8} required value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} />
-                <p className="text-xs text-muted-foreground mt-1">At least 8 characters. Avoid common passwords — leaked passwords are blocked.</p>
-              </div>
-              <Button type="submit" variant="hero" className="w-full" disabled={busy}>
-                {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : "Create Account"}
-              </Button>
-            </form>
+            ) : (
+              <>
+                <Button onClick={handleGoogle} disabled={busy} variant="outline" className="w-full">
+                  Continue with Google
+                </Button>
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center"><span className="w-full border-t" /></div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-card px-2 text-muted-foreground">or</span>
+                  </div>
+                </div>
+                <form onSubmit={handleSubmit} className="space-y-3">
+                  <div>
+                    <Label htmlFor="fullName">Full Name</Label>
+                    <Input id="fullName" required value={form.fullName} onChange={(e) => setForm({ ...form, fullName: e.target.value })} />
+                  </div>
+                  <div>
+                    <Label htmlFor="email">Email</Label>
+                    <Input id="email" type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+                  </div>
+                  <Button type="submit" variant="hero" className="w-full" disabled={busy}>
+                    {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : "Email me a sign-in link"}
+                  </Button>
+                  <p className="text-xs text-muted-foreground text-center">
+                    You'll set your password after clicking the link.
+                  </p>
+                </form>
+              </>
+            )}
             <p className="text-sm text-center text-muted-foreground">
               Already have an account?{" "}
               <Link to="/portal/login" className="text-primary font-medium hover:underline">
