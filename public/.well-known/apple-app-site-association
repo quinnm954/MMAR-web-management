@@ -1,0 +1,23 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appIDs": ["TEAMID.app.lovable.6370c0499e634e0c894716857b255272"],
+        "components": [
+          { "/": "/portal/*", "comment": "Customer portal deep links" },
+          { "/": "/portal/appointments/*", "comment": "Appointment detail" },
+          { "/": "/portal/invoices/*", "comment": "Invoice detail" },
+          { "/": "/portal/estimates/*", "comment": "Estimate detail" },
+          { "/": "/portal/repair-orders/*", "comment": "Repair order detail" },
+          { "/": "/admin/*", "comment": "Admin / staff routes" },
+          { "/": "/tech/*", "comment": "Tech / advisor routes" },
+          { "/": "/mmar-care", "comment": "App landing page" }
+        ]
+      }
+    ]
+  },
+  "webcredentials": {
+    "apps": ["TEAMID.app.lovable.6370c0499e634e0c894716857b255272"]
+  }
+}
