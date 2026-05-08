@@ -1,0 +1,70 @@
+import { supabase } from '@/integrations/supabase/client';
+
+export type LineItem = { description: string; quantity: number; unit_price: number; amount: number };
+
+/**
+ * Move an approved estimate's appointment into active Repair Order state.
+ */
+export async function startRepairOrderFromEstimate(estimate: { id: string; appointment_id: string | null; status: string }) {
+  if (!estimate.appointment_id) {
+    throw new Error('This estimate is not linked to an appointment.');
+  }
+  if (estimate.status !== 'approved' && estimate.status !== 'partially_approved') {
+    throw new Error('Only approved estimates can start a Repair Order.');
+  }
+  const { error: aErr } = await supabase
+    .from('appointments')
+    .update({ status: 'in_progress', board_column: 'in_progress' })
+    .eq('id', estimate.appointment_id);
+  if (aErr) throw aErr;
+  const { error: eErr } = await supabase
+    .from('estimates')
+    .update({ status: 'converted' })
+    .eq('id', estimate.id);
+  if (eErr) throw eErr;
+  return estimate.appointment_id;
+}
+
+/**
+ * Generate an invoice for a Repair Order (appointment) from its approved estimate
+ * line items. Invoice creation happens via service_records → trigger create_invoice_from_service_record.
+ */
+export async function generateInvoiceForRepairOrder(opts: {
+  appointmentId: string;
+  customerId: string;
+  vehicleId: string | null;
+  serviceType: string;
+  approvedLineItems: LineItem[];
+  invoiceTotal: number;
+  mileage?: number | null;
+}) {
+  const { appointmentId, customerId, vehicleId, serviceType, approvedLineItems, invoiceTotal, mileage } = opts;
+  if (!vehicleId) throw new Error('Repair Order has no vehicle linked — add one before invoicing.');
+  if (invoiceTotal <= 0) throw new Error('Nothing approved to invoice.');
+
+  // 1. Insert a service record (the trigger create_invoice_from_service_record will issue an invoice)
+  const { data: sr, error: sErr } = await supabase
+    .from('service_records')
+    .insert({
+      appointment_id: appointmentId,
+      customer_id: customerId,
+      vehicle_id: vehicleId,
+      service_type: serviceType,
+      service_date: new Date().toISOString().slice(0, 10),
+      mileage_at_service: mileage ?? null,
+      labor_performed: approvedLineItems.map(l => `${l.quantity} × ${l.description}`).join('\n'),
+      parts_used: approvedLineItems as any,
+      invoice_total: invoiceTotal,
+    })
+    .select('id')
+    .single();
+  if (sErr) throw sErr;
+
+  // 2. Mark the appointment completed
+  await supabase
+    .from('appointments')
+    .update({ status: 'completed', board_column: 'completed' })
+    .eq('id', appointmentId);
+
+  return sr.id;
+}
