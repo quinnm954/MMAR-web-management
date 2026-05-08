@@ -98,6 +98,32 @@ const NativeBoot = () => {
     return () => remove?.();
   }, []);
 
+  // Universal Links (iOS) / App Links (Android): when the OS opens the app
+  // via an https://... link, route the in-app navigator to the matching path
+  // instead of letting the system browser take over.
+  useEffect(() => {
+    if (!isNative()) return;
+    let remove: (() => void) | undefined;
+    (async () => {
+      try {
+        const { App } = await import('@capacitor/app');
+        const handle = await App.addListener('appUrlOpen', ({ url }) => {
+          try {
+            const parsed = new URL(url);
+            const path = `${parsed.pathname}${parsed.search}${parsed.hash}` || '/';
+            // Mark as resolved so the boot redirect doesn't override the deep link
+            didBootRedirect.current = true;
+            navigate(path, { replace: false });
+          } catch {
+            // Not a parseable URL — ignore
+          }
+        });
+        remove = () => handle.remove();
+      } catch {}
+    })();
+    return () => remove?.();
+  }, [navigate]);
+
   return null;
 };
 
