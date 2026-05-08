@@ -33,6 +33,11 @@ const WarrantyPolicy = () => {
 
       {/* Policy Document */}
       <div className="container mx-auto px-4 py-8 max-w-4xl">
+        {/* Linked estimate summary (when ?estimate= or ?token= present) */}
+        <div className="print:hidden mb-6">
+          <EstimateSummaryCard />
+        </div>
+
         <div className="bg-card border border-border rounded-lg shadow-sm p-8 md:p-12 contract-document">
           {/* Header */}
           <div className="text-center border-b-2 border-primary pb-6 mb-8">
