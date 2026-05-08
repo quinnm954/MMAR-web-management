@@ -67,6 +67,39 @@ export default function RepairOrderDetail({ appointmentId, open, onClose }: Prop
         } else {
           setInvoices([]);
         }
+
+        // Load technicians (any user with technician role) for the assignment picker
+        const { data: techRoles } = await supabase
+          .from("user_roles")
+          .select("user_id")
+          .eq("role", "technician");
+        const techIds = Array.from(new Set((techRoles || []).map((t: any) => t.user_id)));
+        if (techIds.length) {
+          const { data: techProfs } = await supabase
+            .from("profiles")
+            .select("id, full_name, email")
+            .in("id", techIds);
+          const list = (techProfs || []).map((p: any) => ({ id: p.id, name: p.full_name || p.email || p.id.slice(0, 8) }));
+          setTechs(list);
+          setTechMap(Object.fromEntries(list.map((t) => [t.id, t.name])));
+        } else {
+          setTechs([]);
+          setTechMap({});
+        }
+
+        // Assignment history from audit logs
+        const { data: logs } = await supabase
+          .from("audit_logs")
+          .select("id, actor_email, before_data, after_data, changed_fields, created_at")
+          .eq("table_name", "appointments")
+          .eq("record_id", a.id)
+          .order("created_at", { ascending: false })
+          .limit(50);
+        const techLogs = (logs || []).filter((l: any) =>
+          (l.changed_fields || []).includes("assigned_technician_id") ||
+          (!l.before_data && l.after_data?.assigned_technician_id)
+        );
+        setAssignHistory(techLogs);
       }
       setLoading(false);
     })();
