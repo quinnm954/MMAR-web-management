@@ -44,7 +44,7 @@ const DocReferences = ({ financingHref, hideFinancing, estimateId, estimateToken
                   </Button>
                 ) : (
                   <Button asChild size="sm" variant="outline">
-                    <Link to="/financing-contract">View financing terms</Link>
+                    <Link to={financingFallbackHref}>View financing terms</Link>
                   </Button>
                 )}
               </div>
