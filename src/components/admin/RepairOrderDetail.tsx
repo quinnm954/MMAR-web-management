@@ -209,6 +209,85 @@ export default function RepairOrderDetail({ appointmentId, open, onClose }: Prop
     }
   };
 
+  const [applyingHours, setApplyingHours] = useState(false);
+  // Pick the estimate that should reflect actual labor: approved first, else most recent.
+  const targetEstimate = approvedEstimate || estimates[0];
+
+  const applyLaborToEstimate = async () => {
+    if (!targetEstimate) {
+      toast.error('No estimate to update');
+      return;
+    }
+    const totalHours = Number((totalLaborMinutes / 60).toFixed(2));
+    if (totalHours <= 0) {
+      toast.error('No labor time clocked yet');
+      return;
+    }
+    setApplyingHours(true);
+    try {
+      const lines: any[] = Array.isArray(targetEstimate.line_items) ? [...targetEstimate.line_items] : [];
+      const laborIdx = lines
+        .map((l, i) => ({ l, i }))
+        .filter(({ l }) => l.kind === 'labor' || (Number(l.labor_hours) || 0) > 0);
+
+      if (laborIdx.length === 0) {
+        // No labor line — append a new one using the default labor rate from shop_settings.
+        const { data: rate } = await supabase
+          .from('labor_rates')
+          .select('hourly_rate')
+          .eq('is_default', true)
+          .eq('is_active', true)
+          .maybeSingle();
+        const hr = Number((rate as any)?.hourly_rate ?? 0);
+        lines.push({
+          description: 'Labor',
+          quantity: totalHours,
+          unit_price: hr,
+          amount: Number((totalHours * hr).toFixed(2)),
+          labor_hours: totalHours,
+          kind: 'labor',
+        });
+      } else if (laborIdx.length === 1) {
+        const { l, i } = laborIdx[0];
+        const unit = Number(l.unit_price) || 0;
+        lines[i] = {
+          ...l,
+          labor_hours: totalHours,
+          quantity: totalHours,
+          amount: Number((totalHours * unit).toFixed(2)),
+        };
+      } else {
+        // Distribute proportionally to the existing labor_hours weights.
+        const currentTotal = laborIdx.reduce((s, { l }) => s + (Number(l.labor_hours) || 0), 0) || laborIdx.length;
+        laborIdx.forEach(({ l, i }) => {
+          const weight = (Number(l.labor_hours) || 1) / currentTotal;
+          const hrs = Number((totalHours * weight).toFixed(2));
+          const unit = Number(l.unit_price) || 0;
+          lines[i] = { ...l, labor_hours: hrs, quantity: hrs, amount: Number((hrs * unit).toFixed(2)) };
+        });
+      }
+
+      const subtotal = lines.reduce((s, l) => s + (Number(l.amount) || 0), 0);
+      const { error } = await supabase
+        .from('estimates')
+        .update({ line_items: lines, subtotal })
+        .eq('id', targetEstimate.id);
+      if (error) throw error;
+      toast.success(`Estimate updated: ${totalHours} hr${totalHours === 1 ? '' : 's'} of labor`);
+      // Refresh local estimates state
+      const { data: est } = await supabase
+        .from('estimates')
+        .select('*')
+        .eq('appointment_id', appt!.id)
+        .order('created_at', { ascending: false });
+      setEstimates(est || []);
+    } catch (e: any) {
+      toast.error(e.message || 'Could not update estimate');
+    } finally {
+      setApplyingHours(false);
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
@@ -430,7 +509,18 @@ export default function RepairOrderDetail({ appointmentId, open, onClose }: Prop
             </Section>
 
             {/* Time entries */}
-            <Section icon={Clock} title={`Labor Time (${(totalLaborMinutes / 60).toFixed(2)} hrs)`}>
+            <Section
+              icon={Clock}
+              title={`Labor Time (${(totalLaborMinutes / 60).toFixed(2)} hrs)`}
+              action={
+                targetEstimate && totalLaborMinutes > 0 ? (
+                  <Button size="sm" variant="outline" onClick={applyLaborToEstimate} disabled={applyingHours}>
+                    {applyingHours ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : <FileSpreadsheet className="h-3 w-3 mr-1" />}
+                    Apply to estimate
+                  </Button>
+                ) : null
+              }
+            >
               {timeEntries.length === 0 && <Empty>No time clocked.</Empty>}
               {timeEntries.map((t) => (
                 <Row key={t.id}>
