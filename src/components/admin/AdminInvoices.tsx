@@ -242,6 +242,13 @@ const AdminInvoices = () => {
                       <SelectContent>{STATUSES.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
                     </Select>
                     <Badge className={statusColor(i.status)}>{i.status}</Badge>
+                    <DeleteButton
+                      table="invoices"
+                      id={i.id}
+                      size="icon"
+                      description={`Delete invoice ${i.invoice_number ?? ""}? This will not refund any payments.`}
+                      onDeleted={load}
+                    />
                   </div>
                 </div>
                 {replies.length > 0 && (
