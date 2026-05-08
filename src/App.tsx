@@ -48,6 +48,7 @@ import TechProtectedRoute from "./components/tech/TechProtectedRoute";
 import EstimateApproval from "./pages/EstimateApproval";
 import InspectionReport from "./pages/InspectionReport";
 import Login from "./pages/Login";
+import SetPassword from "./pages/SetPassword";
 import SharedCustomerSummary from "./pages/SharedCustomerSummary";
 
 const queryClient = new QueryClient();
