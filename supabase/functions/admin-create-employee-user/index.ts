@@ -123,7 +123,7 @@ Deno.serve(async (req) => {
     // Ensure profile exists
     await admin.from("profiles").upsert({ id: userId, email, full_name: fullName });
 
-    return new Response(JSON.stringify({ user_id: userId, role }), {
+    return new Response(JSON.stringify({ user_id: userId, role, reused }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e: any) {
