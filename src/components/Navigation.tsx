@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { Menu, X, ChevronDown, Phone, User } from "lucide-react";
+import { Menu, X, ChevronDown, Phone, User, LogOut, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import mmarLogo from "@/assets/mmar-logo.jpeg";
 import {
