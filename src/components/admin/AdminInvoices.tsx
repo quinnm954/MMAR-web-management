@@ -220,6 +220,10 @@ const AdminInvoices = () => {
                       <div className="font-bold">${i.total.toFixed(2)}</div>
                       {i.amount_paid > 0 && <div className="text-xs text-muted-foreground">Paid ${i.amount_paid.toFixed(2)}</div>}
                     </div>
+                    <Button size="sm" variant="outline" onClick={() => window.open(`/portal/invoices/${i.id}`, "_blank")} title="Open invoice page">
+                      <ExternalLink className="h-3 w-3 mr-1" />
+                      View
+                    </Button>
                     {i.status !== "paid" && i.status !== "void" && (
                       <>
                         <Button size="sm" variant="outline" onClick={() => sharePaymentLink(i)} disabled={textingId === i.id} title="Share payment link">
