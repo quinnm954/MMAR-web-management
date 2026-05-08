@@ -104,6 +104,7 @@ Deno.serve(async (req) => {
       // Re-flag must_set_password and merge metadata without clobbering other fields
       const meta = (existing.user_metadata ?? {}) as Record<string, unknown>;
       await admin.auth.admin.updateUserById(existing.id, {
+        email_confirm: true,
         user_metadata: {
           ...meta,
           must_set_password: true,
