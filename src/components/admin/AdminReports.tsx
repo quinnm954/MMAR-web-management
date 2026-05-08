@@ -69,6 +69,7 @@ export default function AdminReports() {
   const [profitRows, setProfitRows] = useState<ProfitRow[]>([]);
   const [defaultRate, setDefaultRate] = useState<number>(35);
   const [days, setDays] = useState<number>(30);
+  const [techFilter, setTechFilter] = useState<string>('all');
 
   const [syncing, setSyncing] = useState(false);
 
