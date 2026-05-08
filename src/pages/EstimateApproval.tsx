@@ -301,6 +301,11 @@ const EstimateApproval = () => {
           </ul>
         </div>
       )}
+
+      <DocReferences
+        financingHref={est?.id ? `/financing-contract?estimate=${est.id}` : undefined}
+        hideFinancing={est?.status === 'declined'}
+      />
     </BrandedDocLayout>
   );
 };
