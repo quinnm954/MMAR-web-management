@@ -50,6 +50,7 @@ import InspectionReport from "./pages/InspectionReport";
 import Login from "./pages/Login";
 import SetPassword from "./pages/SetPassword";
 import SharedCustomerSummary from "./pages/SharedCustomerSummary";
+import MmarCare from "./pages/MmarCare";
 
 const queryClient = new QueryClient();
 
