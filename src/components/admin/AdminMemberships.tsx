@@ -138,6 +138,12 @@ const AdminMemberships = () => {
                       <LinkIcon className="h-3 w-3 mr-1" />Subscribe
                     </Button>
                   )}
+                  <DeleteButton
+                    table="memberships"
+                    id={r.id}
+                    description="Delete this membership? Active Stripe subscriptions must be cancelled separately."
+                    onDeleted={load}
+                  />
                 </div>
               </div>
             </div>
