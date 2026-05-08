@@ -100,7 +100,17 @@ const Footer = () => {
           <p>
             © {new Date().getFullYear()} Capital Services Management, INC. All rights reserved.
           </p>
-          <span>Lehigh Acres and Fort Myers</span>
+          <div className="flex items-center gap-3">
+            <span>Lehigh Acres and Fort Myers</span>
+            <span aria-hidden="true">·</span>
+            <a
+              href="/admin/login"
+              className="text-muted-foreground/60 hover:text-primary transition-colors"
+              aria-label="Staff login"
+            >
+              Staff
+            </a>
+          </div>
         </div>
       </div>
     </footer>
