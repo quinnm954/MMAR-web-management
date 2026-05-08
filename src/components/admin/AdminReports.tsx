@@ -227,6 +227,25 @@ export default function AdminReports() {
     })();
   }, [days]);
 
+  useEffect(() => { load(); }, [load]);
+
+  const syncStripeFees = async (force = false) => {
+    setSyncing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('sync-stripe-fees', {
+        body: { days: Math.max(days, 90), force },
+      });
+      if (error) throw error;
+      const d = data as { synced: number; skipped: number; scanned: number };
+      toast.success(`Synced ${d.synced} of ${d.scanned} invoices${d.skipped ? ` (${d.skipped} skipped)` : ''}`);
+      await load();
+    } catch (e: any) {
+      toast.error(e?.message || 'Failed to sync Stripe fees');
+    } finally {
+      setSyncing(false);
+    }
+  };
+
   const fmt = (n: number) =>
     '$' + n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
