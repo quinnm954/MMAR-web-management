@@ -251,8 +251,25 @@ export default function AdminReports() {
   const fmt = (n: number) =>
     '$' + n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
+  const techOptions = useMemo(() => {
+    const set = new Set<string>();
+    profitRows.forEach((r) => { if (r.technician && r.technician !== '—') set.add(r.technician); });
+    return Array.from(set).sort();
+  }, [profitRows]);
+
+  const filteredRows = useMemo(
+    () => (techFilter === 'all' ? profitRows : profitRows.filter((r) => r.technician === techFilter)),
+    [profitRows, techFilter],
+  );
+
+  const perfTotals = useMemo(() => {
+    const paidH = filteredRows.reduce((s, r) => s + r.paidLaborHours, 0);
+    const clockedH = filteredRows.reduce((s, r) => s + r.clockedHours, 0);
+    return { paidH, clockedH, variance: clockedH - paidH };
+  }, [filteredRows]);
+
   const totals = useMemo(() => {
-    return profitRows.reduce(
+    return filteredRows.reduce(
       (acc, r) => {
         acc.revenue += r.revenue;
         acc.cogs += r.cogs;
@@ -264,7 +281,7 @@ export default function AdminReports() {
       },
       { revenue: 0, cogs: 0, employeeCost: 0, stripeFee: 0, grossProfit: 0, netProfit: 0 },
     );
-  }, [profitRows]);
+  }, [filteredRows]);
 
   return (
     <div className="space-y-4">
