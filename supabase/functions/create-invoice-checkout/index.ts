@@ -1,5 +1,5 @@
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
-import Stripe from "https://esm.sh/stripe@17.7.0?target=deno";
+import { createClient } from "npm:@supabase/supabase-js@2.57.2";
+import Stripe from "npm:stripe@18.5.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -26,15 +26,16 @@ Deno.serve(async (req) => {
     );
 
     const token = authHeader.replace("Bearer ", "");
-    const { data: claims, error: claimsErr } = await supabase.auth.getClaims(token);
-    if (claimsErr || !claims?.claims) {
+    const { data: userData, error: userErr } = await supabase.auth.getUser(token);
+    const user = userData?.user;
+    if (userErr || !user) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-    const userId = claims.claims.sub;
-    const userEmail = claims.claims.email as string | undefined;
+    const userId = user.id;
+    const userEmail = user.email;
 
     const body = await req.json().catch(() => ({}));
     const invoiceId = body?.invoice_id;
@@ -80,7 +81,7 @@ Deno.serve(async (req) => {
     }
 
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY")!, {
-      apiVersion: "2024-11-20.acacia",
+      apiVersion: "2025-08-27.basil",
     });
 
     const origin = req.headers.get("origin") || "https://shop-flow-home.lovable.app";

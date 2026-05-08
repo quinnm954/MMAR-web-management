@@ -1,5 +1,5 @@
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
-import Stripe from "https://esm.sh/stripe@17.7.0?target=deno";
+import { createClient } from "npm:@supabase/supabase-js@2.57.2";
+import Stripe from "npm:stripe@18.5.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -22,11 +22,12 @@ Deno.serve(async (req) => {
       global: { headers: { Authorization: authHeader } },
     });
     const token = authHeader.replace("Bearer ", "");
-    const { data: claims, error: cErr } = await userClient.auth.getClaims(token);
-    if (cErr || !claims?.claims) {
+    const { data: userData, error: userErr } = await userClient.auth.getUser(token);
+    const user = userData?.user;
+    if (userErr || !user) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
-    const userId = claims.claims.sub;
+    const userId = user.id;
 
     // Admin check via has_role
     const admin = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
@@ -84,7 +85,7 @@ Deno.serve(async (req) => {
     const { data: profile } = await admin.from("profiles").select("email, full_name").eq("id", invoice.customer_id).maybeSingle();
 
     // Create Stripe checkout session
-    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY")!, { apiVersion: "2024-11-20.acacia" });
+    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY")!, { apiVersion: "2025-08-27.basil" });
     const origin = req.headers.get("origin") || "https://shop-flow-home.lovable.app";
     const session = await stripe.checkout.sessions.create({
       mode: "payment",

@@ -22,6 +22,7 @@ interface Invoice {
   invoice_number: string | null;
   status: string;
   subtotal: number;
+  shop_supplies: number;
   tax: number;
   total: number;
   amount_paid: number;
@@ -156,6 +157,7 @@ const PortalInvoiceDetail = () => {
         {/* Totals */}
         <div className="mt-4 ml-auto sm:w-72 space-y-1 text-sm">
           <div className="flex justify-between"><span className="text-muted-foreground">Subtotal</span><span>${Number(inv.subtotal).toFixed(2)}</span></div>
+          {Number(inv.shop_supplies) > 0 && <div className="flex justify-between"><span className="text-muted-foreground">Shop / disposal fees</span><span>${Number(inv.shop_supplies).toFixed(2)}</span></div>}
           {Number(inv.tax) > 0 && <div className="flex justify-between"><span className="text-muted-foreground">Tax</span><span>${Number(inv.tax).toFixed(2)}</span></div>}
           <div className="flex justify-between font-bold text-lg pt-2 border-t border-border"><span>Total</span><span>${Number(inv.total).toFixed(2)}</span></div>
           {Number(inv.amount_paid) > 0 && (
