@@ -303,9 +303,31 @@ const EstimateApproval = () => {
         </div>
       )}
 
+      {/* Financing opt-in: only shown after approval, only if customer says Yes do we surface the contract link */}
+      {locked && est.status !== 'declined' && financingChoice === null && (
+        <div className="mt-6 rounded-md border border-border bg-muted/20 p-4 text-sm">
+          <div className="font-medium mb-1">Would you like to finance this repair?</div>
+          <p className="text-xs text-muted-foreground mb-3">
+            We offer in-house financing: 100% parts + 50% labor down, balance over 12 months at 25% APR.
+            This is optional — choose No if you'll pay in full.
+          </p>
+          <div className="flex gap-2">
+            <Button size="sm" variant="hero" onClick={() => setFinancingChoice('yes')}>Yes, I'd like financing</Button>
+            <Button size="sm" variant="outline" onClick={() => setFinancingChoice('no')}>No thanks</Button>
+          </div>
+        </div>
+      )}
+      {locked && financingChoice === 'no' && (
+        <div className="mt-4 text-xs text-muted-foreground italic text-center">
+          Financing declined. <button className="underline" onClick={() => setFinancingChoice(null)}>Change my mind</button>
+        </div>
+      )}
+
       <DocReferences
-        financingHref={est?.id ? `/financing-contract?estimate=${est.id}` : undefined}
-        hideFinancing={est?.status === 'declined'}
+        financingHref={
+          financingChoice === 'yes' && est?.id ? `/financing-contract?estimate=${est.id}` : undefined
+        }
+        hideFinancing={est?.status === 'declined' || !locked || financingChoice !== 'yes'}
       />
     </BrandedDocLayout>
   );
