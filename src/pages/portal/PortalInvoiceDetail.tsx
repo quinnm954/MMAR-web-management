@@ -180,6 +180,8 @@ const PortalInvoiceDetail = () => {
             </Button>
           ) : null}
         </div>
+
+        <DocReferences hideFinancing={isPaid} />
       </BrandedDocLayout>
     </>
   );
