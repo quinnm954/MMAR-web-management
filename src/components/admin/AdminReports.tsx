@@ -5,7 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
-type LineItem = { quantity?: number; unit_price?: number; unit_cost?: number; amount?: number; kind?: string };
+type LineItem = { quantity?: number; unit_price?: number; unit_cost?: number; amount?: number; kind?: string; labor_hours?: number };
 
 type InvoiceRow = {
   id: string;
@@ -24,9 +24,10 @@ type ProfitRow = {
   invoice_number: string | null;
   date: string;
   customer: string;
+  technician: string;
+  laborHours: number;
   revenue: number;
   cogs: number;
-  laborMinutes: number;
   employeeCost: number;
   grossProfit: number;
   netProfit: number;
@@ -48,14 +49,14 @@ export default function AdminReports() {
   });
 
   const [profitRows, setProfitRows] = useState<ProfitRow[]>([]);
-  const [laborRate, setLaborRate] = useState<number>(35);
+  const [defaultRate, setDefaultRate] = useState<number>(35);
   const [days, setDays] = useState<number>(30);
 
   useEffect(() => {
     (async () => {
       const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
 
-      const [inv, completed, members, ests, hours, settings] = await Promise.all([
+      const [inv, completed, members, ests, settings, employeesRes] = await Promise.all([
         supabase
           .from('invoices')
           .select('id, invoice_number, total, subtotal, status, created_at, customer_id, service_record_id, line_items')
@@ -64,19 +65,23 @@ export default function AdminReports() {
         supabase.from('appointments').select('id', { count: 'exact', head: true }).eq('status', 'completed').gte('created_at', since),
         supabase.from('memberships').select('id', { count: 'exact', head: true }).eq('status', 'active'),
         supabase.from('estimates').select('id', { count: 'exact', head: true }).eq('status', 'sent'),
-        supabase.from('time_entries').select('duration_minutes').gte('clock_in', since),
         supabase.from('shop_settings').select('labor_cost_per_hour').eq('id', 1).single(),
+        supabase.from('employees' as any).select('id, user_id, full_name, hourly_rate, pay_basis').eq('is_active', true),
       ]);
 
       const allInvoices = ((inv.data ?? []) as any[]) as InvoiceRow[];
       const paid = allInvoices.filter((i) => i.status === 'paid');
       const revenue = paid.reduce((s, i) => s + Number(i.total || 0), 0);
-      const totalMin = (hours.data ?? []).reduce((s, e) => s + (e.duration_minutes || 0), 0);
 
       const rate = Number((settings.data as any)?.labor_cost_per_hour ?? 35);
-      setLaborRate(rate);
+      setDefaultRate(rate);
 
-      // Parts revenue/cost across paid invoices
+      // Employee map by user_id
+      const employees = (employeesRes.data ?? []) as any[];
+      const empByUser = new Map<string, any>();
+      employees.forEach((e) => { if (e.user_id) empByUser.set(e.user_id, e); });
+
+      // Parts revenue/cost
       let partsRevenue = 0;
       let partsCost = 0;
       for (const i of paid) {
@@ -95,7 +100,6 @@ export default function AdminReports() {
       const partsMargin = partsRevenue - partsCost;
       const partsMarginPct = partsRevenue > 0 ? (partsMargin / partsRevenue) * 100 : 0;
 
-      // Per-invoice profit table
       const customerIds = Array.from(new Set(paid.map((p) => p.customer_id).filter(Boolean)));
       const serviceIds = paid.map((p) => p.service_record_id).filter(Boolean) as string[];
 
@@ -112,18 +116,39 @@ export default function AdminReports() {
         (srRes.data ?? []).map((r: any) => [r.id, r.appointment_id]),
       );
       const apptIds = Array.from(new Set(Array.from(apptByService.values()).filter(Boolean))) as string[];
-      const minutesByAppt = new Map<string, number>();
+
+      // Appointments → tech assignment + estimate labor hours
+      const apptInfo = new Map<string, { tech: string | null; laborHours: number }>();
       if (apptIds.length) {
-        const { data: te } = await supabase
-          .from('time_entries')
-          .select('appointment_id, duration_minutes')
-          .in('appointment_id', apptIds);
-        (te ?? []).forEach((row: any) => {
-          if (!row.appointment_id) return;
-          minutesByAppt.set(
-            row.appointment_id,
-            (minutesByAppt.get(row.appointment_id) ?? 0) + Number(row.duration_minutes || 0),
-          );
+        const [apRes, estRes, teRes] = await Promise.all([
+          supabase.from('appointments').select('id, assigned_technician_id').in('id', apptIds),
+          supabase.from('estimates').select('appointment_id, line_items').in('appointment_id', apptIds),
+          supabase.from('time_entries').select('appointment_id, duration_minutes, technician_id').in('appointment_id', apptIds),
+        ]);
+        (apRes.data ?? []).forEach((a: any) => {
+          apptInfo.set(a.id, { tech: a.assigned_technician_id, laborHours: 0 });
+        });
+        // Sum labor_hours from estimates per appointment
+        (estRes.data ?? []).forEach((e: any) => {
+          const items = Array.isArray(e.line_items) ? e.line_items : [];
+          const hrs = items.reduce((s: number, li: any) => s + (Number(li.labor_hours) || 0), 0);
+          const cur = apptInfo.get(e.appointment_id) ?? { tech: null, laborHours: 0 };
+          cur.laborHours += hrs;
+          apptInfo.set(e.appointment_id, cur);
+        });
+        // Fallback to clock time when estimate has no labor_hours
+        const clockByAppt = new Map<string, { minutes: number; tech: string | null }>();
+        (teRes.data ?? []).forEach((t: any) => {
+          const cur = clockByAppt.get(t.appointment_id) ?? { minutes: 0, tech: null };
+          cur.minutes += Number(t.duration_minutes || 0);
+          if (!cur.tech) cur.tech = t.technician_id;
+          clockByAppt.set(t.appointment_id, cur);
+        });
+        clockByAppt.forEach((v, k) => {
+          const cur = apptInfo.get(k) ?? { tech: null, laborHours: 0 };
+          if (cur.laborHours === 0) cur.laborHours = v.minutes / 60;
+          if (!cur.tech) cur.tech = v.tech;
+          apptInfo.set(k, cur);
         });
       }
 
@@ -135,8 +160,11 @@ export default function AdminReports() {
           return s + qty * cost;
         }, 0);
         const apptId = inv.service_record_id ? apptByService.get(inv.service_record_id) : undefined;
-        const minutes = apptId ? (minutesByAppt.get(apptId) ?? 0) : 0;
-        const employeeCost = (minutes / 60) * rate;
+        const info = apptId ? apptInfo.get(apptId) : undefined;
+        const laborHours = info?.laborHours ?? 0;
+        const tech = info?.tech ? empByUser.get(info.tech) : null;
+        const techRate = tech?.hourly_rate != null ? Number(tech.hourly_rate) : rate;
+        const employeeCost = laborHours * techRate;
         const revenueRow = Number(inv.total || 0);
         const grossProfit = revenueRow - cogs;
         const netProfit = grossProfit - employeeCost;
@@ -146,15 +174,18 @@ export default function AdminReports() {
           invoice_number: inv.invoice_number,
           date: new Date(inv.created_at).toLocaleDateString(),
           customer: cust?.full_name || cust?.email || '—',
+          technician: tech?.full_name ?? (info?.tech ? 'Unassigned employee' : '—'),
+          laborHours,
           revenue: revenueRow,
           cogs,
-          laborMinutes: minutes,
           employeeCost,
           grossProfit,
           netProfit,
         };
       });
       setProfitRows(rows);
+
+      const totalLaborHrs = rows.reduce((s, r) => s + r.laborHours, 0);
 
       setData({
         revenue30: revenue,
@@ -163,7 +194,7 @@ export default function AdminReports() {
         completedJobs: completed.count ?? 0,
         activeMembers: members.count ?? 0,
         pendingEstimates: ests.count ?? 0,
-        techHours: Math.round(totalMin / 60),
+        techHours: Math.round(totalLaborHrs),
         partsRevenue,
         partsCost,
         partsMargin,
@@ -213,13 +244,14 @@ export default function AdminReports() {
         <KPI label="Completed Jobs" value={String(data.completedJobs)} />
         <KPI label="Active Memberships" value={String(data.activeMembers)} />
         <KPI label="Pending Estimates" value={String(data.pendingEstimates)} />
-        <KPI label="Tech Hours" value={String(data.techHours)} />
+        <KPI label="Billable Labor Hrs" value={String(data.techHours)} />
       </div>
 
       <h2 className="font-display text-xl pt-2">Profit by Invoice (paid)</h2>
       <p className="text-xs text-muted-foreground -mt-2">
-        Gross profit = revenue − parts cost (COGS from line item unit_cost). Net profit = gross profit − employee cost
-        (technician clock time × ${laborRate.toFixed(2)}/hr from shop settings).
+        Gross profit = revenue − parts cost (COGS). Net profit = gross profit − employee cost. Employee cost uses each
+        technician's per-employee hourly rate from the Employees tab × labor hours billed on the estimate. Falls back to
+        clock time and the default rate (${defaultRate.toFixed(2)}/hr) when no employee record exists.
       </p>
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
         <KPI label="Total Revenue" value={fmt(totals.revenue)} />
@@ -237,9 +269,10 @@ export default function AdminReports() {
                 <TableHead>Invoice</TableHead>
                 <TableHead>Date</TableHead>
                 <TableHead>Customer</TableHead>
+                <TableHead>Technician</TableHead>
+                <TableHead className="text-right">Labor (hrs)</TableHead>
                 <TableHead className="text-right">Revenue</TableHead>
                 <TableHead className="text-right">COGS</TableHead>
-                <TableHead className="text-right">Labor (hrs)</TableHead>
                 <TableHead className="text-right">Employee Cost</TableHead>
                 <TableHead className="text-right">Gross Profit</TableHead>
                 <TableHead className="text-right">Net Profit</TableHead>
@@ -248,7 +281,7 @@ export default function AdminReports() {
             <TableBody>
               {profitRows.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={9} className="text-center text-muted-foreground py-6">
+                  <TableCell colSpan={10} className="text-center text-muted-foreground py-6">
                     No paid invoices in this window.
                   </TableCell>
                 </TableRow>
@@ -258,9 +291,10 @@ export default function AdminReports() {
                     <TableCell className="font-mono text-xs">{r.invoice_number ?? r.id.slice(0, 8)}</TableCell>
                     <TableCell className="text-xs">{r.date}</TableCell>
                     <TableCell className="text-xs">{r.customer}</TableCell>
+                    <TableCell className="text-xs">{r.technician}</TableCell>
+                    <TableCell className="text-right">{r.laborHours.toFixed(2)}</TableCell>
                     <TableCell className="text-right">{fmt(r.revenue)}</TableCell>
                     <TableCell className="text-right">{fmt(r.cogs)}</TableCell>
-                    <TableCell className="text-right">{(r.laborMinutes / 60).toFixed(2)}</TableCell>
                     <TableCell className="text-right">{fmt(r.employeeCost)}</TableCell>
                     <TableCell className={`text-right ${r.grossProfit < 0 ? 'text-destructive' : ''}`}>
                       {fmt(r.grossProfit)}
