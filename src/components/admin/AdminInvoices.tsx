@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
-import { Loader2, Plus, Receipt, MessageSquare, Link2, Share2 } from "lucide-react";
+import { Loader2, Plus, Receipt, MessageSquare, Link2, Share2, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { shareLink } from "@/lib/share";
 
@@ -220,6 +220,10 @@ const AdminInvoices = () => {
                       <div className="font-bold">${i.total.toFixed(2)}</div>
                       {i.amount_paid > 0 && <div className="text-xs text-muted-foreground">Paid ${i.amount_paid.toFixed(2)}</div>}
                     </div>
+                    <Button size="sm" variant="outline" onClick={() => window.open(`/portal/invoices/${i.id}`, "_blank")} title="Open invoice page">
+                      <ExternalLink className="h-3 w-3 mr-1" />
+                      View
+                    </Button>
                     {i.status !== "paid" && i.status !== "void" && (
                       <>
                         <Button size="sm" variant="outline" onClick={() => sharePaymentLink(i)} disabled={textingId === i.id} title="Share payment link">
