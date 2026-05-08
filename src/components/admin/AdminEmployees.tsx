@@ -211,10 +211,22 @@ export default function AdminEmployees() {
                   <Input type="number" step="0.01" value={form.salary_amount ?? ''} onChange={(e) => setForm({ ...form, salary_amount: e.target.value ? parseFloat(e.target.value) : null })} />
                 </div>
               </div>
+              {!form.id && (
+                <div className="rounded-md border p-3 space-y-2 bg-muted/30">
+                  <div className="flex items-center gap-2">
+                    <Switch checked={createLogin} onCheckedChange={setCreateLogin} />
+                    <Label>Create login account for this employee</Label>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">
+                    A login will be created using the email above. Role is assigned from Type
+                    ({form.employee_type}). On first sign-in they'll be prompted to set their own password.
+                  </p>
+                </div>
+              )}
               <div>
                 <Label>Linked User ID (optional)</Label>
                 <Input
-                  placeholder="auth user uuid for technician assignment"
+                  placeholder="auth user uuid (auto-filled if creating a login above)"
                   value={form.user_id ?? ''}
                   onChange={(e) => setForm({ ...form, user_id: e.target.value || null })}
                 />
@@ -232,8 +244,8 @@ export default function AdminEmployees() {
               </div>
             </div>
             <DialogFooter>
-              <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
-              <Button onClick={save}>Save</Button>
+              <Button variant="outline" onClick={() => setOpen(false)} disabled={saving}>Cancel</Button>
+              <Button onClick={save} disabled={saving}>{saving ? 'Saving…' : 'Save'}</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
