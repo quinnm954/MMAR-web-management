@@ -306,7 +306,8 @@ export default function AdminReports() {
         Gross profit = gross revenue − cost of goods. Net profit = gross profit − cost of employees − Stripe fees.
         Employee cost uses each technician's per-employee hourly rate from the Employees tab × labor hours billed on the
         estimate. Falls back to clock time and the default rate (${defaultRate.toFixed(2)}/hr) when no employee record
-        exists. Stripe fees are estimated at 2.9% + $0.30 per paid invoice processed through Stripe.
+        exists. Stripe fees use the actual amount Stripe charged per payment when synced; otherwise an estimate of
+        2.9% + $0.30 is used as a fallback. Click "Sync Stripe fees" to refresh actual amounts.
       </p>
       <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
         <KPI label="Gross Revenue" value={fmt(totals.revenue)} />
