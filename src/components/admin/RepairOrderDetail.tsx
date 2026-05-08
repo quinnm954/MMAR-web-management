@@ -255,8 +255,25 @@ export default function RepairOrderDetail({ appointmentId, open, onClose }: Prop
             </Section>
 
             {/* Invoices */}
-            <Section icon={Receipt} title={`Invoices (${invoices.length}) · $${totalPaid.toFixed(2)} / $${totalInvoiced.toFixed(2)}`}>
-              {invoices.length === 0 && <Empty>No invoices issued.</Empty>}
+            <Section
+              icon={Receipt}
+              title={`Invoices (${invoices.length}) · $${totalPaid.toFixed(2)} / $${totalInvoiced.toFixed(2)}`}
+              action={
+                approvedEstimate && invoices.length === 0 ? (
+                  <Button size="sm" onClick={issueInvoice} disabled={issuing}>
+                    {issuing ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : <FileCheck className="h-3 w-3 mr-1" />}
+                    Issue Invoice
+                  </Button>
+                ) : null
+              }
+            >
+              {invoices.length === 0 && (
+                <Empty>
+                  {approvedEstimate
+                    ? 'Click "Issue Invoice" to bill the approved estimate lines.'
+                    : 'Approve an estimate first to issue an invoice.'}
+                </Empty>
+              )}
               {invoices.map((i) => (
                 <Row key={i.id}>
                   <div>
