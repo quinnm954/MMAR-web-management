@@ -175,8 +175,10 @@ export default function AdminReports() {
         const techRate = tech?.hourly_rate != null ? Number(tech.hourly_rate) : rate;
         const employeeCost = laborHours * techRate;
         const revenueRow = Number(inv.total || 0);
+        const hasStripe = Boolean(inv.stripe_session_id || inv.stripe_payment_intent_id);
+        const stripeFee = stripeFeeFor(revenueRow, inv.status === 'paid', hasStripe);
         const grossProfit = revenueRow - cogs;
-        const netProfit = grossProfit - employeeCost;
+        const netProfit = grossProfit - employeeCost - stripeFee;
         const cust = customerMap.get(inv.customer_id);
         return {
           id: inv.id,
@@ -188,6 +190,7 @@ export default function AdminReports() {
           revenue: revenueRow,
           cogs,
           employeeCost,
+          stripeFee,
           grossProfit,
           netProfit,
         };
