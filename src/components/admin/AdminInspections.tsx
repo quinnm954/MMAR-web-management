@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Copy, ExternalLink, Trash2, Camera, Share2 } from 'lucide-react';
+import { Plus, Copy, ExternalLink, Trash2, Camera, Share2, FileText } from 'lucide-react';
 import { toast } from 'sonner';
 import { shareLink } from '@/lib/share';
 
