@@ -27,6 +27,7 @@ const tool = {
               quantity: { type: "number" },
               unit_price: { type: "number" },
               labor_hours: { type: "number" },
+              kind: { type: "string", enum: ["part", "labor", "fee"], description: "Whether this line is a part, labor, or fee/other" },
             },
             required: ["description", "quantity", "unit_price"],
           },
