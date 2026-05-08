@@ -1701,6 +1701,7 @@ export type Database = {
         Args: { payload: Json; queue_name: string }
         Returns: number
       }
+      get_estimate_by_token: { Args: { _token: string }; Returns: Json }
       get_shared_customer_summary: { Args: { _token: string }; Returns: Json }
       has_role: {
         Args: {
@@ -1726,6 +1727,16 @@ export type Database = {
           msg_id: number
           read_ct: number
         }[]
+      }
+      submit_estimate_decision: {
+        Args: {
+          _decline_reason: string
+          _line_items: Json
+          _signature: string
+          _status: string
+          _token: string
+        }
+        Returns: Json
       }
     }
     Enums: {
