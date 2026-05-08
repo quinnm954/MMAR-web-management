@@ -180,6 +180,14 @@ const AdminAppointments = () => {
                 </SelectContent>
               </Select>
             </div>
+            <div className="flex justify-end pt-2 border-t border-border">
+              <DeleteButton
+                table="appointments"
+                id={r.id}
+                description="Delete this appointment? Linked service records and invoices will remain."
+                onDeleted={load}
+              />
+            </div>
           </CardContent>
         </Card>
       ))}
