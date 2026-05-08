@@ -255,14 +255,9 @@ const Navigation = () => {
                   </button>
                 </>
               ) : (
-                <>
-                  <Link to="/mmar-care" onClick={close} className="text-foreground hover:text-primary font-medium py-3 px-2 rounded-lg flex items-center gap-2">
-                    <User className="w-4 h-4" /> MMAR Care Sign In
-                  </Link>
-                  <Link to="/login" onClick={close} className="text-muted-foreground hover:text-primary text-sm py-2 px-2 rounded-lg">
-                    Employee / Admin sign-in
-                  </Link>
-                </>
+                <Link to="/login" onClick={close} className="text-muted-foreground hover:text-primary text-sm py-2 px-2 rounded-lg">
+                  Employee / Admin sign-in
+                </Link>
               )}
 
               <Button variant="hero" size="lg" asChild className="mt-3 min-h-[48px]">
