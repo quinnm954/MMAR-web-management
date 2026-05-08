@@ -11,6 +11,7 @@ interface ProtectedRouteProps {
 
 const ProtectedRoute = ({ children, requireAdmin = true, allowedRoles }: ProtectedRouteProps) => {
   const { user, isAdmin, isManager, hasAnyRole, isLoading } = useAuth();
+  const location = useLocation();
 
   if (isLoading) {
     return (
