@@ -53,6 +53,8 @@ export default function AdminEmployees() {
   const [rows, setRows] = useState<Employee[]>([]);
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<Employee>(empty);
+  const [createLogin, setCreateLogin] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   const load = async () => {
     const { data, error } = await supabase
@@ -72,10 +74,12 @@ export default function AdminEmployees() {
 
   const openNew = () => {
     setForm(empty);
+    setCreateLogin(false);
     setOpen(true);
   };
   const openEdit = (e: Employee) => {
     setForm(e);
+    setCreateLogin(false);
     setOpen(true);
   };
 
@@ -84,26 +88,60 @@ export default function AdminEmployees() {
       toast.error('Name required');
       return;
     }
-    const payload: any = {
-      full_name: form.full_name,
-      email: form.email || null,
-      phone: form.phone || null,
-      employee_type: form.employee_type,
-      pay_basis: form.pay_basis,
-      hourly_rate: Number(form.hourly_rate) || 0,
-      salary_amount: form.salary_amount ? Number(form.salary_amount) : null,
-      is_active: form.is_active,
-      notes: form.notes || null,
-      user_id: form.user_id || null,
-    };
-    const q = form.id
-      ? supabase.from('employees' as any).update(payload).eq('id', form.id)
-      : supabase.from('employees' as any).insert(payload);
-    const { error } = await q;
-    if (error) return toast.error(error.message);
-    toast.success('Saved');
-    setOpen(false);
-    load();
+    setSaving(true);
+    try {
+      let linkedUserId = form.user_id || null;
+
+      // Optionally provision an auth login for this employee
+      if (!form.id && createLogin) {
+        if (!form.email?.trim()) {
+          toast.error('Email is required to create a login account');
+          setSaving(false);
+          return;
+        }
+        const { data, error } = await supabase.functions.invoke('admin-create-employee-user', {
+          body: {
+            email: form.email.trim(),
+            full_name: form.full_name,
+            employee_type: form.employee_type,
+          },
+        });
+        if (error || (data as any)?.error) {
+          toast.error((data as any)?.error || error?.message || 'Failed to create login');
+          setSaving(false);
+          return;
+        }
+        linkedUserId = (data as any).user_id;
+        toast.success('Login created — they will be prompted to set a password on first sign-in');
+      }
+
+      const payload: any = {
+        full_name: form.full_name,
+        email: form.email || null,
+        phone: form.phone || null,
+        employee_type: form.employee_type,
+        pay_basis: form.pay_basis,
+        hourly_rate: Number(form.hourly_rate) || 0,
+        salary_amount: form.salary_amount ? Number(form.salary_amount) : null,
+        is_active: form.is_active,
+        notes: form.notes || null,
+        user_id: linkedUserId,
+      };
+      const q = form.id
+        ? supabase.from('employees' as any).update(payload).eq('id', form.id)
+        : supabase.from('employees' as any).insert(payload);
+      const { error } = await q;
+      if (error) {
+        toast.error(error.message);
+        setSaving(false);
+        return;
+      }
+      toast.success('Saved');
+      setOpen(false);
+      load();
+    } finally {
+      setSaving(false);
+    }
   };
 
   const del = async (id: string) => {
@@ -173,10 +211,22 @@ export default function AdminEmployees() {
                   <Input type="number" step="0.01" value={form.salary_amount ?? ''} onChange={(e) => setForm({ ...form, salary_amount: e.target.value ? parseFloat(e.target.value) : null })} />
                 </div>
               </div>
+              {!form.id && (
+                <div className="rounded-md border p-3 space-y-2 bg-muted/30">
+                  <div className="flex items-center gap-2">
+                    <Switch checked={createLogin} onCheckedChange={setCreateLogin} />
+                    <Label>Create login account for this employee</Label>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">
+                    A login will be created using the email above. Role is assigned from Type
+                    ({form.employee_type}). On first sign-in they'll be prompted to set their own password.
+                  </p>
+                </div>
+              )}
               <div>
                 <Label>Linked User ID (optional)</Label>
                 <Input
-                  placeholder="auth user uuid for technician assignment"
+                  placeholder="auth user uuid (auto-filled if creating a login above)"
                   value={form.user_id ?? ''}
                   onChange={(e) => setForm({ ...form, user_id: e.target.value || null })}
                 />
@@ -194,8 +244,8 @@ export default function AdminEmployees() {
               </div>
             </div>
             <DialogFooter>
-              <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
-              <Button onClick={save}>Save</Button>
+              <Button variant="outline" onClick={() => setOpen(false)} disabled={saving}>Cancel</Button>
+              <Button onClick={save} disabled={saving}>{saving ? 'Saving…' : 'Save'}</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
