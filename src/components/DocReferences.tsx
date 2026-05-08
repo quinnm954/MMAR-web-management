@@ -63,7 +63,7 @@ const DocReferences = ({ financingHref, hideFinancing, estimateId, estimateToken
               you acknowledge the policy.
             </p>
             <Button asChild size="sm" variant="outline">
-              <Link to="/warranty-policy">
+              <Link to={warrantyHref}>
                 Read full warranty <ExternalLink className="h-3 w-3 ml-1" />
               </Link>
             </Button>
