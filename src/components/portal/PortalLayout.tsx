@@ -11,6 +11,7 @@ import {
   Receipt,
   LogOut,
   Wrench,
+  FileText,
 } from "lucide-react";
 import mmarLogo from "@/assets/mmar-logo.jpeg";
 
@@ -19,6 +20,7 @@ const navItems = [
   { to: "/portal/vehicles", label: "My Vehicles", icon: Car },
   { to: "/portal/membership", label: "Membership", icon: CreditCard },
   { to: "/portal/appointments", label: "Appointments", icon: Calendar },
+  { to: "/portal/estimates", label: "Estimates", icon: FileText },
   { to: "/portal/repair-orders", label: "Repair Orders", icon: Wrench },
   { to: "/portal/service-history", label: "Service History", icon: ClipboardList },
   { to: "/portal/invoices", label: "Invoices", icon: Receipt },
