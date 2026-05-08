@@ -128,6 +128,9 @@ const PortalInvoices = () => {
                       <div className="text-xs text-muted-foreground">Paid ${i.amount_paid.toFixed(2)}</div>
                     )}
                   </div>
+                  <Button size="sm" variant="outline" asChild>
+                    <Link to={`/portal/invoices/${i.id}`}>View</Link>
+                  </Button>
                   {i.status !== "paid" && (
                     <Button size="sm" onClick={() => payInvoice(i.id)} disabled={paying === i.id}>
                       {paying === i.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <CreditCard className="h-4 w-4 mr-1" />}
