@@ -7,8 +7,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
-import { Loader2, Plus, Receipt, MessageSquare, Link2 } from "lucide-react";
+import { Loader2, Plus, Receipt, MessageSquare, Link2, Share2 } from "lucide-react";
 import { toast } from "sonner";
+import { shareLink } from "@/lib/share";
 
 interface Customer { id: string; full_name: string | null; email: string | null }
 interface Invoice {
@@ -129,25 +130,20 @@ const AdminInvoices = () => {
 
   const [textingId, setTextingId] = useState<string | null>(null);
 
-  const sendPaymentLink = async (invoiceId: string) => {
-    setTextingId(invoiceId);
-    const { data, error } = await supabase.functions.invoke("send-invoice-payment-link", { body: { invoice_id: invoiceId } });
+  const sharePaymentLink = async (invoice: Invoice) => {
+    setTextingId(invoice.id);
+    const { data, error } = await supabase.functions.invoke("send-invoice-payment-link", { body: { invoice_id: invoice.id, copy_only: true } });
     setTextingId(null);
     const respErr = (data as any)?.error || error?.message;
-    if (respErr) {
-      if (String(respErr).includes("No phone")) {
-        const entered = window.prompt("No phone on file. Enter customer's mobile number (E.164, e.g. +18135017572):");
-        if (!entered) return;
-        setTextingId(invoiceId);
-        const r = await supabase.functions.invoke("send-invoice-payment-link", { body: { invoice_id: invoiceId, phone: entered } });
-        setTextingId(null);
-        const e2 = (r.data as any)?.error || r.error?.message;
-        if (e2) return toast.error(e2);
-        return toast.success(`Payment link sent to ${entered}`);
-      }
-      return toast.error(respErr);
-    }
-    toast.success(`Payment link sent to ${(data as any)?.phone}`);
+    if (respErr) return toast.error(respErr);
+    const url = (data as any)?.url;
+    if (!url) return toast.error("No link returned");
+    await shareLink({
+      url,
+      title: `Invoice ${invoice.invoice_number ?? ''}`.trim(),
+      text: `${invoice.customer?.full_name || 'Customer'}, here is your invoice from MMAR Care for $${(invoice.total - invoice.amount_paid).toFixed(2)}:`,
+      copyToastMessage: 'Payment link copied — share with the customer',
+    });
   };
 
   const [copyingId, setCopyingId] = useState<string | null>(null);
@@ -226,9 +222,9 @@ const AdminInvoices = () => {
                     </div>
                     {i.status !== "paid" && i.status !== "void" && (
                       <>
-                        <Button size="sm" variant="outline" onClick={() => sendPaymentLink(i.id)} disabled={textingId === i.id} title="Send / resend payment link via SMS">
-                          {textingId === i.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <MessageSquare className="h-3 w-3 mr-1" />}
-                          Resend SMS
+                        <Button size="sm" variant="outline" onClick={() => sharePaymentLink(i)} disabled={textingId === i.id} title="Share payment link">
+                          {textingId === i.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Share2 className="h-3 w-3 mr-1" />}
+                          Share
                         </Button>
                         <Button size="sm" variant="ghost" onClick={() => copyPaymentLink(i.id)} disabled={copyingId === i.id} title="Copy payment link to clipboard">
                           {copyingId === i.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Link2 className="h-3 w-3 mr-1" />}
