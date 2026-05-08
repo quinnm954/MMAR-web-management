@@ -33,6 +33,8 @@ const EstimateApproval = () => {
   const [signature, setSignature] = useState<string | null>(null);
   const [requestedDate, setRequestedDate] = useState<Date | undefined>();
   const [timeWindow, setTimeWindow] = useState<string>(TIME_WINDOWS[0]);
+  const [editing, setEditing] = useState(false);
+  const [decisionLogs, setDecisionLogs] = useState<any[]>([]);
 
   useEffect(() => {
     (async () => {
@@ -42,6 +44,7 @@ const EstimateApproval = () => {
       setEst(data);
       setCustomer((payload as any)?.customer ?? null);
       setVehicle((payload as any)?.vehicle ?? null);
+      setDecisionLogs(((payload as any)?.decision_logs as any[]) ?? []);
       // Pre-fill decisions: existing line.status, otherwise 'approved'
       if (data?.line_items) {
         const init: Record<number, 'approved' | 'declined'> = {};
@@ -90,7 +93,11 @@ const EstimateApproval = () => {
       status,
       ...(status === 'declined' ? { declined_at: new Date().toISOString(), decline_reason: reason || null } : { approved_at: new Date().toISOString() }),
     });
-    toast.success(status === 'declined' ? 'Response recorded' : 'Estimate signed!');
+    toast.success(status === 'declined' ? 'Response recorded' : editing ? 'Decision updated!' : 'Estimate signed!');
+    setEditing(false);
+    // Refresh decision history
+    const { data: refreshed } = await supabase.rpc('get_estimate_by_token', { _token: token! });
+    setDecisionLogs(((refreshed as any)?.decision_logs as any[]) ?? []);
 
     // If signed in as the customer, auto-redirect back to portal
     const { data: { user } } = await supabase.auth.getUser();
@@ -113,6 +120,7 @@ const EstimateApproval = () => {
   if (!est) return <div className="min-h-screen flex items-center justify-center text-muted-foreground">Estimate not found</div>;
 
   const submitted = ['approved', 'declined', 'partially_approved'].includes(est.status);
+  const locked = submitted && !editing;
 
   return (
     <BrandedDocLayout
@@ -144,7 +152,7 @@ const EstimateApproval = () => {
         )}
       </div>
 
-      {!submitted && (
+      {!locked && (
         <p className="text-sm text-muted-foreground mb-3">
           Check the items you'd like us to perform. Uncheck any you'd like to decline, then sign below.
         </p>
@@ -163,7 +171,7 @@ const EstimateApproval = () => {
             >
               <Checkbox
                 checked={approved}
-                disabled={submitted}
+                disabled={locked}
                 onCheckedChange={(v) => setDecisions((d) => ({ ...d, [i]: v ? 'approved' : 'declined' }))}
                 className="mt-1"
               />
@@ -171,7 +179,7 @@ const EstimateApproval = () => {
                 <div>
                   <div className="font-medium">{l.description}</div>
                   <div className="text-xs text-muted-foreground">{l.quantity} × ${Number(l.unit_price).toFixed(2)}</div>
-                  {submitted && <Badge variant={approved ? 'default' : 'secondary'} className="mt-1 text-[10px]">{decisions[i]}</Badge>}
+                  {locked && <Badge variant={approved ? 'default' : 'secondary'} className="mt-1 text-[10px]">{decisions[i]}</Badge>}
                 </div>
                 <div className={approved ? 'font-medium' : 'line-through text-muted-foreground'}>${Number(l.amount).toFixed(2)}</div>
               </div>
@@ -192,7 +200,7 @@ const EstimateApproval = () => {
 
       {est.notes && <div className="mt-4 text-sm bg-muted/50 border border-border rounded p-3 whitespace-pre-wrap">{est.notes}</div>}
 
-      {!submitted && (
+      {!locked && (
         <div className="mt-5 space-y-3">
           {lines.some((_, i) => decisions[i] === 'declined') && (
             <Textarea placeholder="Reason for declined items (optional)" value={reason} onChange={(e) => setReason(e.target.value)} />
@@ -261,14 +269,35 @@ const EstimateApproval = () => {
           {est.status === 'declined' && <span className="text-muted-foreground">This estimate was declined.</span>}
         </div>
       )}
-      {submitted && est.status !== 'declined' && (
+      {locked && (
         <div className="mt-4 flex flex-col items-center gap-2">
-          <Button asChild>
-            <Link to="/portal/estimates">Return to your portal</Link>
+          {est.status !== 'declined' && (
+            <Button asChild>
+              <Link to="/portal/estimates">Return to your portal</Link>
+            </Button>
+          )}
+          <Button variant="outline" size="sm" onClick={() => setEditing(true)}>
+            Change my decision
           </Button>
           {isCustomer && redirectIn !== null && redirectIn > 0 && (
             <p className="text-xs text-muted-foreground">Redirecting in {redirectIn}s…</p>
           )}
+        </div>
+      )}
+
+      {decisionLogs.length > 0 && (
+        <div className="mt-6 pt-4 border-t border-border">
+          <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2">Decision history</div>
+          <ul className="space-y-1.5 text-xs">
+            {decisionLogs.map((l) => (
+              <li key={l.id} className="flex flex-wrap items-center gap-2 text-muted-foreground">
+                <span className="font-mono">{new Date(l.created_at).toLocaleString()}</span>
+                <Badge variant="outline" className="uppercase text-[10px]">{l.status.replace('_', ' ')}</Badge>
+                {l.requested_date && <span>· requested {l.requested_date}{l.requested_time_window ? ` (${l.requested_time_window})` : ''}</span>}
+                {l.decline_reason && <span className="italic">· "{l.decline_reason}"</span>}
+              </li>
+            ))}
+          </ul>
         </div>
       )}
     </BrandedDocLayout>
