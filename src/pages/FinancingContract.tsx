@@ -491,6 +491,11 @@ const FinancingContract = () => {
           Back to Home
         </Link>
 
+        {/* Linked estimate summary (when ?estimate= or ?token= present) */}
+        <div className="print:hidden mb-6">
+          <EstimateSummaryCard />
+        </div>
+
         {/* Form Inputs - Hidden in print */}
         <div className="print:hidden space-y-6 mb-8">
           <h1 className="text-3xl font-bold text-foreground">Financing Contract Generator</h1>
