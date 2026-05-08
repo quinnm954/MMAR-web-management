@@ -118,16 +118,20 @@ const AdminLogin = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">6-digit PIN</Label>
                 <Input
                   id="password"
                   type="password"
-                  placeholder="Enter your password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
+                  pattern="[0-9]{6}"
+                  maxLength={6}
                   minLength={6}
-                  className="bg-input border-border"
+                  placeholder="••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                  required
+                  className="bg-input border-border tracking-[0.5em] text-center text-lg"
                 />
               </div>
 
