@@ -201,9 +201,10 @@ const AdminInspections = () => {
                   <TableCell className="text-xs">{i.mileage?.toLocaleString() || '—'}</TableCell>
                   <TableCell>
                     <div className="flex gap-1">
-                      <Button size="icon" variant="ghost" onClick={() => copyLink(i.share_token)}><Copy className="h-4 w-4" /></Button>
-                      <Button size="icon" variant="ghost" onClick={() => window.open(`/inspection/${i.share_token}`, '_blank')}><ExternalLink className="h-4 w-4" /></Button>
+                      <Button size="icon" variant="ghost" title="Copy link" onClick={() => copyLink(i.share_token)}><Copy className="h-4 w-4" /></Button>
+                      <Button size="icon" variant="ghost" title="Open" onClick={() => window.open(`/inspection/${i.share_token}`, '_blank')}><ExternalLink className="h-4 w-4" /></Button>
                       <Button size="icon" variant="ghost" title="Share" onClick={() => send(i)}><Share2 className="h-4 w-4" /></Button>
+                      <Button size="icon" variant="ghost" title="Create estimate from declined work" onClick={() => createEstimateFromInspection(i)}><FileText className="h-4 w-4" /></Button>
                       <Button size="sm" variant="ghost" onClick={() => openExisting(i)}>Edit</Button>
                     </div>
                   </TableCell>
