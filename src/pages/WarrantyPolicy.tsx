@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { ArrowLeft, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import mmarLogo from "@/assets/mmar-logo.jpeg";
+import EstimateSummaryCard from "@/components/EstimateSummaryCard";
 
 const WarrantyPolicy = () => {
   const handlePrint = () => {
