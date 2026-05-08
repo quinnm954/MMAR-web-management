@@ -16,7 +16,8 @@ import { format } from 'date-fns';
 import { shareLink } from '@/lib/share';
 import { startRepairOrderFromEstimate } from '@/lib/repairOrders';
 
-interface LineItem { description: string; quantity: number; unit_price: number; amount: number; catalog_item_id?: string; labor_hours?: number; }
+interface LineItem { description: string; quantity: number; unit_price: number; amount: number; catalog_item_id?: string; labor_hours?: number; kind?: 'part' | 'labor' | 'fee'; unit_cost?: number; }
+const PARTS_MARKUP = 1.30; // Imported PDF parts arrive already marked up 30% — divide to recover cost
 interface Estimate {
   id: string;
   customer_id: string;
@@ -109,13 +110,24 @@ const AdminEstimates = () => {
         );
       }
 
-      const lines: LineItem[] = (ex.line_items || []).map((li: any) => ({
-        description: li.description || '',
-        quantity: Number(li.quantity) || 1,
-        unit_price: Number(li.unit_price) || 0,
-        amount: (Number(li.quantity) || 1) * (Number(li.unit_price) || 0),
-        labor_hours: Number(li.labor_hours) || 0,
-      }));
+      const lines: LineItem[] = (ex.line_items || []).map((li: any) => {
+        const qty = Number(li.quantity) || 1;
+        const price = Number(li.unit_price) || 0;
+        const laborHrs = Number(li.labor_hours) || 0;
+        const kind: 'part' | 'labor' | 'fee' = li.kind === 'labor' || li.kind === 'fee'
+          ? li.kind
+          : (laborHrs > 0 ? 'labor' : 'part');
+        const unit_cost = kind === 'part' ? +(price / PARTS_MARKUP).toFixed(2) : 0;
+        return {
+          description: li.description || '',
+          quantity: qty,
+          unit_price: price,
+          amount: qty * price,
+          labor_hours: laborHrs,
+          kind,
+          unit_cost,
+        };
+      });
 
       setPreview({ extracted: ex, matchedCustomer, matchedVehicle, lines });
     } catch (e: any) {
@@ -418,7 +430,9 @@ const AdminEstimates = () => {
                     <TableHeader>
                       <TableRow>
                         <TableHead>Description</TableHead>
-                        <TableHead className="w-16 text-right">Qty</TableHead>
+                        <TableHead className="w-16">Type</TableHead>
+                        <TableHead className="w-12 text-right">Qty</TableHead>
+                        <TableHead className="w-24 text-right">Cost</TableHead>
                         <TableHead className="w-24 text-right">Unit</TableHead>
                         <TableHead className="w-24 text-right">Amount</TableHead>
                       </TableRow>
@@ -427,20 +441,33 @@ const AdminEstimates = () => {
                       {preview.lines.map((l: LineItem, i: number) => (
                         <TableRow key={i}>
                           <TableCell>{l.description}</TableCell>
+                          <TableCell className="text-xs text-muted-foreground capitalize">{l.kind ?? 'part'}</TableCell>
                           <TableCell className="text-right">{l.quantity}</TableCell>
+                          <TableCell className="text-right text-muted-foreground">{l.kind === 'part' && l.unit_cost ? `$${l.unit_cost.toFixed(2)}` : '—'}</TableCell>
                           <TableCell className="text-right">${l.unit_price.toFixed(2)}</TableCell>
                           <TableCell className="text-right">${l.amount.toFixed(2)}</TableCell>
                         </TableRow>
                       ))}
                       {preview.lines.length === 0 && (
-                        <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground py-4">No items extracted</TableCell></TableRow>
+                        <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-4">No items extracted</TableCell></TableRow>
                       )}
                     </TableBody>
                   </Table>
                 </div>
-                <div className="text-right font-semibold mt-2">
-                  Subtotal: ${preview.lines.reduce((s: number, i: LineItem) => s + i.amount, 0).toFixed(2)}
-                </div>
+                {(() => {
+                  const subtotal = preview.lines.reduce((s: number, i: LineItem) => s + i.amount, 0);
+                  const partsRevenue = preview.lines.filter((l: LineItem) => l.kind === 'part').reduce((s: number, i: LineItem) => s + i.amount, 0);
+                  const partsCost = preview.lines.filter((l: LineItem) => l.kind === 'part').reduce((s: number, i: LineItem) => s + (i.unit_cost ?? 0) * i.quantity, 0);
+                  const margin = partsRevenue - partsCost;
+                  return (
+                    <div className="mt-2 grid grid-cols-2 gap-2 text-xs text-muted-foreground">
+                      <div>Subtotal: <span className="text-foreground font-semibold">${subtotal.toFixed(2)}</span></div>
+                      <div>Parts revenue: <span className="text-foreground font-semibold">${partsRevenue.toFixed(2)}</span></div>
+                      <div>Parts cost (price ÷ 1.30): <span className="text-foreground font-semibold">${partsCost.toFixed(2)}</span></div>
+                      <div>Parts gross margin: <span className="text-foreground font-semibold">${margin.toFixed(2)}</span></div>
+                    </div>
+                  );
+                })()}
               </div>
 
               {preview.extracted.notes && (
