@@ -254,7 +254,10 @@ const AdminInvoices = () => {
                     <div>
                       <div className="font-mono text-sm">{i.invoice_number}</div>
                       <div className="text-xs text-muted-foreground">{i.customer?.full_name || i.customer?.email}</div>
-                      <div className="text-[10px] text-muted-foreground">{new Date(i.created_at).toLocaleDateString()}{i.due_date && ` • Due ${i.due_date}`}</div>
+                      <div className="text-[10px] text-muted-foreground">
+                        {new Date(i.created_at).toLocaleDateString()}{i.due_date && ` • Due ${i.due_date}`}
+                        {i.technician_name && <> • Tech: <span className="text-foreground/80 font-medium">{i.technician_name}</span></>}
+                      </div>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
