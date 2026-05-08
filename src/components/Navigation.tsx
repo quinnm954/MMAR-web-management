@@ -234,7 +234,7 @@ const Navigation = () => {
                 <User className="w-4 h-4" /> MMAR Care
               </Link>
               <Link to="/memberships" onClick={close} className="text-accent hover:text-accent/80 font-semibold py-3 px-2 rounded-lg">Memberships</Link>
-              <Link to="/fleet" onClick={close} className="text-foreground hover:text-primary font-medium py-3 px-2 rounded-lg">Fleet (5+ Vehicles)</Link>
+              
               <Link to="/contact" onClick={close} className="text-foreground hover:text-primary font-medium py-3 px-2 rounded-lg">Contact</Link>
               {user ? (
                 <>
