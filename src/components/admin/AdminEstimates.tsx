@@ -138,18 +138,52 @@ const AdminEstimates = () => {
     }
   };
 
-  const confirmImport = () => {
+  const confirmImport = async () => {
     if (!preview) return;
-    const { extracted: ex, matchedCustomer, matchedVehicle, lines } = preview;
+    const { extracted: ex, matchedVehicle, lines } = preview;
+    let { matchedCustomer } = preview;
     const subtotal = lines.reduce((s: number, i: LineItem) => s + i.amount, 0);
     const shop = Math.min(subtotal * (settings?.shop_supplies_pct ?? 0.05), settings?.shop_supplies_max ?? 50);
     const tax = (subtotal + shop) * (settings?.tax_rate ?? 0.07);
     const valid_until = settings ? new Date(Date.now() + (settings.estimate_valid_days || 14) * 86400000).toISOString().slice(0, 10) : null;
 
+    // Auto-create customer when no match was found and we have any identifying info.
+    let autoCreatedCustomer = false;
+    if (!matchedCustomer && (ex.customer_email || ex.customer_name || ex.customer_phone)) {
+      try {
+        const { data, error } = await supabase.functions.invoke('admin-create-customer', {
+          body: {
+            full_name: ex.customer_name || '',
+            email: ex.customer_email || '',
+            phone: ex.customer_phone || '',
+          },
+        });
+        if (error) throw error;
+        if (data?.customer_id) {
+          matchedCustomer = {
+            id: data.customer_id,
+            full_name: ex.customer_name || null,
+            email: ex.customer_email || null,
+          };
+          autoCreatedCustomer = true;
+          // Refresh local customers list so dropdowns/labels resolve immediately
+          setCustomers((prev) => [...prev, matchedCustomer]);
+          toast.success(
+            data.reused ? 'Linked to existing customer' : 'Created new customer from PDF'
+          );
+        }
+      } catch (e: any) {
+        toast.error(e.message || 'Could not auto-create customer — pick one manually');
+      }
+    }
+
     const notesParts: string[] = [];
     if (ex.notes) notesParts.push(ex.notes);
     if (!matchedCustomer && ex.customer_name) {
       notesParts.push(`Imported customer: ${ex.customer_name}${ex.customer_email ? ' / ' + ex.customer_email : ''}${ex.customer_phone ? ' / ' + ex.customer_phone : ''}`);
+    }
+    if (autoCreatedCustomer && ex.customer_phone) {
+      notesParts.push(`Customer phone: ${ex.customer_phone}`);
     }
     if (!matchedVehicle && (ex.vehicle_make || ex.vehicle_model)) {
       notesParts.push(`Imported vehicle: ${ex.vehicle_year ?? ''} ${ex.vehicle_make ?? ''} ${ex.vehicle_model ?? ''}${ex.vehicle_vin ? ' VIN ' + ex.vehicle_vin : ''}`.trim());
@@ -165,7 +199,7 @@ const AdminEstimates = () => {
       valid_until,
     });
     setPreview(null);
-    toast.success(matchedCustomer ? 'Review and save the estimate' : 'Pick a customer to save');
+    if (!matchedCustomer) toast.info('Pick a customer to save');
   };
 
   const recalc = (li: LineItem[]) => {
