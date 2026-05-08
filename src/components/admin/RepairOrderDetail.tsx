@@ -244,6 +244,64 @@ export default function RepairOrderDetail({ appointmentId, open, onClose }: Prop
               </CardContent>
             </Card>
 
+            {/* Technician assignment */}
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm flex items-center gap-2"><UserCog className="h-4 w-4" /> Assigned Technician</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <Select
+                    value={appt.assigned_technician_id ?? "unassigned"}
+                    onValueChange={(v) => assignTech(v === "unassigned" ? null : v)}
+                    disabled={savingTech}
+                  >
+                    <SelectTrigger className="w-full sm:w-[280px]">
+                      <SelectValue placeholder="Select technician" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="unassigned">— Unassigned —</SelectItem>
+                      {techs.map((t) => (
+                        <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {savingTech && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
+                  {appt.assigned_technician_id && (
+                    <Badge variant="secondary" className="text-xs">
+                      Currently: {techMap[appt.assigned_technician_id] || appt.assigned_technician_id.slice(0, 8)}
+                    </Badge>
+                  )}
+                </div>
+
+                {assignHistory.length > 0 && (
+                  <div>
+                    <div className="text-xs uppercase tracking-wider text-muted-foreground flex items-center gap-1 mb-1">
+                      <History className="h-3 w-3" /> Assignment history
+                    </div>
+                    <ul className="space-y-1 text-xs">
+                      {assignHistory.map((h) => {
+                        const before = h.before_data?.assigned_technician_id;
+                        const after = h.after_data?.assigned_technician_id;
+                        return (
+                          <li key={h.id} className="flex items-center justify-between border-b border-border/40 py-1 last:border-0 gap-2">
+                            <span>
+                              <span className="text-muted-foreground">{before ? (techMap[before] || before.slice(0, 8)) : "—"}</span>
+                              {" → "}
+                              <span className="font-medium">{after ? (techMap[after] || after.slice(0, 8)) : "—"}</span>
+                            </span>
+                            <span className="text-muted-foreground text-right">
+                              {h.actor_email || "system"} · {format(new Date(h.created_at), "MMM d, p")}
+                            </span>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
             {/* Estimates */}
             <Section icon={FileSpreadsheet} title={`Estimates (${estimates.length})`}>
               {estimates.length === 0 && <Empty>No estimates created yet.</Empty>}
