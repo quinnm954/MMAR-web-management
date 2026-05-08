@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { Menu, X, ChevronDown, Phone, User } from "lucide-react";
+import { Menu, X, ChevronDown, Phone, User, LogOut, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import mmarLogo from "@/assets/mmar-logo.jpeg";
 import {
@@ -43,8 +43,26 @@ const RESOURCES = [
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { user } = useAuth();
+  const { user, roles, signOut } = useAuth();
+  const navigate = useNavigate();
   const close = () => setIsOpen(false);
+
+  const portalHome = roles.includes("admin")
+    ? "/admin/dashboard"
+    : roles.some((r) => ["technician", "service_advisor", "manager", "parts"].includes(r))
+      ? "/tech"
+      : "/portal/dashboard";
+  const portalLabel = roles.includes("admin")
+    ? "Admin"
+    : roles.some((r) => ["technician", "service_advisor", "manager", "parts"].includes(r))
+      ? "Staff Portal"
+      : "MMAR Care Portal";
+
+  const handleSignOut = async () => {
+    close();
+    await signOut();
+    navigate("/", { replace: true });
+  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border safe-area-inset">
@@ -116,11 +134,34 @@ const Navigation = () => {
               Contact
             </NavLink>
 
-            <Button variant="outline" size="sm" asChild>
-              <Link to={user ? "/portal/dashboard" : "/login"}>
-                <User className="w-4 h-4 mr-1" /> {user ? "Portal" : "Sign In"}
-              </Link>
-            </Button>
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm">
+                    <User className="w-4 h-4 mr-1" /> Account <ChevronDown className="w-3 h-3 ml-1" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56 bg-background z-50">
+                  <DropdownMenuLabel className="truncate">{user.email}</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link to={portalHome} className="cursor-pointer">
+                      <LayoutDashboard className="w-4 h-4 mr-2" /> {portalLabel}
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer text-destructive focus:text-destructive">
+                    <LogOut className="w-4 h-4 mr-2" /> Sign Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Button variant="outline" size="sm" asChild>
+                <Link to="/login">
+                  <User className="w-4 h-4 mr-1" /> Sign In
+                </Link>
+              </Button>
+            )}
 
             <Button variant="hero" size="default" asChild>
               <a href="tel:8135017572">
@@ -189,9 +230,25 @@ const Navigation = () => {
 
               <Link to="/memberships" onClick={close} className="text-accent hover:text-accent/80 font-semibold py-3 px-2 rounded-lg">Memberships</Link>
               <Link to="/contact" onClick={close} className="text-foreground hover:text-primary font-medium py-3 px-2 rounded-lg">Contact</Link>
-              <Link to={user ? "/portal/dashboard" : "/login"} onClick={close} className="text-foreground hover:text-primary font-medium py-3 px-2 rounded-lg flex items-center gap-2">
-                <User className="w-4 h-4" /> {user ? "MMAR Care Portal" : "Sign In (Customer / Employee / Admin)"}
-              </Link>
+              {user ? (
+                <>
+                  <Link to={portalHome} onClick={close} className="text-foreground hover:text-primary font-medium py-3 px-2 rounded-lg flex items-center gap-2">
+                    <LayoutDashboard className="w-4 h-4" /> {portalLabel}
+                  </Link>
+                  <div className="px-2 text-xs text-muted-foreground truncate">Signed in as {user.email}</div>
+                  <button
+                    type="button"
+                    onClick={handleSignOut}
+                    className="text-destructive hover:text-destructive/80 font-medium py-3 px-2 rounded-lg flex items-center gap-2 text-left"
+                  >
+                    <LogOut className="w-4 h-4" /> Sign Out
+                  </button>
+                </>
+              ) : (
+                <Link to="/login" onClick={close} className="text-foreground hover:text-primary font-medium py-3 px-2 rounded-lg flex items-center gap-2">
+                  <User className="w-4 h-4" /> Sign In (Customer / Employee / Admin)
+                </Link>
+              )}
 
               <Button variant="hero" size="lg" asChild className="mt-3 min-h-[48px]">
                 <a href="tel:8135017572" onClick={close}>
