@@ -234,13 +234,25 @@ export default function AdminEmployees() {
               {!form.id && (
                 <div className="rounded-md border p-3 space-y-2 bg-muted/30">
                   <div className="flex items-center gap-2">
-                    <Switch checked={createLogin} onCheckedChange={setCreateLogin} />
+                    <Switch
+                      checked={createLogin}
+                      onCheckedChange={setCreateLogin}
+                      disabled={!TYPE_TO_ROLE[form.employee_type]}
+                    />
                     <Label>Create login account for this employee</Label>
                   </div>
-                  <p className="text-[11px] text-muted-foreground">
-                    A login will be created using the email above. Role is assigned from Type
-                    ({form.employee_type}). On first sign-in they'll be prompted to set their own password.
-                  </p>
+                  {TYPE_TO_ROLE[form.employee_type] ? (
+                    <p className="text-[11px] text-muted-foreground">
+                      A login will be created using the email above. Role:{' '}
+                      <span className="font-mono">{TYPE_TO_ROLE[form.employee_type]}</span>.
+                      On first sign-in they'll be prompted to set their own password.
+                    </p>
+                  ) : (
+                    <p className="text-[11px] text-destructive">
+                      Type "{form.employee_type}" has no login role and cannot be granted portal
+                      access. Pick one of: {Object.keys(TYPE_TO_ROLE).join(', ')}.
+                    </p>
+                  )}
                 </div>
               )}
               <div>
