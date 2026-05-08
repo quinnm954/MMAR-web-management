@@ -89,6 +89,7 @@ const App = () => (
             <Route path="/portal/invoices/:id" element={<CustomerProtectedRoute><PortalInvoiceDetail /></CustomerProtectedRoute>} />
             <Route path="/portal/estimates" element={<CustomerProtectedRoute><PortalEstimates /></CustomerProtectedRoute>} />
             <Route path="/portal/repair-orders" element={<CustomerProtectedRoute><PortalRepairOrders /></CustomerProtectedRoute>} />
+            <Route path="/portal/financing" element={<CustomerProtectedRoute><PortalFinancing /></CustomerProtectedRoute>} />
             <Route
               path="/admin/dashboard"
               element={
