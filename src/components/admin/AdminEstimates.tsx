@@ -110,13 +110,24 @@ const AdminEstimates = () => {
         );
       }
 
-      const lines: LineItem[] = (ex.line_items || []).map((li: any) => ({
-        description: li.description || '',
-        quantity: Number(li.quantity) || 1,
-        unit_price: Number(li.unit_price) || 0,
-        amount: (Number(li.quantity) || 1) * (Number(li.unit_price) || 0),
-        labor_hours: Number(li.labor_hours) || 0,
-      }));
+      const lines: LineItem[] = (ex.line_items || []).map((li: any) => {
+        const qty = Number(li.quantity) || 1;
+        const price = Number(li.unit_price) || 0;
+        const laborHrs = Number(li.labor_hours) || 0;
+        const kind: 'part' | 'labor' | 'fee' = li.kind === 'labor' || li.kind === 'fee'
+          ? li.kind
+          : (laborHrs > 0 ? 'labor' : 'part');
+        const unit_cost = kind === 'part' ? +(price / PARTS_MARKUP).toFixed(2) : 0;
+        return {
+          description: li.description || '',
+          quantity: qty,
+          unit_price: price,
+          amount: qty * price,
+          labor_hours: laborHrs,
+          kind,
+          unit_cost,
+        };
+      });
 
       setPreview({ extracted: ex, matchedCustomer, matchedVehicle, lines });
     } catch (e: any) {
