@@ -13,6 +13,9 @@ import BrandedDocLayout from '@/components/BrandedDocLayout';
 
 const EstimateApproval = () => {
   const { token } = useParams();
+  const navigate = useNavigate();
+  const [isCustomer, setIsCustomer] = useState(false);
+  const [redirectIn, setRedirectIn] = useState<number | null>(null);
   const [est, setEst] = useState<any>(null);
   const [customer, setCustomer] = useState<any>(null);
   const [vehicle, setVehicle] = useState<any>(null);
