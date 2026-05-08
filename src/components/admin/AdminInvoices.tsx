@@ -25,7 +25,9 @@ interface Invoice {
   paid_at: string | null;
   created_at: string;
   customer_id: string;
+  service_record_id: string | null;
   customer?: Customer | null;
+  technician_name?: string | null;
 }
 
 const STATUSES = ["unpaid", "partial", "paid", "overdue", "void"];
