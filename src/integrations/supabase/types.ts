@@ -557,6 +557,7 @@ export type Database = {
           converted_to_invoice_id: string | null
           created_at: string
           customer_id: string
+          customer_phone: string | null
           decline_reason: string | null
           declined_at: string | null
           estimate_number: string | null
@@ -582,6 +583,7 @@ export type Database = {
           converted_to_invoice_id?: string | null
           created_at?: string
           customer_id: string
+          customer_phone?: string | null
           decline_reason?: string | null
           declined_at?: string | null
           estimate_number?: string | null
@@ -607,6 +609,7 @@ export type Database = {
           converted_to_invoice_id?: string | null
           created_at?: string
           customer_id?: string
+          customer_phone?: string | null
           decline_reason?: string | null
           declined_at?: string | null
           estimate_number?: string | null
