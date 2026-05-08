@@ -249,15 +249,15 @@ export default function AdminReports() {
 
       <h2 className="font-display text-xl pt-2">Profit by Invoice (paid)</h2>
       <p className="text-xs text-muted-foreground -mt-2">
-        Gross profit = revenue − parts cost (COGS). Net profit = gross profit − employee cost. Employee cost uses each
+        Gross profit = gross revenue − cost of goods. Net profit = gross profit − cost of employees. Employee cost uses each
         technician's per-employee hourly rate from the Employees tab × labor hours billed on the estimate. Falls back to
         clock time and the default rate (${defaultRate.toFixed(2)}/hr) when no employee record exists.
       </p>
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-        <KPI label="Total Revenue" value={fmt(totals.revenue)} />
-        <KPI label="Total COGS" value={fmt(totals.cogs)} />
-        <KPI label="Employee Cost" value={fmt(totals.employeeCost)} />
+        <KPI label="Gross Revenue" value={fmt(totals.revenue)} />
+        <KPI label="Cost of Goods" value={fmt(totals.cogs)} />
         <KPI label="Gross Profit" value={fmt(totals.grossProfit)} />
+        <KPI label="Cost of Employees" value={fmt(totals.employeeCost)} />
         <KPI label="Net Profit" value={fmt(totals.netProfit)} />
       </div>
 
