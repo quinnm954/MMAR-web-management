@@ -13,6 +13,7 @@ const ALL_ROLES = ["admin", "manager", "service_advisor", "technician", "parts",
 type Role = typeof ALL_ROLES[number];
 
 export default function AdminRoles() {
+  const { user: currentUser } = useAuth();
   const [users, setUsers] = useState<any[]>([]);
   const [roles, setRoles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -41,7 +42,19 @@ export default function AdminRoles() {
     load();
   };
   const revoke = async (uid: string, role: Role) => {
-    if (!confirm(`Remove ${role} from this user?`)) return;
+    const isSelf = currentUser?.id === uid;
+    if (isSelf && role === "admin") {
+      const adminCount = roles.filter(r => r.role === "admin").length;
+      if (adminCount <= 1) {
+        toast.error("Can't remove the last admin. Grant admin to another user first.");
+        return;
+      }
+      if (!confirm("⚠️ You are about to remove YOUR OWN admin role. You will immediately lose access to admin tools. Continue?")) return;
+    } else if (isSelf) {
+      if (!confirm(`Remove ${role} from your own account?`)) return;
+    } else {
+      if (!confirm(`Remove ${role} from this user?`)) return;
+    }
     const { error } = await supabase.from("user_roles").delete().eq("user_id", uid).eq("role", role);
     if (error) return toast.error(error.message);
     load();
