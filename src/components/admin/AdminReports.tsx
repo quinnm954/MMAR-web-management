@@ -328,7 +328,9 @@ export default function AdminReports() {
                 <TableHead>Date</TableHead>
                 <TableHead>Customer</TableHead>
                 <TableHead>Technician</TableHead>
-                <TableHead className="text-right">Labor (hrs)</TableHead>
+                <TableHead className="text-right">Paid Labor (hrs)</TableHead>
+                <TableHead className="text-right">Clocked (hrs)</TableHead>
+                <TableHead className="text-right">Variance</TableHead>
                 <TableHead className="text-right">Revenue</TableHead>
                 <TableHead className="text-right">COGS</TableHead>
                 <TableHead className="text-right">Gross Profit</TableHead>
@@ -340,7 +342,7 @@ export default function AdminReports() {
             <TableBody>
               {profitRows.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={11} className="text-center text-muted-foreground py-6">
+                  <TableCell colSpan={13} className="text-center text-muted-foreground py-6">
                     No paid invoices in this window.
                   </TableCell>
                 </TableRow>
