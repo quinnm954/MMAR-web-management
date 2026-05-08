@@ -12,15 +12,15 @@ const config: CapacitorConfig = {
   },
   ios: {
     contentInset: 'always',
-    backgroundColor: '#0F172A',
+    backgroundColor: '#000000',
   },
   android: {
-    backgroundColor: '#0F172A',
+    backgroundColor: '#000000',
   },
   plugins: {
     SplashScreen: {
       launchShowDuration: 1500,
-      backgroundColor: '#0F172A',
+      backgroundColor: '#000000',
       androidScaleType: 'CENTER_CROP',
       showSpinner: false,
       splashFullScreen: true,
@@ -28,7 +28,7 @@ const config: CapacitorConfig = {
     },
     StatusBar: {
       style: 'DARK',
-      backgroundColor: '#0F172A',
+      backgroundColor: '#000000',
     },
     PushNotifications: {
       presentationOptions: ['badge', 'sound', 'alert'],
