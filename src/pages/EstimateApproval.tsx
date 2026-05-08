@@ -27,16 +27,12 @@ const EstimateApproval = () => {
 
   useEffect(() => {
     (async () => {
-      const { data } = await supabase.from('estimates').select('*').eq('approval_token', token).maybeSingle();
+      if (!token) { setLoading(false); return; }
+      const { data: payload } = await supabase.rpc('get_estimate_by_token', { _token: token });
+      const data: any = (payload as any)?.estimate ?? null;
       setEst(data);
-      if (data?.customer_id) {
-        const { data: c } = await supabase.from('profiles').select('full_name, email').eq('id', data.customer_id).maybeSingle();
-        setCustomer(c);
-      }
-      if (data?.vehicle_id) {
-        const { data: v } = await supabase.from('vehicles').select('year, make, model, license_plate, vin').eq('id', data.vehicle_id).maybeSingle();
-        setVehicle(v);
-      }
+      setCustomer((payload as any)?.customer ?? null);
+      setVehicle((payload as any)?.vehicle ?? null);
       // Pre-fill decisions: existing line.status, otherwise 'approved'
       if (data?.line_items) {
         const init: Record<number, 'approved' | 'declined'> = {};
