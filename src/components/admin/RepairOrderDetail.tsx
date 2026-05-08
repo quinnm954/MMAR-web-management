@@ -127,6 +127,42 @@ export default function RepairOrderDetail({ appointmentId, open, onClose }: Prop
     }
   };
 
+  const [savingSchedule, setSavingSchedule] = useState(false);
+  const [scheduleInput, setScheduleInput] = useState<string>("");
+  useEffect(() => {
+    if (appt?.scheduled_at) {
+      // datetime-local needs YYYY-MM-DDTHH:mm in local time
+      const d = new Date(appt.scheduled_at);
+      const pad = (n: number) => String(n).padStart(2, "0");
+      setScheduleInput(`${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`);
+    } else if (appt?.requested_date) {
+      // pre-fill with customer's requested date at a sensible default time based on window
+      const win: string = appt.requested_time_window || "";
+      const hour = win.toLowerCase().includes("evening") ? "16:00"
+        : win.toLowerCase().includes("afternoon") ? "13:00"
+        : "09:00";
+      setScheduleInput(`${appt.requested_date}T${hour}`);
+    } else {
+      setScheduleInput("");
+    }
+  }, [appt?.scheduled_at, appt?.requested_date, appt?.requested_time_window]);
+
+  const saveSchedule = async () => {
+    if (!appt || !scheduleInput) return;
+    setSavingSchedule(true);
+    const iso = new Date(scheduleInput).toISOString();
+    const newStatus = appt.status === "requested" ? "scheduled" : appt.status;
+    const newColumn = appt.board_column === "inbox" ? "scheduled" : appt.board_column;
+    const { error } = await supabase
+      .from("appointments")
+      .update({ scheduled_at: iso, status: newStatus, board_column: newColumn })
+      .eq("id", appt.id);
+    setSavingSchedule(false);
+    if (error) return toast.error(error.message);
+    toast.success("Repair order scheduled");
+    setAppt({ ...appt, scheduled_at: iso, status: newStatus, board_column: newColumn });
+  };
+
   const assignTech = async (techId: string | null) => {
     if (!appt) return;
     setSavingTech(true);
