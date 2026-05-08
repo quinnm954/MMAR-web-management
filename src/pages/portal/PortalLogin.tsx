@@ -20,7 +20,17 @@ const PortalLogin = () => {
   const redirect = params.get("redirect") || "/portal/dashboard";
 
   useEffect(() => {
-    if (!isLoading && user) navigate(redirect, { replace: true });
+    if (!isLoading && user) {
+      let target = redirect;
+      try {
+        const stored = sessionStorage.getItem("postLoginRedirect");
+        if (stored) {
+          target = stored;
+          sessionStorage.removeItem("postLoginRedirect");
+        }
+      } catch {}
+      navigate(target, { replace: true });
+    }
   }, [user, isLoading, navigate, redirect]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -28,14 +38,39 @@ const PortalLogin = () => {
     setBusy(true);
     const { error } = await signIn(email, password);
     setBusy(false);
+    if (error) {
+      const msg = error.message || "";
+      if (/confirm/i.test(msg)) {
+        toast.error("Email not confirmed. Check your inbox or resend the confirmation below.");
+      } else {
+        toast.error(msg);
+      }
+    } else {
+      toast.success("Welcome back");
+    }
+  };
+
+  const handleResendConfirmation = async () => {
+    if (!email) {
+      toast.error("Enter your email first");
+      return;
+    }
+    setBusy(true);
+    const { error } = await (await import("@/integrations/supabase/client")).supabase.auth.resend({
+      type: "signup",
+      email,
+      options: { emailRedirectTo: window.location.origin + "/portal/dashboard" },
+    });
+    setBusy(false);
     if (error) toast.error(error.message);
-    else toast.success("Welcome back");
+    else toast.success("Confirmation email sent. Check your inbox.");
   };
 
   const handleGoogle = async () => {
     setBusy(true);
+    try { sessionStorage.setItem("postLoginRedirect", redirect); } catch {}
     const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin + redirect,
+      redirect_uri: window.location.origin,
     });
     if (result.error) {
       toast.error("Google sign-in failed");
