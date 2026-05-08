@@ -83,8 +83,9 @@ const PortalSignup = () => {
                 <Input id="email" type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
               </div>
               <div>
-                <Label htmlFor="password">Password (8+ chars)</Label>
+                <Label htmlFor="password">Password</Label>
                 <Input id="password" type="password" minLength={8} required value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} />
+                <p className="text-xs text-muted-foreground mt-1">At least 8 characters. Avoid common passwords — leaked passwords are blocked.</p>
               </div>
               <Button type="submit" variant="hero" className="w-full" disabled={busy}>
                 {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : "Create Account"}
