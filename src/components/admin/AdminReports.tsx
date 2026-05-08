@@ -32,7 +32,9 @@ type ProfitRow = {
   date: string;
   customer: string;
   technician: string;
-  laborHours: number;
+  paidLaborHours: number;   // billed to customer on the estimate
+  clockedHours: number;     // actual time clocked by tech (performance)
+  varianceHours: number;    // clocked - paid (positive = over paid time)
   revenue: number;
   cogs: number;
   employeeCost: number;
@@ -133,8 +135,8 @@ export default function AdminReports() {
       );
       const apptIds = Array.from(new Set(Array.from(apptByService.values()).filter(Boolean))) as string[];
 
-      // Appointments → tech assignment + estimate labor hours
-      const apptInfo = new Map<string, { tech: string | null; laborHours: number }>();
+      // Appointments → tech assignment, paid (estimate) labor hours, clocked hours
+      const apptInfo = new Map<string, { tech: string | null; paidHours: number; clockedHours: number }>();
       if (apptIds.length) {
         const [apRes, estRes, teRes] = await Promise.all([
           supabase.from('appointments').select('id, assigned_technician_id').in('id', apptIds),
@@ -142,29 +144,23 @@ export default function AdminReports() {
           supabase.from('time_entries').select('appointment_id, duration_minutes, technician_id').in('appointment_id', apptIds),
         ]);
         (apRes.data ?? []).forEach((a: any) => {
-          apptInfo.set(a.id, { tech: a.assigned_technician_id, laborHours: 0 });
+          apptInfo.set(a.id, { tech: a.assigned_technician_id, paidHours: 0, clockedHours: 0 });
         });
-        // Sum labor_hours from estimates per appointment
+        // Sum labor_hours from estimates per appointment (what the customer paid for)
         (estRes.data ?? []).forEach((e: any) => {
           const items = Array.isArray(e.line_items) ? e.line_items : [];
           const hrs = items.reduce((s: number, li: any) => s + (Number(li.labor_hours) || 0), 0);
-          const cur = apptInfo.get(e.appointment_id) ?? { tech: null, laborHours: 0 };
-          cur.laborHours += hrs;
+          const cur = apptInfo.get(e.appointment_id) ?? { tech: null, paidHours: 0, clockedHours: 0 };
+          cur.paidHours += hrs;
           apptInfo.set(e.appointment_id, cur);
         });
-        // Fallback to clock time when estimate has no labor_hours
-        const clockByAppt = new Map<string, { minutes: number; tech: string | null }>();
+        // Sum clocked time per appointment (performance only)
         (teRes.data ?? []).forEach((t: any) => {
-          const cur = clockByAppt.get(t.appointment_id) ?? { minutes: 0, tech: null };
-          cur.minutes += Number(t.duration_minutes || 0);
+          const cur = apptInfo.get(t.appointment_id) ?? { tech: null, paidHours: 0, clockedHours: 0 };
+          cur.clockedHours += Number(t.duration_minutes || 0) / 60;
+          // Fall back to clocked tech only if no assigned tech on the RO
           if (!cur.tech) cur.tech = t.technician_id;
-          clockByAppt.set(t.appointment_id, cur);
-        });
-        clockByAppt.forEach((v, k) => {
-          const cur = apptInfo.get(k) ?? { tech: null, laborHours: 0 };
-          if (cur.laborHours === 0) cur.laborHours = v.minutes / 60;
-          if (!cur.tech) cur.tech = v.tech;
-          apptInfo.set(k, cur);
+          apptInfo.set(t.appointment_id, cur);
         });
       }
 
@@ -177,10 +173,13 @@ export default function AdminReports() {
         }, 0);
         const apptId = inv.service_record_id ? apptByService.get(inv.service_record_id) : undefined;
         const info = apptId ? apptInfo.get(apptId) : undefined;
-        const laborHours = info?.laborHours ?? 0;
+        const paidLaborHours = info?.paidHours ?? 0;
+        const clockedHours = info?.clockedHours ?? 0;
+        const varianceHours = clockedHours - paidLaborHours;
         const tech = info?.tech ? empByUser.get(info.tech) : null;
         const techRate = tech?.hourly_rate != null ? Number(tech.hourly_rate) : rate;
-        const employeeCost = laborHours * techRate;
+        // Pay technicians on PAID labor hours (from the estimate), not clocked time
+        const employeeCost = paidLaborHours * techRate;
         const revenueRow = Number(inv.total || 0);
         const hasStripe = Boolean(inv.stripe_session_id || inv.stripe_payment_intent_id);
         const isPaid = inv.status === 'paid';
@@ -197,7 +196,9 @@ export default function AdminReports() {
           date: new Date(inv.created_at).toLocaleDateString(),
           customer: cust?.full_name || cust?.email || '—',
           technician: tech?.full_name ?? (info?.tech ? 'Unassigned employee' : '—'),
-          laborHours,
+          paidLaborHours,
+          clockedHours,
+          varianceHours,
           revenue: revenueRow,
           cogs,
           employeeCost,
@@ -209,7 +210,7 @@ export default function AdminReports() {
       });
       setProfitRows(rows);
 
-      const totalLaborHrs = rows.reduce((s, r) => s + r.laborHours, 0);
+      const totalLaborHrs = rows.reduce((s, r) => s + r.paidLaborHours, 0);
 
       setData({
         revenue30: revenue,
@@ -304,10 +305,13 @@ export default function AdminReports() {
       <h2 className="font-display text-xl pt-2">Profit by Invoice (paid)</h2>
       <p className="text-xs text-muted-foreground -mt-2">
         Gross profit = gross revenue − cost of goods. Net profit = gross profit − cost of employees − Stripe fees.
-        Employee cost uses each technician's per-employee hourly rate from the Employees tab × labor hours billed on the
-        estimate. Falls back to clock time and the default rate (${defaultRate.toFixed(2)}/hr) when no employee record
-        exists. Stripe fees use the actual amount Stripe charged per payment when synced; otherwise an estimate of
-        2.9% + $0.30 is used as a fallback. Click "Sync Stripe fees" to refresh actual amounts.
+        Technician is taken from the repair order assignment and carried through to the paid invoice. Employee cost
+        uses each technician's per-employee hourly rate from the Employees tab × <strong>paid labor hours</strong>{' '}
+        (from the estimate) — not clocked time. Default rate ${defaultRate.toFixed(2)}/hr is used when no employee
+        record exists. Clocked hours and the variance column are for performance tracking only: positive variance
+        means the tech ran <strong>over paid labor time</strong>; negative means <strong>under paid labor time</strong>.
+        Stripe fees use the actual amount Stripe charged per payment when synced; otherwise an estimate of
+        2.9% + $0.30 is used as a fallback.
       </p>
       <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
         <KPI label="Gross Revenue" value={fmt(totals.revenue)} />
@@ -327,7 +331,9 @@ export default function AdminReports() {
                 <TableHead>Date</TableHead>
                 <TableHead>Customer</TableHead>
                 <TableHead>Technician</TableHead>
-                <TableHead className="text-right">Labor (hrs)</TableHead>
+                <TableHead className="text-right">Paid Labor (hrs)</TableHead>
+                <TableHead className="text-right">Clocked (hrs)</TableHead>
+                <TableHead className="text-right">Variance</TableHead>
                 <TableHead className="text-right">Revenue</TableHead>
                 <TableHead className="text-right">COGS</TableHead>
                 <TableHead className="text-right">Gross Profit</TableHead>
@@ -339,7 +345,7 @@ export default function AdminReports() {
             <TableBody>
               {profitRows.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={11} className="text-center text-muted-foreground py-6">
+                  <TableCell colSpan={13} className="text-center text-muted-foreground py-6">
                     No paid invoices in this window.
                   </TableCell>
                 </TableRow>
@@ -350,7 +356,11 @@ export default function AdminReports() {
                     <TableCell className="text-xs">{r.date}</TableCell>
                     <TableCell className="text-xs">{r.customer}</TableCell>
                     <TableCell className="text-xs">{r.technician}</TableCell>
-                    <TableCell className="text-right">{r.laborHours.toFixed(2)}</TableCell>
+                    <TableCell className="text-right">{r.paidLaborHours.toFixed(2)}</TableCell>
+                    <TableCell className="text-right text-muted-foreground">{r.clockedHours.toFixed(2)}</TableCell>
+                    <TableCell className={`text-right font-medium ${r.varianceHours > 0 ? 'text-destructive' : r.varianceHours < 0 ? 'text-primary' : 'text-muted-foreground'}`} title={r.varianceHours > 0 ? 'Tech took longer than billed (over paid time)' : r.varianceHours < 0 ? 'Tech finished faster than billed (under paid time)' : 'On target'}>
+                      {r.varianceHours > 0 ? '+' : ''}{r.varianceHours.toFixed(2)}
+                    </TableCell>
                     <TableCell className="text-right">{fmt(r.revenue)}</TableCell>
                     <TableCell className="text-right">{fmt(r.cogs)}</TableCell>
                     <TableCell className={`text-right ${r.grossProfit < 0 ? 'text-destructive' : ''}`}>
