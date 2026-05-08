@@ -73,6 +73,17 @@ const TAG_INTROS: Record<string, { title: string; intro: string; related: { href
       { href: "/mobile-starter-repair", label: "Mobile Starter Repair" },
     ],
   },
+  "mmar-care": {
+    title: "MMAR Care — Membership & Customer Portal",
+    intro:
+      "MMAR Care is the free customer portal and optional membership from Mike's Mobile Auto Repair. Manage every vehicle in your household, request appointments, approve estimates, pay invoices, and track warranty — all from your phone. Articles tagged here cover features, plans, fleet options, and tips for getting the most out of your account.",
+    related: [
+      { href: "/mmar-care", label: "Open MMAR Care" },
+      { href: "/memberships", label: "Membership Plans" },
+      { href: "/fleet", label: "Fleet (5+ Vehicles)" },
+      { href: "/portal/signup", label: "Create Free Account" },
+    ],
+  },
 };
 
 const BlogTag = () => {
