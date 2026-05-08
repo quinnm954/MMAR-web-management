@@ -243,6 +243,150 @@ const Memberships = () => {
           </div>
         </section>
 
+        {/* Fleet */}
+        <section id="fleet" className="py-16 px-4 border-t border-border/50">
+          <div className="container mx-auto max-w-6xl">
+            <div className="flex items-center gap-2 mb-2">
+              <Badge variant="secondary">
+                <Truck className="w-3.5 h-3.5 mr-1" />
+                Fleet Plans
+              </Badge>
+            </div>
+            <h2 className="text-3xl lg:text-4xl font-bold mb-3">Fleet Maintenance (5+ Vehicles)</h2>
+            <p className="text-muted-foreground max-w-3xl mb-8">
+              One account for your whole fleet. Volume discounts that scale with vehicle count, fair pricing
+              benchmarked to RepairPal ranges, and final quotes built from each VIN's actual labor times and fuel type.
+            </p>
+
+            {/* Volume tiers */}
+            <h3 className="text-xl font-semibold mb-4">Volume discount tiers</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+              {VOLUME_TIERS.map((t) => (
+                <Card key={t.range} className="border-border/60">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-base text-muted-foreground font-medium">{t.range}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-3xl font-bold text-accent">{t.discount}</div>
+                    <div className="text-xs text-muted-foreground mt-1">off standard labor rate</div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            {/* Pricing matrix */}
+            <h3 className="text-xl font-semibold mb-4">Reference pricing by vehicle type</h3>
+            <div className="rounded-lg border border-border/60 overflow-hidden mb-6">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Vehicle Type</TableHead>
+                    <TableHead>Oil & Filter</TableHead>
+                    <TableHead>Front Brake Job</TableHead>
+                    <TableHead>Diagnostic</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {PRICING_MATRIX.map((row) => {
+                    const Icon = row.icon;
+                    return (
+                      <TableRow key={row.type}>
+                        <TableCell className="font-medium">
+                          <div className="flex items-center gap-2">
+                            <Icon className="w-4 h-4 text-primary" />
+                            {row.type}
+                          </div>
+                        </TableCell>
+                        <TableCell>{row.oil}</TableCell>
+                        <TableCell>{row.brakes}</TableCell>
+                        <TableCell>{row.diag}</TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </div>
+            <p className="text-xs text-muted-foreground mb-8">
+              Typical service ranges benchmarked against RepairPal national averages. Your actual fleet quote is computed per VIN.
+            </p>
+
+            {/* Fuel adjustments */}
+            <h3 className="text-xl font-semibold mb-4">Fuel-type adjustments</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-10">
+              {FUEL_ADJUSTMENTS.map((f) => {
+                const Icon = f.icon;
+                return (
+                  <Card key={f.fuel} className="border-border/60">
+                    <CardContent className="pt-5">
+                      <div className="flex items-center gap-2 mb-1">
+                        <Icon className="w-4 h-4 text-accent" />
+                        <span className="font-semibold">{f.fuel}</span>
+                        <Badge variant="outline" className="ml-auto text-xs">{f.delta}</Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground">{f.note}</p>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+
+            {/* Fleet benefits */}
+            <h3 className="text-xl font-semibold mb-4 text-center">Why fleets choose MMAR</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+              {FLEET_BENEFITS.map((b) => {
+                const Icon = b.icon;
+                return (
+                  <Card key={b.title} className="border-border/60">
+                    <CardContent className="pt-6">
+                      <Icon className="w-8 h-8 text-primary mb-3" />
+                      <h4 className="font-semibold mb-1">{b.title}</h4>
+                      <p className="text-sm text-muted-foreground">{b.text}</p>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+
+            {/* Fleet FAQ */}
+            <h3 className="text-xl font-semibold mb-4 text-center">Fleet FAQ</h3>
+            <Accordion type="single" collapsible className="max-w-3xl mx-auto mb-10">
+              {FLEET_FAQ.map((item, i) => (
+                <AccordionItem key={i} value={`fleet-${i}`}>
+                  <AccordionTrigger className="text-left">{item.q}</AccordionTrigger>
+                  <AccordionContent className="text-muted-foreground">{item.a}</AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+
+            {/* Fleet CTA */}
+            <Card className="border-primary/30 bg-gradient-to-br from-primary/10 to-accent/10">
+              <CardContent className="py-10 text-center">
+                <h3 className="text-2xl font-bold mb-2">Ready for a fleet quote?</h3>
+                <p className="text-muted-foreground mb-6">
+                  Send your VINs — we'll return a per-vehicle price sheet within one business day.
+                </p>
+                <div className="flex flex-wrap gap-3 justify-center">
+                  <Button asChild size="lg">
+                    <a href={`sms:${FLEET_PHONE}?&body=${FLEET_SMS_BODY}`}>
+                      <MessageSquare className="w-4 h-4 mr-2" />
+                      Text fleet quote
+                    </a>
+                  </Button>
+                  <Button asChild size="lg" variant="outline">
+                    <a href={`tel:${FLEET_PHONE}`}>
+                      <Phone className="w-4 h-4 mr-2" />
+                      Call {FLEET_PHONE}
+                    </a>
+                  </Button>
+                </div>
+                <div className="flex items-center justify-center gap-2 mt-4 text-sm text-muted-foreground">
+                  <Check className="w-4 h-4 text-accent" /> No obligation • SW Florida service area
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
         {/* Rules */}
         <section className="py-16 px-4">
           <div className="container mx-auto max-w-3xl">
