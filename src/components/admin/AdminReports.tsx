@@ -67,8 +67,9 @@ export default function AdminReports() {
   const [defaultRate, setDefaultRate] = useState<number>(35);
   const [days, setDays] = useState<number>(30);
 
-  useEffect(() => {
-    (async () => {
+  const [syncing, setSyncing] = useState(false);
+
+  const load = useCallback(async () => {
       const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
 
       const [inv, completed, members, ests, settings, employeesRes] = await Promise.all([
