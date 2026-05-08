@@ -64,6 +64,8 @@ const EstimateApproval = () => {
 
   const submit = async () => {
     if (!signature) return toast.error('Please sign to confirm your decision');
+    const willApprove = !allDeclined;
+    if (willApprove && !requestedDate) return toast.error('Please select a preferred service date');
     setWorking(true);
 
     const updatedLines = lines.map((l, i) => ({ ...l, status: decisions[i] }));
@@ -75,6 +77,8 @@ const EstimateApproval = () => {
       _status: status,
       _signature: signature,
       _decline_reason: status === 'declined' || (status === 'partially_approved' && reason) ? (reason || null) : null,
+      _requested_date: willApprove && requestedDate ? format(requestedDate, 'yyyy-MM-dd') : null,
+      _requested_time_window: willApprove ? timeWindow : null,
     });
     setWorking(false);
     if (error) return toast.error('Could not submit. Please contact us.');
