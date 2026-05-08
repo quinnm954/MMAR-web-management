@@ -86,6 +86,7 @@ const App = () => (
             <Route path="/portal/service-history" element={<CustomerProtectedRoute><PortalServiceHistory /></CustomerProtectedRoute>} />
             <Route path="/portal/invoices" element={<CustomerProtectedRoute><PortalInvoices /></CustomerProtectedRoute>} />
             <Route path="/portal/invoices/:id" element={<CustomerProtectedRoute><PortalInvoiceDetail /></CustomerProtectedRoute>} />
+            <Route path="/portal/estimates" element={<CustomerProtectedRoute><PortalEstimates /></CustomerProtectedRoute>} />
             <Route path="/portal/repair-orders" element={<CustomerProtectedRoute><PortalRepairOrders /></CustomerProtectedRoute>} />
             <Route
               path="/admin/dashboard"
