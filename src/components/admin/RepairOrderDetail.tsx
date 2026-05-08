@@ -29,6 +29,10 @@ export default function RepairOrderDetail({ appointmentId, open, onClose }: Prop
   const [services, setServices] = useState<any[]>([]);
   const [invoices, setInvoices] = useState<any[]>([]);
   const [timeEntries, setTimeEntries] = useState<any[]>([]);
+  const [techs, setTechs] = useState<{ id: string; name: string }[]>([]);
+  const [techMap, setTechMap] = useState<Record<string, string>>({});
+  const [assignHistory, setAssignHistory] = useState<any[]>([]);
+  const [savingTech, setSavingTech] = useState(false);
 
   useEffect(() => {
     if (!appointmentId || !open) return;
