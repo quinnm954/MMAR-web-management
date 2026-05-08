@@ -31,9 +31,17 @@ import AdminCalendar from '@/components/admin/AdminCalendar';
 import AdminTechProductivity from '@/components/admin/AdminTechProductivity';
 import { supabase } from '@/integrations/supabase/client';
 import mmarLogo from '@/assets/mmar-logo.jpeg';
+import type { AppRole } from '@/hooks/useAuth';
+
+type TabDef = { value: string; label: string; icon: any; roles: AppRole[]; content: JSX.Element };
+
+const ALL: AppRole[] = ['admin', 'manager', 'service_advisor', 'technician', 'parts'];
+const ADMIN_ONLY: AppRole[] = ['admin', 'manager'];
+const ADVISOR: AppRole[] = ['admin', 'manager', 'service_advisor'];
+const PARTS: AppRole[] = ['admin', 'manager', 'parts'];
 
 const AdminDashboard = () => {
-  const { signOut, user } = useAuth();
+  const { signOut, user, hasAnyRole, roles } = useAuth();
   const [stats, setStats] = useState({ customers: 0, activeMemberships: 0, openAppointments: 0, unpaidInvoices: 0 });
   const [contracts, setContracts] = useState<any[]>([]);
   const [warranties, setWarranties] = useState<any[]>([]);
