@@ -277,6 +277,17 @@ export default function AdminReports() {
               className="w-24 h-9"
             />
           </div>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            disabled={syncing}
+            onClick={() => syncStripeFees(false)}
+            title="Pull actual Stripe processing fees for paid invoices"
+          >
+            {syncing ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <RefreshCw className="h-4 w-4 mr-2" />}
+            Sync Stripe fees
+          </Button>
         </div>
       </div>
 
