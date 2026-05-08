@@ -454,6 +454,56 @@ export const blogPosts: BlogPost[] = [
       { question: "Why is my AC cold while driving but warm at idle?", answer: "Usually a failing condenser fan, low refrigerant, or a weak compressor clutch. A mobile diagnostic will tell you which in about 30 minutes." },
     ],
   },
+  {
+    slug: "introducing-mmar-care-membership-platform",
+    title: "Introducing MMAR Care: The Easiest Way to Own a Car in Southwest Florida",
+    excerpt:
+      "MMAR Care is the new membership and customer portal from Mike's Mobile Auto Repair — vehicles, appointments, estimates, invoices, financing, and warranty in one place.",
+    dateISO: "2026-05-08",
+    readMinutes: 5,
+    tags: ["MMAR Care", "Membership", "Maintenance"],
+    body: `
+      <p>Owning a car in Southwest Florida is hard on your wallet and your schedule. Heat kills batteries, humidity eats brake lines, and life rarely makes time for a shop visit. That's why we built <a href="/mmar-care"><strong>MMAR Care</strong></a> — a free customer portal and optional membership that makes owning a vehicle simpler, cheaper, and a lot less stressful.</p>
+
+      <h2>What is MMAR Care?</h2>
+      <p>MMAR Care is the customer side of Mike's Mobile Auto Repair. It's where you (and every driver in your household) can manage every vehicle you own from your phone — service history, upcoming maintenance, estimates, invoices, financing, warranty, and appointments — without a single phone call if you don't want one.</p>
+
+      <h2>Everything in one place</h2>
+      <ul>
+        <li><strong>Your vehicles, always up to date.</strong> Every car on your account, with mileage, service records, and recommended maintenance.</li>
+        <li><strong>Effortless scheduling.</strong> Pick a window that works, members get priority booking.</li>
+        <li><strong>Estimates, inspections & repair orders.</strong> Approve estimates online, see digital inspection photos, follow each repair in real time.</li>
+        <li><strong>Invoices and financing.</strong> Pay online, view receipts, manage in-house financing or your monthly membership.</li>
+        <li><strong>Warranty & records on demand.</strong> Magnuson-Moss warranty coverage and service records you can pull up any time — perfect for resale or trade-in.</li>
+        <li><strong>Member perks.</strong> Discounted labor, included oil changes on select plans, and special pricing on tires, brakes, and seasonal services.</li>
+      </ul>
+
+      <h2>Why we built it</h2>
+      <p>Most shops still run on paper invoices, phone tag, and "we'll call you when it's ready." Our customers told us they wanted what every other industry already has — a clean app, transparent pricing, and the ability to see what's happening with their car without chasing anyone down. MMAR Care is our answer.</p>
+
+      <h2>Membership plans for every household</h2>
+      <p>The portal is free for every customer. Memberships are optional and start at a price that pays for itself with one or two services a year. Plans cover oil changes, inspections, priority scheduling, labor discounts, and roadside benefits. If you have <a href="/fleet">5 or more vehicles</a>, our fleet program adds volume pricing and on-site service.</p>
+
+      <h2>How to get started</h2>
+      <ol>
+        <li>Visit <a href="/mmar-care">mmar-care</a> and create your free account.</li>
+        <li>Add your vehicle(s) — VIN decode pulls the year/make/model automatically.</li>
+        <li>Request your first appointment, or pick a membership plan if you want the discounts.</li>
+      </ol>
+
+      <p>Already a customer? You'll get an invite link by text or email — one click and your existing service history shows up in your dashboard. Questions? Call or text <a href="tel:8135017572">(813) 501-7572</a> and we'll walk you through it.</p>
+
+      <h2>The bottom line</h2>
+      <p>MMAR Care won't make Florida any cooler on your car, but it will make owning one a lot easier. Free portal, optional membership, real mechanics on the other end. That's the whole pitch.</p>
+    `,
+    faqs: [
+      { question: "Is MMAR Care free?", answer: "Yes. The portal — vehicles, appointments, estimates, invoices, warranty, and service history — is free for every customer. Memberships are optional and add discounts and included services." },
+      { question: "Do I need a membership to use MMAR Care?", answer: "No. Anyone can create a free account, add vehicles, request appointments, and pay invoices. Membership just unlocks discounted labor, included oil changes, and priority scheduling." },
+      { question: "Can I manage more than one vehicle?", answer: "Yes. Add every vehicle in your household to a single account. Each vehicle has its own service history, mileage, and recommended maintenance." },
+      { question: "What if I have a fleet of vehicles?", answer: "We have a dedicated fleet program for 5+ vehicles with volume pricing and on-site service. See the fleet page or call (813) 501-7572 for a custom quote." },
+      { question: "How do existing customers sign in?", answer: "We'll text or email you a sign-in link — one click and your existing service history loads automatically. You set a password the first time you log in." },
+    ],
+  },
 ];
 
 export const getBlogPostBySlug = (slug: string) =>
