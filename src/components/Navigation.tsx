@@ -134,11 +134,34 @@ const Navigation = () => {
               Contact
             </NavLink>
 
-            <Button variant="outline" size="sm" asChild>
-              <Link to={user ? "/portal/dashboard" : "/login"}>
-                <User className="w-4 h-4 mr-1" /> {user ? "Portal" : "Sign In"}
-              </Link>
-            </Button>
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm">
+                    <User className="w-4 h-4 mr-1" /> Account <ChevronDown className="w-3 h-3 ml-1" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56 bg-background z-50">
+                  <DropdownMenuLabel className="truncate">{user.email}</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link to={portalHome} className="cursor-pointer">
+                      <LayoutDashboard className="w-4 h-4 mr-2" /> {portalLabel}
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer text-destructive focus:text-destructive">
+                    <LogOut className="w-4 h-4 mr-2" /> Sign Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Button variant="outline" size="sm" asChild>
+                <Link to="/login">
+                  <User className="w-4 h-4 mr-1" /> Sign In
+                </Link>
+              </Button>
+            )}
 
             <Button variant="hero" size="default" asChild>
               <a href="tel:8135017572">
