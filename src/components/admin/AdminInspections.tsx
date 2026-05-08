@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Copy, ExternalLink, Trash2, Camera, Share2 } from 'lucide-react';
+import { Plus, Copy, ExternalLink, Trash2, Camera, Share2, FileText } from 'lucide-react';
 import { toast } from 'sonner';
 import { shareLink } from '@/lib/share';
 
@@ -131,6 +131,47 @@ const AdminInspections = () => {
     toast.success('Link copied');
   };
 
+  const createEstimateFromInspection = async (insp: Inspection) => {
+    const { data: itemRows } = await supabase
+      .from('inspection_items')
+      .select('*')
+      .eq('inspection_id', insp.id)
+      .in('status', ['red', 'yellow']);
+
+    if (!itemRows || itemRows.length === 0) {
+      toast.error('No declined or recommended items found on this inspection');
+      return;
+    }
+
+    const lineItems = itemRows.map((it: any) => ({
+      description: `${it.category} — ${it.item_name}${it.notes ? ` (${it.notes})` : ''}`,
+      priority: it.status === 'red' ? 'urgent' : 'recommended',
+      quantity: 1,
+      unit_price: 0,
+      amount: 0,
+    }));
+
+    const estNumber = `EST-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${insp.id.slice(0, 6)}`;
+    const validUntil = new Date(); validUntil.setDate(validUntil.getDate() + 30);
+
+    const { error } = await supabase.from('estimates').insert({
+      customer_id: insp.customer_id,
+      vehicle_id: insp.vehicle_id,
+      estimate_number: estNumber,
+      status: 'draft',
+      line_items: lineItems,
+      subtotal: 0,
+      tax: 0,
+      shop_supplies: 0,
+      total: 0,
+      valid_until: validUntil.toISOString().slice(0, 10),
+      notes: `Auto-generated from inspection on ${new Date(insp.created_at).toLocaleDateString()}. Add pricing before sending.`,
+    });
+
+    if (error) return toast.error(error.message);
+    toast.success(`Draft estimate created with ${lineItems.length} item${lineItems.length === 1 ? '' : 's'} — open Estimates tab to add pricing`);
+  };
+
   const customerVehicles = editing?.customer_id ? vehicles.filter(v => v.owner_id === editing.customer_id) : [];
 
   return (
@@ -160,9 +201,10 @@ const AdminInspections = () => {
                   <TableCell className="text-xs">{i.mileage?.toLocaleString() || '—'}</TableCell>
                   <TableCell>
                     <div className="flex gap-1">
-                      <Button size="icon" variant="ghost" onClick={() => copyLink(i.share_token)}><Copy className="h-4 w-4" /></Button>
-                      <Button size="icon" variant="ghost" onClick={() => window.open(`/inspection/${i.share_token}`, '_blank')}><ExternalLink className="h-4 w-4" /></Button>
+                      <Button size="icon" variant="ghost" title="Copy link" onClick={() => copyLink(i.share_token)}><Copy className="h-4 w-4" /></Button>
+                      <Button size="icon" variant="ghost" title="Open" onClick={() => window.open(`/inspection/${i.share_token}`, '_blank')}><ExternalLink className="h-4 w-4" /></Button>
                       <Button size="icon" variant="ghost" title="Share" onClick={() => send(i)}><Share2 className="h-4 w-4" /></Button>
+                      <Button size="icon" variant="ghost" title="Create estimate from declined work" onClick={() => createEstimateFromInspection(i)}><FileText className="h-4 w-4" /></Button>
                       <Button size="sm" variant="ghost" onClick={() => openExisting(i)}>Edit</Button>
                     </div>
                   </TableCell>

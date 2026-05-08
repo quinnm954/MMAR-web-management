@@ -103,13 +103,13 @@ const Footer = () => {
           <div className="flex items-center gap-3">
             <span>Lehigh Acres and Fort Myers</span>
             <span aria-hidden="true">·</span>
-            <a
-              href="/admin/login"
+            <Link
+              to="/admin/login"
               className="text-muted-foreground/60 hover:text-primary transition-colors"
               aria-label="Staff login"
             >
               Staff
-            </a>
+            </Link>
           </div>
         </div>
       </div>
