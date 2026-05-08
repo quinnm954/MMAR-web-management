@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 
 import { Button } from '@/components/ui/button';
@@ -13,6 +13,9 @@ import BrandedDocLayout from '@/components/BrandedDocLayout';
 
 const EstimateApproval = () => {
   const { token } = useParams();
+  const navigate = useNavigate();
+  const [isCustomer, setIsCustomer] = useState(false);
+  const [redirectIn, setRedirectIn] = useState<number | null>(null);
   const [est, setEst] = useState<any>(null);
   const [customer, setCustomer] = useState<any>(null);
   const [vehicle, setVehicle] = useState<any>(null);
@@ -80,6 +83,22 @@ const EstimateApproval = () => {
     if (error) return toast.error('Could not submit. Please contact us.');
     setEst({ ...est, ...update });
     toast.success(status === 'declined' ? 'Response recorded' : 'Estimate signed!');
+
+    // If signed in as the customer, auto-redirect back to portal
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user && user.id === est.customer_id) {
+      setIsCustomer(true);
+      let n = 5;
+      setRedirectIn(n);
+      const iv = setInterval(() => {
+        n -= 1;
+        setRedirectIn(n);
+        if (n <= 0) {
+          clearInterval(iv);
+          navigate('/portal/estimates');
+        }
+      }, 1000);
+    }
   };
 
   if (loading) return <div className="min-h-screen flex items-center justify-center"><Loader2 className="animate-spin" /></div>;
@@ -192,6 +211,16 @@ const EstimateApproval = () => {
           {est.status === 'approved' && <><CheckCircle2 className="text-primary" /> Approved — we'll be in touch shortly.</>}
           {est.status === 'partially_approved' && <><CheckCircle2 className="text-primary" /> Partial approval recorded.</>}
           {est.status === 'declined' && <span className="text-muted-foreground">This estimate was declined.</span>}
+        </div>
+      )}
+      {submitted && est.status !== 'declined' && (
+        <div className="mt-4 flex flex-col items-center gap-2">
+          <Button asChild>
+            <Link to="/portal/estimates">Return to your portal</Link>
+          </Button>
+          {isCustomer && redirectIn !== null && redirectIn > 0 && (
+            <p className="text-xs text-muted-foreground">Redirecting in {redirectIn}s…</p>
+          )}
         </div>
       )}
     </BrandedDocLayout>
