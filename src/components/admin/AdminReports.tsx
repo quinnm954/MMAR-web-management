@@ -17,6 +17,8 @@ type InvoiceRow = {
   customer_id: string;
   service_record_id: string | null;
   line_items: LineItem[];
+  stripe_session_id: string | null;
+  stripe_payment_intent_id: string | null;
 };
 
 type ProfitRow = {
@@ -29,8 +31,15 @@ type ProfitRow = {
   revenue: number;
   cogs: number;
   employeeCost: number;
+  stripeFee: number;
   grossProfit: number;
   netProfit: number;
+};
+
+// Stripe US standard card fee: 2.9% + $0.30 per successful charge
+const stripeFeeFor = (amount: number, paid: boolean, hasStripe: boolean) => {
+  if (!paid || !hasStripe || amount <= 0) return 0;
+  return amount * 0.029 + 0.3;
 };
 
 export default function AdminReports() {
@@ -59,7 +68,7 @@ export default function AdminReports() {
       const [inv, completed, members, ests, settings, employeesRes] = await Promise.all([
         supabase
           .from('invoices')
-          .select('id, invoice_number, total, subtotal, status, created_at, customer_id, service_record_id, line_items')
+          .select('id, invoice_number, total, subtotal, status, created_at, customer_id, service_record_id, line_items, stripe_session_id, stripe_payment_intent_id')
           .gte('created_at', since)
           .order('created_at', { ascending: false }),
         supabase.from('appointments').select('id', { count: 'exact', head: true }).eq('status', 'completed').gte('created_at', since),
@@ -166,8 +175,10 @@ export default function AdminReports() {
         const techRate = tech?.hourly_rate != null ? Number(tech.hourly_rate) : rate;
         const employeeCost = laborHours * techRate;
         const revenueRow = Number(inv.total || 0);
+        const hasStripe = Boolean(inv.stripe_session_id || inv.stripe_payment_intent_id);
+        const stripeFee = stripeFeeFor(revenueRow, inv.status === 'paid', hasStripe);
         const grossProfit = revenueRow - cogs;
-        const netProfit = grossProfit - employeeCost;
+        const netProfit = grossProfit - employeeCost - stripeFee;
         const cust = customerMap.get(inv.customer_id);
         return {
           id: inv.id,
@@ -179,6 +190,7 @@ export default function AdminReports() {
           revenue: revenueRow,
           cogs,
           employeeCost,
+          stripeFee,
           grossProfit,
           netProfit,
         };
@@ -212,11 +224,12 @@ export default function AdminReports() {
         acc.revenue += r.revenue;
         acc.cogs += r.cogs;
         acc.employeeCost += r.employeeCost;
+        acc.stripeFee += r.stripeFee;
         acc.grossProfit += r.grossProfit;
         acc.netProfit += r.netProfit;
         return acc;
       },
-      { revenue: 0, cogs: 0, employeeCost: 0, grossProfit: 0, netProfit: 0 },
+      { revenue: 0, cogs: 0, employeeCost: 0, stripeFee: 0, grossProfit: 0, netProfit: 0 },
     );
   }, [profitRows]);
 
@@ -249,15 +262,17 @@ export default function AdminReports() {
 
       <h2 className="font-display text-xl pt-2">Profit by Invoice (paid)</h2>
       <p className="text-xs text-muted-foreground -mt-2">
-        Gross profit = gross revenue − cost of goods. Net profit = gross profit − cost of employees. Employee cost uses each
-        technician's per-employee hourly rate from the Employees tab × labor hours billed on the estimate. Falls back to
-        clock time and the default rate (${defaultRate.toFixed(2)}/hr) when no employee record exists.
+        Gross profit = gross revenue − cost of goods. Net profit = gross profit − cost of employees − Stripe fees.
+        Employee cost uses each technician's per-employee hourly rate from the Employees tab × labor hours billed on the
+        estimate. Falls back to clock time and the default rate (${defaultRate.toFixed(2)}/hr) when no employee record
+        exists. Stripe fees are estimated at 2.9% + $0.30 per paid invoice processed through Stripe.
       </p>
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
         <KPI label="Gross Revenue" value={fmt(totals.revenue)} />
         <KPI label="Cost of Goods" value={fmt(totals.cogs)} />
         <KPI label="Gross Profit" value={fmt(totals.grossProfit)} />
         <KPI label="Cost of Employees" value={fmt(totals.employeeCost)} />
+        <KPI label="Stripe Fees" value={fmt(totals.stripeFee)} />
         <KPI label="Net Profit" value={fmt(totals.netProfit)} />
       </div>
 
@@ -273,15 +288,16 @@ export default function AdminReports() {
                 <TableHead className="text-right">Labor (hrs)</TableHead>
                 <TableHead className="text-right">Revenue</TableHead>
                 <TableHead className="text-right">COGS</TableHead>
-                <TableHead className="text-right">Employee Cost</TableHead>
                 <TableHead className="text-right">Gross Profit</TableHead>
+                <TableHead className="text-right">Employee Cost</TableHead>
+                <TableHead className="text-right">Stripe Fees</TableHead>
                 <TableHead className="text-right">Net Profit</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {profitRows.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={10} className="text-center text-muted-foreground py-6">
+                  <TableCell colSpan={11} className="text-center text-muted-foreground py-6">
                     No paid invoices in this window.
                   </TableCell>
                 </TableRow>
@@ -295,10 +311,11 @@ export default function AdminReports() {
                     <TableCell className="text-right">{r.laborHours.toFixed(2)}</TableCell>
                     <TableCell className="text-right">{fmt(r.revenue)}</TableCell>
                     <TableCell className="text-right">{fmt(r.cogs)}</TableCell>
-                    <TableCell className="text-right">{fmt(r.employeeCost)}</TableCell>
                     <TableCell className={`text-right ${r.grossProfit < 0 ? 'text-destructive' : ''}`}>
                       {fmt(r.grossProfit)}
                     </TableCell>
+                    <TableCell className="text-right">{fmt(r.employeeCost)}</TableCell>
+                    <TableCell className="text-right">{fmt(r.stripeFee)}</TableCell>
                     <TableCell className={`text-right font-semibold ${r.netProfit < 0 ? 'text-destructive' : 'text-primary'}`}>
                       {fmt(r.netProfit)}
                     </TableCell>
