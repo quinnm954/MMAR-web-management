@@ -113,6 +113,14 @@ const PortalLogin = () => {
                 {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : "Sign In"}
               </Button>
             </form>
+            <button
+              type="button"
+              onClick={handleResendConfirmation}
+              disabled={busy}
+              className="text-xs text-muted-foreground hover:text-primary underline w-full text-center"
+            >
+              Didn't get a confirmation email? Resend it
+            </button>
             <p className="text-sm text-center text-muted-foreground">
               New to MMAR?{" "}
               <Link to="/portal/signup" className="text-primary font-medium hover:underline">
