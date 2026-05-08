@@ -368,6 +368,95 @@ const AdminEstimates = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <Dialog open={!!preview} onOpenChange={o => !o && setPreview(null)}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader><DialogTitle>Confirm Imported Quote</DialogTitle></DialogHeader>
+          {preview && (
+            <div className="space-y-4 text-sm">
+              <div>
+                <div className="font-semibold mb-1">Customer</div>
+                {preview.matchedCustomer ? (
+                  <div className="flex items-center gap-2">
+                    <Badge className="bg-green-500/15 text-green-600 border-green-500/30" variant="outline">Matched</Badge>
+                    <span>{preview.matchedCustomer.full_name || preview.matchedCustomer.email}</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <Badge className="bg-yellow-500/15 text-yellow-700 border-yellow-500/30" variant="outline">New</Badge>
+                    <span className="text-muted-foreground">
+                      {preview.extracted.customer_name || '—'}
+                      {preview.extracted.customer_email ? ` · ${preview.extracted.customer_email}` : ''}
+                      {preview.extracted.customer_phone ? ` · ${preview.extracted.customer_phone}` : ''}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <div className="font-semibold mb-1">Vehicle</div>
+                {preview.matchedVehicle ? (
+                  <div className="flex items-center gap-2">
+                    <Badge className="bg-green-500/15 text-green-600 border-green-500/30" variant="outline">Matched</Badge>
+                    <span>{preview.matchedVehicle.year} {preview.matchedVehicle.make} {preview.matchedVehicle.model}</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <Badge className="bg-yellow-500/15 text-yellow-700 border-yellow-500/30" variant="outline">{preview.matchedCustomer ? 'New' : 'Unmatched'}</Badge>
+                    <span className="text-muted-foreground">
+                      {preview.extracted.vehicle_year ?? ''} {preview.extracted.vehicle_make ?? ''} {preview.extracted.vehicle_model ?? '—'}
+                      {preview.extracted.vehicle_vin ? ` · VIN ${preview.extracted.vehicle_vin}` : ''}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <div className="font-semibold mb-1">Line Items ({preview.lines.length})</div>
+                <div className="border rounded">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Description</TableHead>
+                        <TableHead className="w-16 text-right">Qty</TableHead>
+                        <TableHead className="w-24 text-right">Unit</TableHead>
+                        <TableHead className="w-24 text-right">Amount</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {preview.lines.map((l: LineItem, i: number) => (
+                        <TableRow key={i}>
+                          <TableCell>{l.description}</TableCell>
+                          <TableCell className="text-right">{l.quantity}</TableCell>
+                          <TableCell className="text-right">${l.unit_price.toFixed(2)}</TableCell>
+                          <TableCell className="text-right">${l.amount.toFixed(2)}</TableCell>
+                        </TableRow>
+                      ))}
+                      {preview.lines.length === 0 && (
+                        <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground py-4">No items extracted</TableCell></TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
+                </div>
+                <div className="text-right font-semibold mt-2">
+                  Subtotal: ${preview.lines.reduce((s: number, i: LineItem) => s + i.amount, 0).toFixed(2)}
+                </div>
+              </div>
+
+              {preview.extracted.notes && (
+                <div>
+                  <div className="font-semibold mb-1">Notes</div>
+                  <div className="text-muted-foreground whitespace-pre-wrap">{preview.extracted.notes}</div>
+                </div>
+              )}
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setPreview(null)}>Cancel</Button>
+            <Button onClick={confirmImport}>Confirm & Open Editor</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
