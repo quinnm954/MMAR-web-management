@@ -117,7 +117,7 @@ const Navigation = () => {
             </NavLink>
 
             <Button variant="outline" size="sm" asChild>
-              <Link to={user ? "/portal/dashboard" : "/portal/login"}>
+              <Link to={user ? "/portal/dashboard" : "/login"}>
                 <User className="w-4 h-4 mr-1" /> {user ? "Portal" : "Sign In"}
               </Link>
             </Button>
