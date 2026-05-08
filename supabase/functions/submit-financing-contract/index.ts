@@ -114,7 +114,12 @@ Deno.serve(async (req) => {
     null;
   const userAgent = req.headers.get("user-agent") ?? null;
 
+  const customerId = typeof body.customer_id === "string" && /^[0-9a-f-]{36}$/i.test(body.customer_id) ? body.customer_id : null;
+  const estimateId = typeof body.estimate_id === "string" && /^[0-9a-f-]{36}$/i.test(body.estimate_id) ? body.estimate_id : null;
+
   const { error } = await admin.from("financing_contracts").insert({
+    customer_id: customerId,
+    estimate_id: estimateId,
     client_name: body.client_name,
     client_address: body.client_address,
     client_contact: body.client_contact,

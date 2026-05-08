@@ -15,6 +15,7 @@ import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import SignaturePad from '@/components/SignaturePad';
 import BrandedDocLayout from '@/components/BrandedDocLayout';
+import DocReferences from '@/components/DocReferences';
 
 const TIME_WINDOWS = ['Morning (8a–12p)', 'Afternoon (12p–4p)', 'Evening (4p–7p)'];
 
@@ -300,6 +301,11 @@ const EstimateApproval = () => {
           </ul>
         </div>
       )}
+
+      <DocReferences
+        financingHref={est?.id ? `/financing-contract?estimate=${est.id}` : undefined}
+        hideFinancing={est?.status === 'declined'}
+      />
     </BrandedDocLayout>
   );
 };

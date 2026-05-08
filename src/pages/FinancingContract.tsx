@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -150,6 +150,10 @@ const calculatePaymentDates = (startDate: string, months: number): Date[] => {
 };
 
 const FinancingContract = () => {
+  const [searchParams] = useSearchParams();
+  const estimateId = searchParams.get("estimate");
+  const [linkedCustomerId, setLinkedCustomerId] = useState<string | null>(null);
+  const [linkedEstimateId, setLinkedEstimateId] = useState<string | null>(null);
   const [formData, setFormData] = useState<EditableContractData>(defaultEditableData);
   const [signatures, setSignatures] = useState<SignatureData>(defaultSignatureData);
   const [hasSaved, setHasSaved] = useState(false);
@@ -171,6 +175,59 @@ const FinancingContract = () => {
       }
     }
   }, []);
+
+  // Prefill from estimate (if linked via ?estimate= URL param)
+  useEffect(() => {
+    if (!estimateId) return;
+    (async () => {
+      const { data: est } = await supabase
+        .from("estimates")
+        .select("id, customer_id, vehicle_id, total, line_items, notes")
+        .eq("id", estimateId)
+        .maybeSingle();
+      if (!est) {
+        toast.error("Couldn't load that estimate — fill in the form manually.");
+        return;
+      }
+      setLinkedEstimateId(est.id);
+      setLinkedCustomerId(est.customer_id);
+
+      const [{ data: profile }, { data: vehicle }] = await Promise.all([
+        supabase.from("profiles").select("full_name, email").eq("id", est.customer_id).maybeSingle(),
+        est.vehicle_id
+          ? supabase.from("vehicles").select("year, make, model, license_plate, vin").eq("id", est.vehicle_id).maybeSingle()
+          : Promise.resolve({ data: null }),
+      ]);
+
+      const approvedTotal = Array.isArray(est.line_items)
+        ? (est.line_items as any[]).reduce(
+            (s, l) => (l.status !== "declined" ? s + Number(l.amount || 0) : s),
+            0,
+          )
+        : Number(est.total || 0);
+
+      const serviceDescription = Array.isArray(est.line_items)
+        ? (est.line_items as any[])
+            .filter((l) => l.status !== "declined")
+            .map((l) => `${l.quantity ?? 1} × ${l.description}`)
+            .join("\n")
+        : "";
+
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 14);
+
+      setFormData((prev) => ({
+        ...prev,
+        clientName: profile?.full_name || prev.clientName,
+        clientContact: profile?.email || prev.clientContact,
+        vehicleInfo: vehicle ? [vehicle.year, vehicle.make, vehicle.model].filter(Boolean).join(" ") : prev.vehicleInfo,
+        serviceDescription: serviceDescription || prev.serviceDescription,
+        totalServicePrice: approvedTotal ? approvedTotal.toFixed(2) : prev.totalServicePrice,
+        firstPaymentDate: prev.firstPaymentDate || tomorrow.toISOString().split("T")[0],
+      }));
+      toast.success("Estimate details loaded — terms calculated automatically.");
+    })();
+  }, [estimateId]);
 
   // Auto-calculations
   const calculations = useMemo(() => {
@@ -283,6 +340,8 @@ const FinancingContract = () => {
 
       const { error } = await supabase.functions.invoke('submit-financing-contract', {
         body: {
+          customer_id: linkedCustomerId,
+          estimate_id: linkedEstimateId,
           client_name: formData.clientName,
           client_address: formData.clientAddress,
           client_contact: formData.clientContact,

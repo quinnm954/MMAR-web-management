@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import BrandedDocLayout from "@/components/BrandedDocLayout";
+import DocReferences from "@/components/DocReferences";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, CreditCard, ArrowLeft, CheckCircle2 } from "lucide-react";
@@ -179,6 +180,8 @@ const PortalInvoiceDetail = () => {
             </Button>
           ) : null}
         </div>
+
+        <DocReferences hideFinancing={isPaid} />
       </BrandedDocLayout>
     </>
   );
