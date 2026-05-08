@@ -28,6 +28,15 @@ type Employee = {
 };
 
 const TYPES = ['technician', 'service_advisor', 'manager', 'parts', 'admin', 'other'];
+// Maps employee_type -> app_role enum value. Types not in this map cannot
+// have a login account provisioned (no corresponding role exists).
+const TYPE_TO_ROLE: Record<string, string> = {
+  technician: 'technician',
+  service_advisor: 'service_advisor',
+  manager: 'manager',
+  parts: 'parts',
+  admin: 'admin',
+};
 const PAY_BASIS = [
   { value: 'labor_hours', label: 'Per Labor Hour (from estimate)' },
   { value: 'hourly_clock', label: 'Hourly (clock in/out)' },
@@ -96,6 +105,13 @@ export default function AdminEmployees() {
       if (!form.id && createLogin) {
         if (!form.email?.trim()) {
           toast.error('Email is required to create a login account');
+          setSaving(false);
+          return;
+        }
+        if (!TYPE_TO_ROLE[form.employee_type]) {
+          toast.error(
+            `Type "${form.employee_type}" has no login role. Pick one of: ${Object.keys(TYPE_TO_ROLE).join(', ')}.`
+          );
           setSaving(false);
           return;
         }
@@ -218,13 +234,25 @@ export default function AdminEmployees() {
               {!form.id && (
                 <div className="rounded-md border p-3 space-y-2 bg-muted/30">
                   <div className="flex items-center gap-2">
-                    <Switch checked={createLogin} onCheckedChange={setCreateLogin} />
+                    <Switch
+                      checked={createLogin}
+                      onCheckedChange={setCreateLogin}
+                      disabled={!TYPE_TO_ROLE[form.employee_type]}
+                    />
                     <Label>Create login account for this employee</Label>
                   </div>
-                  <p className="text-[11px] text-muted-foreground">
-                    A login will be created using the email above. Role is assigned from Type
-                    ({form.employee_type}). On first sign-in they'll be prompted to set their own password.
-                  </p>
+                  {TYPE_TO_ROLE[form.employee_type] ? (
+                    <p className="text-[11px] text-muted-foreground">
+                      A login will be created using the email above. Role:{' '}
+                      <span className="font-mono">{TYPE_TO_ROLE[form.employee_type]}</span>.
+                      On first sign-in they'll be prompted to set their own password.
+                    </p>
+                  ) : (
+                    <p className="text-[11px] text-destructive">
+                      Type "{form.employee_type}" has no login role and cannot be granted portal
+                      access. Pick one of: {Object.keys(TYPE_TO_ROLE).join(', ')}.
+                    </p>
+                  )}
                 </div>
               )}
               <div>
