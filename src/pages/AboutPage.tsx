@@ -90,7 +90,7 @@ const AboutPage = () => {
           </h2>
           <p className="text-muted-foreground leading-relaxed">
             Every estimate is itemized — parts, labor, taxes, the actual brand of the part going on
-            your car. No "shop fees," no "miscellaneous," no padding. If a job comes in under
+            your car. If a job comes in under
             estimate, you pay the lower number. If we find something else while we're under there,
             we stop, photograph it, and send you a revised estimate before we touch it. You approve
             it on your phone. That's it.
