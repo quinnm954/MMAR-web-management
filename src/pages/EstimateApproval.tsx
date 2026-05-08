@@ -131,7 +131,7 @@ const EstimateApproval = () => {
     setDecisions(all);
     setRequestedDate(undefined);
     if (!signature) {
-      toast.message('All items marked declined. Please sign, then submit the decline.');
+      toast.message('All items marked declined. Please sign below, then tap "Decline All" to submit.');
       return;
     }
     submit(all);
