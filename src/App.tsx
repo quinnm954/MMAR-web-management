@@ -34,6 +34,7 @@ import PortalMembership from "./pages/portal/PortalMembership";
 import PortalAppointments from "./pages/portal/PortalAppointments";
 import PortalServiceHistory from "./pages/portal/PortalServiceHistory";
 import PortalInvoices from "./pages/portal/PortalInvoices";
+import PortalInvoiceDetail from "./pages/portal/PortalInvoiceDetail";
 import PortalRepairOrders from "./pages/portal/PortalRepairOrders";
 import CustomerProtectedRoute from "./components/portal/CustomerProtectedRoute";
 import NotFound from "./pages/NotFound";
@@ -83,6 +84,7 @@ const App = () => (
             <Route path="/portal/appointments" element={<CustomerProtectedRoute><PortalAppointments /></CustomerProtectedRoute>} />
             <Route path="/portal/service-history" element={<CustomerProtectedRoute><PortalServiceHistory /></CustomerProtectedRoute>} />
             <Route path="/portal/invoices" element={<CustomerProtectedRoute><PortalInvoices /></CustomerProtectedRoute>} />
+            <Route path="/portal/invoices/:id" element={<CustomerProtectedRoute><PortalInvoiceDetail /></CustomerProtectedRoute>} />
             <Route path="/portal/repair-orders" element={<CustomerProtectedRoute><PortalRepairOrders /></CustomerProtectedRoute>} />
             <Route
               path="/admin/dashboard"
