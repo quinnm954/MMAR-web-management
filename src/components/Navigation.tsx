@@ -230,9 +230,25 @@ const Navigation = () => {
 
               <Link to="/memberships" onClick={close} className="text-accent hover:text-accent/80 font-semibold py-3 px-2 rounded-lg">Memberships</Link>
               <Link to="/contact" onClick={close} className="text-foreground hover:text-primary font-medium py-3 px-2 rounded-lg">Contact</Link>
-              <Link to={user ? "/portal/dashboard" : "/login"} onClick={close} className="text-foreground hover:text-primary font-medium py-3 px-2 rounded-lg flex items-center gap-2">
-                <User className="w-4 h-4" /> {user ? "MMAR Care Portal" : "Sign In (Customer / Employee / Admin)"}
-              </Link>
+              {user ? (
+                <>
+                  <Link to={portalHome} onClick={close} className="text-foreground hover:text-primary font-medium py-3 px-2 rounded-lg flex items-center gap-2">
+                    <LayoutDashboard className="w-4 h-4" /> {portalLabel}
+                  </Link>
+                  <div className="px-2 text-xs text-muted-foreground truncate">Signed in as {user.email}</div>
+                  <button
+                    type="button"
+                    onClick={handleSignOut}
+                    className="text-destructive hover:text-destructive/80 font-medium py-3 px-2 rounded-lg flex items-center gap-2 text-left"
+                  >
+                    <LogOut className="w-4 h-4" /> Sign Out
+                  </button>
+                </>
+              ) : (
+                <Link to="/login" onClick={close} className="text-foreground hover:text-primary font-medium py-3 px-2 rounded-lg flex items-center gap-2">
+                  <User className="w-4 h-4" /> Sign In (Customer / Employee / Admin)
+                </Link>
+              )}
 
               <Button variant="hero" size="lg" asChild className="mt-3 min-h-[48px]">
                 <a href="tel:8135017572" onClick={close}>
