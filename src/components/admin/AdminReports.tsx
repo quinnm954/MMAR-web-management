@@ -224,7 +224,6 @@ export default function AdminReports() {
         partsMargin,
         partsMarginPct,
       });
-    })();
   }, [days]);
 
   useEffect(() => { load(); }, [load]);
