@@ -127,6 +127,28 @@ export default function RepairOrderDetail({ appointmentId, open, onClose }: Prop
     }
   };
 
+  const assignTech = async (techId: string | null) => {
+    if (!appt) return;
+    setSavingTech(true);
+    const { error } = await supabase
+      .from("appointments")
+      .update({ assigned_technician_id: techId })
+      .eq("id", appt.id);
+    setSavingTech(false);
+    if (error) return toast.error(error.message);
+    toast.success(techId ? "Technician assigned" : "Technician unassigned");
+    setAppt({ ...appt, assigned_technician_id: techId });
+    // refresh history
+    const { data: logs } = await supabase
+      .from("audit_logs")
+      .select("id, actor_email, before_data, after_data, changed_fields, created_at")
+      .eq("table_name", "appointments")
+      .eq("record_id", appt.id)
+      .order("created_at", { ascending: false })
+      .limit(50);
+    setAssignHistory((logs || []).filter((l: any) => (l.changed_fields || []).includes("assigned_technician_id")));
+  };
+
   const issueInvoice = async () => {
     if (!appt || !approvedEstimate) return;
     const approvedLines = (approvedEstimate.line_items || []).filter((l: any) => l.status !== 'declined');
