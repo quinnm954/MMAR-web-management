@@ -105,6 +105,7 @@ const App = () => (
             <Route path="/estimate/:token" element={<EstimateApproval />} />
             <Route path="/inspection/:token" element={<InspectionReport />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/set-password" element={<SetPassword />} />
             <Route path="/share/:token" element={<SharedCustomerSummary />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="/:landingSlug" element={<LocalLanding />} />
