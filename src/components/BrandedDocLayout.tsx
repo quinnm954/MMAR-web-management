@@ -11,7 +11,7 @@ interface Props {
 
 const PHONE = "813-501-7572";
 const SHOP = "Mike's Mobile Auto Repair";
-const SITE = "shop-flow-home.lovable.app";
+const SITE = "mikesmautorepair.com";
 
 const BrandedDocLayout = ({ docType, docNumber, rightMeta, children }: Props) => {
   return (
