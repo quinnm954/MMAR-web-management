@@ -131,7 +131,7 @@ const EstimateApproval = () => {
     setDecisions(all);
     setRequestedDate(undefined);
     if (!signature) {
-      toast.message('All items marked declined. Please sign, then submit the decline.');
+      toast.message('All items marked declined. Please sign below, then tap "Decline All" to submit.');
       return;
     }
     submit(all);
@@ -175,7 +175,7 @@ const EstimateApproval = () => {
 
       {!locked && (
         <p className="text-sm text-muted-foreground mb-3">
-          Check the items you'd like us to perform. Uncheck any you'd like to decline, then sign below.
+          For each item below, choose <span className="font-medium text-foreground">Approve</span> or <span className="font-medium text-foreground">Decline</span>. Then sign at the bottom.
         </p>
       )}
 
@@ -183,28 +183,45 @@ const EstimateApproval = () => {
       <div className="space-y-2">
         {lines.map((l: any, i: number) => {
           const approved = decisions[i] === 'approved';
+          const declined = decisions[i] === 'declined';
           return (
-            <label
+            <div
               key={i}
-              className={`flex items-start gap-3 p-3 rounded border transition-colors cursor-pointer ${
-                locked ? 'cursor-default' : approved ? 'border-primary/50 bg-primary/5' : 'border-border bg-muted/20 opacity-60'
+              className={`p-3 rounded border transition-colors ${
+                approved ? 'border-primary/50 bg-primary/5' : declined ? 'border-destructive/40 bg-destructive/5 opacity-70' : 'border-border'
               }`}
             >
-              <Checkbox
-                checked={approved}
-                disabled={locked}
-                onCheckedChange={(v) => setDecisions((d) => ({ ...d, [i]: v ? 'approved' : 'declined' }))}
-                className="mt-1"
-              />
-              <div className="flex-1 flex justify-between text-sm gap-3">
-                <div>
+              <div className="flex justify-between text-sm gap-3">
+                <div className="flex-1">
                   <div className="font-medium">{l.description}</div>
                   <div className="text-xs text-muted-foreground">{l.quantity} × ${Number(l.unit_price).toFixed(2)}</div>
                   {locked && <Badge variant={approved ? 'default' : 'secondary'} className="mt-1 text-[10px]">{decisions[i]}</Badge>}
                 </div>
                 <div className={approved ? 'font-medium' : 'line-through text-muted-foreground'}>${Number(l.amount).toFixed(2)}</div>
               </div>
-            </label>
+              {!locked && (
+                <div className="flex gap-2 mt-2">
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant={approved ? 'hero' : 'outline'}
+                    className="flex-1"
+                    onClick={() => setDecisions((d) => ({ ...d, [i]: 'approved' }))}
+                  >
+                    <CheckCircle2 className="h-3.5 w-3.5 mr-1" /> Approve
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant={declined ? 'destructive' : 'outline'}
+                    className="flex-1"
+                    onClick={() => setDecisions((d) => ({ ...d, [i]: 'declined' }))}
+                  >
+                    <XCircle className="h-3.5 w-3.5 mr-1" /> Decline
+                  </Button>
+                </div>
+              )}
+            </div>
           );
         })}
       </div>
