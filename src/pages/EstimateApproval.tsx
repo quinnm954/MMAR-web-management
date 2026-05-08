@@ -167,7 +167,7 @@ const EstimateApproval = () => {
             >
               <Checkbox
                 checked={approved}
-                disabled={submitted}
+                disabled={locked}
                 onCheckedChange={(v) => setDecisions((d) => ({ ...d, [i]: v ? 'approved' : 'declined' }))}
                 className="mt-1"
               />
@@ -175,7 +175,7 @@ const EstimateApproval = () => {
                 <div>
                   <div className="font-medium">{l.description}</div>
                   <div className="text-xs text-muted-foreground">{l.quantity} × ${Number(l.unit_price).toFixed(2)}</div>
-                  {submitted && <Badge variant={approved ? 'default' : 'secondary'} className="mt-1 text-[10px]">{decisions[i]}</Badge>}
+                  {locked && <Badge variant={approved ? 'default' : 'secondary'} className="mt-1 text-[10px]">{decisions[i]}</Badge>}
                 </div>
                 <div className={approved ? 'font-medium' : 'line-through text-muted-foreground'}>${Number(l.amount).toFixed(2)}</div>
               </div>
