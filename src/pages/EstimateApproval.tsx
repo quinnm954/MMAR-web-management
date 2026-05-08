@@ -1,15 +1,22 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { format } from 'date-fns';
 
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
-import { CheckCircle2, XCircle, Loader2 } from 'lucide-react';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { CalendarIcon, CheckCircle2, XCircle, Loader2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import SignaturePad from '@/components/SignaturePad';
 import BrandedDocLayout from '@/components/BrandedDocLayout';
+
+const TIME_WINDOWS = ['Morning (8a–12p)', 'Afternoon (12p–4p)', 'Evening (4p–7p)'];
 
 const EstimateApproval = () => {
   const { token } = useParams();
@@ -24,6 +31,8 @@ const EstimateApproval = () => {
   const [decisions, setDecisions] = useState<Record<number, 'approved' | 'declined'>>({});
   const [reason, setReason] = useState('');
   const [signature, setSignature] = useState<string | null>(null);
+  const [requestedDate, setRequestedDate] = useState<Date | undefined>();
+  const [timeWindow, setTimeWindow] = useState<string>(TIME_WINDOWS[0]);
 
   useEffect(() => {
     (async () => {
@@ -55,6 +64,8 @@ const EstimateApproval = () => {
 
   const submit = async () => {
     if (!signature) return toast.error('Please sign to confirm your decision');
+    const willApprove = !allDeclined;
+    if (willApprove && !requestedDate) return toast.error('Please select a preferred service date');
     setWorking(true);
 
     const updatedLines = lines.map((l, i) => ({ ...l, status: decisions[i] }));
@@ -66,6 +77,8 @@ const EstimateApproval = () => {
       _status: status,
       _signature: signature,
       _decline_reason: status === 'declined' || (status === 'partially_approved' && reason) ? (reason || null) : null,
+      _requested_date: willApprove && requestedDate ? format(requestedDate, 'yyyy-MM-dd') : null,
+      _requested_time_window: willApprove ? timeWindow : null,
     });
     setWorking(false);
     if (error) return toast.error('Could not submit. Please contact us.');
@@ -184,12 +197,52 @@ const EstimateApproval = () => {
           {lines.some((_, i) => decisions[i] === 'declined') && (
             <Textarea placeholder="Reason for declined items (optional)" value={reason} onChange={(e) => setReason(e.target.value)} />
           )}
+
+          {!allDeclined && (
+            <div className="rounded-md border border-border bg-muted/20 p-3 space-y-3">
+              <div className="text-sm font-medium">Schedule the work</div>
+              <div className="grid sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs text-muted-foreground mb-1 block">Preferred date</label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="outline" className={cn('w-full justify-start text-left font-normal', !requestedDate && 'text-muted-foreground')}>
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {requestedDate ? format(requestedDate, 'PPP') : 'Pick a date'}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={requestedDate}
+                        onSelect={setRequestedDate}
+                        disabled={(d) => d < new Date(new Date().setHours(0, 0, 0, 0))}
+                        initialFocus
+                        className={cn('p-3 pointer-events-auto')}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+                <div>
+                  <label className="text-xs text-muted-foreground mb-1 block">Preferred time window</label>
+                  <Select value={timeWindow} onValueChange={setTimeWindow}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {TIME_WINDOWS.map((w) => <SelectItem key={w} value={w}>{w}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <p className="text-[11px] text-muted-foreground">We'll confirm the exact arrival time by call or text.</p>
+            </div>
+          )}
+
           <div>
             <div className="text-sm font-medium mb-2">Authorization Signature</div>
             <SignaturePad onChange={setSignature} />
             <p className="text-[11px] text-muted-foreground mt-1">By signing, you authorize {`Mike's Mobile Auto Repair`} to perform the approved work.</p>
           </div>
-          <Button onClick={submit} disabled={working || !signature} className="w-full" variant="hero">
+          <Button onClick={submit} disabled={working || !signature || (!allDeclined && !requestedDate)} className="w-full" variant="hero">
             {working ? <Loader2 className="h-4 w-4 animate-spin" /> : allDeclined ? <><XCircle className="h-4 w-4 mr-1" /> Decline All</> : <><CheckCircle2 className="h-4 w-4 mr-1" /> Sign &amp; Approve</>}
           </Button>
         </div>
