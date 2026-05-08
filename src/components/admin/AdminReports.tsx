@@ -224,11 +224,12 @@ export default function AdminReports() {
         acc.revenue += r.revenue;
         acc.cogs += r.cogs;
         acc.employeeCost += r.employeeCost;
+        acc.stripeFee += r.stripeFee;
         acc.grossProfit += r.grossProfit;
         acc.netProfit += r.netProfit;
         return acc;
       },
-      { revenue: 0, cogs: 0, employeeCost: 0, grossProfit: 0, netProfit: 0 },
+      { revenue: 0, cogs: 0, employeeCost: 0, stripeFee: 0, grossProfit: 0, netProfit: 0 },
     );
   }, [profitRows]);
 
