@@ -229,12 +229,6 @@ const MmarCare = () => {
                         Create an account
                       </Link>
                     </p>
-                    <p className="text-xs text-center text-muted-foreground">
-                      Employee or admin?{" "}
-                      <Link to="/login" className="hover:text-primary underline">
-                        Use the staff sign-in
-                      </Link>
-                    </p>
                   </>
                 )}
               </CardContent>
