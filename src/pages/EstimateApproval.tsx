@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 
@@ -22,6 +22,7 @@ const TIME_WINDOWS = ['Morning (8a–12p)', 'Afternoon (12p–4p)', 'Evening (4p
 const EstimateApproval = () => {
   const { token } = useParams();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [isCustomer, setIsCustomer] = useState(false);
   const [redirectIn, setRedirectIn] = useState<number | null>(null);
   const [est, setEst] = useState<any>(null);
@@ -55,9 +56,12 @@ const EstimateApproval = () => {
         });
         setDecisions(init);
       }
+      if (searchParams.get('edit') === '1' && ['approved', 'partially_approved'].includes(data?.status)) {
+        setEditing(true);
+      }
       setLoading(false);
     })();
-  }, [token]);
+  }, [token, searchParams]);
 
   const lines: any[] = est?.line_items || [];
   const approvedTotal = useMemo(
@@ -73,16 +77,17 @@ const EstimateApproval = () => {
     return all;
   };
 
-  const submit = async (decisionOverride = decisions) => {
+  const submit = async (decisionOverride = decisions, statusOverride?: 'approved' | 'partially_approved' | 'declined') => {
     if (!signature) return toast.error('Please sign to confirm your decision');
-    const nextAllDeclined = lines.length > 0 && lines.every((_, i) => decisionOverride[i] === 'declined');
-    const nextAnyApproved = lines.some((_, i) => decisionOverride[i] === 'approved');
-    const willApprove = !nextAllDeclined;
+    const finalDecisions = statusOverride === 'declined' ? getAllDeclinedDecisions() : decisionOverride;
+    const nextAllDeclined = statusOverride === 'declined' || (lines.length > 0 && lines.every((_, i) => finalDecisions[i] === 'declined'));
+    const nextAnyApproved = lines.some((_, i) => finalDecisions[i] === 'approved');
+    const status = statusOverride ?? (nextAllDeclined ? 'declined' : nextAnyApproved && lines.some((_, i) => finalDecisions[i] === 'declined') ? 'partially_approved' : 'approved');
+    const willApprove = status !== 'declined';
     if (willApprove && !requestedDate) return toast.error('Please select a preferred service date');
     setWorking(true);
 
-    const updatedLines = lines.map((l, i) => ({ ...l, status: decisionOverride[i] }));
-    const status = nextAllDeclined ? 'declined' : nextAnyApproved && lines.some((_, i) => decisionOverride[i] === 'declined') ? 'partially_approved' : 'approved';
+    const updatedLines = lines.map((l, i) => ({ ...l, status: finalDecisions[i] ?? (status === 'declined' ? 'declined' : 'approved') }));
 
     const { error } = await supabase.rpc('submit_estimate_decision', {
       _token: token!,
@@ -134,7 +139,7 @@ const EstimateApproval = () => {
       toast.message('All items marked declined. Please sign below, then tap "Decline All" to submit.');
       return;
     }
-    submit(all);
+    submit(all, 'declined');
   };
 
   if (loading) return <div className="min-h-screen flex items-center justify-center"><Loader2 className="animate-spin" /></div>;

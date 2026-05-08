@@ -164,6 +164,10 @@ const PortalEstimates = () => {
                         <Button size="sm" variant="hero" asChild>
                           <Link to={`/estimate/${e.approval_token}`}>Review &amp; Approve <ChevronRight className="h-4 w-4 ml-1" /></Link>
                         </Button>
+                      ) : approvedFamily && e.approval_token ? (
+                        <Button size="sm" variant="outline" asChild>
+                          <Link to={`/estimate/${e.approval_token}?edit=1`}>Change / Decline Items</Link>
+                        </Button>
                       ) : e.approval_token ? (
                         <Button size="sm" variant="outline" asChild>
                           <Link to={`/estimate/${e.approval_token}`}>View</Link>
