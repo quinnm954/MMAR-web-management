@@ -13,7 +13,7 @@ const AdminLogin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { signIn, user, isAdmin, isLoading } = useAuth();
+  const { signIn, signOut, user, isAdmin, isStaff, isLoading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -35,7 +35,30 @@ const AdminLogin = () => {
           description: error.message,
           variant: 'destructive',
         });
+        return;
       }
+
+      // Verify the signed-in user actually has an admin role.
+      const { data: { user: authedUser } } = await supabase.auth.getUser();
+      if (!authedUser) return;
+
+      const { data: roleRows } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', authedUser.id);
+
+      const userRoles = (roleRows ?? []).map((r: any) => r.role);
+      if (!userRoles.includes('admin')) {
+        await signOut();
+        toast({
+          title: 'Access denied',
+          description: 'This account does not have admin access. Use the customer portal login instead.',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      navigate('/admin/dashboard');
     } finally {
       setIsSubmitting(false);
     }
