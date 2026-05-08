@@ -9,7 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Pencil, Share2, Trash2, Copy, ExternalLink, Wrench } from 'lucide-react';
+import { Plus, Pencil, Share2, Trash2, Copy, ExternalLink, Wrench, Upload, Loader2 } from 'lucide-react';
+import { useRef } from 'react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { shareLink } from '@/lib/share';
@@ -46,6 +47,8 @@ const AdminEstimates = () => {
   const [catalog, setCatalog] = useState<any[]>([]);
   const [settings, setSettings] = useState<any>(null);
   const [editing, setEditing] = useState<any | null>(null);
+  const [importing, setImporting] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
 
   const load = async () => {
     const [e, c, v, ca, s] = await Promise.all([
@@ -68,6 +71,87 @@ const AdminEstimates = () => {
   const newEstimate = () => {
     const valid_until = settings ? new Date(Date.now() + (settings.estimate_valid_days || 14) * 86400000).toISOString().slice(0, 10) : null;
     setEditing({ status: 'draft', line_items: [], subtotal: 0, tax: 0, shop_supplies: 0, total: 0, valid_until });
+  };
+
+  const importPdf = async (file: File) => {
+    if (!file) return;
+    if (file.size > 15 * 1024 * 1024) return toast.error('PDF too large (max 15MB)');
+    setImporting(true);
+    try {
+      const buf = await file.arrayBuffer();
+      const bytes = new Uint8Array(buf);
+      let bin = '';
+      for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+      const pdf_base64 = btoa(bin);
+      const { data, error } = await supabase.functions.invoke('parse-quote-pdf', {
+        body: { pdf_base64, mime_type: file.type || 'application/pdf' },
+      });
+      if (error) throw error;
+      const ex = data?.extracted;
+      if (!ex) throw new Error('Nothing extracted');
+
+      // Try to match an existing customer by email (case-insensitive)
+      let matchedCustomer: any = null;
+      if (ex.customer_email) {
+        matchedCustomer = customers.find(c => c.email?.toLowerCase() === ex.customer_email.toLowerCase());
+      }
+      if (!matchedCustomer && ex.customer_name) {
+        matchedCustomer = customers.find(c => c.full_name?.toLowerCase() === ex.customer_name.toLowerCase());
+      }
+
+      let matchedVehicle: any = null;
+      if (matchedCustomer) {
+        const vs = vehicles.filter(v => v.owner_id === matchedCustomer.id);
+        if (ex.vehicle_make && ex.vehicle_model) {
+          matchedVehicle = vs.find(v =>
+            v.make?.toLowerCase() === ex.vehicle_make.toLowerCase() &&
+            v.model?.toLowerCase() === ex.vehicle_model.toLowerCase() &&
+            (!ex.vehicle_year || v.year === ex.vehicle_year)
+          );
+        }
+      }
+
+      const lines: LineItem[] = (ex.line_items || []).map((li: any) => ({
+        description: li.description || '',
+        quantity: Number(li.quantity) || 1,
+        unit_price: Number(li.unit_price) || 0,
+        amount: (Number(li.quantity) || 1) * (Number(li.unit_price) || 0),
+        labor_hours: Number(li.labor_hours) || 0,
+      }));
+
+      const subtotal = lines.reduce((s, i) => s + i.amount, 0);
+      const shop = Math.min(subtotal * (settings?.shop_supplies_pct ?? 0.05), settings?.shop_supplies_max ?? 50);
+      const tax = (subtotal + shop) * (settings?.tax_rate ?? 0.07);
+      const valid_until = settings ? new Date(Date.now() + (settings.estimate_valid_days || 14) * 86400000).toISOString().slice(0, 10) : null;
+
+      const notesParts: string[] = [];
+      if (ex.notes) notesParts.push(ex.notes);
+      if (!matchedCustomer && ex.customer_name) {
+        notesParts.push(`Imported customer: ${ex.customer_name}${ex.customer_email ? ' / ' + ex.customer_email : ''}${ex.customer_phone ? ' / ' + ex.customer_phone : ''}`);
+      }
+      if (!matchedVehicle && (ex.vehicle_make || ex.vehicle_model)) {
+        notesParts.push(`Imported vehicle: ${ex.vehicle_year ?? ''} ${ex.vehicle_make ?? ''} ${ex.vehicle_model ?? ''}${ex.vehicle_vin ? ' VIN ' + ex.vehicle_vin : ''}`.trim());
+      }
+
+      setEditing({
+        status: 'draft',
+        customer_id: matchedCustomer?.id ?? null,
+        vehicle_id: matchedVehicle?.id ?? null,
+        line_items: lines,
+        subtotal,
+        shop_supplies: shop,
+        tax,
+        total: subtotal + shop + tax,
+        notes: notesParts.join('\n') || null,
+        valid_until,
+      });
+      toast.success(matchedCustomer ? 'PDF imported — review and save' : 'PDF imported — pick a customer to save');
+    } catch (e: any) {
+      toast.error(e.message || 'Could not parse PDF');
+    } finally {
+      setImporting(false);
+      if (fileRef.current) fileRef.current.value = '';
+    }
   };
 
   const recalc = (li: LineItem[]) => {
@@ -147,7 +231,12 @@ const AdminEstimates = () => {
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-end">
+      <div className="flex justify-end gap-2">
+        <input ref={fileRef} type="file" accept="application/pdf" className="hidden" onChange={e => e.target.files?.[0] && importPdf(e.target.files[0])} />
+        <Button variant="outline" onClick={() => fileRef.current?.click()} disabled={importing}>
+          {importing ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Upload className="h-4 w-4 mr-1" />}
+          Import PDF Quote
+        </Button>
         <Button onClick={newEstimate}><Plus className="h-4 w-4 mr-1" /> New Estimate</Button>
       </div>
 

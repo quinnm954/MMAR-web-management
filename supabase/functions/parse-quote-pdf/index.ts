@@ -1,0 +1,100 @@
+import { corsHeaders } from "https://esm.sh/@supabase/supabase-js@2.95.0/cors";
+
+const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+
+const tool = {
+  type: "function",
+  function: {
+    name: "extract_quote",
+    description: "Extract structured quote/estimate data from the PDF.",
+    parameters: {
+      type: "object",
+      properties: {
+        customer_name: { type: "string" },
+        customer_email: { type: "string" },
+        customer_phone: { type: "string" },
+        vehicle_year: { type: "number" },
+        vehicle_make: { type: "string" },
+        vehicle_model: { type: "string" },
+        vehicle_vin: { type: "string" },
+        notes: { type: "string" },
+        line_items: {
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              description: { type: "string" },
+              quantity: { type: "number" },
+              unit_price: { type: "number" },
+              labor_hours: { type: "number" },
+            },
+            required: ["description", "quantity", "unit_price"],
+          },
+        },
+      },
+      required: ["line_items"],
+    },
+  },
+};
+
+Deno.serve(async (req) => {
+  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+
+  try {
+    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY missing");
+    const { pdf_base64, mime_type } = await req.json();
+    if (!pdf_base64) throw new Error("pdf_base64 required");
+
+    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "google/gemini-2.5-flash",
+        messages: [
+          {
+            role: "system",
+            content:
+              "You extract auto-repair quote/estimate data from PDF documents. Return clean line items (parts & labor), customer info, and vehicle info. Use numeric values (no $ signs). If a field is missing, omit it.",
+          },
+          {
+            role: "user",
+            content: [
+              { type: "text", text: "Extract the quote details from this PDF." },
+              {
+                type: "image_url",
+                image_url: { url: `data:${mime_type || "application/pdf"};base64,${pdf_base64}` },
+              },
+            ],
+          },
+        ],
+        tools: [tool],
+        tool_choice: { type: "function", function: { name: "extract_quote" } },
+      }),
+    });
+
+    if (!res.ok) {
+      const txt = await res.text();
+      if (res.status === 429) return new Response(JSON.stringify({ error: "Rate limit. Try again shortly." }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      if (res.status === 402) return new Response(JSON.stringify({ error: "AI credits exhausted. Add funds in Settings → Workspace → Usage." }), { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      throw new Error(`AI gateway ${res.status}: ${txt}`);
+    }
+
+    const data = await res.json();
+    const call = data?.choices?.[0]?.message?.tool_calls?.[0];
+    const args = call?.function?.arguments ? JSON.parse(call.function.arguments) : null;
+    if (!args) throw new Error("No structured output returned");
+
+    return new Response(JSON.stringify({ extracted: args }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  } catch (e) {
+    console.error("parse-quote-pdf error", e);
+    return new Response(JSON.stringify({ error: e instanceof Error ? e.message : String(e) }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+});
