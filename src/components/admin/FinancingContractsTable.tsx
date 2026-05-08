@@ -84,7 +84,34 @@ const FinancingContractsTable = ({ data, onRefresh }: FinancingContractsTablePro
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [signatureUrls, setSignatureUrls] = useState<{ client: string | null; provider: string | null }>({ client: null, provider: null });
+  const [linkBusy, setLinkBusy] = useState<string | null>(null);
   const itemsPerPage = 10;
+
+  const generateLink = async (
+    contract: FinancingContract,
+    kind: 'financing_down_payment' | 'financing_monthly',
+    sendSms: boolean,
+  ) => {
+    const key = `${contract.id}:${kind}:${sendSms}`;
+    setLinkBusy(key);
+    try {
+      const { data, error } = await supabase.functions.invoke('create-payment-link', {
+        body: { kind, reference_id: contract.id, send_sms: sendSms },
+      });
+      if (error || (data as any)?.error) throw new Error(error?.message || (data as any)?.error);
+      const url = (data as any).url as string;
+      if (sendSms) {
+        toast.success('Payment link texted to customer');
+      } else {
+        await navigator.clipboard.writeText(url).catch(() => {});
+        window.prompt('Copy payment link:', url);
+      }
+    } catch (e: any) {
+      toast.error(e.message || 'Failed to generate link');
+    } finally {
+      setLinkBusy(null);
+    }
+  };
 
   useEffect(() => {
     let cancelled = false;
