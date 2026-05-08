@@ -63,6 +63,48 @@ const RULES = [
   { q: "Cancellation Policy", a: "Membership may be canceled after the first 3 months. Remaining balances may apply if services rendered exceed payments received." },
 ];
 
+const FLEET_PHONE = "813-501-7572";
+const FLEET_SMS_BODY = encodeURIComponent(
+  "Hi MMAR — I'd like a fleet quote. Fleet size: __ vehicles. Mix (cars/SUVs/vans/trucks): __. Fuel types (gas/hybrid/EV/diesel): __. VINs available on request."
+);
+
+const VOLUME_TIERS = [
+  { range: "5–9 vehicles", discount: "10%" },
+  { range: "10–24 vehicles", discount: "15%" },
+  { range: "25–49 vehicles", discount: "20%" },
+  { range: "50+ vehicles", discount: "Custom" },
+];
+
+const PRICING_MATRIX = [
+  { type: "Compact / Sedan", icon: Car, oil: "$55 – $85", brakes: "$255 – $360", diag: "$95 – $135" },
+  { type: "SUV / Crossover", icon: Car, oil: "$70 – $110", brakes: "$295 – $410", diag: "$110 – $150" },
+  { type: "Van / Minivan", icon: Truck, oil: "$80 – $120", brakes: "$310 – $440", diag: "$110 – $160" },
+  { type: "Light / Medium Truck", icon: Truck, oil: "$95 – $145", brakes: "$330 – $490", diag: "$120 – $170" },
+];
+
+const FUEL_ADJUSTMENTS = [
+  { fuel: "Gasoline", icon: Fuel, note: "Baseline pricing", delta: "—" },
+  { fuel: "Hybrid", icon: Zap, note: "Specialty oil + HV-safe procedures", delta: "+5–10%" },
+  { fuel: "Electric (EV)", icon: Zap, note: "No oil; brake/coolant/HV inspection focus", delta: "Custom" },
+  { fuel: "Diesel", icon: Fuel, note: "Higher oil capacity, fuel filters, DEF", delta: "+15–25%" },
+];
+
+const FLEET_BENEFITS = [
+  { icon: Wrench, title: "On-site service", text: "We come to your yard, lot, or job site — no downtime hauling vehicles to a shop." },
+  { icon: Clock, title: "Priority scheduling", text: "Fleet accounts get next-available slots and recurring PM windows." },
+  { icon: ShieldCheck, title: "Per-VIN history", text: "Every vehicle gets its own service record, inspection photos, and digital invoices." },
+  { icon: Truck, title: "Mixed-fleet ready", text: "Cars, vans, light trucks — gas, hybrid, EV, and diesel all supported." },
+];
+
+const FLEET_FAQ = [
+  { q: "What counts as a fleet?", a: "Any account with 5 or more vehicles under one billing entity qualifies for fleet pricing." },
+  { q: "How is my final price set?", a: "We quote per VIN. Once you share VINs we decode year/make/model/engine/fuel and apply the volume discount tier and any fuel-type adjustment." },
+  { q: "Do you use RepairPal pricing?", a: "We reference RepairPal national price ranges as a sanity check for fairness, but your actual quote is built from VIN-specific labor times and local parts pricing." },
+  { q: "Can we mix fuel types?", a: "Yes. A single fleet account can combine gas, hybrid, EV, and diesel vehicles. Each VIN is priced individually." },
+  { q: "Do you offer recurring PM contracts?", a: "Yes — monthly or quarterly preventive maintenance plans are available with locked-in rates for the contract term." },
+  { q: "Invoicing and payment terms?", a: "Net-15 or Net-30 available for approved fleet accounts. Consolidated monthly statements included." },
+];
+
 const Memberships = () => {
   const [plans, setPlans] = useState<Plan[]>([]);
 
