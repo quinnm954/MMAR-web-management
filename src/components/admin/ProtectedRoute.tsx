@@ -22,7 +22,11 @@ const ProtectedRoute = ({ children, requireAdmin = true, allowedRoles }: Protect
   }
 
   if (!user) {
-    return <Navigate to="/admin/login" replace />;
+    return <Navigate to="/login" replace />;
+  }
+
+  if ((user.user_metadata as any)?.must_set_password && location.pathname !== "/set-password") {
+    return <Navigate to="/set-password" replace />;
   }
 
   // Default behavior: admin or manager can access. If allowedRoles passed, use it.
