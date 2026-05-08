@@ -116,6 +116,7 @@ const EstimateApproval = () => {
   if (!est) return <div className="min-h-screen flex items-center justify-center text-muted-foreground">Estimate not found</div>;
 
   const submitted = ['approved', 'declined', 'partially_approved'].includes(est.status);
+  const locked = submitted && !editing;
 
   return (
     <BrandedDocLayout
