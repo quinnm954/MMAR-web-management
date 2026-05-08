@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Loader2, Plus, Receipt, MessageSquare, Link2, Share2, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { shareLink } from "@/lib/share";
+import DeleteButton from "@/components/admin/DeleteButton";
 
 interface Customer { id: string; full_name: string | null; email: string | null }
 interface Invoice {
