@@ -255,6 +255,21 @@ const EstimateApproval = () => {
           <Button onClick={submit} disabled={working || !signature || (!allDeclined && !requestedDate)} className="w-full" variant="hero">
             {working ? <Loader2 className="h-4 w-4 animate-spin" /> : allDeclined ? <><XCircle className="h-4 w-4 mr-1" /> Decline All</> : <><CheckCircle2 className="h-4 w-4 mr-1" /> Sign &amp; Approve</>}
           </Button>
+          {!allDeclined && (
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full text-destructive hover:text-destructive"
+              onClick={() => {
+                const all: Record<number, 'declined'> = {};
+                lines.forEach((_, i) => (all[i] = 'declined'));
+                setDecisions(all);
+                setRequestedDate(undefined);
+              }}
+            >
+              <XCircle className="h-4 w-4 mr-1" /> Decline entire estimate
+            </Button>
+          )}
         </div>
       )}
 
