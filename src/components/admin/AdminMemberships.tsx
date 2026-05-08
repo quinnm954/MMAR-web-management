@@ -121,6 +121,23 @@ const AdminMemberships = () => {
                     {STATUSES.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
                   </SelectContent>
                 </Select>
+                <div className="flex flex-wrap gap-1">
+                  {!r.deposit_paid && (
+                    <>
+                      <Button size="sm" variant="outline" className="h-7 text-xs" disabled={!!linkBusy?.startsWith(r.id)} onClick={() => generateLink(r.id, "membership_deposit", false)}>
+                        <LinkIcon className="h-3 w-3 mr-1" />Deposit
+                      </Button>
+                      <Button size="sm" variant="ghost" className="h-7 px-2" title="Text deposit link" disabled={!!linkBusy?.startsWith(r.id)} onClick={() => generateLink(r.id, "membership_deposit", true)}>
+                        <MessageSquare className="h-3.5 w-3.5" />
+                      </Button>
+                    </>
+                  )}
+                  {r.plan?.stripe_price_id && (
+                    <Button size="sm" variant="outline" className="h-7 text-xs" disabled={!!linkBusy?.startsWith(r.id)} onClick={() => generateLink(r.id, "membership_subscription", false)}>
+                      <LinkIcon className="h-3 w-3 mr-1" />Subscribe
+                    </Button>
+                  )}
+                </div>
               </div>
             </div>
           </CardContent>
