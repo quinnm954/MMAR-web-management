@@ -126,6 +126,10 @@ const Navigation = () => {
               </DropdownMenuContent>
             </DropdownMenu>
 
+            <NavLink to="/mmar-care" className={({ isActive }) => `px-3 py-2 font-medium transition-colors ${isActive ? "text-primary" : "text-muted-foreground hover:text-primary"}`}>
+              MMAR Care
+            </NavLink>
+
             <NavLink to="/memberships" className={({ isActive }) => `px-3 py-2 font-medium transition-colors ${isActive ? "text-accent" : "text-accent/80 hover:text-accent"}`}>
               Memberships
             </NavLink>
