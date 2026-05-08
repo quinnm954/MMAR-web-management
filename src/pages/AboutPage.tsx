@@ -146,7 +146,6 @@ const AboutPage = () => {
           <ul className="text-muted-foreground space-y-2">
             <li>Sell you parts you don't need.</li>
             <li>Quote a number on the phone before we've actually looked at the car.</li>
-            <li>Hide labor in "shop supplies" or "environmental fees."</li>
             <li>Use stop-leak in your AC system. Ever.</li>
             <li>Pretend a problem is fixed when it's only patched.</li>
           </ul>
