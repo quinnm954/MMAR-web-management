@@ -10,6 +10,7 @@ import mmarLogo from "@/assets/mmar-logo.jpeg";
 import SignaturePad from "@/components/financing/SignaturePad";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import EstimateSummaryCard from "@/components/EstimateSummaryCard";
 
 interface EditableContractData {
   clientName: string;
