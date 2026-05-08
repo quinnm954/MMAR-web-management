@@ -48,6 +48,7 @@ const AdminEstimates = () => {
   const [settings, setSettings] = useState<any>(null);
   const [editing, setEditing] = useState<any | null>(null);
   const [importing, setImporting] = useState(false);
+  const [preview, setPreview] = useState<any | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const load = async () => {
