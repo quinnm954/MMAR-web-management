@@ -213,6 +213,16 @@ const EstimateApproval = () => {
           {est.status === 'declined' && <span className="text-muted-foreground">This estimate was declined.</span>}
         </div>
       )}
+      {submitted && est.status !== 'declined' && (
+        <div className="mt-4 flex flex-col items-center gap-2">
+          <Button asChild>
+            <Link to="/portal/estimates">Return to your portal</Link>
+          </Button>
+          {isCustomer && redirectIn !== null && redirectIn > 0 && (
+            <p className="text-xs text-muted-foreground">Redirecting in {redirectIn}s…</p>
+          )}
+        </div>
+      )}
     </BrandedDocLayout>
   );
 };
