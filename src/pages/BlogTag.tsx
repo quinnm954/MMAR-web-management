@@ -209,6 +209,37 @@ const BlogTag = () => {
             ))}
           </div>
 
+          {tagSlug === "mmar-care" && (
+            <div className="mt-12 rounded-2xl border border-primary/40 bg-gradient-to-br from-primary/15 via-background to-gold/10 p-6 md:p-10 text-center">
+              <div className="inline-flex items-center gap-2 text-xs uppercase tracking-widest text-gold mb-3">
+                <Tag className="w-4 h-4" /> Get Started
+              </div>
+              <h2 className="font-display text-2xl md:text-4xl tracking-wide mb-3">
+                <span className="text-sky">Start Your</span> <span className="text-gold">MMAR Care</span>
+              </h2>
+              <p className="text-muted-foreground text-base md:text-lg max-w-2xl mx-auto mb-6">
+                Free customer portal. Optional membership. Manage every vehicle in your household, request appointments, and pay invoices — all from your phone.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <Link
+                  to="/portal/signup"
+                  className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-primary text-primary-foreground font-semibold hover:opacity-90 transition-opacity"
+                >
+                  Create Free Account <ArrowRight className="w-4 h-4" />
+                </Link>
+                <Link
+                  to="/mmar-care"
+                  className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg border border-primary/50 text-primary font-semibold hover:bg-primary/10 transition-colors"
+                >
+                  Learn About MMAR Care
+                </Link>
+              </div>
+              <p className="text-xs text-muted-foreground mt-4">
+                Prefer to talk first? Call or text <a href="tel:8135017572" className="text-primary hover:underline">(813) 501-7572</a>.
+              </p>
+            </div>
+          )}
+
           <div className="mt-12">
             <InlineCallStrip label="Need a mobile mechanic right now?" />
           </div>
