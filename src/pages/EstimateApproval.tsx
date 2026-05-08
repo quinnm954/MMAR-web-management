@@ -88,89 +88,113 @@ const EstimateApproval = () => {
   const submitted = ['approved', 'declined', 'partially_approved'].includes(est.status);
 
   return (
-    <div className="min-h-screen bg-background py-8 px-4">
-      <div className="max-w-2xl mx-auto space-y-4">
-        <Card>
-          <CardHeader>
-            <div className="flex justify-between items-center">
-              <CardTitle>Estimate {est.estimate_number}</CardTitle>
-              <Badge variant="outline">{est.status}</Badge>
+    <BrandedDocLayout
+      docType="ESTIMATE"
+      docNumber={est.estimate_number}
+      rightMeta={
+        <>
+          <div>Status: <span className="font-medium uppercase">{est.status}</span></div>
+          {est.valid_until && <div>Valid until {est.valid_until}</div>}
+        </>
+      }
+    >
+      {/* Bill To / Vehicle */}
+      <div className="grid sm:grid-cols-2 gap-4 mb-6 text-sm">
+        <div>
+          <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Prepared For</div>
+          <div className="font-medium">{customer?.full_name || customer?.email || '—'}</div>
+          {customer?.email && customer?.full_name && <div className="text-xs text-muted-foreground">{customer.email}</div>}
+        </div>
+        {vehicle && (
+          <div className="sm:text-right">
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Vehicle</div>
+            <div className="font-medium">{[vehicle.year, vehicle.make, vehicle.model].filter(Boolean).join(' ')}</div>
+            <div className="text-xs text-muted-foreground">
+              {vehicle.license_plate && <>Plate: {vehicle.license_plate} · </>}
+              {vehicle.vin && <>VIN: {vehicle.vin}</>}
             </div>
-            {est.valid_until && <p className="text-sm text-muted-foreground">Valid until {est.valid_until}</p>}
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {!submitted && <p className="text-sm text-muted-foreground">Check the items you'd like us to perform. Uncheck any you'd like to decline.</p>}
-
-            <div className="space-y-2">
-              {lines.map((l: any, i: number) => {
-                const approved = decisions[i] === 'approved';
-                return (
-                  <label
-                    key={i}
-                    className={`flex items-start gap-3 p-3 rounded border transition-colors cursor-pointer ${
-                      submitted ? 'cursor-default' : approved ? 'border-primary/50 bg-primary/5' : 'border-border bg-muted/20 opacity-60'
-                    }`}
-                  >
-                    <Checkbox
-                      checked={approved}
-                      disabled={submitted}
-                      onCheckedChange={(v) => setDecisions((d) => ({ ...d, [i]: v ? 'approved' : 'declined' }))}
-                      className="mt-1"
-                    />
-                    <div className="flex-1 flex justify-between text-sm">
-                      <div>
-                        <div className="font-medium">{l.description}</div>
-                        <div className="text-xs text-muted-foreground">{l.quantity} × ${Number(l.unit_price).toFixed(2)}</div>
-                        {submitted && <Badge variant={approved ? 'default' : 'secondary'} className="mt-1 text-[10px]">{decisions[i]}</Badge>}
-                      </div>
-                      <div className={approved ? '' : 'line-through text-muted-foreground'}>${Number(l.amount).toFixed(2)}</div>
-                    </div>
-                  </label>
-                );
-              })}
-            </div>
-
-            <div className="space-y-1 text-sm pt-2 border-t">
-              <div className="flex justify-between"><span>Selected subtotal</span><span>${approvedTotal.toFixed(2)}</span></div>
-              <div className="flex justify-between text-xs text-muted-foreground"><span>Original total (before tax/supplies)</span><span>${Number(est.subtotal).toFixed(2)}</span></div>
-              <div className="flex justify-between font-bold text-lg pt-2 border-t"><span>Original Total</span><span>${Number(est.total).toFixed(2)}</span></div>
-              <p className="text-xs text-muted-foreground">Final invoice will reflect approved items plus tax/shop supplies.</p>
-            </div>
-
-            {est.notes && <div className="text-sm bg-muted p-3 rounded">{est.notes}</div>}
-
-            {!submitted && (
-              <>
-                {lines.some((_, i) => decisions[i] === 'declined') && (
-                  <Textarea placeholder="Reason for declined items (optional)" value={reason} onChange={(e) => setReason(e.target.value)} />
-                )}
-                <div>
-                  <div className="text-sm font-medium mb-2">Signature</div>
-                  <SignaturePad onChange={setSignature} />
-                </div>
-                <Button onClick={submit} disabled={working || !signature} className="w-full" variant="hero">
-                  {working ? <Loader2 className="h-4 w-4 animate-spin" /> : allDeclined ? <><XCircle className="h-4 w-4 mr-1" /> Decline All</> : <><CheckCircle2 className="h-4 w-4 mr-1" /> Sign & Approve</>}
-                </Button>
-              </>
-            )}
-
-            {submitted && est.signature_image && (
-              <div className="pt-3 border-t">
-                <div className="text-xs text-muted-foreground mb-1">Signed {est.signed_at && new Date(est.signed_at).toLocaleString()}</div>
-                <img src={est.signature_image} alt="signature" className="bg-white rounded p-1 max-h-32" />
-              </div>
-            )}
-            {submitted && (
-              <div className="text-center py-2 font-semibold flex items-center justify-center gap-2">
-                {est.status === 'approved' && <><CheckCircle2 className="text-green-500" /> Approved — we'll be in touch shortly.</>}
-                {est.status === 'partially_approved' && <><CheckCircle2 className="text-primary" /> Partial approval recorded.</>}
-                {est.status === 'declined' && <span className="text-muted-foreground">This estimate was declined.</span>}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+          </div>
+        )}
       </div>
-    </div>
+
+      {!submitted && (
+        <p className="text-sm text-muted-foreground mb-3">
+          Check the items you'd like us to perform. Uncheck any you'd like to decline, then sign below.
+        </p>
+      )}
+
+      {/* Line Items */}
+      <div className="space-y-2">
+        {lines.map((l: any, i: number) => {
+          const approved = decisions[i] === 'approved';
+          return (
+            <label
+              key={i}
+              className={`flex items-start gap-3 p-3 rounded border transition-colors cursor-pointer ${
+                submitted ? 'cursor-default' : approved ? 'border-primary/50 bg-primary/5' : 'border-border bg-muted/20 opacity-60'
+              }`}
+            >
+              <Checkbox
+                checked={approved}
+                disabled={submitted}
+                onCheckedChange={(v) => setDecisions((d) => ({ ...d, [i]: v ? 'approved' : 'declined' }))}
+                className="mt-1"
+              />
+              <div className="flex-1 flex justify-between text-sm gap-3">
+                <div>
+                  <div className="font-medium">{l.description}</div>
+                  <div className="text-xs text-muted-foreground">{l.quantity} × ${Number(l.unit_price).toFixed(2)}</div>
+                  {submitted && <Badge variant={approved ? 'default' : 'secondary'} className="mt-1 text-[10px]">{decisions[i]}</Badge>}
+                </div>
+                <div className={approved ? 'font-medium' : 'line-through text-muted-foreground'}>${Number(l.amount).toFixed(2)}</div>
+              </div>
+            </label>
+          );
+        })}
+      </div>
+
+      {/* Totals */}
+      <div className="mt-5 space-y-1 text-sm">
+        <div className="flex justify-between"><span className="text-muted-foreground">Selected subtotal</span><span>${approvedTotal.toFixed(2)}</span></div>
+        <div className="flex justify-between text-xs text-muted-foreground"><span>Original subtotal (before tax/supplies)</span><span>${Number(est.subtotal).toFixed(2)}</span></div>
+        {Number(est.shop_supplies) > 0 && <div className="flex justify-between text-xs text-muted-foreground"><span>Shop supplies</span><span>${Number(est.shop_supplies).toFixed(2)}</span></div>}
+        {Number(est.tax) > 0 && <div className="flex justify-between text-xs text-muted-foreground"><span>Tax</span><span>${Number(est.tax).toFixed(2)}</span></div>}
+        <div className="flex justify-between font-bold text-lg pt-2 border-t border-border"><span>Estimate Total</span><span>${Number(est.total).toFixed(2)}</span></div>
+        <p className="text-[11px] text-muted-foreground">Final invoice will reflect approved items plus tax/shop supplies.</p>
+      </div>
+
+      {est.notes && <div className="mt-4 text-sm bg-muted/50 border border-border rounded p-3 whitespace-pre-wrap">{est.notes}</div>}
+
+      {!submitted && (
+        <div className="mt-5 space-y-3">
+          {lines.some((_, i) => decisions[i] === 'declined') && (
+            <Textarea placeholder="Reason for declined items (optional)" value={reason} onChange={(e) => setReason(e.target.value)} />
+          )}
+          <div>
+            <div className="text-sm font-medium mb-2">Authorization Signature</div>
+            <SignaturePad onChange={setSignature} />
+            <p className="text-[11px] text-muted-foreground mt-1">By signing, you authorize {`Mike's Mobile Auto Repair`} to perform the approved work.</p>
+          </div>
+          <Button onClick={submit} disabled={working || !signature} className="w-full" variant="hero">
+            {working ? <Loader2 className="h-4 w-4 animate-spin" /> : allDeclined ? <><XCircle className="h-4 w-4 mr-1" /> Decline All</> : <><CheckCircle2 className="h-4 w-4 mr-1" /> Sign &amp; Approve</>}
+          </Button>
+        </div>
+      )}
+
+      {submitted && est.signature_image && (
+        <div className="mt-5 pt-3 border-t border-border">
+          <div className="text-xs text-muted-foreground mb-1">Signed {est.signed_at && new Date(est.signed_at).toLocaleString()}</div>
+          <img src={est.signature_image} alt="signature" className="bg-white rounded p-1 max-h-32" />
+        </div>
+      )}
+      {submitted && (
+        <div className="mt-4 text-center py-2 font-semibold flex items-center justify-center gap-2">
+          {est.status === 'approved' && <><CheckCircle2 className="text-primary" /> Approved — we'll be in touch shortly.</>}
+          {est.status === 'partially_approved' && <><CheckCircle2 className="text-primary" /> Partial approval recorded.</>}
+          {est.status === 'declined' && <span className="text-muted-foreground">This estimate was declined.</span>}
+        </div>
+      )}
+    </BrandedDocLayout>
   );
 };
 
