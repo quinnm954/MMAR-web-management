@@ -31,6 +31,7 @@ const navItems = [
 const PortalLayout = ({ children }: { children: ReactNode }) => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  useNativePushRegistration();
 
   const handleSignOut = async () => {
     await signOut();
