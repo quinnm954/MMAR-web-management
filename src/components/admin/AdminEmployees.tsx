@@ -53,6 +53,8 @@ export default function AdminEmployees() {
   const [rows, setRows] = useState<Employee[]>([]);
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<Employee>(empty);
+  const [createLogin, setCreateLogin] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   const load = async () => {
     const { data, error } = await supabase
