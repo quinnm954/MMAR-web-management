@@ -50,6 +50,20 @@ const PortalLogin = () => {
     }
   };
 
+  const handleForgotPassword = async () => {
+    if (!email) {
+      toast.error("Enter your email above first");
+      return;
+    }
+    setBusy(true);
+    const { error } = await (await import("@/integrations/supabase/client")).supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin + "/set-password",
+    });
+    setBusy(false);
+    if (error) toast.error(error.message);
+    else toast.success("Password reset email sent. Check your inbox.");
+  };
+
   const handleResendConfirmation = async () => {
     if (!email) {
       toast.error("Enter your email first");
