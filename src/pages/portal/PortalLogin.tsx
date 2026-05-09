@@ -126,6 +126,14 @@ const PortalLogin = () => {
               <Button type="submit" variant="hero" className="w-full" disabled={busy}>
                 {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : "Sign In"}
               </Button>
+              <button
+                type="button"
+                onClick={handleForgotPassword}
+                disabled={busy}
+                className="text-xs text-primary hover:underline w-full text-center"
+              >
+                Forgot password?
+              </button>
             </form>
             <button
               type="button"
