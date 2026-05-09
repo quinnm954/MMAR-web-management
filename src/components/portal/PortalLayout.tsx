@@ -1,8 +1,14 @@
 import { ReactNode } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useNativePushRegistration } from "@/hooks/useNativePushRegistration";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   LayoutDashboard,
   Car,
@@ -13,6 +19,8 @@ import {
   LogOut,
   Wrench,
   FileText,
+  Menu,
+  ChevronDown,
 } from "lucide-react";
 import mmarLogo from "@/assets/mmar-logo.jpeg";
 
