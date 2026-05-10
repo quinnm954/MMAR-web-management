@@ -159,6 +159,8 @@ const AdminDashboard = () => {
             { value: 'audit', label: 'Audit Log', icon: History, roles: ADMIN_ONLY, content: <AdminAuditLog /> },
             { value: 'employees', label: 'Employees', icon: UserCog, roles: ADMIN_ONLY, content: <AdminEmployees /> },
             { value: 'roles', label: 'Roles', icon: ShieldCheck, roles: ADMIN_ONLY, content: <AdminRoles /> },
+            { value: 'calls', label: 'Calls', icon: Phone, roles: ADMIN_ONLY, content: <AdminCalls /> },
+            { value: 'phone-settings', label: 'Phone Setup', icon: PhoneCall, roles: ADMIN_ONLY, content: <AdminPhoneSettings /> },
             { value: 'settings', label: 'Settings', icon: Settings, roles: ADMIN_ONLY, content: <AdminShopSettings /> },
           ];
           const visible = tabs.filter(t => hasAnyRole(t.roles));
