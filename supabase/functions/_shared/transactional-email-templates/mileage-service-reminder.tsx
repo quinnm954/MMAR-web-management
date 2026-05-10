@@ -19,11 +19,12 @@ interface Props {
   vehicle?: string
   currentMileage?: number
   dueServices?: DueService[]
+  priceRegionLabel?: string
 }
 
 const fmt = (n: number) => n.toLocaleString('en-US')
 
-const MileageServiceReminderEmail = ({ customerName, vehicle, currentMileage, dueServices = [] }: Props) => {
+const MileageServiceReminderEmail = ({ customerName, vehicle, currentMileage, dueServices = [], priceRegionLabel }: Props) => {
   const serviceList = dueServices.map((s) => s.name).join(', ')
   const quoteBody = `Hi Mike — I'd like a quote for: ${serviceList || 'recommended maintenance'}${vehicle ? ` on my ${vehicle}` : ''}. Please apply my 20% mileage reminder discount.`
   const smsQuoteHref = `sms:${PHONE}?&body=${encodeURIComponent(quoteBody)}`
@@ -43,7 +44,8 @@ const MileageServiceReminderEmail = ({ customerName, vehicle, currentMileage, du
             prevents bigger repair bills down the road.
           </Text>
           <Text style={smallText}>
-            Each item below shows the typical <strong>competitor price range</strong> at local dealers
+            Each item below shows the typical <strong>competitor price range</strong> for your area
+            {priceRegionLabel ? <> (<strong>{priceRegionLabel}</strong>)</> : null} at local dealers
             and national chains (Firestone, Pep Boys, Tires Plus) so you can see what you'd pay
             elsewhere — our mobile pricing is usually well below the low end, plus the 20% discount
             stacks on top.
@@ -74,7 +76,7 @@ const MileageServiceReminderEmail = ({ customerName, vehicle, currentMileage, du
                   </Text>
                   {s.competitorPriceRange && (
                     <Text style={priceRow}>
-                      <span style={priceLabel}>Competitor price:</span>{' '}
+                      <span style={priceLabel}>{priceRegionLabel ? `${priceRegionLabel} price:` : 'Competitor price:'}</span>{' '}
                       <span style={priceValue}>
                         ${fmt(s.competitorPriceRange[0])}–${fmt(s.competitorPriceRange[1])}
                       </span>
@@ -128,28 +130,30 @@ export const template = {
     customerName: 'Alex',
     vehicle: '2018 Honda Civic',
     currentMileage: 92000,
+    priceRegionLabel: 'Naples / Marco Island, FL',
     dueServices: [
-      { name: 'Oil & filter change', intervalMiles: 5000, lastServiceMiles: 85000, overdueBy: 2000, competitorPriceRange: [60, 120] },
-      { name: 'Tire rotation', intervalMiles: 7500, lastServiceMiles: 80000, overdueBy: 4500, competitorPriceRange: [25, 50] },
-      { name: 'Multi-point inspection', intervalMiles: 10000, lastServiceMiles: 80000, overdueBy: 2000, competitorPriceRange: [40, 90] },
-      { name: 'Wheel alignment check', intervalMiles: 15000, lastServiceMiles: 70000, overdueBy: 7000, competitorPriceRange: [89, 150] },
-      { name: 'Brake inspection', intervalMiles: 15000, lastServiceMiles: 75000, overdueBy: 2000, competitorPriceRange: [40, 90] },
-      { name: 'Cabin air filter', intervalMiles: 20000, lastServiceMiles: 70000, overdueBy: 2000, competitorPriceRange: [50, 110] },
-      { name: 'Battery test', intervalMiles: 25000, lastServiceMiles: null, overdueBy: 67000, competitorPriceRange: [25, 60] },
-      { name: 'Engine air filter', intervalMiles: 30000, lastServiceMiles: 60000, overdueBy: 2000, competitorPriceRange: [40, 95] },
-      { name: 'Brake fluid flush', intervalMiles: 30000, lastServiceMiles: null, overdueBy: 62000, competitorPriceRange: [110, 175] },
-      { name: 'A/C system performance check', intervalMiles: 30000, lastServiceMiles: null, overdueBy: 62000, competitorPriceRange: [80, 180] },
-      { name: 'Brake pads & rotors', intervalMiles: 40000, lastServiceMiles: 50000, overdueBy: 2000, competitorPriceRange: [350, 750] },
-      { name: 'Power steering fluid flush', intervalMiles: 50000, lastServiceMiles: null, overdueBy: 42000, competitorPriceRange: [110, 175] },
-      { name: 'Transmission fluid service', intervalMiles: 60000, lastServiceMiles: null, overdueBy: 32000, competitorPriceRange: [180, 350] },
-      { name: 'Coolant flush', intervalMiles: 60000, lastServiceMiles: null, overdueBy: 32000, competitorPriceRange: [120, 220] },
-      { name: 'Spark plug replacement', intervalMiles: 60000, lastServiceMiles: null, overdueBy: 32000, competitorPriceRange: [180, 450] },
-      { name: 'Differential fluid service', intervalMiles: 60000, lastServiceMiles: null, overdueBy: 32000, competitorPriceRange: [110, 220] },
-      { name: 'Serpentine belt inspection', intervalMiles: 60000, lastServiceMiles: null, overdueBy: 32000, competitorPriceRange: [125, 250] },
-      { name: 'Fuel filter replacement', intervalMiles: 60000, lastServiceMiles: null, overdueBy: 32000, competitorPriceRange: [80, 200] },
-      { name: 'Shocks & struts inspection', intervalMiles: 75000, lastServiceMiles: null, overdueBy: 17000, competitorPriceRange: [50, 120] },
-      { name: 'Timing belt replacement', intervalMiles: 90000, lastServiceMiles: null, overdueBy: 2000, competitorPriceRange: [600, 1200] },
-      { name: 'Oxygen sensor replacement', intervalMiles: 100000, lastServiceMiles: null, overdueBy: -8000, competitorPriceRange: [220, 500] },
+      // Sample shows Naples-area pricing (national base × 1.12, rounded to $5)
+      { name: 'Oil & filter change', intervalMiles: 5000, lastServiceMiles: 85000, overdueBy: 2000, competitorPriceRange: [65, 135] },
+      { name: 'Tire rotation', intervalMiles: 7500, lastServiceMiles: 80000, overdueBy: 4500, competitorPriceRange: [30, 55] },
+      { name: 'Multi-point inspection', intervalMiles: 10000, lastServiceMiles: 80000, overdueBy: 2000, competitorPriceRange: [45, 100] },
+      { name: 'Wheel alignment check', intervalMiles: 15000, lastServiceMiles: 70000, overdueBy: 7000, competitorPriceRange: [100, 170] },
+      { name: 'Brake inspection', intervalMiles: 15000, lastServiceMiles: 75000, overdueBy: 2000, competitorPriceRange: [45, 100] },
+      { name: 'Cabin air filter', intervalMiles: 20000, lastServiceMiles: 70000, overdueBy: 2000, competitorPriceRange: [55, 125] },
+      { name: 'Battery test', intervalMiles: 25000, lastServiceMiles: null, overdueBy: 67000, competitorPriceRange: [30, 65] },
+      { name: 'Engine air filter', intervalMiles: 30000, lastServiceMiles: 60000, overdueBy: 2000, competitorPriceRange: [45, 105] },
+      { name: 'Brake fluid flush', intervalMiles: 30000, lastServiceMiles: null, overdueBy: 62000, competitorPriceRange: [125, 195] },
+      { name: 'A/C system performance check', intervalMiles: 30000, lastServiceMiles: null, overdueBy: 62000, competitorPriceRange: [90, 200] },
+      { name: 'Brake pads & rotors', intervalMiles: 40000, lastServiceMiles: 50000, overdueBy: 2000, competitorPriceRange: [390, 840] },
+      { name: 'Power steering fluid flush', intervalMiles: 50000, lastServiceMiles: null, overdueBy: 42000, competitorPriceRange: [125, 195] },
+      { name: 'Transmission fluid service', intervalMiles: 60000, lastServiceMiles: null, overdueBy: 32000, competitorPriceRange: [200, 390] },
+      { name: 'Coolant flush', intervalMiles: 60000, lastServiceMiles: null, overdueBy: 32000, competitorPriceRange: [135, 245] },
+      { name: 'Spark plug replacement', intervalMiles: 60000, lastServiceMiles: null, overdueBy: 32000, competitorPriceRange: [200, 505] },
+      { name: 'Differential fluid service', intervalMiles: 60000, lastServiceMiles: null, overdueBy: 32000, competitorPriceRange: [125, 245] },
+      { name: 'Serpentine belt inspection', intervalMiles: 60000, lastServiceMiles: null, overdueBy: 32000, competitorPriceRange: [140, 280] },
+      { name: 'Fuel filter replacement', intervalMiles: 60000, lastServiceMiles: null, overdueBy: 32000, competitorPriceRange: [90, 225] },
+      { name: 'Shocks & struts inspection', intervalMiles: 75000, lastServiceMiles: null, overdueBy: 17000, competitorPriceRange: [55, 135] },
+      { name: 'Timing belt replacement', intervalMiles: 90000, lastServiceMiles: null, overdueBy: 2000, competitorPriceRange: [670, 1345] },
+      { name: 'Oxygen sensor replacement', intervalMiles: 100000, lastServiceMiles: null, overdueBy: -8000, competitorPriceRange: [245, 560] },
     ],
   },
 } satisfies TemplateEntry
