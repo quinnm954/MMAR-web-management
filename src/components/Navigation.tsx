@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Menu, X, ChevronDown, Phone, User, LogOut, LayoutDashboard } from "lucide-react";
+import { Menu, X, ChevronDown, Phone, User, LogOut, LayoutDashboard, CalendarCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -134,6 +134,10 @@ const Navigation = () => {
               Memberships
             </NavLink>
 
+            <NavLink to="/book" className={({ isActive }) => `px-3 py-2 font-semibold transition-colors ${isActive ? "text-accent" : "text-accent/90 hover:text-accent"}`}>
+              Book
+            </NavLink>
+
             <NavLink to="/contact" className={({ isActive }) => `px-3 py-2 font-medium transition-colors ${isActive ? "text-primary" : "text-muted-foreground hover:text-primary"}`}>
               Contact
             </NavLink>
@@ -166,8 +170,13 @@ const Navigation = () => {
             )}
 
             <Button variant="hero" size="default" asChild>
+              <Link to="/book">
+                <CalendarCheck className="w-4 h-4 mr-1" /> Book
+              </Link>
+            </Button>
+            <Button variant="heroOutline" size="default" asChild>
               <a href="tel:8135017572">
-                <Phone className="w-4 h-4 mr-1" /> Call Now
+                <Phone className="w-4 h-4 mr-1" /> Call
               </a>
             </Button>
           </div>
@@ -235,6 +244,9 @@ const Navigation = () => {
               </Link>
               <Link to="/memberships" onClick={close} className="text-accent hover:text-accent/80 font-semibold py-3 px-2 rounded-lg">Memberships</Link>
               
+              <Link to="/book" onClick={close} className="text-accent hover:text-accent/80 font-semibold py-3 px-2 rounded-lg flex items-center gap-2">
+                <CalendarCheck className="w-4 h-4" /> Book Online
+              </Link>
               <Link to="/contact" onClick={close} className="text-foreground hover:text-primary font-medium py-3 px-2 rounded-lg">Contact</Link>
               {user ? (
                 <>
@@ -257,6 +269,11 @@ const Navigation = () => {
               )}
 
               <Button variant="hero" size="lg" asChild className="mt-3 min-h-[48px]">
+                <Link to="/book" onClick={close}>
+                  <CalendarCheck className="w-4 h-4 mr-2" /> Book Online
+                </Link>
+              </Button>
+              <Button variant="heroOutline" size="lg" asChild className="min-h-[48px]">
                 <a href="tel:8135017572" onClick={close}>
                   <Phone className="w-4 h-4 mr-2" /> Call (813) 501-7572
                 </a>
