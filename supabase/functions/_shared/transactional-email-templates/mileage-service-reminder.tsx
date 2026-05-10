@@ -52,16 +52,29 @@ const MileageServiceReminderEmail = ({ customerName, vehicle, currentMileage, du
                   ? 'due now'
                   : `due in ${fmt(Math.abs(s.overdueBy))} mi`
               return (
-                <Text key={i} style={detail}>
-                  <span style={isOverdue ? badgeOverdue : badgeDueSoon}>
-                    {isOverdue ? 'OVERDUE' : 'DUE SOON'}
-                  </span>{' '}
-                  <strong>{s.name}</strong> — every {fmt(s.intervalMiles)} mi
-                  {s.lastServiceMiles != null
-                    ? ` · last done at ${fmt(s.lastServiceMiles)} mi`
-                    : ' · no record on file'}
-                  {' · '}{statusLabel}
-                </Text>
+                <Section key={i} style={itemBlock}>
+                  <Text style={itemTitle}>
+                    <span style={isOverdue ? badgeOverdue : badgeDueSoon}>
+                      {isOverdue ? 'OVERDUE' : 'DUE SOON'}
+                    </span>{' '}
+                    <strong>{s.name}</strong>
+                  </Text>
+                  <Text style={itemMeta}>
+                    every {fmt(s.intervalMiles)} mi
+                    {s.lastServiceMiles != null
+                      ? ` · last done at ${fmt(s.lastServiceMiles)} mi`
+                      : ' · no record on file'}
+                    {' · '}{statusLabel}
+                  </Text>
+                  {s.competitorPriceRange && (
+                    <Text style={priceRow}>
+                      <span style={priceLabel}>Competitor price:</span>{' '}
+                      <span style={priceValue}>
+                        ${fmt(s.competitorPriceRange[0])}–${fmt(s.competitorPriceRange[1])}
+                      </span>
+                    </Text>
+                  )}
+                </Section>
               )
             })}
           </Section>
