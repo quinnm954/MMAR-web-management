@@ -39,6 +39,7 @@ const EstimateApproval = () => {
   const [editing, setEditing] = useState(false);
   const [decisionLogs, setDecisionLogs] = useState<any[]>([]);
   const [financingChoice, setFinancingChoice] = useState<'yes' | 'no' | null>(null);
+  const [reviewPledge, setReviewPledge] = useState(false);
 
   useEffect(() => {
     (async () => {
