@@ -434,7 +434,10 @@ const AdminEstimates = () => {
                     <TableBody>
                       {(editing.line_items || []).map((l: LineItem, i: number) => (
                         <TableRow key={i}>
-                          <TableCell><Input value={l.description} onChange={e => updateLine(i, { description: e.target.value })} /></TableCell>
+                          <TableCell>
+                            <Input value={l.description} onChange={e => updateLine(i, { description: e.target.value })} />
+                            {l.kind === 'fee' && <span className="text-[10px] text-muted-foreground ml-1">Flat fee · no tax/shop</span>}
+                          </TableCell>
                           <TableCell><Input type="number" step="0.5" value={l.quantity} onChange={e => updateLine(i, { quantity: parseFloat(e.target.value) || 0 })} /></TableCell>
                           <TableCell><Input type="number" step="0.1" value={l.labor_hours ?? 0} onChange={e => updateLine(i, { labor_hours: parseFloat(e.target.value) || 0 })} title="Billable labor hours" /></TableCell>
                           <TableCell><Input type="number" step="0.01" value={l.unit_price} onChange={e => updateLine(i, { unit_price: parseFloat(e.target.value) || 0 })} /></TableCell>
