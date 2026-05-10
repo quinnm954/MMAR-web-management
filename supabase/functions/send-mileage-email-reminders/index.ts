@@ -230,7 +230,7 @@ Deno.serve(async (req) => {
   }
 
   return new Response(
-    JSON.stringify({ scanned: vehicles?.length ?? 0, sent: sent.length, skipped: skipped.length, errors: errors.length, details: { sent, skipped, errors } }),
+    JSON.stringify({ scanned: vehicles?.length ?? 0, sent: sent.length, skipped: skipped.length, errors: errors.length, owner_cache: { hits: ownerCacheHits, misses: ownerCacheMisses, unique_owners: ownerCache.size }, details: { sent, skipped, errors } }),
     { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
   );
 });
