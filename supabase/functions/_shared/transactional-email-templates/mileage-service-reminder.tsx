@@ -42,6 +42,12 @@ const MileageServiceReminderEmail = ({ customerName, vehicle, currentMileage, du
             following mileage-based services are due or overdue. Keeping up with these protects your warranty and
             prevents bigger repair bills down the road.
           </Text>
+          <Text style={smallText}>
+            Each item below shows the typical <strong>competitor price range</strong> at local dealers
+            and national chains (Firestone, Pep Boys, Tires Plus) so you can see what you'd pay
+            elsewhere — our mobile pricing is usually well below the low end, plus the 20% discount
+            stacks on top.
+          </Text>
 
           <Section style={card}>
             {dueServices.map((s, i) => {
