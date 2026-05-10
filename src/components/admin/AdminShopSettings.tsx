@@ -22,14 +22,20 @@ const AdminShopSettings = () => {
   const [settings, setSettings] = useState<any>(null);
   const [rates, setRates] = useState<any[]>([]);
   const [newRate, setNewRate] = useState({ name: '', hourly_rate: 0 });
+  const [payDefaults, setPayDefaults] = useState<Record<string, any>>({});
 
   const load = async () => {
-    const [s, r] = await Promise.all([
+    const [s, r, p] = await Promise.all([
       supabase.from('shop_settings').select('*').eq('id', 1).single(),
       supabase.from('labor_rates').select('*').order('created_at'),
+      supabase.from('employee_pay_defaults' as any).select('*'),
     ]);
     setSettings(s.data);
     setRates(r.data ?? []);
+    const map: Record<string, any> = {};
+    TITLES.forEach((t) => { map[t] = { employee_type: t, pay_basis: 'labor_hours', hourly_rate: 0, salary_amount: null }; });
+    ((p.data ?? []) as any[]).forEach((d) => { map[d.employee_type] = d; });
+    setPayDefaults(map);
   };
   useEffect(() => { load(); }, []);
 
@@ -38,6 +44,18 @@ const AdminShopSettings = () => {
     const { error } = await supabase.from('shop_settings').update({ ...up, updated_at: new Date().toISOString() }).eq('id', 1);
     if (error) return toast.error(error.message);
     toast.success('Settings saved');
+  };
+
+  const savePayDefault = async (t: string) => {
+    const d = payDefaults[t];
+    const { error } = await supabase.from('employee_pay_defaults' as any).upsert({
+      employee_type: t,
+      pay_basis: d.pay_basis,
+      hourly_rate: Number(d.hourly_rate) || 0,
+      salary_amount: d.salary_amount ? Number(d.salary_amount) : null,
+    }, { onConflict: 'employee_type' });
+    if (error) return toast.error(error.message);
+    toast.success(`${t.replace('_', ' ')} pay defaults saved`);
   };
 
   const addRate = async () => {
