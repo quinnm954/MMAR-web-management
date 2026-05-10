@@ -64,6 +64,14 @@ const Footer = () => {
                   </Link>
                 </li>
               ))}
+              <li>
+                <Link
+                  to="/lee-county-fl"
+                  className="text-gold hover:text-primary font-semibold"
+                >
+                  All of Lee County, FL →
+                </Link>
+              </li>
             </ul>
           </div>
 
