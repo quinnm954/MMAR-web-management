@@ -19,7 +19,7 @@ const PortalDashboard = () => {
     if (!user) return;
     setRefreshing(true);
     const [v, m, a, p] = await Promise.all([
-      supabase.from("vehicles").select("id", { count: "exact", head: true }).eq("owner_id", user.id),
+      supabase.from("vehicles").select("id", { count: "exact", head: true }).eq("owner_id", user.id).eq("is_active", true),
       supabase.from("memberships").select("id", { count: "exact", head: true }).eq("customer_id", user.id).eq("status", "active"),
       supabase.from("appointments").select("id", { count: "exact", head: true }).eq("customer_id", user.id).in("status", ["requested", "scheduled"]),
       supabase.from("profiles").select("full_name").eq("id", user.id).maybeSingle(),
