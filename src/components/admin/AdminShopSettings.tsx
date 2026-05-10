@@ -4,10 +4,19 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Plus, Trash2 } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
+
+const TITLES = ['technician', 'service_advisor', 'manager', 'parts', 'admin', 'other'];
+const PAY_BASIS = [
+  { value: 'labor_hours', label: 'Per Labor Hour' },
+  { value: 'hourly_clock', label: 'Hourly (clock in/out)' },
+  { value: 'salary', label: 'Salary' },
+  { value: 'flat', label: 'Flat / Per Job' },
+];
 
 const AdminShopSettings = () => {
   const [settings, setSettings] = useState<any>(null);
