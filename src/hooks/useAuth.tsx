@@ -2,9 +2,9 @@ import { useState, useEffect, createContext, useContext, ReactNode } from 'react
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 
-export type AppRole = 'admin' | 'manager' | 'service_advisor' | 'technician' | 'parts' | 'customer';
+export type AppRole = 'owner' | 'admin' | 'manager' | 'service_advisor' | 'technician' | 'parts' | 'customer';
 
-const STAFF_ROLES: AppRole[] = ['admin', 'manager', 'service_advisor', 'technician', 'parts'];
+const STAFF_ROLES: AppRole[] = ['owner', 'admin', 'manager', 'service_advisor', 'technician', 'parts'];
 
 interface AuthContextType {
   user: User | null;
@@ -114,7 +114,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const hasRole = (role: AppRole) => roles.includes(role);
   const hasAnyRole = (rs: AppRole[]) => rs.some(r => roles.includes(r));
-  const isAdmin = roles.includes('admin');
+  const isAdmin = roles.includes('admin') || roles.includes('owner');
   const isManager = roles.includes('manager');
   const isStaff = STAFF_ROLES.some(r => roles.includes(r));
 

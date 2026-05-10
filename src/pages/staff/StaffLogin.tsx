@@ -10,7 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Loader2, ArrowLeft, HardHat } from 'lucide-react';
 import mmarLogo from '@/assets/mmar-logo.jpeg';
 
-const STAFF_ROLES = ['technician', 'service_advisor', 'manager', 'parts', 'admin'];
+const STAFF_ROLES = ['owner', 'technician', 'service_advisor', 'manager', 'parts', 'admin'];
 
 const StaffLogin = () => {
   const [email, setEmail] = useState('');
@@ -51,7 +51,7 @@ const StaffLogin = () => {
         });
         return;
       }
-      navigate(userRoles.includes('admin') ? '/admin/dashboard' : '/tech');
+      navigate(userRoles.some((r: string) => r === 'owner' || r === 'admin') ? '/admin/dashboard' : '/tech');
     } finally {
       setIsSubmitting(false);
     }

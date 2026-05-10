@@ -49,7 +49,7 @@ const AdminLogin = () => {
         .eq('user_id', authedUser.id);
 
       const userRoles = (roleRows ?? []).map((r: any) => r.role);
-      if (!userRoles.includes('admin')) {
+      if (!userRoles.some((r: string) => r === 'owner' || r === 'admin')) {
         await signOut();
         toast({
           title: 'Access denied',

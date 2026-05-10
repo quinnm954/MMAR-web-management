@@ -50,10 +50,10 @@ import type { AppRole } from '@/hooks/useAuth';
 
 type TabDef = { value: string; label: string; icon: any; roles: AppRole[]; content: JSX.Element };
 
-const ALL: AppRole[] = ['admin', 'manager', 'service_advisor', 'technician', 'parts'];
-const ADMIN_ONLY: AppRole[] = ['admin', 'manager'];
-const ADVISOR: AppRole[] = ['admin', 'manager', 'service_advisor'];
-const PARTS: AppRole[] = ['admin', 'manager', 'parts'];
+const ALL: AppRole[] = ['owner', 'admin', 'manager', 'service_advisor', 'technician', 'parts'];
+const ADMIN_ONLY: AppRole[] = ['owner', 'admin', 'manager'];
+const ADVISOR: AppRole[] = ['owner', 'admin', 'manager', 'service_advisor'];
+const PARTS: AppRole[] = ['owner', 'admin', 'manager', 'parts'];
 
 const AdminDashboard = () => {
   const { signOut, user, hasAnyRole, roles } = useAuth();
