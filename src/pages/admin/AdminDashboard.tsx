@@ -4,7 +4,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { LogOut, FileText, ShieldCheck, Users, CreditCard, Calendar, ClipboardList, Receipt, Wrench, Mail, FileSpreadsheet, ClipboardCheck, Package, Settings, KanbanSquare, Clock, BarChart3, Share2, Car, AlertTriangle, FileDown, Activity, History, UserCog, DollarSign, RefreshCw } from 'lucide-react';
+import { LogOut, FileText, ShieldCheck, Users, CreditCard, Calendar, CalendarCheck, ClipboardList, Receipt, Wrench, Mail, FileSpreadsheet, ClipboardCheck, Package, Settings, KanbanSquare, Clock, BarChart3, Share2, Car, AlertTriangle, FileDown, Activity, History, UserCog, DollarSign, RefreshCw } from 'lucide-react';
 import AdminEmployees from '@/components/admin/AdminEmployees';
 import AdminAuditLog from '@/components/admin/AdminAuditLog';
 import AdminRoles from '@/components/admin/AdminRoles';
@@ -13,6 +13,7 @@ import WarrantyTable from '@/components/admin/WarrantyTable';
 import AdminCustomers from '@/components/admin/AdminCustomers';
 import AdminMemberships from '@/components/admin/AdminMemberships';
 import AdminAppointments from '@/components/admin/AdminAppointments';
+import AdminBookingRequests from '@/components/admin/AdminBookingRequests';
 import AdminServiceRecords from '@/components/admin/AdminServiceRecords';
 import AdminInvoices from '@/components/admin/AdminInvoices';
 import AdminEmails from '@/components/admin/AdminEmails';
@@ -136,6 +137,7 @@ const AdminDashboard = () => {
             { value: 'customers', label: 'Customers', icon: Users, roles: ADVISOR, content: <AdminCustomers /> },
             { value: 'garage', label: 'Garage', icon: Car, roles: ADVISOR, content: <AdminGarage /> },
             { value: 'memberships', label: 'Memberships', icon: CreditCard, roles: ADVISOR, content: <AdminMemberships /> },
+            { value: 'booking-requests', label: 'Booking Requests', icon: CalendarCheck, roles: ADVISOR, content: <AdminBookingRequests /> },
             { value: 'appointments', label: 'Appointments', icon: Calendar, roles: ADVISOR, content: <AdminAppointments /> },
             { value: 'service', label: 'Service Records', icon: ClipboardList, roles: ADVISOR, content: <AdminServiceRecords /> },
             { value: 'estimates', label: 'Estimates', icon: FileSpreadsheet, roles: ADVISOR, content: <AdminEstimates /> },
