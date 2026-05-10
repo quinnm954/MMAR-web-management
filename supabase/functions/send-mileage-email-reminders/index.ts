@@ -100,11 +100,12 @@ Deno.serve(async (req) => {
         const lastMiles = matches.length
           ? Math.max(...matches.map((m) => m.mileage_at_service as number))
           : null;
-        // Assume nothing previously due was done: baseline is 0 if no record
         const baseline = lastMiles ?? 0;
         const overdueBy = (v.current_mileage as number) - (baseline + cfg.intervalMiles);
         return { name: cfg.name, intervalMiles: cfg.intervalMiles, lastServiceMiles: lastMiles, overdueBy };
-      }).filter((s) => s.overdueBy >= 0);
+      })
+        .filter((s) => s.overdueBy >= -DUE_SOON_WINDOW)
+        .sort((a, b) => b.overdueBy - a.overdueBy);
 
       if (dueServices.length === 0) { skipped.push({ vehicle_id: v.id, reason: 'nothing_due' }); continue; }
 
