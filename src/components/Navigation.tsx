@@ -244,6 +244,9 @@ const Navigation = () => {
               </Link>
               <Link to="/memberships" onClick={close} className="text-accent hover:text-accent/80 font-semibold py-3 px-2 rounded-lg">Memberships</Link>
               
+              <Link to="/book" onClick={close} className="text-accent hover:text-accent/80 font-semibold py-3 px-2 rounded-lg flex items-center gap-2">
+                <CalendarCheck className="w-4 h-4" /> Book Online
+              </Link>
               <Link to="/contact" onClick={close} className="text-foreground hover:text-primary font-medium py-3 px-2 rounded-lg">Contact</Link>
               {user ? (
                 <>
@@ -266,6 +269,11 @@ const Navigation = () => {
               )}
 
               <Button variant="hero" size="lg" asChild className="mt-3 min-h-[48px]">
+                <Link to="/book" onClick={close}>
+                  <CalendarCheck className="w-4 h-4 mr-2" /> Book Online
+                </Link>
+              </Button>
+              <Button variant="heroOutline" size="lg" asChild className="min-h-[48px]">
                 <a href="tel:8135017572" onClick={close}>
                   <Phone className="w-4 h-4 mr-2" /> Call (813) 501-7572
                 </a>
