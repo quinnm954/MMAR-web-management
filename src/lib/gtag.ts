@@ -113,12 +113,19 @@ function labelFor(s: Settings, type: ConversionEvent): string | null {
   }
 }
 
-/** Fire a Google Ads conversion. `type` defaults to phone_call for back-compat. */
-export const trackConversion = async (type: ConversionEvent = "phone_call") => {
+const VALID: ConversionEvent[] = ["phone_call", "text_click", "quote_submit", "lead"];
+
+/** Fire a Google Ads conversion. `type` defaults to phone_call for back-compat.
+ *  Tolerates being passed directly as a React onClick handler — non-string args are ignored. */
+export const trackConversion = async (type?: unknown) => {
   if (typeof window === "undefined" || !window.gtag) return;
+  const eventType: ConversionEvent =
+    typeof type === "string" && (VALID as string[]).includes(type)
+      ? (type as ConversionEvent)
+      : "phone_call";
   const s = await loadSettings();
   if (!s?.google_ads_conversion_id) return;
-  const label = labelFor(s, type);
+  const label = labelFor(s, eventType);
   if (!label) return; // not configured yet — silently skip
   window.gtag("event", "conversion", {
     send_to: `${s.google_ads_conversion_id}/${label}`,
