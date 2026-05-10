@@ -20,3 +20,15 @@ verify_jwt = false
 
 [functions.twilio-inbound-sms]
 verify_jwt = false
+
+[functions.twilio-voice-incoming]
+verify_jwt = false
+
+[functions.twilio-voice-status]
+verify_jwt = false
+
+[functions.twilio-voice-recording]
+verify_jwt = false
+
+[functions.twilio-voice-transcription]
+verify_jwt = false
