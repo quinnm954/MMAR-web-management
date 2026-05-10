@@ -51,7 +51,7 @@ const StaffLogin = () => {
         });
         return;
       }
-      navigate(userRoles.includes('admin') ? '/admin/dashboard' : '/tech');
+      navigate(userRoles.some((r: string) => r === 'owner' || r === 'admin') ? '/admin/dashboard' : '/tech');
     } finally {
       setIsSubmitting(false);
     }
