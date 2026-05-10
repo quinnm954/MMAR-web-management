@@ -49,6 +49,10 @@ export default function AdminRoles() {
   };
   const revoke = async (uid: string, role: Role) => {
     const isSelf = currentUser?.id === uid;
+    if (role === 'owner' && !isOwner) {
+      toast.error('Only an owner can revoke the owner role.');
+      return;
+    }
     if (isSelf && role === "admin") {
       const adminCount = roles.filter(r => r.role === "admin").length;
       if (adminCount <= 1) {
