@@ -29,6 +29,7 @@ import Memberships from "./pages/Memberships";
 import PortalLogin from "./pages/portal/PortalLogin";
 import PortalSignup from "./pages/portal/PortalSignup";
 import PortalDashboard from "./pages/portal/PortalDashboard";
+import PortalOnboarding from "./pages/portal/PortalOnboarding";
 import MembershipSignup from "./pages/portal/MembershipSignup";
 import PortalVehicles from "./pages/portal/PortalVehicles";
 import PortalMembership from "./pages/portal/PortalMembership";
@@ -91,6 +92,7 @@ const App = () => (
             <Route path="/portal/login" element={<PortalLogin />} />
             <Route path="/portal/signup" element={<PortalSignup />} />
             <Route path="/portal/membership-signup" element={<MembershipSignup />} />
+            <Route path="/portal/onboarding" element={<CustomerProtectedRoute><PortalOnboarding /></CustomerProtectedRoute>} />
             <Route path="/portal/dashboard" element={<CustomerProtectedRoute><PortalDashboard /></CustomerProtectedRoute>} />
             <Route path="/portal/vehicles" element={<CustomerProtectedRoute><PortalVehicles /></CustomerProtectedRoute>} />
             <Route path="/portal/membership" element={<CustomerProtectedRoute><PortalMembership /></CustomerProtectedRoute>} />
