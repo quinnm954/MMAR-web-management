@@ -55,6 +55,13 @@ Deno.serve(async (req) => {
           })
           .eq("id", invoiceId);
         console.log("Invoice paid", invoiceId);
+
+        // Email paid receipt to customer
+        try {
+          await sendInvoicePaidReceipt(admin, invoiceId, session.payment_intent as string | null);
+        } catch (e) {
+          console.warn("paid receipt email failed", e);
+        }
       }
 
       // Membership subscription checkout completed
