@@ -19,6 +19,7 @@ interface Props {
   vehicle?: string
   currentMileage?: number
   dueServices?: DueService[]
+  priceRegionLabel?: string
 }
 
 const fmt = (n: number) => n.toLocaleString('en-US')
