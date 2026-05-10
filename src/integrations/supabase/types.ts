@@ -330,6 +330,66 @@ export type Database = {
         }
         Relationships: []
       }
+      call_logs: {
+        Row: {
+          answered_at: string | null
+          completed_at: string | null
+          created_at: string
+          customer_id: string | null
+          direction: string
+          duration_seconds: number | null
+          from_number: string | null
+          id: string
+          read_at: string | null
+          recording_sid: string | null
+          recording_url: string | null
+          status: string
+          to_number: string | null
+          transcription: string | null
+          twilio_call_sid: string | null
+          updated_at: string
+          voicemail: boolean
+        }
+        Insert: {
+          answered_at?: string | null
+          completed_at?: string | null
+          created_at?: string
+          customer_id?: string | null
+          direction?: string
+          duration_seconds?: number | null
+          from_number?: string | null
+          id?: string
+          read_at?: string | null
+          recording_sid?: string | null
+          recording_url?: string | null
+          status?: string
+          to_number?: string | null
+          transcription?: string | null
+          twilio_call_sid?: string | null
+          updated_at?: string
+          voicemail?: boolean
+        }
+        Update: {
+          answered_at?: string | null
+          completed_at?: string | null
+          created_at?: string
+          customer_id?: string | null
+          direction?: string
+          duration_seconds?: number | null
+          from_number?: string | null
+          id?: string
+          read_at?: string | null
+          recording_sid?: string | null
+          recording_url?: string | null
+          status?: string
+          to_number?: string | null
+          transcription?: string | null
+          twilio_call_sid?: string | null
+          updated_at?: string
+          voicemail?: boolean
+        }
+        Relationships: []
+      }
       catalog_items: {
         Row: {
           category: string | null
@@ -1405,6 +1465,45 @@ export type Database = {
           sms_enabled?: boolean
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      phone_settings: {
+        Row: {
+          business_hours: Json
+          forward_to_number: string | null
+          id: number
+          record_calls: boolean
+          ring_timeout_seconds: number
+          routing_enabled: boolean
+          transcribe_voicemail: boolean
+          unavailable_greeting: string
+          updated_at: string
+          voicemail_greeting: string
+        }
+        Insert: {
+          business_hours?: Json
+          forward_to_number?: string | null
+          id?: number
+          record_calls?: boolean
+          ring_timeout_seconds?: number
+          routing_enabled?: boolean
+          transcribe_voicemail?: boolean
+          unavailable_greeting?: string
+          updated_at?: string
+          voicemail_greeting?: string
+        }
+        Update: {
+          business_hours?: Json
+          forward_to_number?: string | null
+          id?: number
+          record_calls?: boolean
+          ring_timeout_seconds?: number
+          routing_enabled?: boolean
+          transcribe_voicemail?: boolean
+          unavailable_greeting?: string
+          updated_at?: string
+          voicemail_greeting?: string
         }
         Relationships: []
       }
