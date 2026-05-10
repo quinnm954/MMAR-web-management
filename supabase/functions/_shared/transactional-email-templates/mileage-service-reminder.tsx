@@ -104,3 +104,5 @@ const detail = { fontSize: '14px', color: '#0a1628', margin: '6px 0', lineHeight
 const button = { backgroundColor: '#3aa6e0', color: '#ffffff', padding: '12px 22px', borderRadius: '6px', textDecoration: 'none', fontWeight: 'bold', fontSize: '15px', display: 'inline-block', margin: '8px 0 16px' }
 const hr = { borderColor: '#e2e8f0', margin: '24px 0' }
 const footer = { fontSize: '12px', color: '#94a3b8' }
+const link = { color: '#3aa6e0', textDecoration: 'underline', fontWeight: 'bold' as const }
+const smallText = { fontSize: '13px', color: '#64748b', lineHeight: '1.5', margin: '0 0 12px' }
