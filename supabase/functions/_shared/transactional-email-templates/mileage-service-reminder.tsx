@@ -43,15 +43,26 @@ const MileageServiceReminderEmail = ({ customerName, vehicle, currentMileage, du
           </Text>
 
           <Section style={card}>
-            {dueServices.map((s, i) => (
-              <Text key={i} style={detail}>
-                <strong>{s.name}</strong> — every {fmt(s.intervalMiles)} mi
-                {s.lastServiceMiles != null
-                  ? ` · last done at ${fmt(s.lastServiceMiles)} mi`
-                  : ' · no record on file'}
-                {s.overdueBy > 0 ? ` · overdue by ${fmt(s.overdueBy)} mi` : ''}
-              </Text>
-            ))}
+            {dueServices.map((s, i) => {
+              const isOverdue = s.overdueBy > 0
+              const statusLabel = isOverdue
+                ? `overdue by ${fmt(s.overdueBy)} mi`
+                : s.overdueBy === 0
+                  ? 'due now'
+                  : `due in ${fmt(Math.abs(s.overdueBy))} mi`
+              return (
+                <Text key={i} style={detail}>
+                  <span style={isOverdue ? badgeOverdue : badgeDueSoon}>
+                    {isOverdue ? 'OVERDUE' : 'DUE SOON'}
+                  </span>{' '}
+                  <strong>{s.name}</strong> — every {fmt(s.intervalMiles)} mi
+                  {s.lastServiceMiles != null
+                    ? ` · last done at ${fmt(s.lastServiceMiles)} mi`
+                    : ' · no record on file'}
+                  {' · '}{statusLabel}
+                </Text>
+              )
+            })}
           </Section>
 
           <Section style={promoCard}>
@@ -96,11 +107,29 @@ export const template = {
   previewData: {
     customerName: 'Alex',
     vehicle: '2018 Honda Civic',
-    currentMileage: 72000,
+    currentMileage: 92000,
     dueServices: [
-      { name: 'Oil & filter change', intervalMiles: 5000, lastServiceMiles: 65000, overdueBy: 2000 },
-      { name: 'Tire rotation', intervalMiles: 7500, lastServiceMiles: 60000, overdueBy: 4500 },
-      { name: 'Brake fluid flush', intervalMiles: 30000, lastServiceMiles: null, overdueBy: 42000 },
+      { name: 'Oil & filter change', intervalMiles: 5000, lastServiceMiles: 85000, overdueBy: 2000 },
+      { name: 'Tire rotation', intervalMiles: 7500, lastServiceMiles: 80000, overdueBy: 4500 },
+      { name: 'Multi-point inspection', intervalMiles: 10000, lastServiceMiles: 80000, overdueBy: 2000 },
+      { name: 'Wheel alignment check', intervalMiles: 15000, lastServiceMiles: 70000, overdueBy: 7000 },
+      { name: 'Brake inspection', intervalMiles: 15000, lastServiceMiles: 75000, overdueBy: 2000 },
+      { name: 'Cabin air filter', intervalMiles: 20000, lastServiceMiles: 70000, overdueBy: 2000 },
+      { name: 'Battery test', intervalMiles: 25000, lastServiceMiles: null, overdueBy: 67000 },
+      { name: 'Engine air filter', intervalMiles: 30000, lastServiceMiles: 60000, overdueBy: 2000 },
+      { name: 'Brake fluid flush', intervalMiles: 30000, lastServiceMiles: null, overdueBy: 62000 },
+      { name: 'A/C system performance check', intervalMiles: 30000, lastServiceMiles: null, overdueBy: 62000 },
+      { name: 'Brake pads & rotors', intervalMiles: 40000, lastServiceMiles: 50000, overdueBy: 2000 },
+      { name: 'Power steering fluid flush', intervalMiles: 50000, lastServiceMiles: null, overdueBy: 42000 },
+      { name: 'Transmission fluid service', intervalMiles: 60000, lastServiceMiles: null, overdueBy: 32000 },
+      { name: 'Coolant flush', intervalMiles: 60000, lastServiceMiles: null, overdueBy: 32000 },
+      { name: 'Spark plug replacement', intervalMiles: 60000, lastServiceMiles: null, overdueBy: 32000 },
+      { name: 'Differential fluid service', intervalMiles: 60000, lastServiceMiles: null, overdueBy: 32000 },
+      { name: 'Serpentine belt inspection', intervalMiles: 60000, lastServiceMiles: null, overdueBy: 32000 },
+      { name: 'Fuel filter replacement', intervalMiles: 60000, lastServiceMiles: null, overdueBy: 32000 },
+      { name: 'Shocks & struts inspection', intervalMiles: 75000, lastServiceMiles: null, overdueBy: 17000 },
+      { name: 'Timing belt replacement', intervalMiles: 90000, lastServiceMiles: null, overdueBy: 2000 },
+      { name: 'Oxygen sensor replacement', intervalMiles: 100000, lastServiceMiles: null, overdueBy: -8000 },
     ],
   },
 } satisfies TemplateEntry
@@ -110,7 +139,7 @@ const container = { padding: '24px', maxWidth: '560px', margin: '0 auto' }
 const h1 = { fontSize: '24px', fontWeight: 'bold', color: '#0a1628', margin: '0 0 16px' }
 const text = { fontSize: '15px', color: '#334155', lineHeight: '1.6', margin: '0 0 16px' }
 const card = { backgroundColor: '#f1f5f9', borderLeft: '4px solid #3aa6e0', padding: '16px 20px', margin: '20px 0', borderRadius: '4px' }
-const detail = { fontSize: '14px', color: '#0a1628', margin: '6px 0', lineHeight: '1.5' }
+const detail = { fontSize: '14px', color: '#0a1628', margin: '8px 0', lineHeight: '1.5' }
 const button = { backgroundColor: '#3aa6e0', color: '#ffffff', padding: '12px 22px', borderRadius: '6px', textDecoration: 'none', fontWeight: 'bold', fontSize: '15px', display: 'inline-block', margin: '8px 0 16px' }
 const hr = { borderColor: '#e2e8f0', margin: '24px 0' }
 const footer = { fontSize: '12px', color: '#94a3b8' }
@@ -120,3 +149,5 @@ const promoCard = { backgroundColor: '#fff8e1', border: '2px dashed #f5b400', pa
 const promoBadge = { fontSize: '11px', fontWeight: 'bold' as const, color: '#a07400', letterSpacing: '1px', margin: '0 0 6px' }
 const promoHeadline = { fontSize: '20px', fontWeight: 'bold' as const, color: '#0a1628', margin: '0 0 8px' }
 const promoSubtext = { fontSize: '13px', color: '#5b4a14', lineHeight: '1.5', margin: '0' }
+const badgeOverdue = { display: 'inline-block', backgroundColor: '#dc2626', color: '#ffffff', fontSize: '10px', fontWeight: 'bold' as const, padding: '2px 6px', borderRadius: '3px', letterSpacing: '0.5px', verticalAlign: 'middle' }
+const badgeDueSoon = { display: 'inline-block', backgroundColor: '#f5b400', color: '#0a1628', fontSize: '10px', fontWeight: 'bold' as const, padding: '2px 6px', borderRadius: '3px', letterSpacing: '0.5px', verticalAlign: 'middle' }
