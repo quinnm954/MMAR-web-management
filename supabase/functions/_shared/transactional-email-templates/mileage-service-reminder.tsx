@@ -116,3 +116,7 @@ const hr = { borderColor: '#e2e8f0', margin: '24px 0' }
 const footer = { fontSize: '12px', color: '#94a3b8' }
 const link = { color: '#3aa6e0', textDecoration: 'underline', fontWeight: 'bold' as const }
 const smallText = { fontSize: '13px', color: '#64748b', lineHeight: '1.5', margin: '0 0 12px' }
+const promoCard = { backgroundColor: '#fff8e1', border: '2px dashed #f5b400', padding: '16px 20px', margin: '20px 0', borderRadius: '6px', textAlign: 'center' as const }
+const promoBadge = { fontSize: '11px', fontWeight: 'bold' as const, color: '#a07400', letterSpacing: '1px', margin: '0 0 6px' }
+const promoHeadline = { fontSize: '20px', fontWeight: 'bold' as const, color: '#0a1628', margin: '0 0 8px' }
+const promoSubtext = { fontSize: '13px', color: '#5b4a14', lineHeight: '1.5', margin: '0' }
