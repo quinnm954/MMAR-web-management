@@ -27,6 +27,7 @@ import mmarLogo from "@/assets/mmar-logo.jpeg";
 const navItems = [
   { to: "/portal/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/portal/vehicles", label: "My Vehicles", icon: Car },
+  { to: "/portal/maintenance", label: "Maintenance Log", icon: Wrench },
   { to: "/portal/membership", label: "Membership", icon: CreditCard },
   { to: "/portal/appointments", label: "Appointments", icon: Calendar },
   { to: "/portal/estimates", label: "Estimates", icon: FileText },
