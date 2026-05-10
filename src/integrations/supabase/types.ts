@@ -2457,6 +2457,10 @@ export type Database = {
           read_ct: number
         }[]
       }
+      set_booking_attribution: {
+        Args: { _attribution: Json; _token: string }
+        Returns: undefined
+      }
       submit_booking_request: {
         Args: {
           _description: string
