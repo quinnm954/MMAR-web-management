@@ -173,9 +173,12 @@ Deno.serve(async (req) => {
         .not('mileage_at_service', 'is', null);
 
       const dueServices = INTERVALS.map((cfg) => {
+        // Match by configured keywords OR by exact canonical name
+        // (the portal stores `service_type = cfg.name` for self-reported services).
+        const allKeywords = [...cfg.keywords, cfg.name.toLowerCase()];
         const matches = (records || []).filter((r) => {
           const t = (r.service_type || '').toLowerCase();
-          return cfg.keywords.some((kw) => t.includes(kw));
+          return allKeywords.some((kw) => t.includes(kw));
         });
         const lastMiles = matches.length
           ? Math.max(...matches.map((m) => m.mileage_at_service as number))
