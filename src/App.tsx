@@ -59,8 +59,11 @@ import Book from "./pages/Book";
 import AppointmentConfirmation from "./pages/AppointmentConfirmation";
 import NativeBoot from "./components/NativeBoot";
 import PullToRefresh from "./components/PullToRefresh";
+import { captureAttribution } from "@/lib/gtag";
 
 const queryClient = new QueryClient();
+
+if (typeof window !== "undefined") captureAttribution();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
