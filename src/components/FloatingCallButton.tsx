@@ -1,7 +1,7 @@
 import { Phone, MessageCircle, MapPin } from "lucide-react";
 import { trackConversion } from "@/lib/gtag";
 
-const GMB_CID = "12463376982965951252";
+const GMB_URL = "https://share.google/bx2Gb42dslCITJdS8";
 const ADDRESS = "Mike's Mobile Auto Repair, Fort Myers, FL";
 const ENCODED = encodeURIComponent(ADDRESS);
 
