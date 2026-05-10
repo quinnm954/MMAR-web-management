@@ -161,6 +161,15 @@ const PortalInvoiceDetail = () => {
         {/* Totals */}
         <div className="mt-4 ml-auto sm:w-72 space-y-1 text-sm">
           <div className="flex justify-between"><span className="text-muted-foreground">Subtotal</span><span>${Number(inv.subtotal).toFixed(2)}</span></div>
+          {Number(inv.discount_amount ?? 0) > 0 && (
+            <div className="flex justify-between text-primary">
+              <span>
+                Discount{inv.discount_type === 'percent' && inv.discount_value ? ` (${inv.discount_value}%)` : ''}
+                {inv.discount_reason && <span className="text-xs text-muted-foreground"> · {inv.discount_reason}</span>}
+              </span>
+              <span>−${Number(inv.discount_amount).toFixed(2)}</span>
+            </div>
+          )}
           {Number(inv.shop_supplies) > 0 && <div className="flex justify-between"><span className="text-muted-foreground">Shop / disposal fees</span><span>${Number(inv.shop_supplies).toFixed(2)}</span></div>}
           {Number(inv.tax) > 0 && <div className="flex justify-between"><span className="text-muted-foreground">Tax</span><span>${Number(inv.tax).toFixed(2)}</span></div>}
           <div className="flex justify-between font-bold text-lg pt-2 border-t border-border"><span>Total</span><span>${Number(inv.total).toFixed(2)}</span></div>
