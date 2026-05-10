@@ -1,59 +1,47 @@
-## Goals
-
-1. Customer signup asks for **only name + email** — no password, no address, no vehicles.
-2. After they click the email link → they land on **Set Password** → then **Onboarding** (address + vehicles + service history) → then dashboard.
-3. Replace the unified `/login` page with **dedicated** login pages for customers, staff, and admins.
-
-## Current state (already in place)
-
-- `PortalSignup` already collects only name + email and sends a magic link with `must_set_password: true`.
-- `SetPassword` page exists and clears the flag.
-- `CustomerProtectedRoute` already redirects to `/set-password` if the flag is set, then to `/portal/onboarding` if profile/vehicle is incomplete.
-- `AdminLogin` exists at `/admin/login`.
-- The unified `/login` page (`src/pages/Login.tsx`) lets you pick "Customer / Employee / Admin" — this is what we're removing.
+## Goal
+Replace the three separate login pages (`/portal/login`, `/admin/login`, `/staff/login`) and the public `/portal/signup` with a single unified `/login` page. Signup is restricted to customers only — staff accounts are created by admins/owners from the dashboard, who also assign roles.
 
 ## Changes
 
-### 1. Signup → first-login flow polish
-- `PortalSignup`: tighten copy so it's obvious the next step is "set password, then add vehicles." No functional change to the form itself.
-- `SetPassword`: after saving the password, route customers to `/portal/onboarding` (not `/portal/dashboard`) so the next step is unmistakable. Staff/admin still route to their dashboards.
-- `CustomerProtectedRoute`: no change — already enforces password → onboarding → dashboard order.
+### 1. New unified auth page — `src/pages/Login.tsx`
+- Tabs: **Sign In** / **Sign Up**
+- **Sign In**: email + password. After login, route by role:
+  - `owner` / `admin` / `manager` / `parts_advisor` / `service_advisor` → `/admin/dashboard`
+  - `technician` → `/tech`
+  - customer (no staff role) → `/portal/dashboard`
+- **Sign Up**: customer-only (name, email, phone, password). Creates auth user + profile row, no role assignment. Clear copy: "Staff? Ask an admin to create your account."
+- Includes "Forgot password" link → existing reset flow.
+- Google sign-in button (existing customer pattern).
 
-### 2. New dedicated **Staff Login** page
-- New file: `src/pages/staff/StaffLogin.tsx` (employees: technician, service_advisor, manager, parts).
-- Same look as `AdminLogin` but validates against the staff role set; redirects to `/tech` on success.
-- Add route `/staff/login` in `src/App.tsx`.
+### 2. Routing — `src/App.tsx`
+- Keep `/login` as the canonical route, point it at the new `Login` page.
+- Make `/portal/login`, `/portal/signup`, `/admin/login`, `/staff/login` redirect to `/login` (preserve `?redirect=` param) so existing links/bookmarks keep working.
+- Remove imports of `AdminLogin`, `StaffLogin`, `PortalLogin`, `PortalSignup` once redirects are in place. Delete the now-unused page files.
 
-### 3. Retire the unified `/login`
-- Delete `src/pages/Login.tsx` and its route.
-- Update remaining references:
-  - `src/components/Navigation.tsx` (desktop + mobile "Staff sign-in" link) → point to `/staff/login`. Add a small secondary link to `/admin/login` next to it on desktop ("Admin").
-  - `src/pages/SetPassword.tsx` fallback navigate → `/portal/login`.
-  - `src/components/admin/ProtectedRoute.tsx` → `/admin/login`.
-- Customer-facing entry points (Navigation "Sign in" button, footer, hero, etc.) already use `/portal/login` — keep as is.
+### 3. Admin: create staff accounts + assign roles
+- Extend `src/components/admin/AdminEmployees.tsx` with an **"Invite / Create Account"** action that:
+  - Calls a new edge function `admin-create-user` (service-role) which creates the auth user with a temporary password (or uses Supabase invite), inserts a `profiles` row, links to the `employees` row, and assigns initial role(s) in `user_roles`.
+  - Sends the user a "set your password" link (reuses existing `/set-password` page).
+- Edge function gates on `has_role(caller, 'admin' | 'owner')`.
 
-### 4. Cross-link the three login pages
-Each login page gets a small footer with links to the other two ("Not a customer? Staff sign-in · Admin sign-in") so a user who lands on the wrong one can self-correct.
+### 4. Admin: per-account role management
+- `src/components/admin/AdminRoles.tsx` already exists for role assignment — review and ensure:
+  - Only `admin` / `owner` can view and mutate.
+  - Supports add/remove of any role from `app_role` enum per user.
+  - Owner role can only be granted by another owner (UI guard + RLS).
+- No DB schema changes needed beyond what already exists (`user_roles`, `has_role`, `is_staff`).
 
-## Files touched
+### 5. Cleanup
+- Delete `src/pages/admin/AdminLogin.tsx`, `src/pages/staff/StaffLogin.tsx`, `src/pages/portal/PortalLogin.tsx`, `src/pages/portal/PortalSignup.tsx`.
+- Update any in-app links/buttons currently pointing at the old login routes to use `/login`.
 
-```text
-src/pages/portal/PortalSignup.tsx        (copy tweak)
-src/pages/SetPassword.tsx                (route customers to /portal/onboarding)
-src/pages/staff/StaffLogin.tsx           (NEW)
-src/pages/admin/AdminLogin.tsx           (add cross-links)
-src/pages/portal/PortalLogin.tsx         (add cross-links)
-src/components/Navigation.tsx            (point staff link to /staff/login)
-src/components/admin/ProtectedRoute.tsx  (redirect → /admin/login)
-src/App.tsx                              (add /staff/login route, remove /login route + Login import)
-src/pages/Login.tsx                      (DELETE)
-```
+## Technical notes
+- Auth state flow: set up `onAuthStateChange` first, then `getSession()` (existing `useAuth` already does this).
+- Role-based redirect happens after `useAuth` reports `userRoles`; show a brief loading state to avoid flashing the wrong destination.
+- Edge function uses `SUPABASE_SERVICE_ROLE_KEY` from env; verify caller JWT and role server-side.
+- Owner-only-grants-owner enforced via an RLS policy on `user_roles` insert/delete: `role = 'owner' ⇒ has_role(auth.uid(), 'owner')`.
 
-## Resulting flows
-
-- **Customer signup**: `/portal/signup` (name+email) → email link → `/set-password` → `/portal/onboarding` (address + vehicles + history) → `/portal/dashboard`.
-- **Customer returning**: `/portal/login` → dashboard.
-- **Staff**: `/staff/login` → `/tech`.
-- **Admin**: `/admin/login` → `/admin/dashboard`.
-
-No database, RLS, or edge-function changes are required.
+## Out of scope
+- No changes to the customer portal pages themselves.
+- No change to existing `/set-password` flow.
+- No change to membership signup (`/portal/membership-signup`) which is a separate flow.
