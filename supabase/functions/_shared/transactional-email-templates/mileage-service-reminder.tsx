@@ -12,6 +12,7 @@ interface DueService {
   lastServiceMiles: number | null
   overdueBy: number
   competitorPriceRange?: [number, number]
+  importance?: string
 }
 
 interface Props {
