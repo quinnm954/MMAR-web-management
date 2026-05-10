@@ -43,15 +43,26 @@ const MileageServiceReminderEmail = ({ customerName, vehicle, currentMileage, du
           </Text>
 
           <Section style={card}>
-            {dueServices.map((s, i) => (
-              <Text key={i} style={detail}>
-                <strong>{s.name}</strong> — every {fmt(s.intervalMiles)} mi
-                {s.lastServiceMiles != null
-                  ? ` · last done at ${fmt(s.lastServiceMiles)} mi`
-                  : ' · no record on file'}
-                {s.overdueBy > 0 ? ` · overdue by ${fmt(s.overdueBy)} mi` : ''}
-              </Text>
-            ))}
+            {dueServices.map((s, i) => {
+              const isOverdue = s.overdueBy > 0
+              const statusLabel = isOverdue
+                ? `overdue by ${fmt(s.overdueBy)} mi`
+                : s.overdueBy === 0
+                  ? 'due now'
+                  : `due in ${fmt(Math.abs(s.overdueBy))} mi`
+              return (
+                <Text key={i} style={detail}>
+                  <span style={isOverdue ? badgeOverdue : badgeDueSoon}>
+                    {isOverdue ? 'OVERDUE' : 'DUE SOON'}
+                  </span>{' '}
+                  <strong>{s.name}</strong> — every {fmt(s.intervalMiles)} mi
+                  {s.lastServiceMiles != null
+                    ? ` · last done at ${fmt(s.lastServiceMiles)} mi`
+                    : ' · no record on file'}
+                  {' · '}{statusLabel}
+                </Text>
+              )
+            })}
           </Section>
 
           <Section style={promoCard}>
