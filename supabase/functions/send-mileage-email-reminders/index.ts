@@ -133,13 +133,15 @@ Deno.serve(async (req) => {
         .maybeSingle();
       if (recent) { skipped.push({ vehicle_id: v.id, reason: 'cooldown' }); continue; }
 
-      // Owner profile + email
+      // Owner profile + email + ZIP for regional pricing
       const { data: profile } = await sb
         .from('profiles')
-        .select('id, full_name, email')
+        .select('id, full_name, email, postal_code')
         .eq('id', v.owner_id)
         .maybeSingle();
       if (!profile?.email) { skipped.push({ vehicle_id: v.id, reason: 'no_email' }); continue; }
+
+      const region = regionForZip(profile.postal_code);
 
       // All service records for this vehicle (need mileage_at_service + service_type)
       const { data: records } = await sb
