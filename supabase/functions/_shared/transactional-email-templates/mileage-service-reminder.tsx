@@ -22,45 +22,61 @@ interface Props {
 
 const fmt = (n: number) => n.toLocaleString('en-US')
 
-const MileageServiceReminderEmail = ({ customerName, vehicle, currentMileage, dueServices = [] }: Props) => (
-  <Html lang="en">
-    <Head />
-    <Preview>Recommended maintenance is due on your {vehicle ?? 'vehicle'}</Preview>
-    <Body style={main}>
-      <Container style={container}>
-        <Heading style={h1}>Time for some maintenance</Heading>
-        <Text style={text}>{customerName ? `Hi ${customerName},` : 'Hi there,'}</Text>
-        <Text style={text}>
-          Based on your {vehicle ?? 'vehicle'}{currentMileage ? ` (${fmt(currentMileage)} miles)` : ''}, the
-          following mileage-based services are due or overdue. Keeping up with these protects your warranty and
-          prevents bigger repair bills down the road.
-        </Text>
+const MileageServiceReminderEmail = ({ customerName, vehicle, currentMileage, dueServices = [] }: Props) => {
+  const serviceList = dueServices.map((s) => s.name).join(', ')
+  const quoteBody = `Hi Mike — I'd like a quote for: ${serviceList || 'recommended maintenance'}${vehicle ? ` on my ${vehicle}` : ''}.`
+  const smsQuoteHref = `sms:${PHONE}?&body=${encodeURIComponent(quoteBody)}`
+  const webQuoteHref = `${SITE_URL}/contact?services=${encodeURIComponent(serviceList)}${vehicle ? `&vehicle=${encodeURIComponent(vehicle)}` : ''}`
 
-        <Section style={card}>
-          {dueServices.map((s, i) => (
-            <Text key={i} style={detail}>
-              <strong>{s.name}</strong> — every {fmt(s.intervalMiles)} mi
-              {s.lastServiceMiles != null
-                ? ` · last done at ${fmt(s.lastServiceMiles)} mi`
-                : ' · no record on file'}
-              {s.overdueBy > 0 ? ` · overdue by ${fmt(s.overdueBy)} mi` : ''}
-            </Text>
-          ))}
-        </Section>
+  return (
+    <Html lang="en">
+      <Head />
+      <Preview>Recommended maintenance is due on your {vehicle ?? 'vehicle'}</Preview>
+      <Body style={main}>
+        <Container style={container}>
+          <Heading style={h1}>Time for some maintenance</Heading>
+          <Text style={text}>{customerName ? `Hi ${customerName},` : 'Hi there,'}</Text>
+          <Text style={text}>
+            Based on your {vehicle ?? 'vehicle'}{currentMileage ? ` (${fmt(currentMileage)} miles)` : ''}, the
+            following mileage-based services are due or overdue. Keeping up with these protects your warranty and
+            prevents bigger repair bills down the road.
+          </Text>
 
-        <Text style={text}>
-          We come to you — no need to drop the vehicle off. Reply to this email or call/text{' '}
-          <strong>{PHONE}</strong> and we'll get you scheduled.
-        </Text>
+          <Section style={card}>
+            {dueServices.map((s, i) => (
+              <Text key={i} style={detail}>
+                <strong>{s.name}</strong> — every {fmt(s.intervalMiles)} mi
+                {s.lastServiceMiles != null
+                  ? ` · last done at ${fmt(s.lastServiceMiles)} mi`
+                  : ' · no record on file'}
+                {s.overdueBy > 0 ? ` · overdue by ${fmt(s.overdueBy)} mi` : ''}
+              </Text>
+            ))}
+          </Section>
 
-        <Button href={`sms:${PHONE}`} style={button}>Text us to schedule</Button>
+          <Text style={text}>
+            Want pricing before you book? Tap below to request a free quote on the services listed above —
+            we'll text you back with a transparent estimate. We come to you, no shop drop-off needed.
+          </Text>
 
-        <Hr style={hr} />
-        <Text style={footer}>— The {SITE_NAME} Team</Text>
-      </Container>
-    </Body>
-  </Html>
-)
+          <Button href={smsQuoteHref} style={button}>Get a quote for these services</Button>
+
+          <Text style={text}>
+            Prefer the web?{' '}
+            <Link href={webQuoteHref} style={link}>Request your quote online →</Link>
+          </Text>
+
+          <Text style={smallText}>
+            Or call/text <strong>{PHONE}</strong> any time.
+          </Text>
+
+          <Hr style={hr} />
+          <Text style={footer}>— The {SITE_NAME} Team</Text>
+        </Container>
+      </Body>
+    </Html>
+  )
+}
 
 export const template = {
   component: MileageServiceReminderEmail,
