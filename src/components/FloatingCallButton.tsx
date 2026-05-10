@@ -1,13 +1,13 @@
 import { Phone, MessageCircle, MapPin } from "lucide-react";
 import { trackConversion } from "@/lib/gtag";
 
-const GMB_CID = "12463376982965951252";
+const GMB_URL = "https://share.google/bx2Gb42dslCITJdS8";
 const ADDRESS = "Mike's Mobile Auto Repair, Fort Myers, FL";
 const ENCODED = encodeURIComponent(ADDRESS);
 
 const getDirectionsUrl = () => {
   if (typeof navigator === "undefined") {
-    return `https://www.google.com/maps?cid=${GMB_CID}`;
+    return GMB_URL;
   }
   const ua = navigator.userAgent || "";
   const platform = (navigator as Navigator & { userAgentData?: { platform?: string } })
@@ -26,7 +26,7 @@ const getDirectionsUrl = () => {
   }
 
   // Everything else → Google Maps
-  return `https://www.google.com/maps?cid=${GMB_CID}`;
+  return GMB_URL;
 };
 
 const FloatingCallButton = () => {
@@ -51,7 +51,7 @@ const FloatingCallButton = () => {
         <span className="font-semibold text-sm">Text Us</span>
       </a>
       <a
-        href={`https://www.google.com/maps?cid=${GMB_CID}`}
+        href={GMB_URL}
         onClick={handleDirections}
         className="flex items-center gap-2 bg-secondary text-secondary-foreground px-5 py-3 rounded-full shadow-lg hover:bg-secondary/90 active:scale-95 transition-all duration-200"
         aria-label="Get directions to Mike's Mobile Auto Repair"

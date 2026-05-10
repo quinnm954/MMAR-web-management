@@ -4,11 +4,10 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { useSeo } from "@/lib/useSeo";
 
-const GMB_CID = "12463376982965951252";
-// Direct "write a review" deep link via the place CID. This opens the
-// Google review composer for our Google Business Profile.
-const REVIEW_URL = `https://search.google.com/local/writereview?placeid=&cid=${GMB_CID}`;
-const FALLBACK_URL = `https://www.google.com/maps?cid=${GMB_CID}`;
+// Google Business Profile share link — opens the business profile where
+// customers can tap "Write a review" directly.
+const REVIEW_URL = "https://share.google/bx2Gb42dslCITJdS8";
+const FALLBACK_URL = "https://share.google/bx2Gb42dslCITJdS8";
 const PHONE = "+18135017572";
 const SMS_HREF = `sms:${PHONE}?&body=${encodeURIComponent(
   "Hi Mike — I just had service done and wanted to share feedback before I leave a review."
