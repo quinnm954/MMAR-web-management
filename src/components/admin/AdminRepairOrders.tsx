@@ -78,28 +78,37 @@ export default function AdminRepairOrders() {
         ) : (
           <div className="space-y-2">
             {filtered.map((r) => (
-              <button
+              <div
                 key={r.id}
-                onClick={() => setOpenId(r.id)}
-                className="w-full text-left p-3 rounded-lg border border-border/50 hover:border-primary/50 hover:bg-primary/5 transition-colors"
+                className="w-full p-3 rounded-lg border border-border/50 hover:border-primary/50 hover:bg-primary/5 transition-colors flex items-center gap-2"
               >
-                <div className="flex items-center justify-between gap-3 flex-wrap">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span className="font-mono text-xs text-muted-foreground">RO#{r.id.slice(0, 8).toUpperCase()}</span>
-                      <Badge variant="outline" className="text-xs">{r.status}</Badge>
-                      {r.priority && r.priority !== "normal" && <Badge variant="destructive" className="text-xs">{r.priority}</Badge>}
+                <button onClick={() => setOpenId(r.id)} className="flex-1 min-w-0 text-left">
+                  <div className="flex items-center justify-between gap-3 flex-wrap">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono text-xs text-muted-foreground">RO#{r.id.slice(0, 8).toUpperCase()}</span>
+                        <Badge variant="outline" className="text-xs">{r.status}</Badge>
+                        {r.priority && r.priority !== "normal" && <Badge variant="destructive" className="text-xs">{r.priority}</Badge>}
+                      </div>
+                      <div className="font-medium mt-1 truncate">{r.service_type}</div>
+                      <div className="text-xs text-muted-foreground truncate">
+                        {r.customer?.full_name || "Unknown"} · {r.vehicle ? `${r.vehicle.year} ${r.vehicle.make} ${r.vehicle.model}` : "No vehicle"}
+                      </div>
                     </div>
-                    <div className="font-medium mt-1 truncate">{r.service_type}</div>
-                    <div className="text-xs text-muted-foreground truncate">
-                      {r.customer?.full_name || "Unknown"} · {r.vehicle ? `${r.vehicle.year} ${r.vehicle.make} ${r.vehicle.model}` : "No vehicle"}
+                    <div className="text-xs text-muted-foreground text-right">
+                      {r.scheduled_at ? format(new Date(r.scheduled_at), "MMM d, p") : r.requested_date || format(new Date(r.created_at), "MMM d")}
                     </div>
                   </div>
-                  <div className="text-xs text-muted-foreground text-right">
-                    {r.scheduled_at ? format(new Date(r.scheduled_at), "MMM d, p") : r.requested_date || format(new Date(r.created_at), "MMM d")}
-                  </div>
-                </div>
-              </button>
+                </button>
+                <DeleteButton
+                  table="appointments"
+                  id={r.id}
+                  size="icon"
+                  label="Delete repair order"
+                  description="This permanently deletes the repair order and any linked estimates/invoices may be orphaned. This cannot be undone."
+                  onDeleted={() => setRows((prev) => prev.filter((x) => x.id !== r.id))}
+                />
+              </div>
             ))}
           </div>
         )}
