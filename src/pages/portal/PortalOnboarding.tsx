@@ -247,7 +247,16 @@ const PortalOnboarding = () => {
     } else {
       toast.success("Welcome aboard! Your account is all set.");
     }
-    navigate("/portal/dashboard", { replace: true });
+    const dest = isAdmin ? "/admin/dashboard" : isStaff ? "/tech" : "/portal/dashboard";
+    // Use a microtask + hard fallback so a stale render can't block the redirect
+    setTimeout(() => {
+      navigate(dest, { replace: true });
+      setTimeout(() => {
+        if (window.location.pathname === "/portal/onboarding") {
+          window.location.assign(dest);
+        }
+      }, 250);
+    }, 0);
   };
 
   return (
