@@ -11,6 +11,7 @@ import { Link } from "react-router-dom";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import ROAttachments from "./ROAttachments";
+import DeleteButton from "./DeleteButton";
 import { generateInvoiceForRepairOrder } from "@/lib/repairOrders";
 
 interface Props {
