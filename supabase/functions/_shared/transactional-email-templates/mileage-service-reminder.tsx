@@ -188,3 +188,6 @@ const itemMeta = { fontSize: '12px', color: '#64748b', margin: '0 0 4px', lineHe
 const priceRow = { fontSize: '12px', margin: '2px 0 0', lineHeight: '1.4' }
 const priceLabel = { color: '#64748b', fontStyle: 'italic' as const }
 const priceValue = { color: '#0a1628', fontWeight: 'bold' as const }
+const detailsBlock = { margin: '6px 0 2px', padding: '0', fontSize: '12px' }
+const detailsSummary = { cursor: 'pointer', color: '#3aa6e0', fontWeight: 'bold' as const, fontSize: '12px', listStyle: 'none', padding: '2px 0', userSelect: 'none' as const }
+const detailsBody = { fontSize: '12px', color: '#475569', lineHeight: '1.5', padding: '6px 10px 4px', margin: '4px 0 0', backgroundColor: '#f8fafc', borderLeft: '3px solid #cbd5e1', borderRadius: '3px' }
