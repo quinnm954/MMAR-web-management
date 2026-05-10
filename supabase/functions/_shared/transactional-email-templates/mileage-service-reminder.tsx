@@ -83,6 +83,12 @@ const MileageServiceReminderEmail = ({ customerName, vehicle, currentMileage, du
                       </span>
                     </Text>
                   )}
+                  {s.importance && (
+                    <details style={detailsBlock}>
+                      <summary style={detailsSummary}>Why this matters ▾</summary>
+                      <div style={detailsBody}>{s.importance}</div>
+                    </details>
+                  )}
                 </Section>
               )
             })}
