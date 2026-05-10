@@ -392,6 +392,51 @@ const AdminInvoices = () => {
           })}
         </div>
       )}
+
+      <Dialog open={!!discountEditing} onOpenChange={(o) => !o && setDiscountEditing(null)}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>Apply Discount</DialogTitle></DialogHeader>
+          <div className="space-y-3">
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label>Type</Label>
+                <Select value={discountForm.type} onValueChange={(v) => setDiscountForm({ ...discountForm, type: v as "amount" | "percent" })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="amount">$ Amount</SelectItem>
+                    <SelectItem value="percent">% Percent</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>Value</Label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  placeholder={discountForm.type === "percent" ? "e.g. 20" : "e.g. 50.00"}
+                  value={discountForm.value}
+                  onChange={(e) => setDiscountForm({ ...discountForm, value: e.target.value })}
+                />
+              </div>
+            </div>
+            <div>
+              <Label>Reason</Label>
+              <Input
+                placeholder="e.g. loyalty, mileage reminder promo"
+                value={discountForm.reason}
+                onChange={(e) => setDiscountForm({ ...discountForm, reason: e.target.value })}
+              />
+            </div>
+            <p className="text-xs text-muted-foreground">Tax and shop supplies will be recalculated against the discounted subtotal.</p>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDiscountEditing(null)}>Cancel</Button>
+            <Button variant="hero" onClick={saveDiscount} disabled={savingDiscount}>
+              {savingDiscount ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
