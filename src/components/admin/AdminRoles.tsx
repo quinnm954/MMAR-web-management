@@ -15,7 +15,7 @@ type Role = typeof ALL_ROLES[number];
 export default function AdminRoles() {
   const { user: currentUser, hasRole } = useAuth();
   const isOwner = hasRole('owner');
-  const { user: currentUser } = useAuth();
+  
   const [users, setUsers] = useState<any[]>([]);
   const [roles, setRoles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -38,6 +38,10 @@ export default function AdminRoles() {
   const rolesByUser = (uid: string) => roles.filter(r => r.user_id === uid).map(r => r.role as Role);
 
   const grant = async (uid: string, role: Role) => {
+    if (role === 'owner' && !isOwner) {
+      toast.error('Only an owner can grant the owner role.');
+      return;
+    }
     const { error } = await supabase.from("user_roles").insert({ user_id: uid, role });
     if (error) return toast.error(error.message);
     toast.success(`Granted ${role}`);
