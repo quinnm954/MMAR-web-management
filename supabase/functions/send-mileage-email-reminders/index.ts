@@ -160,7 +160,13 @@ Deno.serve(async (req) => {
           : null;
         const baseline = lastMiles ?? 0;
         const overdueBy = (v.current_mileage as number) - (baseline + cfg.intervalMiles);
-        return { name: cfg.name, intervalMiles: cfg.intervalMiles, lastServiceMiles: lastMiles, overdueBy, competitorPriceRange: cfg.competitorPriceRange };
+        return {
+          name: cfg.name,
+          intervalMiles: cfg.intervalMiles,
+          lastServiceMiles: lastMiles,
+          overdueBy,
+          competitorPriceRange: applyRegion(cfg.competitorPriceRange, region.multiplier),
+        };
       })
         .filter((s) => s.overdueBy >= -DUE_SOON_WINDOW)
         .sort((a, b) => b.overdueBy - a.overdueBy);
