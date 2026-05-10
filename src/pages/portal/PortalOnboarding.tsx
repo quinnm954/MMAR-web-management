@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { toast } from "sonner";
@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Card,
   CardContent,
@@ -14,36 +15,25 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Loader2, Phone, MapPin, Car, ArrowRight } from "lucide-react";
+import { Loader2, Phone, MapPin, Car, Wrench, ArrowRight } from "lucide-react";
 import Navigation from "@/components/Navigation";
+import { MAINTENANCE_INTERVALS, SELF_REPORTED_NOTE } from "@/data/maintenanceIntervals";
 
-const schema = z.object({
-  phone: z
-    .string()
-    .trim()
-    .min(10, "Enter a valid phone number")
-    .max(20),
+const baseSchema = z.object({
+  phone: z.string().trim().min(10, "Enter a valid phone number").max(20),
   address_line1: z.string().trim().min(3, "Street address is required").max(200),
   address_line2: z.string().trim().max(100).optional().or(z.literal("")),
   city: z.string().trim().min(2, "City is required").max(80),
   state: z.string().trim().min(2, "State is required").max(2),
   postal_code: z.string().trim().min(5, "ZIP is required").max(10),
-  vehicle_year: z
-    .string()
-    .trim()
-    .regex(/^\d{4}$/, "Enter a 4-digit year"),
+  vehicle_year: z.string().trim().regex(/^\d{4}$/, "Enter a 4-digit year"),
   vehicle_make: z.string().trim().min(1, "Make is required").max(40),
   vehicle_model: z.string().trim().min(1, "Model is required").max(40),
-  vehicle_mileage: z
-    .string()
-    .trim()
-    .max(7)
-    .optional()
-    .or(z.literal("")),
+  vehicle_mileage: z.string().trim().max(7).optional().or(z.literal("")),
   vehicle_plate: z.string().trim().max(15).optional().or(z.literal("")),
 });
 
-type FormState = z.infer<typeof schema>;
+type FormState = z.infer<typeof baseSchema>;
 
 const empty: FormState = {
   phone: "",
@@ -59,14 +49,23 @@ const empty: FormState = {
   vehicle_plate: "",
 };
 
+interface MaintRow {
+  checked: boolean;
+  miles: string;
+}
+
+const today = () => new Date().toISOString().slice(0, 10);
+
 const PortalOnboarding = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [form, setForm] = useState<FormState>(empty);
+  const [maint, setMaint] = useState<Record<string, MaintRow>>(() =>
+    Object.fromEntries(MAINTENANCE_INTERVALS.map((m) => [m.name, { checked: false, miles: "" }])),
+  );
   const [busy, setBusy] = useState(false);
   const [hydrating, setHydrating] = useState(true);
 
-  // Pre-fill any data the user already has so they don't re-type it
   useEffect(() => {
     if (!user) return;
     (async () => {
@@ -93,16 +92,39 @@ const PortalOnboarding = () => {
   const set = (k: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm((f) => ({ ...f, [k]: e.target.value }));
 
+  const toggleMaint = (name: string, checked: boolean) =>
+    setMaint((m) => ({ ...m, [name]: { ...m[name], checked } }));
+
+  const setMaintMiles = (name: string, miles: string) =>
+    setMaint((m) => ({ ...m, [name]: { ...m[name], miles } }));
+
+  const checkedCount = useMemo(
+    () => Object.values(maint).filter((r) => r.checked).length,
+    [maint],
+  );
+
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
-    const parsed = schema.safeParse(form);
+    const parsed = baseSchema.safeParse(form);
     if (!parsed.success) {
       toast.error(parsed.error.errors[0].message);
       return;
     }
+    // Validate that every checked maintenance row has a positive mileage value
+    const checkedRows = Object.entries(maint).filter(([, r]) => r.checked);
+    for (const [name, row] of checkedRows) {
+      const n = Number(row.miles);
+      if (!row.miles || !Number.isFinite(n) || n <= 0) {
+        toast.error(`Enter the mileage when "${name}" was last done`);
+        return;
+      }
+    }
+
     setBusy(true);
     const v = parsed.data;
+
+    // 1) Update profile
     const { error: pErr } = await supabase
       .from("profiles")
       .update({
@@ -119,32 +141,49 @@ const PortalOnboarding = () => {
       toast.error(pErr.message);
       return;
     }
-    const { error: vErr } = await supabase.from("vehicles").insert({
-      owner_id: user.id,
-      year: Number(v.vehicle_year),
-      make: v.vehicle_make,
-      model: v.vehicle_model,
-      current_mileage: v.vehicle_mileage ? Number(v.vehicle_mileage) : null,
-      license_plate: v.vehicle_plate || null,
-      is_active: true,
-    });
-    setBusy(false);
-    if (vErr) {
-      toast.error(vErr.message);
+
+    // 2) Create vehicle
+    const { data: vehicle, error: vErr } = await supabase
+      .from("vehicles")
+      .insert({
+        owner_id: user.id,
+        year: Number(v.vehicle_year),
+        make: v.vehicle_make,
+        model: v.vehicle_model,
+        current_mileage: v.vehicle_mileage ? Number(v.vehicle_mileage) : null,
+        license_plate: v.vehicle_plate || null,
+        is_active: true,
+      })
+      .select("id")
+      .single();
+    if (vErr || !vehicle) {
+      setBusy(false);
+      toast.error(vErr?.message ?? "Could not save vehicle");
       return;
     }
+
+    // 3) Insert any self-reported maintenance records
+    if (checkedRows.length > 0) {
+      const rows = checkedRows.map(([name, row]) => ({
+        customer_id: user.id,
+        vehicle_id: vehicle.id,
+        service_type: name,
+        mileage_at_service: Number(row.miles),
+        service_date: today(),
+        technician_notes: SELF_REPORTED_NOTE,
+      }));
+      const { error: srErr } = await supabase.from("service_records").insert(rows);
+      if (srErr) {
+        // Non-fatal: vehicle is saved, just warn so they can fix from /portal/maintenance later
+        toast.warning(`Saved your account, but maintenance log failed: ${srErr.message}`);
+      }
+    }
+
+    setBusy(false);
     try {
       sessionStorage.setItem(`onboarded:${user.id}`, "1");
     } catch {}
     toast.success("Welcome aboard! Your account is all set.");
-    navigate("/portal/dashboard", { replace: true });
-  };
-
-  const skip = () => {
-    if (!user) return;
-    try {
-      sessionStorage.setItem(`onboarded:${user.id}`, "skipped");
-    } catch {}
     navigate("/portal/dashboard", { replace: true });
   };
 
@@ -158,7 +197,7 @@ const PortalOnboarding = () => {
               <CardTitle className="text-2xl">Finish setting up your account</CardTitle>
               <CardDescription>
                 A few quick details so we can dispatch a tech to you and start tracking your
-                vehicle's service history. Takes under a minute.
+                vehicle's service history.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -197,56 +236,25 @@ const PortalOnboarding = () => {
                     </div>
                     <div>
                       <Label htmlFor="addr1">Street address</Label>
-                      <Input
-                        id="addr1"
-                        autoComplete="address-line1"
-                        value={form.address_line1}
-                        onChange={set("address_line1")}
-                        required
-                      />
+                      <Input id="addr1" autoComplete="address-line1" value={form.address_line1} onChange={set("address_line1")} required />
                     </div>
                     <div>
                       <Label htmlFor="addr2">Apt / Suite (optional)</Label>
-                      <Input
-                        id="addr2"
-                        autoComplete="address-line2"
-                        value={form.address_line2}
-                        onChange={set("address_line2")}
-                      />
+                      <Input id="addr2" autoComplete="address-line2" value={form.address_line2} onChange={set("address_line2")} />
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                       <div className="sm:col-span-2">
                         <Label htmlFor="city">City</Label>
-                        <Input
-                          id="city"
-                          autoComplete="address-level2"
-                          value={form.city}
-                          onChange={set("city")}
-                          required
-                        />
+                        <Input id="city" autoComplete="address-level2" value={form.city} onChange={set("city")} required />
                       </div>
                       <div>
                         <Label htmlFor="state">State</Label>
-                        <Input
-                          id="state"
-                          autoComplete="address-level1"
-                          maxLength={2}
-                          value={form.state}
-                          onChange={set("state")}
-                          required
-                        />
+                        <Input id="state" autoComplete="address-level1" maxLength={2} value={form.state} onChange={set("state")} required />
                       </div>
                     </div>
                     <div>
                       <Label htmlFor="zip">ZIP code</Label>
-                      <Input
-                        id="zip"
-                        autoComplete="postal-code"
-                        inputMode="numeric"
-                        value={form.postal_code}
-                        onChange={set("postal_code")}
-                        required
-                      />
+                      <Input id="zip" autoComplete="postal-code" inputMode="numeric" value={form.postal_code} onChange={set("postal_code")} required />
                     </div>
                   </section>
 
@@ -258,64 +266,81 @@ const PortalOnboarding = () => {
                     <div className="grid grid-cols-3 gap-3">
                       <div>
                         <Label htmlFor="year">Year</Label>
-                        <Input
-                          id="year"
-                          inputMode="numeric"
-                          maxLength={4}
-                          placeholder="2020"
-                          value={form.vehicle_year}
-                          onChange={set("vehicle_year")}
-                          required
-                        />
+                        <Input id="year" inputMode="numeric" maxLength={4} placeholder="2020" value={form.vehicle_year} onChange={set("vehicle_year")} required />
                       </div>
                       <div>
                         <Label htmlFor="make">Make</Label>
-                        <Input
-                          id="make"
-                          placeholder="Honda"
-                          value={form.vehicle_make}
-                          onChange={set("vehicle_make")}
-                          required
-                        />
+                        <Input id="make" placeholder="Honda" value={form.vehicle_make} onChange={set("vehicle_make")} required />
                       </div>
                       <div>
                         <Label htmlFor="model">Model</Label>
-                        <Input
-                          id="model"
-                          placeholder="Civic"
-                          value={form.vehicle_model}
-                          onChange={set("vehicle_model")}
-                          required
-                        />
+                        <Input id="model" placeholder="Civic" value={form.vehicle_model} onChange={set("vehicle_model")} required />
                       </div>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div>
                         <Label htmlFor="mileage">Current mileage (optional)</Label>
-                        <Input
-                          id="mileage"
-                          inputMode="numeric"
-                          placeholder="85000"
-                          value={form.vehicle_mileage}
-                          onChange={set("vehicle_mileage")}
-                        />
+                        <Input id="mileage" inputMode="numeric" placeholder="85000" value={form.vehicle_mileage} onChange={set("vehicle_mileage")} />
                       </div>
                       <div>
                         <Label htmlFor="plate">License plate (optional)</Label>
-                        <Input
-                          id="plate"
-                          value={form.vehicle_plate}
-                          onChange={set("vehicle_plate")}
-                        />
+                        <Input id="plate" value={form.vehicle_plate} onChange={set("vehicle_plate")} />
                       </div>
                     </div>
                   </section>
 
-                  <div className="flex flex-col-reverse sm:flex-row sm:justify-between gap-3 pt-2">
-                    <Button type="button" variant="ghost" onClick={skip} disabled={busy}>
-                      Skip for now
-                    </Button>
-                    <Button type="submit" variant="hero" disabled={busy} className="sm:min-w-[200px]">
+                  {/* Maintenance checklist */}
+                  <section className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                        <Wrench className="h-4 w-4 text-primary" /> Recent maintenance
+                      </div>
+                      {checkedCount > 0 && (
+                        <span className="text-xs text-muted-foreground">{checkedCount} checked</span>
+                      )}
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Check off anything that's already been done elsewhere recently and enter the
+                      odometer reading at the time. This stops us from reminding you about services
+                      you don't need yet. You can edit this list anytime from{" "}
+                      <span className="font-medium text-foreground">My Vehicles → Maintenance</span>.
+                    </p>
+                    <div className="rounded-md border border-border/60 divide-y divide-border/60 max-h-[360px] overflow-y-auto">
+                      {MAINTENANCE_INTERVALS.map((item) => {
+                        const row = maint[item.name];
+                        return (
+                          <div key={item.name} className="flex items-center gap-3 px-3 py-2">
+                            <Checkbox
+                              id={`m-${item.name}`}
+                              checked={row.checked}
+                              onCheckedChange={(v) => toggleMaint(item.name, v === true)}
+                            />
+                            <label
+                              htmlFor={`m-${item.name}`}
+                              className="flex-1 text-sm cursor-pointer leading-tight"
+                            >
+                              <div className="font-medium text-foreground">{item.name}</div>
+                              <div className="text-[11px] text-muted-foreground">
+                                every {item.intervalMiles.toLocaleString()} mi
+                              </div>
+                            </label>
+                            <Input
+                              type="text"
+                              inputMode="numeric"
+                              placeholder="miles"
+                              className="w-24 h-8 text-sm"
+                              value={row.miles}
+                              onChange={(e) => setMaintMiles(item.name, e.target.value.replace(/[^\d]/g, ""))}
+                              disabled={!row.checked}
+                            />
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </section>
+
+                  <div className="flex justify-end pt-2">
+                    <Button type="submit" variant="hero" disabled={busy} className="sm:min-w-[220px]">
                       {busy ? (
                         <Loader2 className="h-4 w-4 animate-spin" />
                       ) : (
