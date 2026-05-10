@@ -115,19 +115,50 @@ const AdminEstimates = () => {
         );
       }
 
+      const docLaborRate = Number(ex.labor_rate) || 0;
+      const fallbackLaborRate = docLaborRate > 0 ? docLaborRate : defaultLaborRate;
+      const LABOR_KEYWORDS = /\b(labor|labour|hours?|hrs?|tech\s*time|shop\s*labor|diagnostic|diag\b)\b/i;
+
       const lines: LineItem[] = (ex.line_items || []).map((li: any) => {
-        const qty = Number(li.quantity) || 1;
-        const price = Number(li.unit_price) || 0;
-        const laborHrs = Number(li.labor_hours) || 0;
-        const kind: 'part' | 'labor' | 'fee' = li.kind === 'labor' || li.kind === 'fee'
-          ? li.kind
-          : (laborHrs > 0 ? 'labor' : 'part');
+        let qty = Number(li.quantity) || 0;
+        let price = Number(li.unit_price) || 0;
+        const lineTotal = Number(li.line_total) || 0;
+        let laborHrs = Number(li.labor_hours) || 0;
+        const desc = String(li.description || '');
+        const looksLikeLabor = LABOR_KEYWORDS.test(desc);
+
+        let kind: 'part' | 'labor' | 'fee';
+        if (li.kind === 'labor' || li.kind === 'fee' || li.kind === 'part') {
+          kind = li.kind;
+        } else {
+          kind = laborHrs > 0 || looksLikeLabor ? 'labor' : 'part';
+        }
+
+        if (kind === 'labor') {
+          // Normalize: quantity = hours, unit_price = hourly rate, labor_hours mirrors qty.
+          if (laborHrs <= 0 && qty > 0) laborHrs = qty;
+          if (laborHrs <= 0 && lineTotal > 0 && fallbackLaborRate > 0) {
+            laborHrs = +(lineTotal / fallbackLaborRate).toFixed(2);
+          }
+          if (qty <= 0) qty = laborHrs;
+          if (price <= 0) {
+            if (lineTotal > 0 && qty > 0) price = +(lineTotal / qty).toFixed(2);
+            else price = fallbackLaborRate;
+          }
+          if (qty <= 0 && lineTotal > 0 && price > 0) qty = +(lineTotal / price).toFixed(2);
+        } else {
+          if (qty <= 0) qty = 1;
+          if (price <= 0 && lineTotal > 0 && qty > 0) price = +(lineTotal / qty).toFixed(2);
+          laborHrs = 0;
+        }
+
+        const amount = +(qty * price).toFixed(2);
         const unit_cost = kind === 'part' ? +(price / PARTS_MARKUP).toFixed(2) : 0;
         return {
-          description: li.description || '',
+          description: desc,
           quantity: qty,
           unit_price: price,
-          amount: qty * price,
+          amount,
           labor_hours: laborHrs,
           kind,
           unit_cost,
