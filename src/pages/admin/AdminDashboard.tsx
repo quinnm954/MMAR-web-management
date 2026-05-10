@@ -3,8 +3,17 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { LogOut, FileText, ShieldCheck, Users, CreditCard, Calendar, CalendarCheck, ClipboardList, Receipt, Wrench, Mail, FileSpreadsheet, ClipboardCheck, Package, Settings, KanbanSquare, Clock, BarChart3, Share2, Car, AlertTriangle, FileDown, Activity, History, UserCog, DollarSign, RefreshCw, Phone, PhoneCall } from 'lucide-react';
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { LogOut, FileText, ShieldCheck, Users, CreditCard, Calendar, CalendarCheck, ClipboardList, Receipt, Wrench, Mail, FileSpreadsheet, ClipboardCheck, Package, Settings, KanbanSquare, Clock, BarChart3, Share2, Car, AlertTriangle, FileDown, Activity, History, UserCog, DollarSign, RefreshCw, Phone, PhoneCall, ChevronDown } from 'lucide-react';
 import AdminCalls from '@/components/admin/AdminCalls';
 import AdminPhoneSettings from '@/components/admin/AdminPhoneSettings';
 import AdminTrackingSettings from '@/components/admin/AdminTrackingSettings';
@@ -168,22 +177,88 @@ const AdminDashboard = () => {
             return <p className="text-sm text-muted-foreground">No sections available for your role ({roles.join(', ') || 'none'}).</p>;
           }
           const defaultTab = visible.find(t => t.value === 'customers')?.value ?? visible[0].value;
+          const [activeTab, setActiveTab] = useState(defaultTab);
+          const active = visible.find(t => t.value === activeTab) ?? visible[0];
+          const ActiveIcon = active.icon;
+
+          const groups = [
+            { label: 'Workshop', values: ['kanban','calendar','ros','service','inspections','estimates','invoices'] },
+            { label: 'Front Desk', values: ['customers','garage','memberships','bookings','share','declined'] },
+            { label: 'Admin', values: ['reports','catalog','time','shifts','laborpay','productivity','quickbooks','financing','warranty','emails','audit','employees','roles','calls','phone-settings','tracking','settings'] },
+          ];
+
           return (
-            <Tabs defaultValue={defaultTab} className="space-y-4">
-              <TabsList className="flex flex-wrap h-auto">
-                {visible.map(t => {
-                  const Icon = t.icon;
-                  return (
-                    <TabsTrigger key={t.value} value={t.value}>
-                      <Icon className="h-4 w-4 mr-1.5" /> {t.label}
-                    </TabsTrigger>
-                  );
-                })}
-              </TabsList>
-              {visible.map(t => (
-                <TabsContent key={t.value} value={t.value}>{t.content}</TabsContent>
-              ))}
-            </Tabs>
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" className="min-w-[180px] justify-between">
+                      <span className="flex items-center gap-2">
+                        <ActiveIcon className="h-4 w-4 text-primary" />
+                        {active.label}
+                      </span>
+                      <ChevronDown className="h-4 w-4 opacity-60" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="max-h-[70vh] overflow-y-auto w-56">
+                    {groups.map((g, gi) => {
+                      const groupTabs = visible.filter(t => g.values.includes(t.value));
+                      if (groupTabs.length === 0) return null;
+                      return (
+                        <>
+                          {gi > 0 && <DropdownMenuSeparator />}
+                          <DropdownMenuLabel>{g.label}</DropdownMenuLabel>
+                          <DropdownMenuGroup>
+                            {groupTabs.map(t => {
+                              const Icon = t.icon;
+                              return (
+                                <DropdownMenuItem
+                                  key={t.value}
+                                  className={activeTab === t.value ? 'bg-accent text-accent-foreground' : ''}
+                                  onClick={() => setActiveTab(t.value)}
+                                >
+                                  <Icon className="h-4 w-4 mr-2 shrink-0" />
+                                  {t.label}
+                                </DropdownMenuItem>
+                              );
+                            })}
+                          </DropdownMenuGroup>
+                        </>
+                      );
+                    })}
+                    {/* Fallback: any visible tabs not in a group */}
+                    {(() => {
+                      const groupedValues = groups.flatMap(g => g.values);
+                      const ungrouped = visible.filter(t => !groupedValues.includes(t.value));
+                      if (ungrouped.length === 0) return null;
+                      return (
+                        <>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuGroup>
+                            {ungrouped.map(t => {
+                              const Icon = t.icon;
+                              return (
+                                <DropdownMenuItem
+                                  key={t.value}
+                                  className={activeTab === t.value ? 'bg-accent text-accent-foreground' : ''}
+                                  onClick={() => setActiveTab(t.value)}
+                                >
+                                  <Icon className="h-4 w-4 mr-2 shrink-0" />
+                                  {t.label}
+                                </DropdownMenuItem>
+                              );
+                            })}
+                          </DropdownMenuGroup>
+                        </>
+                      );
+                    })()}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+              <div className="border rounded-lg p-4 bg-card">
+                {active.content}
+              </div>
+            </div>
           );
         })()}
       </main>
