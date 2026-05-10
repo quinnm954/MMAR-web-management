@@ -205,10 +205,31 @@ const AdminInvoices = () => {
   };
 
   const updateStatus = async (id: string, status: string) => {
+    const inv = invoices.find((x) => x.id === id);
+    const wasPaid = inv?.status === "paid";
     const update: Record<string, unknown> = { status };
-    if (status === "paid") update.paid_at = new Date().toISOString();
+    if (status === "paid") {
+      update.paid_at = new Date().toISOString();
+      if (inv && (!inv.amount_paid || inv.amount_paid < inv.total)) {
+        update.amount_paid = inv.total;
+      }
+    }
     const { error } = await supabase.from("invoices").update(update).eq("id", id);
     if (error) return toast.error(error.message);
+
+    // Send paid receipt email when transitioning to paid
+    if (status === "paid" && !wasPaid) {
+      try {
+        const { error: mailErr } = await supabase.functions.invoke("send-invoice-paid-receipt", {
+          body: { invoice_id: id },
+        });
+        if (mailErr) console.warn("receipt email error", mailErr);
+        else toast.success("Paid receipt emailed to customer");
+      } catch (e) {
+        console.warn("receipt email failed", e);
+      }
+    }
+
     load();
   };
 

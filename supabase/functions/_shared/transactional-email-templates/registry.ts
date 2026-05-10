@@ -16,6 +16,7 @@ import { template as membershipWelcome } from './membership-welcome.tsx'
 import { template as estimateReady } from './estimate-ready.tsx'
 import { template as inspectionReady } from './inspection-ready.tsx'
 import { template as mileageServiceReminder } from './mileage-service-reminder.tsx'
+import { template as invoicePaidReceipt } from './invoice-paid-receipt.tsx'
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   'appointment-confirmed': appointmentConfirmed,
@@ -25,4 +26,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'estimate-ready': estimateReady,
   'inspection-ready': inspectionReady,
   'mileage-service-reminder': mileageServiceReminder,
+  'invoice-paid-receipt': invoicePaidReceipt,
 }
