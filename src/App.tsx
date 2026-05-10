@@ -53,6 +53,7 @@ import SharedCustomerSummary from "./pages/SharedCustomerSummary";
 import MmarCare from "./pages/MmarCare";
 import Fleet from "./pages/Fleet";
 import NativeBoot from "./components/NativeBoot";
+import PullToRefresh from "./components/PullToRefresh";
 
 const queryClient = new QueryClient();
 
@@ -64,6 +65,7 @@ const App = () => (
       <BrowserRouter>
         <AuthProvider>
           <NativeBoot />
+          <PullToRefresh />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/financing-contract" element={<FinancingContract />} />
