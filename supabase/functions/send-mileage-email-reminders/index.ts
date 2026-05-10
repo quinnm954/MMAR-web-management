@@ -166,6 +166,7 @@ Deno.serve(async (req) => {
           lastServiceMiles: lastMiles,
           overdueBy,
           competitorPriceRange: applyRegion(cfg.competitorPriceRange, region.multiplier),
+          importance: cfg.importance,
         };
       })
         .filter((s) => s.overdueBy >= -DUE_SOON_WINDOW)
