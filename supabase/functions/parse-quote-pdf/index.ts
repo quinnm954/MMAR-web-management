@@ -60,7 +60,7 @@ Deno.serve(async (req) => {
           {
             role: "system",
             content:
-              "You extract auto-repair quote/estimate data from PDF documents. Return clean line items (parts & labor), customer info, and vehicle info. Use numeric values (no $ signs). If a field is missing, omit it.",
+              "You extract auto-repair quote/estimate data from PDF documents. Return clean line items (parts, LABOR, fees), customer info, and vehicle info.\n\nCRITICAL labor rules:\n- Identify EVERY labor/time line on the quote — keywords: 'labor', 'hours', 'hrs', 'time', 'tech time', 'shop labor', 'diagnostic'.\n- For labor lines: set kind='labor', set quantity = labor hours, set unit_price = hourly labor rate, set labor_hours = same value as quantity.\n- Never collapse labor into a single dollar amount — always express it as hours × rate.\n- If only the labor TOTAL is shown and you can detect the shop's labor rate, derive hours = total / rate.\n- If a line clearly represents work performed but no hours are shown, still mark kind='labor' and set labor_hours / quantity to the best estimate (0 if truly unknown).\n\nUse numeric values (no $ signs). If a field is missing, omit it.",
           },
           {
             role: "user",
