@@ -240,9 +240,11 @@ const AdminEstimates = () => {
   };
 
   const recalc = (li: LineItem[]) => {
-    const subtotal = li.reduce((s, i) => s + (Number(i.quantity) * Number(i.unit_price)), 0);
-    const shop = Math.min(subtotal * (settings?.shop_supplies_pct ?? 0.05), settings?.shop_supplies_max ?? 50);
-    const tax = (subtotal + shop) * (settings?.tax_rate ?? 0.07);
+    const taxableSubtotal = li.reduce((s, i) => i.kind === 'fee' ? s : s + (Number(i.quantity) * Number(i.unit_price)), 0);
+    const feeSubtotal = li.reduce((s, i) => i.kind === 'fee' ? s + (Number(i.quantity) * Number(i.unit_price)) : s, 0);
+    const subtotal = taxableSubtotal + feeSubtotal;
+    const shop = Math.min(taxableSubtotal * (settings?.shop_supplies_pct ?? 0.05), settings?.shop_supplies_max ?? 50);
+    const tax = (taxableSubtotal + shop) * (settings?.tax_rate ?? 0.07);
     return { subtotal, shop_supplies: shop, tax, total: subtotal + shop + tax };
   };
 
@@ -258,6 +260,12 @@ const AdminEstimates = () => {
       : { description: '', quantity: 1, unit_price: 0, amount: 0, labor_hours: 0 };
     updateLines([...(editing.line_items || []), line]);
   };
+
+  const addDiagnosisFee = () => {
+    const line: LineItem = { description: 'Diagnosis Fee', quantity: 1, unit_price: 0, amount: 0, labor_hours: 0, kind: 'fee' };
+    updateLines([...(editing.line_items || []), line]);
+  };
+
 
   const updateLine = (idx: number, patch: Partial<LineItem>) => {
     const lines = [...editing.line_items];
