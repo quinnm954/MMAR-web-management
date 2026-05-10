@@ -229,7 +229,7 @@ export default function AdminEmployees() {
               <div className="grid grid-cols-2 gap-2">
                 <div>
                   <Label>Type</Label>
-                  <Select value={form.employee_type} onValueChange={(v) => setForm({ ...form, employee_type: v })}>
+                  <Select value={form.employee_type} onValueChange={onTypeChange}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>{TYPES.map((t) => <SelectItem key={t} value={t}>{t.replace('_', ' ')}</SelectItem>)}</SelectContent>
                   </Select>
