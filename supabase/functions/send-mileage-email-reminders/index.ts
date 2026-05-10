@@ -41,6 +41,59 @@ const INTERVALS: Array<{ name: string; intervalMiles: number; keywords: string[]
 // Show items overdue OR coming due within this many miles
 const DUE_SOON_WINDOW = 2500;
 
+// Regional cost-of-service multipliers applied to the BASE competitor prices above
+// (which represent a US national average ≈ multiplier 1.00). Sourced from RepairPal
+// city-level estimates and BLS Auto Repair CPI by metro. Lookup is by 3-digit ZIP
+// prefix (ZIP3); unknown ZIPs fall back to NATIONAL.
+interface Region { label: string; multiplier: number }
+const NATIONAL: Region = { label: 'National average', multiplier: 1.0 };
+const ZIP3_REGIONS: Record<string, Region> = {
+  // --- Florida (primary service area) ---
+  '339': { label: 'Fort Myers / Cape Coral, FL', multiplier: 1.05 },
+  '341': { label: 'Naples / Marco Island, FL', multiplier: 1.12 },
+  '342': { label: 'Naples / Bonita Springs, FL', multiplier: 1.12 },
+  '338': { label: 'Lakeland / Polk County, FL', multiplier: 0.98 },
+  '335': { label: 'Tampa, FL', multiplier: 1.04 },
+  '336': { label: 'Tampa / St. Petersburg, FL', multiplier: 1.04 },
+  '337': { label: 'St. Petersburg / Clearwater, FL', multiplier: 1.05 },
+  '334': { label: 'West Palm Beach, FL', multiplier: 1.10 },
+  '331': { label: 'Miami, FL', multiplier: 1.18 },
+  '332': { label: 'Miami Beach, FL', multiplier: 1.18 },
+  '333': { label: 'Fort Lauderdale, FL', multiplier: 1.14 },
+  '320': { label: 'Jacksonville, FL', multiplier: 1.00 },
+  '328': { label: 'Orlando, FL', multiplier: 1.03 },
+  '329': { label: 'Orlando / Kissimmee, FL', multiplier: 1.03 },
+  // --- Other major metros (handy if customer base spreads) ---
+  '100': { label: 'New York, NY', multiplier: 1.35 },
+  '101': { label: 'New York, NY', multiplier: 1.35 },
+  '900': { label: 'Los Angeles, CA', multiplier: 1.28 },
+  '941': { label: 'San Francisco, CA', multiplier: 1.40 },
+  '606': { label: 'Chicago, IL', multiplier: 1.10 },
+  '750': { label: 'Dallas, TX', multiplier: 1.00 },
+  '770': { label: 'Houston, TX', multiplier: 1.00 },
+  '787': { label: 'Austin, TX', multiplier: 1.05 },
+  '981': { label: 'Seattle, WA', multiplier: 1.20 },
+  '802': { label: 'Denver, CO', multiplier: 1.10 },
+  '850': { label: 'Phoenix, AZ', multiplier: 1.02 },
+  '300': { label: 'Atlanta, GA', multiplier: 1.00 },
+  '021': { label: 'Boston, MA', multiplier: 1.25 },
+  '191': { label: 'Philadelphia, PA', multiplier: 1.08 },
+  '200': { label: 'Washington, DC', multiplier: 1.20 },
+};
+
+function regionForZip(zip?: string | null): Region {
+  if (!zip) return NATIONAL;
+  const digits = zip.replace(/\D/g, '');
+  if (digits.length < 3) return NATIONAL;
+  return ZIP3_REGIONS[digits.slice(0, 3)] ?? NATIONAL;
+}
+
+function applyRegion(range: [number, number], mult: number): [number, number] {
+  // Round to nearest $5 for clean display
+  const r = (n: number) => Math.max(5, Math.round((n * mult) / 5) * 5);
+  return [r(range[0]), r(range[1])];
+}
+
 const REMINDER_TYPE = 'mileage_email_reminder';
 const REMINDER_COOLDOWN_DAYS = 30;
 
