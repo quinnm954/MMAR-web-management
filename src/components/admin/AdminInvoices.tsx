@@ -55,7 +55,13 @@ const AdminInvoices = () => {
     subtotal: "",
     tax: "",
     due_date: "",
+    discount_type: "amount" as "amount" | "percent",
+    discount_value: "",
+    discount_reason: "",
   });
+  const [discountEditing, setDiscountEditing] = useState<string | null>(null);
+  const [discountForm, setDiscountForm] = useState({ type: "amount" as "amount" | "percent", value: "", reason: "" });
+  const [savingDiscount, setSavingDiscount] = useState(false);
 
   const load = async () => {
     setLoading(true);
