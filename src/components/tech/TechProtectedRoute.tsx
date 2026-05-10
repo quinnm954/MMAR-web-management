@@ -17,7 +17,7 @@ const TechProtectedRoute = ({ children }: { children: ReactNode }) => {
         .from("user_roles")
         .select("role")
         .eq("user_id", user.id)
-        .in("role", ["technician", "service_advisor", "manager", "parts", "admin"]);
+        .in("role", ["owner", "technician", "service_advisor", "manager", "parts", "admin"]);
       setIsTech((data ?? []).length > 0);
       setChecking(false);
     })();
