@@ -2216,6 +2216,19 @@ export type Database = {
       }
     }
     Functions: {
+      admin_confirm_booking_request: {
+        Args: {
+          _id: string
+          _notes?: string
+          _requested_date?: string
+          _requested_time_window?: string
+        }
+        Returns: Json
+      }
+      admin_decline_booking_request: {
+        Args: { _id: string; _reason?: string }
+        Returns: Json
+      }
       delete_email: {
         Args: { message_id: number; queue_name: string }
         Returns: boolean
