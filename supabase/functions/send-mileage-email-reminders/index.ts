@@ -11,15 +11,32 @@ const corsHeaders = {
 const INTERVALS: Array<{ name: string; intervalMiles: number; keywords: string[] }> = [
   { name: 'Oil & filter change', intervalMiles: 5000, keywords: ['oil change', 'oil & filter', 'oil and filter', 'oil service'] },
   { name: 'Tire rotation', intervalMiles: 7500, keywords: ['tire rotation', 'rotate tires'] },
+  { name: 'Multi-point inspection', intervalMiles: 10000, keywords: ['multi-point', 'multi point inspection', 'vehicle inspection'] },
+  { name: 'Wheel alignment check', intervalMiles: 15000, keywords: ['alignment'] },
   { name: 'Brake inspection', intervalMiles: 15000, keywords: ['brake inspection', 'brake check'] },
   { name: 'Cabin air filter', intervalMiles: 20000, keywords: ['cabin air filter', 'cabin filter'] },
+  { name: 'Battery test', intervalMiles: 25000, keywords: ['battery test', 'battery service'] },
+  { name: 'Fuel system cleaning', intervalMiles: 30000, keywords: ['fuel system', 'fuel injector', 'induction service'] },
   { name: 'Engine air filter', intervalMiles: 30000, keywords: ['air filter', 'engine air filter'] },
   { name: 'Brake fluid flush', intervalMiles: 30000, keywords: ['brake fluid'] },
+  { name: 'A/C system performance check', intervalMiles: 30000, keywords: ['a/c service', 'ac service', 'air conditioning'] },
+  { name: 'Brake pads & rotors', intervalMiles: 40000, keywords: ['brake pad', 'brake rotor', 'brakes replaced'] },
+  { name: 'Power steering fluid flush', intervalMiles: 50000, keywords: ['power steering'] },
   { name: 'Transmission fluid service', intervalMiles: 60000, keywords: ['transmission fluid', 'trans fluid'] },
   { name: 'Coolant flush', intervalMiles: 60000, keywords: ['coolant', 'antifreeze'] },
   { name: 'Spark plug replacement', intervalMiles: 60000, keywords: ['spark plug'] },
   { name: 'Differential fluid service', intervalMiles: 60000, keywords: ['differential'] },
+  { name: 'Transfer case fluid (4WD/AWD)', intervalMiles: 60000, keywords: ['transfer case'] },
+  { name: 'PCV valve replacement', intervalMiles: 60000, keywords: ['pcv'] },
+  { name: 'Serpentine belt inspection', intervalMiles: 60000, keywords: ['serpentine belt', 'drive belt'] },
+  { name: 'Fuel filter replacement', intervalMiles: 60000, keywords: ['fuel filter'] },
+  { name: 'Shocks & struts inspection', intervalMiles: 75000, keywords: ['shocks', 'struts'] },
+  { name: 'Timing belt replacement', intervalMiles: 90000, keywords: ['timing belt'] },
+  { name: 'Oxygen sensor replacement', intervalMiles: 100000, keywords: ['oxygen sensor', 'o2 sensor'] },
 ];
+
+// Show items overdue OR coming due within this many miles
+const DUE_SOON_WINDOW = 2500;
 
 const REMINDER_TYPE = 'mileage_email_reminder';
 const REMINDER_COOLDOWN_DAYS = 30;
