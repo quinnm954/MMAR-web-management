@@ -61,6 +61,7 @@ const EstimateApproval = () => {
       if (searchParams.get('edit') === '1' && ['approved', 'partially_approved'].includes(data?.status)) {
         setEditing(true);
       }
+      if (data?.review_discount_pledged) setReviewPledge(true);
       setLoading(false);
     })();
   }, [token, searchParams]);
