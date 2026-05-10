@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 const reviewPlatforms = [
   {
     name: "Google",
-    url: "https://share.google/NYSilcfxnQMaqaahE",
+    url: "https://share.google/bx2Gb42dslCITJdS8",
     icon: (
       <svg viewBox="0 0 24 24" className="w-5 h-5" aria-hidden="true">
         <path fill="currentColor" d="M21.6 12.227c0-.7-.063-1.374-.18-2.022H12v3.823h5.385a4.604 4.604 0 0 1-1.997 3.022v2.51h3.232c1.89-1.74 2.98-4.302 2.98-7.333Z"/>
