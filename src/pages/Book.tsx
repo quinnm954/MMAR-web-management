@@ -120,7 +120,7 @@ const Book = () => {
       toast.error("Submitted, but couldn't load your confirmation page. We'll text you shortly.");
       return;
     }
-    toast.success("Request received! We'll text you to confirm.");
+    toast.success("Request received! We'll review and text you to confirm your day & time.");
     navigate(`/appointments/${token}`, { replace: true });
   };
 
@@ -133,17 +133,20 @@ const Book = () => {
             <span className="inline-flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full bg-primary/10 text-primary">
               <CalendarCheck className="h-3.5 w-3.5" /> via {sourceLabel}
             </span>
-            <h1 className="text-3xl sm:text-4xl font-bold mt-3">Book Mobile Auto Service</h1>
+            <h1 className="text-3xl sm:text-4xl font-bold mt-3">Request Mobile Auto Service</h1>
             <p className="text-muted-foreground mt-2">
-              We come to your driveway in Southwest Florida. Fill out the form and we'll text you to
-              confirm — or call <a className="text-primary font-medium" href="tel:8135017572">813-501-7572</a>.
+              Pick your preferred day &amp; time and we'll text you to confirm. Nothing is locked in
+              until our team verifies availability — or call{" "}
+              <a className="text-primary font-medium" href="tel:8135017572">813-501-7572</a>.
             </p>
           </div>
 
           <Card className="border-border/50">
             <CardHeader>
-              <CardTitle>Tell us what you need</CardTitle>
-              <CardDescription>It takes about a minute. No account required.</CardDescription>
+              <CardTitle>Request your appointment</CardTitle>
+              <CardDescription>
+                Takes about a minute. No account required. We'll review and confirm — usually within a few hours.
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={submit} className="space-y-5">
