@@ -22,6 +22,7 @@ import {
 import { CalendarCheck, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { trackConversion, getAttribution } from "@/lib/gtag";
 
 const currentYear = new Date().getFullYear();
 const digitsOnly = (v: string) => v.replace(/\D/g, "");
@@ -145,6 +146,16 @@ const QuoteRequestDialog = ({
     }
 
     const token = (data as { token?: string })?.token;
+
+    // Attach Google Ads attribution (gclid / utm) for offline conversion uploads
+    if (token) {
+      const attr = { ...getAttribution(), user_agent: navigator.userAgent };
+      supabase.rpc("set_booking_attribution", { _token: token, _attribution: attr }).catch(() => {});
+    }
+
+    // Fire Google Ads "quote submit" conversion
+    trackConversion("quote_submit");
+
     toast.success("Request received! We'll text you to confirm your day & time.");
     onOpenChange(false);
     if (token) navigate(`/appointments/${token}`);
