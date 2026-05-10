@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import PortalLayout from "@/components/portal/PortalLayout";
@@ -7,10 +6,19 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { decodeVin } from "@/lib/nhtsa";
 import { toast } from "sonner";
-import { Car, Plus, Loader2, Search, Trash2 } from "lucide-react";
+import { Car, Plus, Loader2, Search, Trash2, Wrench, ChevronDown, ChevronRight } from "lucide-react";
+import { MAINTENANCE_INTERVALS, SELF_REPORTED_NOTE } from "@/data/maintenanceIntervals";
 
 interface Vehicle {
   id: string;
@@ -25,6 +33,16 @@ interface Vehicle {
   current_mileage: number | null;
 }
 
+interface MaintRow {
+  checked: boolean;
+  miles: string;
+}
+
+const emptyMaint = (): Record<string, MaintRow> =>
+  Object.fromEntries(MAINTENANCE_INTERVALS.map((m) => [m.name, { checked: false, miles: "" }]));
+
+const today = () => new Date().toISOString().slice(0, 10);
+
 const PortalVehicles = () => {
   const { user } = useAuth();
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
@@ -33,6 +51,14 @@ const PortalVehicles = () => {
   const [decoding, setDecoding] = useState(false);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState<Partial<Vehicle>>({});
+  const [maint, setMaint] = useState<Record<string, MaintRow>>(emptyMaint);
+  const [maintOpen, setMaintOpen] = useState(false);
+
+  const resetForm = () => {
+    setForm({});
+    setMaint(emptyMaint());
+    setMaintOpen(false);
+  };
 
   const load = async () => {
     if (!user) return;
@@ -62,26 +88,71 @@ const PortalVehicles = () => {
     toast.success(`Found ${r.year} ${r.make} ${r.model}`);
   };
 
+  const toggleMaint = (name: string, checked: boolean) =>
+    setMaint((m) => ({ ...m, [name]: { ...m[name], checked } }));
+
+  const setMaintMiles = (name: string, miles: string) =>
+    setMaint((m) => ({ ...m, [name]: { ...m[name], miles } }));
+
+  const checkedCount = Object.values(maint).filter((r) => r.checked).length;
+
   const handleSave = async () => {
     if (!user) return;
     if (!form.year || !form.make || !form.model) return toast.error("Year, Make, Model required");
+
+    // Validate any checked maintenance rows have a positive mileage
+    const checkedRows = Object.entries(maint).filter(([, r]) => r.checked);
+    for (const [name, row] of checkedRows) {
+      const n = Number(row.miles);
+      if (!row.miles || !Number.isFinite(n) || n <= 0) {
+        setMaintOpen(true);
+        return toast.error(`Enter the mileage when "${name}" was last done`);
+      }
+    }
+
     setSaving(true);
-    const { error } = await supabase.from("vehicles").insert({
-      owner_id: user.id,
-      vin: form.vin || null,
-      year: form.year,
-      make: form.make,
-      model: form.model,
-      trim: form.trim || null,
-      engine: form.engine || null,
-      license_plate: form.license_plate || null,
-      color: form.color || null,
-      current_mileage: form.current_mileage || null,
-    });
+    const { data: vehicle, error } = await supabase
+      .from("vehicles")
+      .insert({
+        owner_id: user.id,
+        vin: form.vin || null,
+        year: form.year,
+        make: form.make,
+        model: form.model,
+        trim: form.trim || null,
+        engine: form.engine || null,
+        license_plate: form.license_plate || null,
+        color: form.color || null,
+        current_mileage: form.current_mileage || null,
+      })
+      .select("id")
+      .single();
+    if (error || !vehicle) {
+      setSaving(false);
+      return toast.error(error?.message ?? "Could not save vehicle");
+    }
+
+    if (checkedRows.length > 0) {
+      const rows = checkedRows.map(([name, row]) => ({
+        customer_id: user.id,
+        vehicle_id: vehicle.id,
+        service_type: name,
+        mileage_at_service: Number(row.miles),
+        service_date: today(),
+        technician_notes: SELF_REPORTED_NOTE,
+      }));
+      const { error: srErr } = await supabase.from("service_records").insert(rows);
+      if (srErr) {
+        toast.warning(`Vehicle added, but maintenance log failed: ${srErr.message}`);
+      } else {
+        toast.success(`Vehicle added with ${checkedRows.length} maintenance ${checkedRows.length === 1 ? "record" : "records"}`);
+      }
+    } else {
+      toast.success("Vehicle added");
+    }
+
     setSaving(false);
-    if (error) return toast.error(error.message);
-    toast.success("Vehicle added");
-    setForm({});
+    resetForm();
     setOpen(false);
     load();
   };
@@ -101,11 +172,17 @@ const PortalVehicles = () => {
           <h1 className="text-3xl font-bold">My Vehicles</h1>
           <p className="text-muted-foreground mt-1">Vehicles linked to your MMAR Care account.</p>
         </div>
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog
+          open={open}
+          onOpenChange={(o) => {
+            setOpen(o);
+            if (!o) resetForm();
+          }}
+        >
           <DialogTrigger asChild>
             <Button variant="hero"><Plus className="h-4 w-4 mr-1" /> Add Vehicle</Button>
           </DialogTrigger>
-          <DialogContent className="max-w-lg">
+          <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
             <DialogHeader><DialogTitle>Add a Vehicle</DialogTitle></DialogHeader>
             <div className="space-y-3">
               <div>
@@ -127,9 +204,66 @@ const PortalVehicles = () => {
                 <div><Label>Color</Label><Input value={form.color || ""} onChange={(e) => setForm({ ...form, color: e.target.value })} /></div>
                 <div className="col-span-2"><Label>Current Mileage</Label><Input type="number" value={form.current_mileage || ""} onChange={(e) => setForm({ ...form, current_mileage: parseInt(e.target.value) || undefined })} /></div>
               </div>
+
+              {/* Maintenance checklist */}
+              <div className="rounded-lg border border-border/60 bg-background/40">
+                <button
+                  type="button"
+                  onClick={() => setMaintOpen((v) => !v)}
+                  className="w-full flex items-center gap-2 px-3 py-2 text-left text-sm font-medium text-foreground"
+                >
+                  {maintOpen ? (
+                    <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                  ) : (
+                    <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                  )}
+                  <Wrench className="h-4 w-4 text-primary" />
+                  <span className="flex-1">Recent maintenance for this vehicle</span>
+                  {checkedCount > 0 && (
+                    <span className="text-[11px] text-muted-foreground font-normal">{checkedCount} checked</span>
+                  )}
+                </button>
+                {maintOpen && (
+                  <div className="px-3 pb-3 pt-1 space-y-2 border-t border-border/40">
+                    <p className="text-[11px] text-muted-foreground">
+                      Check off anything done elsewhere recently and enter the odometer reading at the time. You can edit anytime from Maintenance.
+                    </p>
+                    <div className="rounded-md border border-border/60 divide-y divide-border/60 max-h-[280px] overflow-y-auto">
+                      {MAINTENANCE_INTERVALS.map((item) => {
+                        const row = maint[item.name];
+                        const id = `mv-${item.name}`;
+                        return (
+                          <div key={item.name} className="flex items-center gap-3 px-3 py-2">
+                            <Checkbox
+                              id={id}
+                              checked={row.checked}
+                              onCheckedChange={(c) => toggleMaint(item.name, c === true)}
+                            />
+                            <label htmlFor={id} className="flex-1 text-sm cursor-pointer leading-tight">
+                              <div className="font-medium text-foreground">{item.name}</div>
+                              <div className="text-[11px] text-muted-foreground">
+                                every {item.intervalMiles.toLocaleString()} mi
+                              </div>
+                            </label>
+                            <Input
+                              type="text"
+                              inputMode="numeric"
+                              placeholder="miles"
+                              className="w-24 h-8 text-sm"
+                              value={row.miles}
+                              onChange={(e) => setMaintMiles(item.name, e.target.value.replace(/[^\d]/g, ""))}
+                              disabled={!row.checked}
+                            />
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
             <DialogFooter>
-              <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
+              <Button variant="outline" onClick={() => { setOpen(false); resetForm(); }}>Cancel</Button>
               <Button variant="hero" onClick={handleSave} disabled={saving}>
                 {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save Vehicle"}
               </Button>
