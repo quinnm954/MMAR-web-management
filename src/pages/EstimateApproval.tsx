@@ -18,6 +18,7 @@ import BrandedDocLayout from '@/components/BrandedDocLayout';
 import DocReferences from '@/components/DocReferences';
 
 const TIME_WINDOWS = ['Morning (8a–12p)', 'Afternoon (12p–4p)', 'Evening (4p–7p)'];
+const GOOGLE_REVIEW_URL = 'https://share.google/bx2Gb42dslCITJdS8';
 
 const EstimateApproval = () => {
   const { token } = useParams();
