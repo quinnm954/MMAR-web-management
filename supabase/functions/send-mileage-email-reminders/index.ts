@@ -121,6 +121,34 @@ Deno.serve(async (req) => {
 
   const cooldownIso = new Date(Date.now() - REMINDER_COOLDOWN_DAYS * 86400000).toISOString();
 
+  // Per-run cache: owner_id -> { profile, region }.
+  // Avoids refetching the same owner profile (and re-resolving their ZIP region)
+  // when a customer has multiple vehicles in this batch.
+  type OwnerCacheEntry = {
+    profile: { id: string; full_name: string | null; email: string | null; postal_code: string | null } | null;
+    region: Region;
+  };
+  const ownerCache = new Map<string, OwnerCacheEntry>();
+  let ownerCacheHits = 0;
+  let ownerCacheMisses = 0;
+
+  async function getOwner(ownerId: string): Promise<OwnerCacheEntry> {
+    const cached = ownerCache.get(ownerId);
+    if (cached) { ownerCacheHits++; return cached; }
+    ownerCacheMisses++;
+    const { data: profile } = await sb
+      .from('profiles')
+      .select('id, full_name, email, postal_code')
+      .eq('id', ownerId)
+      .maybeSingle();
+    const entry: OwnerCacheEntry = {
+      profile: profile ?? null,
+      region: regionForZip(profile?.postal_code),
+    };
+    ownerCache.set(ownerId, entry);
+    return entry;
+  }
+
   for (const v of vehicles || []) {
     try {
       // Cooldown: skip if reminder for this vehicle was sent recently
@@ -133,15 +161,9 @@ Deno.serve(async (req) => {
         .maybeSingle();
       if (recent) { skipped.push({ vehicle_id: v.id, reason: 'cooldown' }); continue; }
 
-      // Owner profile + email + ZIP for regional pricing
-      const { data: profile } = await sb
-        .from('profiles')
-        .select('id, full_name, email, postal_code')
-        .eq('id', v.owner_id)
-        .maybeSingle();
+      // Owner profile + email + ZIP for regional pricing (cached per run)
+      const { profile, region } = await getOwner(v.owner_id);
       if (!profile?.email) { skipped.push({ vehicle_id: v.id, reason: 'no_email' }); continue; }
-
-      const region = regionForZip(profile.postal_code);
 
       // All service records for this vehicle (need mileage_at_service + service_type)
       const { data: records } = await sb
@@ -208,7 +230,7 @@ Deno.serve(async (req) => {
   }
 
   return new Response(
-    JSON.stringify({ scanned: vehicles?.length ?? 0, sent: sent.length, skipped: skipped.length, errors: errors.length, details: { sent, skipped, errors } }),
+    JSON.stringify({ scanned: vehicles?.length ?? 0, sent: sent.length, skipped: skipped.length, errors: errors.length, owner_cache: { hits: ownerCacheHits, misses: ownerCacheMisses, unique_owners: ownerCache.size }, details: { sent, skipped, errors } }),
     { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
   );
 });
