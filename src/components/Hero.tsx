@@ -36,7 +36,7 @@ const Hero = () => {
             style={{ animationDelay: "0.2s" }}
           >
             <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5 sm:gap-3">
-              <Button variant="hero" size="lg" className="w-full min-h-[52px] px-3" asChild>
+              <Button variant="hero" size="lg" className="w-full min-h-[52px] px-3 bg-white text-primary hover:bg-white/90 hover:text-primary border-2 border-white" asChild>
                 <a href="tel:8135017572" onClick={trackConversion}>
                   <Phone className="w-5 h-5 mr-2 shrink-0" />
                   <span className="truncate">Call Now</span>
@@ -48,7 +48,7 @@ const Hero = () => {
                   <span className="truncate">Book Online</span>
                 </Link>
               </Button>
-              <Button variant="heroOutline" size="lg" className="w-full min-h-[52px] px-3" asChild>
+              <Button variant="hero" size="lg" className="w-full min-h-[52px] px-3" asChild>
                 <Link to="/services">
                   <Wrench className="w-5 h-5 mr-2 shrink-0" />
                   <span className="truncate">Services</span>
