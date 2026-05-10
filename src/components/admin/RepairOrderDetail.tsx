@@ -199,6 +199,7 @@ export default function RepairOrderDetail({ appointmentId, open, onClose }: Prop
         approvedLineItems: approvedLines,
         invoiceTotal: total,
         mileage: vehicle?.current_mileage ?? null,
+        estimate: approvedEstimate,
       });
       toast.success('Invoice issued');
       await reload();
