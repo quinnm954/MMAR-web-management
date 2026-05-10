@@ -112,8 +112,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     } catch {}
   };
 
-  const hasRole = (role: AppRole) => roles.includes(role);
-  const hasAnyRole = (rs: AppRole[]) => rs.some(r => roles.includes(r));
+  const hasRole = (role: AppRole) => roles.includes(role) || (role === 'admin' && roles.includes('owner'));
+  const hasAnyRole = (rs: AppRole[]) => rs.some(r => hasRole(r));
   const isAdmin = roles.includes('admin') || roles.includes('owner');
   const isManager = roles.includes('manager');
   const isStaff = STAFF_ROLES.some(r => roles.includes(r));
