@@ -150,6 +150,12 @@ const AdminLogin = () => {
                 )}
               </Button>
             </form>
+
+            <div className="mt-6 pt-4 border-t border-border/50 text-center text-xs text-muted-foreground space-x-3">
+              <Link to="/portal/login" className="hover:text-primary hover:underline">Customer login</Link>
+              <span>·</span>
+              <Link to="/staff/login" className="hover:text-primary hover:underline">Staff login</Link>
+            </div>
           </CardContent>
         </Card>
       </div>

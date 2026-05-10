@@ -149,6 +149,11 @@ const PortalLogin = () => {
                 Create an account
               </Link>
             </p>
+            <div className="pt-3 border-t border-border/50 text-center text-xs text-muted-foreground space-x-3">
+              <Link to="/staff/login" className="hover:text-primary hover:underline">Staff login</Link>
+              <span>·</span>
+              <Link to="/admin/login" className="hover:text-primary hover:underline">Admin login</Link>
+            </div>
           </CardContent>
         </Card>
       </main>

@@ -73,7 +73,7 @@ const PortalSignup = () => {
             </div>
             <CardTitle className="text-2xl">Create your account</CardTitle>
             <CardDescription>
-              Join MMAR Care — no password needed to sign up. We'll email you a secure link, and you'll set a password on your first sign-in.
+              Just your name and email to get started. We'll email you a secure sign-in link — set your password on first sign-in, then add your address and vehicle.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
