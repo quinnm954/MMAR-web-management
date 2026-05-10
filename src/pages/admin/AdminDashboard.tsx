@@ -107,9 +107,14 @@ const AdminDashboard = () => {
               <p className="text-sm text-muted-foreground">{user?.email}</p>
             </div>
           </div>
-          <Button variant="outline" onClick={() => signOut()}>
-            <LogOut className="mr-2 h-4 w-4" /> Sign Out
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="sm" onClick={refreshAll} disabled={refreshing} title={`Last refreshed ${lastRefreshed.toLocaleTimeString()}`}>
+              <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+            </Button>
+            <Button variant="outline" onClick={() => signOut()}>
+              <LogOut className="mr-2 h-4 w-4" /> Sign Out
+            </Button>
+          </div>
         </div>
       </header>
 
