@@ -150,7 +150,7 @@ const QuoteRequestDialog = ({
     // Attach Google Ads attribution (gclid / utm) for offline conversion uploads
     if (token) {
       const attr = { ...getAttribution(), user_agent: navigator.userAgent };
-      supabase.rpc("set_booking_attribution", { _token: token, _attribution: attr }).catch(() => {});
+      void supabase.rpc("set_booking_attribution", { _token: token, _attribution: attr }).then(() => {}, () => {});
     }
 
     // Fire Google Ads "quote submit" conversion
