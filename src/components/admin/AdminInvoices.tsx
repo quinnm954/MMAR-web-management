@@ -21,6 +21,10 @@ interface Invoice {
   tax: number;
   total: number;
   amount_paid: number;
+  discount_type?: string | null;
+  discount_value?: number | null;
+  discount_amount?: number | null;
+  discount_reason?: string | null;
   due_date: string | null;
   paid_at: string | null;
   created_at: string;
