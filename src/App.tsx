@@ -8,8 +8,9 @@ import Index from "./pages/Index";
 
 import FinancingContract from "./pages/FinancingContract";
 import WarrantyPolicy from "./pages/WarrantyPolicy";
-import AdminLogin from "./pages/admin/AdminLogin";
 import AdminDashboard from "./pages/admin/AdminDashboard";
+import Login from "./pages/Login";
+import { Navigate } from "react-router-dom";
 import ProtectedRoute from "./components/admin/ProtectedRoute";
 import ServiceCategory from "./pages/ServiceCategory";
 import ServicesIndex from "./pages/ServicesIndex";
@@ -26,8 +27,6 @@ import ReviewLanding from "./pages/ReviewLanding";
 import ContactPage from "./pages/ContactPage";
 import InstallApp from "./pages/InstallApp";
 import Memberships from "./pages/Memberships";
-import PortalLogin from "./pages/portal/PortalLogin";
-import PortalSignup from "./pages/portal/PortalSignup";
 import PortalDashboard from "./pages/portal/PortalDashboard";
 import PortalOnboarding from "./pages/portal/PortalOnboarding";
 import PortalMaintenance from "./pages/portal/PortalMaintenance";
@@ -50,7 +49,6 @@ import TechInspections from "./pages/tech/TechInspections";
 import TechProtectedRoute from "./components/tech/TechProtectedRoute";
 import EstimateApproval from "./pages/EstimateApproval";
 import InspectionReport from "./pages/InspectionReport";
-import StaffLogin from "./pages/staff/StaffLogin";
 import SetPassword from "./pages/SetPassword";
 import SharedCustomerSummary from "./pages/SharedCustomerSummary";
 import MmarCare from "./pages/MmarCare";
@@ -91,12 +89,12 @@ const App = () => (
             <Route path="/blog" element={<Blog />} />
             <Route path="/blog/tag/:tag" element={<BlogTag />} />
             <Route path="/blog/:slug" element={<BlogPost />} />
-            <Route path="/admin/login" element={<AdminLogin />} />
+            <Route path="/admin/login" element={<Navigate to="/login" replace />} />
             <Route path="/memberships" element={<Memberships />} />
             <Route path="/mmar-care" element={<MmarCare />} />
             <Route path="/fleet" element={<Fleet />} />
-            <Route path="/portal/login" element={<PortalLogin />} />
-            <Route path="/portal/signup" element={<PortalSignup />} />
+            <Route path="/portal/login" element={<Navigate to="/login" replace />} />
+            <Route path="/portal/signup" element={<Navigate to="/login?tab=signup" replace />} />
             <Route path="/portal/membership-signup" element={<MembershipSignup />} />
             <Route path="/portal/onboarding" element={<CustomerProtectedRoute><PortalOnboarding /></CustomerProtectedRoute>} />
             <Route path="/portal/dashboard" element={<CustomerProtectedRoute><PortalDashboard /></CustomerProtectedRoute>} />
@@ -124,8 +122,8 @@ const App = () => (
             <Route path="/tech/inspections" element={<TechProtectedRoute><TechInspections /></TechProtectedRoute>} />
             <Route path="/estimate/:token" element={<EstimateApproval />} />
             <Route path="/inspection/:token" element={<InspectionReport />} />
-            <Route path="/staff/login" element={<StaffLogin />} />
-            <Route path="/login" element={<PortalLogin />} />
+            <Route path="/staff/login" element={<Navigate to="/login" replace />} />
+            <Route path="/login" element={<Login />} />
             <Route path="/set-password" element={<SetPassword />} />
             <Route path="/share/:token" element={<SharedCustomerSummary />} />
             <Route path="/book" element={<Book />} />

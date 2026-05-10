@@ -9,11 +9,13 @@ import { Loader2, ShieldCheck, UserPlus, X, Search } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 
-const ALL_ROLES = ["admin", "manager", "service_advisor", "technician", "parts", "customer"] as const;
+const ALL_ROLES = ["owner", "admin", "manager", "service_advisor", "technician", "parts", "customer"] as const;
 type Role = typeof ALL_ROLES[number];
 
 export default function AdminRoles() {
-  const { user: currentUser } = useAuth();
+  const { user: currentUser, hasRole } = useAuth();
+  const isOwner = hasRole('owner');
+  
   const [users, setUsers] = useState<any[]>([]);
   const [roles, setRoles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -36,6 +38,10 @@ export default function AdminRoles() {
   const rolesByUser = (uid: string) => roles.filter(r => r.user_id === uid).map(r => r.role as Role);
 
   const grant = async (uid: string, role: Role) => {
+    if (role === 'owner' && !isOwner) {
+      toast.error('Only an owner can grant the owner role.');
+      return;
+    }
     const { error } = await supabase.from("user_roles").insert({ user_id: uid, role });
     if (error) return toast.error(error.message);
     toast.success(`Granted ${role}`);
@@ -43,6 +49,10 @@ export default function AdminRoles() {
   };
   const revoke = async (uid: string, role: Role) => {
     const isSelf = currentUser?.id === uid;
+    if (role === 'owner' && !isOwner) {
+      toast.error('Only an owner can revoke the owner role.');
+      return;
+    }
     if (isSelf && role === "admin") {
       const adminCount = roles.filter(r => r.role === "admin").length;
       if (adminCount <= 1) {

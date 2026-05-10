@@ -118,7 +118,7 @@ const Footer = () => {
             <span>Lehigh Acres and Fort Myers</span>
             <span aria-hidden="true">·</span>
             <Link
-              to="/admin/login"
+              to="/login"
               className="text-muted-foreground/60 hover:text-primary transition-colors"
               aria-label="Staff login"
             >
