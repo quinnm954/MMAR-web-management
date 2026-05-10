@@ -40,7 +40,7 @@ const Footer = () => {
             <div className="mt-4">
               <p className="text-xs uppercase tracking-wider text-muted-foreground mb-2">Reviews &amp; Social</p>
               <div className="flex flex-wrap gap-2 text-xs">
-                <a href="https://share.google/NYSilcfxnQMaqaahE" target="_blank" rel="noopener noreferrer" className="px-2.5 py-1 rounded-full bg-primary/10 text-primary hover:bg-primary/20">Google</a>
+                <a href="https://share.google/bx2Gb42dslCITJdS8" target="_blank" rel="noopener noreferrer" className="px-2.5 py-1 rounded-full bg-primary/10 text-primary hover:bg-primary/20">Google</a>
                 <a href="https://www.facebook.com/Mikesmobileautorepairllc/" target="_blank" rel="noopener noreferrer" className="px-2.5 py-1 rounded-full bg-primary/10 text-primary hover:bg-primary/20">Facebook</a>
                 <a href="https://www.tiktok.com/@mmarllc" target="_blank" rel="noopener noreferrer" className="px-2.5 py-1 rounded-full bg-primary/10 text-primary hover:bg-primary/20">TikTok</a>
                 <a href="https://www.yelp.com/biz/mikes-mobile-auto-repair-lehigh-acres" target="_blank" rel="noopener noreferrer" className="px-2.5 py-1 rounded-full bg-primary/10 text-primary hover:bg-primary/20">Yelp</a>
