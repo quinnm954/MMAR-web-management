@@ -172,82 +172,83 @@ const AdminDashboard = () => {
           }
           const defaultTab = visible.find(t => t.value === 'dashboard')?.value ?? visible.find(t => t.value === 'customers')?.value ?? visible[0].value;
           const [activeTab, setActiveTab] = useState(defaultTab);
+          const [usage, setUsage] = useState<Record<string, number>>(() => {
+            try { return JSON.parse(localStorage.getItem('admin_tab_usage') || '{}'); } catch { return {}; }
+          });
           const active = visible.find(t => t.value === activeTab) ?? visible[0];
-          const ActiveIcon = active.icon;
+
+          const selectTab = (value: string) => {
+            setActiveTab(value);
+            setUsage(prev => {
+              const next = { ...prev, [value]: (prev[value] || 0) + 1 };
+              try { localStorage.setItem('admin_tab_usage', JSON.stringify(next)); } catch {}
+              return next;
+            });
+          };
 
           const groups = [
-            { label: 'Workshop', values: ['kanban','calendar','ros','service','inspections','estimates','invoices'] },
-            { label: 'Front Desk', values: ['customers','garage','memberships','bookings','share','declined'] },
-            { label: 'Admin', values: ['dashboard','reports','catalog','time','shifts','laborpay','productivity','quickbooks','financing','warranty','emails','audit','employees','roles','calls','phone-settings','tracking','settings'] },
+            { label: 'Workshop', values: ['kanban','calendar','ros','service','inspections','estimates','invoices','time','shifts','productivity'] },
+            { label: 'Front Desk', values: ['customers','garage','memberships','bookings','share','declined','calls'] },
+            { label: 'Admin', values: ['dashboard','reports','catalog','laborpay','quickbooks','financing','warranty','emails','audit','employees','roles','phone-settings','tracking','settings'] },
           ];
+          const groupedValues = groups.flatMap(g => g.values);
+          const ungrouped = visible.filter(t => !groupedValues.includes(t.value));
+
+          const sortByUsage = (a: TabDef, b: TabDef) =>
+            (usage[b.value] || 0) - (usage[a.value] || 0) || a.label.localeCompare(b.label);
+
+          const renderGroup = (label: string, values: string[]) => {
+            const items = visible.filter(t => values.includes(t.value)).sort(sortByUsage);
+            if (items.length === 0) return null;
+            const isActiveGroup = items.some(t => t.value === activeTab);
+            return (
+              <DropdownMenu key={label}>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant={isActiveGroup ? 'default' : 'outline'}
+                    size="sm"
+                    className="justify-between"
+                  >
+                    {label}
+                    <ChevronDown className="h-4 w-4 ml-1 opacity-70" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="max-h-[70vh] overflow-y-auto w-56">
+                  <DropdownMenuLabel className="text-xs text-muted-foreground">
+                    {label} · most used first
+                  </DropdownMenuLabel>
+                  <DropdownMenuGroup>
+                    {items.map(t => {
+                      const Icon = t.icon;
+                      const count = usage[t.value] || 0;
+                      return (
+                        <DropdownMenuItem
+                          key={t.value}
+                          className={activeTab === t.value ? 'bg-accent text-accent-foreground' : ''}
+                          onClick={() => selectTab(t.value)}
+                        >
+                          <Icon className="h-4 w-4 mr-2 shrink-0" />
+                          <span className="flex-1">{t.label}</span>
+                          {count > 0 && (
+                            <span className="ml-2 text-[10px] text-muted-foreground">{count}</span>
+                          )}
+                        </DropdownMenuItem>
+                      );
+                    })}
+                  </DropdownMenuGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            );
+          };
 
           return (
             <div className="space-y-4">
-              <div className="flex items-center gap-3">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" className="min-w-[180px] justify-between">
-                      <span className="flex items-center gap-2">
-                        <ActiveIcon className="h-4 w-4 text-primary" />
-                        {active.label}
-                      </span>
-                      <ChevronDown className="h-4 w-4 opacity-60" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="max-h-[70vh] overflow-y-auto w-56">
-                    {groups.map((g, gi) => {
-                      const groupTabs = visible.filter(t => g.values.includes(t.value));
-                      if (groupTabs.length === 0) return null;
-                      return (
-                        <>
-                          {gi > 0 && <DropdownMenuSeparator />}
-                          <DropdownMenuLabel>{g.label}</DropdownMenuLabel>
-                          <DropdownMenuGroup>
-                            {groupTabs.map(t => {
-                              const Icon = t.icon;
-                              return (
-                                <DropdownMenuItem
-                                  key={t.value}
-                                  className={activeTab === t.value ? 'bg-accent text-accent-foreground' : ''}
-                                  onClick={() => setActiveTab(t.value)}
-                                >
-                                  <Icon className="h-4 w-4 mr-2 shrink-0" />
-                                  {t.label}
-                                </DropdownMenuItem>
-                              );
-                            })}
-                          </DropdownMenuGroup>
-                        </>
-                      );
-                    })}
-                    {/* Fallback: any visible tabs not in a group */}
-                    {(() => {
-                      const groupedValues = groups.flatMap(g => g.values);
-                      const ungrouped = visible.filter(t => !groupedValues.includes(t.value));
-                      if (ungrouped.length === 0) return null;
-                      return (
-                        <>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuGroup>
-                            {ungrouped.map(t => {
-                              const Icon = t.icon;
-                              return (
-                                <DropdownMenuItem
-                                  key={t.value}
-                                  className={activeTab === t.value ? 'bg-accent text-accent-foreground' : ''}
-                                  onClick={() => setActiveTab(t.value)}
-                                >
-                                  <Icon className="h-4 w-4 mr-2 shrink-0" />
-                                  {t.label}
-                                </DropdownMenuItem>
-                              );
-                            })}
-                          </DropdownMenuGroup>
-                        </>
-                      );
-                    })()}
-                  </DropdownMenuContent>
-                </DropdownMenu>
+              <div className="flex flex-wrap items-center gap-2">
+                {groups.map(g => renderGroup(g.label, g.values))}
+                {ungrouped.length > 0 && renderGroup('More', ungrouped.map(t => t.value))}
+                <div className="ml-auto text-xs text-muted-foreground">
+                  Current: <span className="font-medium text-foreground">{active.label}</span>
+                </div>
               </div>
               <div className="border rounded-lg p-4 bg-card">
                 {active.content}
