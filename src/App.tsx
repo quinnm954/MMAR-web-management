@@ -10,7 +10,7 @@ import FinancingContract from "./pages/FinancingContract";
 import WarrantyPolicy from "./pages/WarrantyPolicy";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import Login from "./pages/Login";
-import { Navigate, useLocation } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import ProtectedRoute from "./components/admin/ProtectedRoute";
 import ServiceCategory from "./pages/ServiceCategory";
 import ServicesIndex from "./pages/ServicesIndex";
