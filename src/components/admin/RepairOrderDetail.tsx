@@ -11,6 +11,7 @@ import { Link } from "react-router-dom";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import ROAttachments from "./ROAttachments";
+import DeleteButton from "./DeleteButton";
 import { generateInvoiceForRepairOrder } from "@/lib/repairOrders";
 
 interface Props {
@@ -199,6 +200,7 @@ export default function RepairOrderDetail({ appointmentId, open, onClose }: Prop
         approvedLineItems: approvedLines,
         invoiceTotal: total,
         mileage: vehicle?.current_mileage ?? null,
+        estimate: approvedEstimate,
       });
       toast.success('Invoice issued');
       await reload();
@@ -292,9 +294,20 @@ export default function RepairOrderDetail({ appointmentId, open, onClose }: Prop
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Wrench className="h-5 w-5 text-primary" />
-            Repair Order {appt ? `#${appt.id.slice(0, 8).toUpperCase()}` : ""}
+          <DialogTitle className="flex items-center justify-between gap-2 pr-8">
+            <span className="flex items-center gap-2">
+              <Wrench className="h-5 w-5 text-primary" />
+              Repair Order {appt ? `#${appt.id.slice(0, 8).toUpperCase()}` : ""}
+            </span>
+            {appt && (
+              <DeleteButton
+                table="appointments"
+                id={appt.id}
+                label="Delete RO"
+                description="This permanently deletes the repair order. Linked estimates will be unlinked. This cannot be undone."
+                onDeleted={onClose}
+              />
+            )}
           </DialogTitle>
         </DialogHeader>
 

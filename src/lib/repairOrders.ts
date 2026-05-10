@@ -45,8 +45,19 @@ export async function generateInvoiceForRepairOrder(opts: {
   approvedLineItems: LineItem[];
   invoiceTotal: number;
   mileage?: number | null;
+  /** Estimate to mirror exactly on the invoice (subtotal/tax/shop/discount/total). */
+  estimate?: {
+    subtotal?: number | null;
+    shop_supplies?: number | null;
+    tax?: number | null;
+    total?: number | null;
+    discount_type?: string | null;
+    discount_value?: number | null;
+    discount_amount?: number | null;
+    discount_reason?: string | null;
+  } | null;
 }) {
-  const { appointmentId, customerId, vehicleId, serviceType, approvedLineItems, invoiceTotal, mileage } = opts;
+  const { appointmentId, customerId, vehicleId, serviceType, approvedLineItems, invoiceTotal, mileage, estimate } = opts;
   if (!vehicleId) throw new Error('Repair Order has no vehicle linked — add one before invoicing.');
   if (invoiceTotal <= 0) throw new Error('Nothing approved to invoice.');
 
@@ -68,7 +79,38 @@ export async function generateInvoiceForRepairOrder(opts: {
     .single();
   if (sErr) throw sErr;
 
-  // 2. Mark the appointment completed
+  // 2. If we have the source estimate, override the auto-generated invoice totals
+  //    so the invoice matches the approved estimate exactly (including flat
+  //    diagnosis fees that should not be taxed).
+  if (estimate) {
+    const { data: inv } = await supabase
+      .from('invoices')
+      .select('id')
+      .eq('service_record_id', sr.id)
+      .maybeSingle();
+    if (inv?.id) {
+      const subtotal = Number(estimate.subtotal ?? invoiceTotal) || 0;
+      const shop = Number(estimate.shop_supplies ?? 0) || 0;
+      const tax = Number(estimate.tax ?? 0) || 0;
+      const total = Number(estimate.total ?? (subtotal + shop + tax)) || 0;
+      await supabase
+        .from('invoices')
+        .update({
+          line_items: approvedLineItems as any,
+          subtotal,
+          shop_supplies: shop,
+          tax,
+          total,
+          discount_type: (estimate.discount_type as any) ?? 'amount',
+          discount_value: Number(estimate.discount_value ?? 0) || 0,
+          discount_amount: Number(estimate.discount_amount ?? 0) || 0,
+          discount_reason: estimate.discount_reason ?? null,
+        })
+        .eq('id', inv.id);
+    }
+  }
+
+  // 3. Mark the appointment completed
   await supabase
     .from('appointments')
     .update({ status: 'completed', board_column: 'completed' })
