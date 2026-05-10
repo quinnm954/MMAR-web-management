@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Loader2, Calendar, MapPin, Wrench } from "lucide-react";
+import { Loader2, Calendar, MapPin, Wrench, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import TechLayout from "@/components/tech/TechLayout";
@@ -71,7 +71,19 @@ const TechDashboard = () => {
     setLoading(false);
   };
 
-  useEffect(() => { load(); }, [user]);
+  useEffect(() => {
+    load();
+    const onFocus = () => { if (document.visibilityState === 'visible') load(); };
+    document.addEventListener('visibilitychange', onFocus);
+    window.addEventListener('focus', onFocus);
+    const interval = setInterval(load, 60000);
+    return () => {
+      document.removeEventListener('visibilitychange', onFocus);
+      window.removeEventListener('focus', onFocus);
+      clearInterval(interval);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
   const updateStatus = async (id: string, status: string) => {
     const { error } = await supabase.from("appointments").update({ status }).eq("id", id);
@@ -125,7 +137,12 @@ const TechDashboard = () => {
   return (
     <TechLayout>
       <div className="space-y-3">
-        <h2 className="text-lg font-bold">My Assigned Jobs</h2>
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-bold">My Assigned Jobs</h2>
+          <Button variant="ghost" size="icon" onClick={load} disabled={loading} aria-label="Refresh">
+            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+          </Button>
+        </div>
 
         {loading ? (
           <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>

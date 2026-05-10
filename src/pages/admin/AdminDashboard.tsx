@@ -4,7 +4,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { LogOut, FileText, ShieldCheck, Users, CreditCard, Calendar, ClipboardList, Receipt, Wrench, Mail, FileSpreadsheet, ClipboardCheck, Package, Settings, KanbanSquare, Clock, BarChart3, Share2, Car, AlertTriangle, FileDown, Activity, History, UserCog, DollarSign } from 'lucide-react';
+import { LogOut, FileText, ShieldCheck, Users, CreditCard, Calendar, ClipboardList, Receipt, Wrench, Mail, FileSpreadsheet, ClipboardCheck, Package, Settings, KanbanSquare, Clock, BarChart3, Share2, Car, AlertTriangle, FileDown, Activity, History, UserCog, DollarSign, RefreshCw } from 'lucide-react';
 import AdminEmployees from '@/components/admin/AdminEmployees';
 import AdminAuditLog from '@/components/admin/AdminAuditLog';
 import AdminRoles from '@/components/admin/AdminRoles';
@@ -48,6 +48,8 @@ const AdminDashboard = () => {
   const [stats, setStats] = useState({ customers: 0, activeMemberships: 0, openAppointments: 0, unpaidInvoices: 0 });
   const [contracts, setContracts] = useState<any[]>([]);
   const [warranties, setWarranties] = useState<any[]>([]);
+  const [refreshing, setRefreshing] = useState(false);
+  const [lastRefreshed, setLastRefreshed] = useState<Date>(new Date());
 
   const reloadFinancing = async () => {
     const { data } = await supabase.from('financing_contracts').select('*').order('created_at', { ascending: false });
@@ -58,23 +60,36 @@ const AdminDashboard = () => {
     setWarranties(data ?? []);
   };
 
+  const refreshAll = async () => {
+    setRefreshing(true);
+    const [c, m, a, i] = await Promise.all([
+      supabase.from('profiles').select('id', { count: 'exact', head: true }),
+      supabase.from('memberships').select('id', { count: 'exact', head: true }).eq('status', 'active'),
+      supabase.from('appointments').select('id', { count: 'exact', head: true }).in('status', ['requested', 'scheduled', 'in_progress']),
+      supabase.from('invoices').select('id', { count: 'exact', head: true }).in('status', ['unpaid', 'partial', 'overdue']),
+    ]);
+    setStats({
+      customers: c.count ?? 0,
+      activeMemberships: m.count ?? 0,
+      openAppointments: a.count ?? 0,
+      unpaidInvoices: i.count ?? 0,
+    });
+    await Promise.all([reloadFinancing(), reloadWarranty()]);
+    setLastRefreshed(new Date());
+    setRefreshing(false);
+  };
+
   useEffect(() => {
-    (async () => {
-      const [c, m, a, i] = await Promise.all([
-        supabase.from('profiles').select('id', { count: 'exact', head: true }),
-        supabase.from('memberships').select('id', { count: 'exact', head: true }).eq('status', 'active'),
-        supabase.from('appointments').select('id', { count: 'exact', head: true }).in('status', ['requested', 'scheduled', 'in_progress']),
-        supabase.from('invoices').select('id', { count: 'exact', head: true }).in('status', ['unpaid', 'partial', 'overdue']),
-      ]);
-      setStats({
-        customers: c.count ?? 0,
-        activeMemberships: m.count ?? 0,
-        openAppointments: a.count ?? 0,
-        unpaidInvoices: i.count ?? 0,
-      });
-      reloadFinancing();
-      reloadWarranty();
-    })();
+    refreshAll();
+    const onFocus = () => { if (document.visibilityState === 'visible') refreshAll(); };
+    document.addEventListener('visibilitychange', onFocus);
+    window.addEventListener('focus', onFocus);
+    const interval = setInterval(refreshAll, 60000);
+    return () => {
+      document.removeEventListener('visibilitychange', onFocus);
+      window.removeEventListener('focus', onFocus);
+      clearInterval(interval);
+    };
   }, []);
 
   return (
@@ -92,9 +107,14 @@ const AdminDashboard = () => {
               <p className="text-sm text-muted-foreground">{user?.email}</p>
             </div>
           </div>
-          <Button variant="outline" onClick={() => signOut()}>
-            <LogOut className="mr-2 h-4 w-4" /> Sign Out
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="sm" onClick={refreshAll} disabled={refreshing} title={`Last refreshed ${lastRefreshed.toLocaleTimeString()}`}>
+              <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+            </Button>
+            <Button variant="outline" onClick={() => signOut()}>
+              <LogOut className="mr-2 h-4 w-4" /> Sign Out
+            </Button>
+          </div>
         </div>
       </header>
 
