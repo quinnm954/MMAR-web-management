@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Dialog,
   DialogContent,
@@ -11,66 +12,84 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { MessageSquare } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { CalendarCheck, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const currentYear = new Date().getFullYear();
 const digitsOnly = (v: string) => v.replace(/\D/g, "");
+const TIME_WINDOWS = [
+  "Morning (8am – 12pm)",
+  "Afternoon (12pm – 5pm)",
+  "Evening (5pm – 8pm)",
+];
 
 interface QuoteRequestDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   serviceName: string | null;
-  phone?: string;
 }
 
 const QuoteRequestDialog = ({
   open,
   onOpenChange,
   serviceName,
-  phone = "8135017572",
 }: QuoteRequestDialogProps) => {
+  const navigate = useNavigate();
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
   const [year, setYear] = useState("");
   const [make, setMake] = useState("");
   const [model, setModel] = useState("");
   const [mileage, setMileage] = useState("");
   const [location, setLocation] = useState("");
   const [notes, setNotes] = useState("");
-  const [previewText, setPreviewText] = useState<string | null>(null);
+  const [requestedDate, setRequestedDate] = useState("");
+  const [timeWindow, setTimeWindow] = useState("");
+  const [serviceTypeOverride, setServiceTypeOverride] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [busy, setBusy] = useState(false);
 
-  const STORAGE_KEY = "quoteRequest:vehicleInfo";
+  const STORAGE_KEY = "quoteRequest:contactInfo";
 
   useEffect(() => {
     if (open) {
-      setPreviewText(null);
       setErrors({});
       try {
         const saved = localStorage.getItem(STORAGE_KEY);
         if (saved) {
           const v = JSON.parse(saved);
+          setName(v.name ?? "");
+          setPhone(v.phone ?? "");
+          setEmail(v.email ?? "");
           setYear(v.year ?? "");
           setMake(v.make ?? "");
           setModel(v.model ?? "");
           setMileage(v.mileage ?? "");
           setLocation(v.location ?? "");
-          setNotes(v.notes ?? "");
           return;
         }
       } catch {
         // ignore
       }
-      setYear("");
-      setMake("");
-      setModel("");
-      setMileage("");
-      setLocation("");
-      setNotes("");
     }
-  }, [open, serviceName]);
+  }, [open]);
 
-  const handleReview = () => {
+  const handleSubmit = async () => {
     const next: Record<string, string> = {};
+    const finalService = serviceName ?? serviceTypeOverride.trim();
+    if (!finalService) next.service = "Tell us what service you need";
+    if (!name.trim() || name.trim().length < 2) next.name = "Your name is required";
+    if (digitsOnly(phone).length < 10) next.phone = "Enter a valid phone number";
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) next.email = "Enter a valid email";
     if (year) {
       const y = Number(year);
       if (!/^\d{4}$/.test(year) || y < 1900 || y > currentYear + 1) {
@@ -83,11 +102,7 @@ const QuoteRequestDialog = ({
         next.mileage = "Enter a mileage between 0 and 1,000,000";
       }
     }
-    if (make.length > 50) next.make = "Make is too long (50 max)";
-    if (model.length > 50) next.model = "Model is too long (50 max)";
-    if (location.length > 100) next.location = "Location is too long (100 max)";
     if (notes.length > 1000) next.notes = "Notes are too long (1000 max)";
-
     setErrors(next);
     if (Object.keys(next).length > 0) {
       toast.error("Please fix the highlighted fields");
@@ -95,32 +110,44 @@ const QuoteRequestDialog = ({
     }
 
     const vehicle = [year, make, model].filter(Boolean).join(" ").trim();
-    const lines = [
-      `Hi, I'd like a quote for: ${serviceName ?? ""}`,
-      vehicle ? `Vehicle: ${vehicle}` : "",
+    const description = [
       mileage ? `Mileage: ${mileage}` : "",
-      location ? `Location: ${location}` : "",
-      notes ? `Notes: ${notes}` : "",
-    ].filter(Boolean);
+      notes ? notes : "",
+    ].filter(Boolean).join("\n");
+
+    setBusy(true);
+    const { data, error } = await supabase.rpc("submit_booking_request", {
+      _name: name.trim(),
+      _phone: phone.trim(),
+      _email: email.trim() || null,
+      _service_type: finalService,
+      _description: description || null,
+      _service_address: location.trim() || null,
+      _vehicle_info: vehicle || null,
+      _requested_date: requestedDate || null,
+      _requested_time_window: timeWindow || null,
+      _source: "in_app",
+    });
+    setBusy(false);
+
+    if (error || !data) {
+      toast.error(error?.message ?? "Could not submit. Please call (813) 501-7572.");
+      return;
+    }
 
     try {
       localStorage.setItem(
         STORAGE_KEY,
-        JSON.stringify({ year, make, model, mileage, location, notes }),
+        JSON.stringify({ name, phone, email, year, make, model, mileage, location }),
       );
     } catch {
       // ignore
     }
 
-    setPreviewText(lines.join("\n"));
-  };
-
-  const handleSend = () => {
-    if (!previewText) return;
-    const body = encodeURIComponent(previewText);
-    window.location.href = `sms:${phone}?body=${body}`;
-    setPreviewText(null);
+    const token = (data as { token?: string })?.token;
+    toast.success("Request received! We'll text you to confirm your day & time.");
     onOpenChange(false);
+    if (token) navigate(`/appointments/${token}`);
   };
 
   return (
@@ -129,164 +156,191 @@ const QuoteRequestDialog = ({
         <DialogHeader>
           <DialogTitle className="font-display text-2xl tracking-wide">
             <span className="text-sky">REQUEST</span>{" "}
-            <span className="text-gold">QUOTE</span>
+            <span className="text-gold">SERVICE</span>
           </DialogTitle>
           <DialogDescription>
             {serviceName ? (
               <>
-                Service: <span className="font-semibold text-foreground">{serviceName}</span>
+                Service: <span className="font-semibold text-foreground">{serviceName}</span>. We'll review and text you to confirm.
               </>
             ) : (
-              "Add your vehicle info — we'll text you back."
+              "Tell us what you need — we'll review and text you to confirm a time."
             )}
           </DialogDescription>
         </DialogHeader>
 
-        {previewText === null ? (
-          <>
-            <div className="space-y-4">
-              <div className="grid grid-cols-3 gap-3">
-                <div className="space-y-1.5">
-                  <Label htmlFor="year">Year</Label>
-                  <Input
-                    id="year"
-                    inputMode="numeric"
-                    pattern="\d*"
-                    maxLength={4}
-                    placeholder="2018"
-                    value={year}
-                    aria-invalid={!!errors.year}
-                    className={errors.year ? "border-destructive focus-visible:ring-destructive" : ""}
-                    onChange={(e) => {
-                      setYear(digitsOnly(e.target.value).slice(0, 4));
-                      if (errors.year) setErrors((p) => ({ ...p, year: "" }));
-                    }}
-                  />
-                  {errors.year && <p className="text-xs text-destructive">{errors.year}</p>}
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="make">Make</Label>
-                  <Input
-                    id="make"
-                    placeholder="Toyota"
-                    value={make}
-                    aria-invalid={!!errors.make}
-                    className={errors.make ? "border-destructive focus-visible:ring-destructive" : ""}
-                    onChange={(e) => {
-                      setMake(e.target.value);
-                      if (errors.make) setErrors((p) => ({ ...p, make: "" }));
-                    }}
-                  />
-                  {errors.make && <p className="text-xs text-destructive">{errors.make}</p>}
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="model">Model</Label>
-                  <Input
-                    id="model"
-                    placeholder="Camry"
-                    value={model}
-                    aria-invalid={!!errors.model}
-                    className={errors.model ? "border-destructive focus-visible:ring-destructive" : ""}
-                    onChange={(e) => {
-                      setModel(e.target.value);
-                      if (errors.model) setErrors((p) => ({ ...p, model: "" }));
-                    }}
-                  />
-                  {errors.model && <p className="text-xs text-destructive">{errors.model}</p>}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="space-y-1.5">
-                  <Label htmlFor="mileage">Mileage (optional)</Label>
-                  <Input
-                    id="mileage"
-                    inputMode="numeric"
-                    pattern="\d*"
-                    maxLength={7}
-                    placeholder="85000"
-                    value={mileage}
-                    aria-invalid={!!errors.mileage}
-                    className={errors.mileage ? "border-destructive focus-visible:ring-destructive" : ""}
-                    onChange={(e) => {
-                      setMileage(digitsOnly(e.target.value).slice(0, 7));
-                      if (errors.mileage) setErrors((p) => ({ ...p, mileage: "" }));
-                    }}
-                  />
-                  {errors.mileage && <p className="text-xs text-destructive">{errors.mileage}</p>}
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="location">Location (optional)</Label>
-                  <Input
-                    id="location"
-                    placeholder="Fort Myers, FL"
-                    value={location}
-                    aria-invalid={!!errors.location}
-                    className={errors.location ? "border-destructive focus-visible:ring-destructive" : ""}
-                    onChange={(e) => {
-                      setLocation(e.target.value);
-                      if (errors.location) setErrors((p) => ({ ...p, location: "" }));
-                    }}
-                  />
-                  {errors.location && <p className="text-xs text-destructive">{errors.location}</p>}
-                </div>
-              </div>
-
-              <div className="space-y-1.5">
-                <Label htmlFor="notes">Notes (optional)</Label>
-                <Textarea
-                  id="notes"
-                  placeholder="Symptoms, sounds, when it started…"
-                  rows={3}
-                  value={notes}
-                  aria-invalid={!!errors.notes}
-                  className={errors.notes ? "border-destructive focus-visible:ring-destructive" : ""}
-                  onChange={(e) => {
-                    setNotes(e.target.value);
-                    if (errors.notes) setErrors((p) => ({ ...p, notes: "" }));
-                  }}
-                />
-                {errors.notes && <p className="text-xs text-destructive">{errors.notes}</p>}
-              </div>
-            </div>
-
-            <DialogFooter className="gap-2 sm:gap-2">
-              <Button variant="outline" onClick={() => onOpenChange(false)}>
-                Cancel
-              </Button>
-              <Button variant="hero" onClick={handleReview} className="gap-2">
-                <MessageSquare className="w-4 h-4" />
-                Review Text
-              </Button>
-            </DialogFooter>
-          </>
-        ) : (
-          <>
-            <div className="space-y-2">
-              <Label htmlFor="preview">Preview & edit your message</Label>
-              <Textarea
-                id="preview"
-                rows={8}
-                value={previewText}
-                onChange={(e) => setPreviewText(e.target.value)}
-                maxLength={1500}
+        <div className="space-y-4">
+          {!serviceName && (
+            <div className="space-y-1.5">
+              <Label htmlFor="service">Service needed</Label>
+              <Input
+                id="service"
+                placeholder="e.g. Brake service, oil change…"
+                value={serviceTypeOverride}
+                aria-invalid={!!errors.service}
+                className={errors.service ? "border-destructive focus-visible:ring-destructive" : ""}
+                onChange={(e) => {
+                  setServiceTypeOverride(e.target.value);
+                  if (errors.service) setErrors((p) => ({ ...p, service: "" }));
+                }}
               />
-              <p className="text-xs text-muted-foreground">
-                Sending to {phone}. Your messaging app will open next.
-              </p>
+              {errors.service && <p className="text-xs text-destructive">{errors.service}</p>}
             </div>
+          )}
 
-            <DialogFooter className="gap-2 sm:gap-2">
-              <Button variant="outline" onClick={() => setPreviewText(null)}>
-                Back
-              </Button>
-              <Button variant="hero" onClick={handleSend} className="gap-2">
-                <MessageSquare className="w-4 h-4" />
-                Send Text
-              </Button>
-            </DialogFooter>
-          </>
-        )}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label htmlFor="name">Your name</Label>
+              <Input
+                id="name"
+                value={name}
+                aria-invalid={!!errors.name}
+                className={errors.name ? "border-destructive focus-visible:ring-destructive" : ""}
+                onChange={(e) => {
+                  setName(e.target.value);
+                  if (errors.name) setErrors((p) => ({ ...p, name: "" }));
+                }}
+              />
+              {errors.name && <p className="text-xs text-destructive">{errors.name}</p>}
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="phone">Mobile</Label>
+              <Input
+                id="phone"
+                type="tel"
+                inputMode="tel"
+                autoComplete="tel"
+                value={phone}
+                aria-invalid={!!errors.phone}
+                className={errors.phone ? "border-destructive focus-visible:ring-destructive" : ""}
+                onChange={(e) => {
+                  setPhone(e.target.value);
+                  if (errors.phone) setErrors((p) => ({ ...p, phone: "" }));
+                }}
+              />
+              {errors.phone && <p className="text-xs text-destructive">{errors.phone}</p>}
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="email">Email (optional)</Label>
+            <Input
+              id="email"
+              type="email"
+              autoComplete="email"
+              value={email}
+              aria-invalid={!!errors.email}
+              className={errors.email ? "border-destructive focus-visible:ring-destructive" : ""}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                if (errors.email) setErrors((p) => ({ ...p, email: "" }));
+              }}
+            />
+            {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
+          </div>
+
+          <div className="grid grid-cols-3 gap-3">
+            <div className="space-y-1.5">
+              <Label htmlFor="year">Year</Label>
+              <Input
+                id="year"
+                inputMode="numeric"
+                pattern="\d*"
+                maxLength={4}
+                placeholder="2018"
+                value={year}
+                aria-invalid={!!errors.year}
+                className={errors.year ? "border-destructive focus-visible:ring-destructive" : ""}
+                onChange={(e) => {
+                  setYear(digitsOnly(e.target.value).slice(0, 4));
+                  if (errors.year) setErrors((p) => ({ ...p, year: "" }));
+                }}
+              />
+              {errors.year && <p className="text-xs text-destructive">{errors.year}</p>}
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="make">Make</Label>
+              <Input id="make" placeholder="Toyota" value={make} onChange={(e) => setMake(e.target.value)} />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="model">Model</Label>
+              <Input id="model" placeholder="Camry" value={model} onChange={(e) => setModel(e.target.value)} />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label htmlFor="mileage">Mileage (optional)</Label>
+              <Input
+                id="mileage"
+                inputMode="numeric"
+                pattern="\d*"
+                maxLength={7}
+                placeholder="85000"
+                value={mileage}
+                aria-invalid={!!errors.mileage}
+                className={errors.mileage ? "border-destructive focus-visible:ring-destructive" : ""}
+                onChange={(e) => {
+                  setMileage(digitsOnly(e.target.value).slice(0, 7));
+                  if (errors.mileage) setErrors((p) => ({ ...p, mileage: "" }));
+                }}
+              />
+              {errors.mileage && <p className="text-xs text-destructive">{errors.mileage}</p>}
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="location">Service address (optional)</Label>
+              <Input id="location" placeholder="Fort Myers, FL" value={location} onChange={(e) => setLocation(e.target.value)} />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label htmlFor="requested_date">Preferred date (optional)</Label>
+              <Input
+                id="requested_date"
+                type="date"
+                value={requestedDate}
+                onChange={(e) => setRequestedDate(e.target.value)}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="time_window">Time window (optional)</Label>
+              <Select value={timeWindow} onValueChange={setTimeWindow}>
+                <SelectTrigger id="time_window"><SelectValue placeholder="Anytime" /></SelectTrigger>
+                <SelectContent>
+                  {TIME_WINDOWS.map((w) => <SelectItem key={w} value={w}>{w}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="notes">Notes (optional)</Label>
+            <Textarea
+              id="notes"
+              placeholder="Symptoms, sounds, when it started…"
+              rows={3}
+              value={notes}
+              aria-invalid={!!errors.notes}
+              className={errors.notes ? "border-destructive focus-visible:ring-destructive" : ""}
+              onChange={(e) => {
+                setNotes(e.target.value);
+                if (errors.notes) setErrors((p) => ({ ...p, notes: "" }));
+              }}
+            />
+            {errors.notes && <p className="text-xs text-destructive">{errors.notes}</p>}
+          </div>
+        </div>
+
+        <DialogFooter className="gap-2 sm:gap-2">
+          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={busy}>
+            Cancel
+          </Button>
+          <Button variant="hero" onClick={handleSubmit} disabled={busy} className="gap-2">
+            {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <CalendarCheck className="w-4 h-4" />}
+            Request Service
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
