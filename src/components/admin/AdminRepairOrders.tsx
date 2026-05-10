@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Loader2, Search, Wrench } from "lucide-react";
 import RepairOrderDetail from "./RepairOrderDetail";
+import DeleteButton from "./DeleteButton";
 import { format } from "date-fns";
 
 export default function AdminRepairOrders() {
