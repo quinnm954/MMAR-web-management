@@ -76,7 +76,7 @@ const MileageServiceReminderEmail = ({ customerName, vehicle, currentMileage, du
                   </Text>
                   {s.competitorPriceRange && (
                     <Text style={priceRow}>
-                      <span style={priceLabel}>Competitor price:</span>{' '}
+                      <span style={priceLabel}>{priceRegionLabel ? `${priceRegionLabel} price:` : 'Competitor price:'}</span>{' '}
                       <span style={priceValue}>
                         ${fmt(s.competitorPriceRange[0])}–${fmt(s.competitorPriceRange[1])}
                       </span>
