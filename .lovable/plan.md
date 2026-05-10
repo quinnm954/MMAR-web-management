@@ -1,57 +1,59 @@
-## Goal
-Build the full call-handling system in the admin portal now, but keep it **dormant** until you finish porting your number to Twilio. Nothing routes, records, or transcribes until you flip a single switch in Phone Settings.
+## Goals
 
-## Safety gate (key change)
-- New `phone_settings.routing_enabled` boolean, defaults to **false**.
-- Until you set it to `true` in the admin UI, the voice webhook will respond with a polite TwiML message ("This number is being upgraded — please call back shortly") and **not forward, not record, not transcribe**.
-- Lets you point Twilio's webhook at the function the moment porting completes without any pre-port surprises.
-- Phone Settings page shows a clear banner: "Routing is OFF — calls will not be forwarded. Enable when porting is complete."
+1. Customer signup asks for **only name + email** — no password, no address, no vehicles.
+2. After they click the email link → they land on **Set Password** → then **Onboarding** (address + vehicles + service history) → then dashboard.
+3. Replace the unified `/login` page with **dedicated** login pages for customers, staff, and admins.
 
-## What gets built (now, but inactive)
+## Current state (already in place)
 
-### Database
-- `call_logs` — from, to, direction, status (initiated/ringing/answered/completed/missed/voicemail), duration, recording URL, transcription, customer_id, twilio_call_sid, created_at.
-- `phone_settings` — single row: `routing_enabled` (default false), `forward_to_number`, `business_hours` JSON, `voicemail_greeting`, `record_calls`, `transcribe_voicemail`.
-- RLS: admins-only.
+- `PortalSignup` already collects only name + email and sends a magic link with `must_set_password: true`.
+- `SetPassword` page exists and clears the flag.
+- `CustomerProtectedRoute` already redirects to `/set-password` if the flag is set, then to `/portal/onboarding` if profile/vehicle is incomplete.
+- `AdminLogin` exists at `/admin/login`.
+- The unified `/login` page (`src/pages/Login.tsx`) lets you pick "Customer / Employee / Admin" — this is what we're removing.
 
-### Edge functions (4 new)
-- `twilio-voice-incoming` — checks `routing_enabled` first. If OFF → returns "upgrade in progress" TwiML. If ON → during business hours dials your cell with recording; otherwise records voicemail.
-- `twilio-voice-status` — upserts `call_logs` row from Twilio lifecycle events.
-- `twilio-voice-recording` — saves recording URL to the call row.
-- `twilio-voice-transcription` — saves transcription text + bumps unread.
+## Changes
 
-### Admin portal UI
-- New nav item **Calls** — list view with filters (All / Missed / Voicemails / Today), inline audio player, transcription, customer match, click-to-text shortcut. Empty state: "No calls yet — calls will appear here once your number is ported and routing is enabled."
-- New **Phone Settings** page (under admin Shop Settings) with:
-  - Big ON/OFF toggle for `routing_enabled`
-  - Forward-to cell number
-  - Business hours editor
-  - Voicemail greeting text
-  - Record calls toggle
-  - Transcribe voicemails toggle
-  - Copy-to-clipboard webhook URL to paste into Twilio Console after porting
-  - Step-by-step porting + webhook checklist
+### 1. Signup → first-login flow polish
+- `PortalSignup`: tighten copy so it's obvious the next step is "set password, then add vehicles." No functional change to the form itself.
+- `SetPassword`: after saving the password, route customers to `/portal/onboarding` (not `/portal/dashboard`) so the next step is unmistakable. Staff/admin still route to their dashboards.
+- `CustomerProtectedRoute`: no change — already enforces password → onboarding → dashboard order.
 
-### Reused
-- Caller→customer match: same lookup pattern as `twilio-inbound-sms`.
-- SMS inbox stays exactly as is.
+### 2. New dedicated **Staff Login** page
+- New file: `src/pages/staff/StaffLogin.tsx` (employees: technician, service_advisor, manager, parts).
+- Same look as `AdminLogin` but validates against the staff role set; redirects to `/tech` on success.
+- Add route `/staff/login` in `src/App.tsx`.
 
-## What you do when porting completes
-1. Open admin → **Phone Settings**.
-2. Paste your cell into "Forward to".
-3. Copy the webhook URL → paste into Twilio Console → Phone Numbers → your number → Voice Configuration.
-4. Flip **Routing Enabled** to ON.
-5. Test by calling your own number.
+### 3. Retire the unified `/login`
+- Delete `src/pages/Login.tsx` and its route.
+- Update remaining references:
+  - `src/components/Navigation.tsx` (desktop + mobile "Staff sign-in" link) → point to `/staff/login`. Add a small secondary link to `/admin/login` next to it on desktop ("Admin").
+  - `src/pages/SetPassword.tsx` fallback navigate → `/portal/login`.
+  - `src/components/admin/ProtectedRoute.tsx` → `/admin/login`.
+- Customer-facing entry points (Navigation "Sign in" button, footer, hero, etc.) already use `/portal/login` — keep as is.
 
-That's the only switch — no code changes needed.
+### 4. Cross-link the three login pages
+Each login page gets a small footer with links to the other two ("Not a customer? Staff sign-in · Admin sign-in") so a user who lands on the wrong one can self-correct.
 
-## Out of scope
-- In-browser softphone (Twilio Voice SDK).
-- Outbound click-to-call.
-- IVR menus / multi-staff routing.
+## Files touched
 
-## Deliverables
-- [ ] Migration: `call_logs`, `phone_settings` (routing_enabled defaults false)
-- [ ] 4 edge functions deployed but inert until toggle ON
-- [ ] Admin **Calls** inbox page
-- [ ] Admin **Phone Settings** page with safety toggle + setup checklist
+```text
+src/pages/portal/PortalSignup.tsx        (copy tweak)
+src/pages/SetPassword.tsx                (route customers to /portal/onboarding)
+src/pages/staff/StaffLogin.tsx           (NEW)
+src/pages/admin/AdminLogin.tsx           (add cross-links)
+src/pages/portal/PortalLogin.tsx         (add cross-links)
+src/components/Navigation.tsx            (point staff link to /staff/login)
+src/components/admin/ProtectedRoute.tsx  (redirect → /admin/login)
+src/App.tsx                              (add /staff/login route, remove /login route + Login import)
+src/pages/Login.tsx                      (DELETE)
+```
+
+## Resulting flows
+
+- **Customer signup**: `/portal/signup` (name+email) → email link → `/set-password` → `/portal/onboarding` (address + vehicles + history) → `/portal/dashboard`.
+- **Customer returning**: `/portal/login` → dashboard.
+- **Staff**: `/staff/login` → `/tech`.
+- **Admin**: `/admin/login` → `/admin/dashboard`.
+
+No database, RLS, or edge-function changes are required.

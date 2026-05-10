@@ -7,59 +7,51 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, ArrowLeft } from 'lucide-react';
+import { Loader2, ArrowLeft, HardHat } from 'lucide-react';
 import mmarLogo from '@/assets/mmar-logo.jpeg';
 
-const AdminLogin = () => {
+const STAFF_ROLES = ['technician', 'service_advisor', 'manager', 'parts', 'admin'];
+
+const StaffLogin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { signIn, signOut, user, isAdmin, isStaff, isLoading } = useAuth();
+  const { signIn, signOut, user, isStaff, isAdmin, isLoading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
-    if (!isLoading && user && isAdmin) {
-      navigate('/admin/dashboard');
+    if (!isLoading && user && isStaff) {
+      navigate(isAdmin ? '/admin/dashboard' : '/tech');
     }
-  }, [user, isAdmin, isLoading, navigate]);
+  }, [user, isStaff, isAdmin, isLoading, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-
     try {
       const { error } = await signIn(email, password);
       if (error) {
-        toast({
-          title: 'Login failed',
-          description: error.message,
-          variant: 'destructive',
-        });
+        toast({ title: 'Login failed', description: error.message, variant: 'destructive' });
         return;
       }
-
-      // Verify the signed-in user actually has an admin role.
       const { data: { user: authedUser } } = await supabase.auth.getUser();
       if (!authedUser) return;
-
       const { data: roleRows } = await supabase
         .from('user_roles')
         .select('role')
         .eq('user_id', authedUser.id);
-
       const userRoles = (roleRows ?? []).map((r: any) => r.role);
-      if (!userRoles.includes('admin')) {
+      if (!userRoles.some((r: string) => STAFF_ROLES.includes(r))) {
         await signOut();
         toast({
           title: 'Access denied',
-          description: 'This account does not have admin access. Use the customer portal login instead.',
+          description: 'This account is not a staff account. Use the customer portal login instead.',
           variant: 'destructive',
         });
         return;
       }
-
-      navigate('/admin/dashboard');
+      navigate(userRoles.includes('admin') ? '/admin/dashboard' : '/tech');
     } finally {
       setIsSubmitting(false);
     }
@@ -79,8 +71,7 @@ const AdminLogin = () => {
         to="/"
         className="absolute top-4 left-4 flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
       >
-        <ArrowLeft className="h-4 w-4" />
-        Back to Home
+        <ArrowLeft className="h-4 w-4" /> Back to Home
       </Link>
 
       <div className="w-full max-w-md">
@@ -94,11 +85,12 @@ const AdminLogin = () => {
 
         <Card className="glass-card border-border">
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-display text-foreground">
-              Admin Login
-            </CardTitle>
+            <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-2">
+              <HardHat className="h-6 w-6 text-primary" />
+            </div>
+            <CardTitle className="text-2xl font-display text-foreground">Staff Login</CardTitle>
             <CardDescription>
-              Sign in to access the admin dashboard
+              Technicians, service advisors, managers, and parts staff.
             </CardDescription>
           </CardHeader>
 
@@ -109,7 +101,7 @@ const AdminLogin = () => {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="Enter your email"
+                  placeholder="you@shop.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -118,43 +110,29 @@ const AdminLogin = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password">6-digit PIN</Label>
+                <Label htmlFor="password">Password</Label>
                 <Input
                   id="password"
                   type="password"
-                  inputMode="numeric"
-                  autoComplete="one-time-code"
-                  pattern="[0-9]{6}"
-                  maxLength={6}
-                  minLength={6}
-                  placeholder="••••••"
+                  autoComplete="current-password"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                  onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="bg-input border-border tracking-[0.5em] text-center text-lg"
+                  className="bg-input border-border"
                 />
               </div>
 
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={isSubmitting}
-              >
+              <Button type="submit" className="w-full" disabled={isSubmitting}>
                 {isSubmitting ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Signing in...
-                  </>
-                ) : (
-                  'Sign In'
-                )}
+                  <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Signing in...</>
+                ) : 'Sign In'}
               </Button>
             </form>
 
             <div className="mt-6 pt-4 border-t border-border/50 text-center text-xs text-muted-foreground space-x-3">
               <Link to="/portal/login" className="hover:text-primary hover:underline">Customer login</Link>
               <span>·</span>
-              <Link to="/staff/login" className="hover:text-primary hover:underline">Staff login</Link>
+              <Link to="/admin/login" className="hover:text-primary hover:underline">Admin login</Link>
             </div>
           </CardContent>
         </Card>
@@ -163,4 +141,4 @@ const AdminLogin = () => {
   );
 };
 
-export default AdminLogin;
+export default StaffLogin;

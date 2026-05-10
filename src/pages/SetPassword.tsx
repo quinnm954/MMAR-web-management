@@ -25,7 +25,7 @@ const SetPassword = () => {
   const destination = () => {
     if (isAdmin) return "/admin/dashboard";
     if (hasAnyRole(["technician", "service_advisor", "manager", "parts"])) return "/tech";
-    return "/portal/dashboard";
+    return "/portal/onboarding";
   };
 
   const submit = async (e: React.FormEvent) => {
@@ -44,7 +44,7 @@ const SetPassword = () => {
   };
 
   if (!user) {
-    navigate("/login", { replace: true });
+    navigate("/portal/login", { replace: true });
     return null;
   }
 
