@@ -24,9 +24,9 @@ const fmt = (n: number) => n.toLocaleString('en-US')
 
 const MileageServiceReminderEmail = ({ customerName, vehicle, currentMileage, dueServices = [] }: Props) => {
   const serviceList = dueServices.map((s) => s.name).join(', ')
-  const quoteBody = `Hi Mike — I'd like a quote for: ${serviceList || 'recommended maintenance'}${vehicle ? ` on my ${vehicle}` : ''}.`
+  const quoteBody = `Hi Mike — I'd like a quote for: ${serviceList || 'recommended maintenance'}${vehicle ? ` on my ${vehicle}` : ''}. Please apply my 20% mileage reminder discount.`
   const smsQuoteHref = `sms:${PHONE}?&body=${encodeURIComponent(quoteBody)}`
-  const webQuoteHref = `${SITE_URL}/contact?services=${encodeURIComponent(serviceList)}${vehicle ? `&vehicle=${encodeURIComponent(vehicle)}` : ''}`
+  const webQuoteHref = `${SITE_URL}/contact?services=${encodeURIComponent(serviceList)}${vehicle ? `&vehicle=${encodeURIComponent(vehicle)}` : ''}&promo=MILEAGE20`
 
   return (
     <Html lang="en">
