@@ -29,6 +29,7 @@ import Memberships from "./pages/Memberships";
 import PortalLogin from "./pages/portal/PortalLogin";
 import PortalSignup from "./pages/portal/PortalSignup";
 import PortalDashboard from "./pages/portal/PortalDashboard";
+import PortalOnboarding from "./pages/portal/PortalOnboarding";
 import MembershipSignup from "./pages/portal/MembershipSignup";
 import PortalVehicles from "./pages/portal/PortalVehicles";
 import PortalMembership from "./pages/portal/PortalMembership";
