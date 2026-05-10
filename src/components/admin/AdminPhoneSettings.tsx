@@ -44,7 +44,7 @@ export default function AdminPhoneSettings() {
 
   const load = async () => {
     const { data } = await supabase.from('phone_settings').select('*').eq('id', 1).maybeSingle();
-    if (data) setS(data as Settings);
+    if (data) setS(data as unknown as Settings);
   };
   useEffect(() => { load(); }, []);
 
