@@ -185,6 +185,7 @@ Deno.serve(async (req) => {
             vehicle: vehicleLabel,
             currentMileage: v.current_mileage,
             dueServices,
+            priceRegionLabel: region.label,
           },
         },
       });
