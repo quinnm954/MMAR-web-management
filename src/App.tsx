@@ -75,6 +75,7 @@ const App = () => (
             <Route path="/services" element={<ServicesIndex />} />
             <Route path="/services/:slug" element={<ServiceCategory />} />
             <Route path="/service-areas" element={<ServiceAreas />} />
+            <Route path="/lee-county-fl" element={<LeeCounty />} />
             <Route path="/areas/:city" element={<CityPage />} />
             <Route path="/reviews" element={<Reviews />} />
             <Route path="/review" element={<ReviewLanding />} />
