@@ -1864,9 +1864,30 @@ const _allLocalLandingPages: LocalLandingPage[] = [
   },
 ];
 
-export const localLandingPages: LocalLandingPage[] = _allLocalLandingPages.filter(
+import { buildMatrixPages } from "./serviceCityMatrix";
+
+const _handWritten = _allLocalLandingPages.filter(
   (p) => !p.citySlug || ALLOWED_CITY_SLUGS.has(p.citySlug)
 );
 
+// Track (categoryId × citySlug) pairs already covered by hand-written pages
+// so the matrix generator doesn't duplicate them under a different slug.
+const _coveredPairs = new Set(
+  _handWritten
+    .filter((p) => p.citySlug)
+    .map((p) => `${p.categoryId}|${p.citySlug}`)
+);
+const _existingSlugs = new Set(_handWritten.map((p) => p.slug));
+
+const _matrix = buildMatrixPages(_existingSlugs).filter(
+  (p) => !_coveredPairs.has(`${p.categoryId}|${p.citySlug}`)
+);
+
+export const localLandingPages: LocalLandingPage[] = [
+  ..._handWritten,
+  ..._matrix,
+];
+
 export const getLandingPageBySlug = (slug: string) =>
   localLandingPages.find((p) => p.slug === slug);
+
