@@ -37,14 +37,14 @@ interface Confirmation {
 }
 
 const STATUS_LABEL: Record<string, { text: string; tone: string }> = {
-  new: { text: "Received", tone: "bg-primary/10 text-primary" },
-  requested: { text: "Pending confirmation", tone: "bg-primary/10 text-primary" },
+  new: { text: "Pending review", tone: "bg-amber-500/15 text-amber-500" },
+  requested: { text: "Pending review", tone: "bg-amber-500/15 text-amber-500" },
   contacted: { text: "We've reached out", tone: "bg-accent/20 text-accent-foreground" },
-  scheduled: { text: "Scheduled", tone: "bg-emerald-500/15 text-emerald-500" },
+  scheduled: { text: "Confirmed", tone: "bg-emerald-500/15 text-emerald-500" },
   confirmed: { text: "Confirmed", tone: "bg-emerald-500/15 text-emerald-500" },
   in_progress: { text: "In progress", tone: "bg-amber-500/15 text-amber-500" },
   completed: { text: "Completed", tone: "bg-emerald-500/15 text-emerald-500" },
-  converted: { text: "Booked", tone: "bg-emerald-500/15 text-emerald-500" },
+  converted: { text: "Confirmed", tone: "bg-emerald-500/15 text-emerald-500" },
   cancelled: { text: "Cancelled", tone: "bg-muted text-muted-foreground" },
   declined: { text: "Declined", tone: "bg-muted text-muted-foreground" },
   spam: { text: "Closed", tone: "bg-muted text-muted-foreground" },
@@ -119,15 +119,36 @@ const AppointmentConfirmation = () => {
             </Card>
           ) : (
             <>
-              <div className="text-center mb-6">
-                <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-emerald-500/10 mb-3">
-                  <CheckCircle2 className="h-7 w-7 text-emerald-500" />
-                </div>
-                <h1 className="text-3xl font-bold">You're on the schedule</h1>
-                <p className="text-muted-foreground mt-1">
-                  {data.customer_name ? `Thanks, ${data.customer_name}.` : "Thanks!"} We'll text you to confirm.
-                </p>
-              </div>
+              {(() => {
+                const isConfirmed = ["confirmed", "scheduled", "converted", "in_progress", "completed"].includes(data.status);
+                const isDeclined = ["declined", "cancelled", "spam"].includes(data.status);
+                return (
+                  <div className="text-center mb-6">
+                    <div className={`inline-flex items-center justify-center w-14 h-14 rounded-full mb-3 ${
+                      isConfirmed ? "bg-emerald-500/10" : isDeclined ? "bg-muted" : "bg-amber-500/10"
+                    }`}>
+                      {isConfirmed ? (
+                        <CheckCircle2 className="h-7 w-7 text-emerald-500" />
+                      ) : isDeclined ? (
+                        <AlertCircle className="h-7 w-7 text-muted-foreground" />
+                      ) : (
+                        <Clock className="h-7 w-7 text-amber-500" />
+                      )}
+                    </div>
+                    <h1 className="text-3xl font-bold">
+                      {isConfirmed ? "You're confirmed" : isDeclined ? "Request closed" : "Request received"}
+                    </h1>
+                    <p className="text-muted-foreground mt-1">
+                      {data.customer_name ? `Thanks, ${data.customer_name}.` : "Thanks!"}{" "}
+                      {isConfirmed
+                        ? "We'll see you at your scheduled time."
+                        : isDeclined
+                        ? "Please call us if you'd like to reschedule."
+                        : "Our team is verifying your preferred day & time — we'll text you shortly to confirm."}
+                    </p>
+                  </div>
+                );
+              })()}
 
               <Card className="border-border/50">
                 <CardHeader className="flex-row items-center justify-between space-y-0">
