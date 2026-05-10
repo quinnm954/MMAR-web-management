@@ -161,9 +161,9 @@ export default function AdminSalesDashboard() {
     return months;
   }, [paid]);
 
-  // Sales mix — labor vs parts vs other (this month)
+  // Sales mix — diagnosis vs labor vs parts (this month)
   const mix = useMemo(() => {
-    const acc = { labor: 0, parts: 0, other: 0 };
+    const acc = { diagnosis: 0, labor: 0, parts: 0 };
     paid.forEach(inv => {
       const d = new Date(inv.paid_at || inv.created_at);
       if (d < monthStart) return;
@@ -173,15 +173,22 @@ export default function AdminSalesDashboard() {
         const price = Number(li.unit_price ?? 0);
         const amt = Number(li.amount ?? qty * price);
         const k = String(li.kind || '').toLowerCase();
-        if (k === 'labor') acc.labor += amt;
+        const desc = `${li.name ?? ''} ${li.description ?? ''}`.toLowerCase();
+        const isDiagnosis =
+          k === 'diagnosis' ||
+          k === 'diagnostic' ||
+          /diagnos|diag\b|inspection|scan/.test(desc);
+        if (isDiagnosis) acc.diagnosis += amt;
+        else if (k === 'labor') acc.labor += amt;
         else if (k === 'part') acc.parts += amt;
-        else acc.other += amt;
+        // Unknown/other line kinds are excluded so the mix stays focused on
+        // diagnosis / labor / parts only.
       });
     });
     return [
+      { name: 'Diagnosis', value: Math.round(acc.diagnosis) },
       { name: 'Labor', value: Math.round(acc.labor) },
       { name: 'Parts', value: Math.round(acc.parts) },
-      { name: 'Other', value: Math.round(acc.other) },
     ].filter(x => x.value > 0);
   }, [paid, monthStart]);
 
