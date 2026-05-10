@@ -137,7 +137,12 @@ const TechDashboard = () => {
   return (
     <TechLayout>
       <div className="space-y-3">
-        <h2 className="text-lg font-bold">My Assigned Jobs</h2>
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-bold">My Assigned Jobs</h2>
+          <Button variant="ghost" size="icon" onClick={load} disabled={loading} aria-label="Refresh">
+            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+          </Button>
+        </div>
 
         {loading ? (
           <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
