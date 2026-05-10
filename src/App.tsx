@@ -55,6 +55,8 @@ import SetPassword from "./pages/SetPassword";
 import SharedCustomerSummary from "./pages/SharedCustomerSummary";
 import MmarCare from "./pages/MmarCare";
 import Fleet from "./pages/Fleet";
+import Book from "./pages/Book";
+import AppointmentConfirmation from "./pages/AppointmentConfirmation";
 import NativeBoot from "./components/NativeBoot";
 import PullToRefresh from "./components/PullToRefresh";
 
