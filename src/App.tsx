@@ -55,6 +55,8 @@ import SetPassword from "./pages/SetPassword";
 import SharedCustomerSummary from "./pages/SharedCustomerSummary";
 import MmarCare from "./pages/MmarCare";
 import Fleet from "./pages/Fleet";
+import Book from "./pages/Book";
+import AppointmentConfirmation from "./pages/AppointmentConfirmation";
 import NativeBoot from "./components/NativeBoot";
 import PullToRefresh from "./components/PullToRefresh";
 
@@ -122,6 +124,8 @@ const App = () => (
             <Route path="/login" element={<Login />} />
             <Route path="/set-password" element={<SetPassword />} />
             <Route path="/share/:token" element={<SharedCustomerSummary />} />
+            <Route path="/book" element={<Book />} />
+            <Route path="/appointments/:token" element={<AppointmentConfirmation />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="/:landingSlug" element={<LocalLanding />} />
             <Route path="*" element={<NotFound />} />

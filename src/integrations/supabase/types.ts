@@ -87,6 +87,7 @@ export type Database = {
         Row: {
           assigned_technician_id: string | null
           board_column: string
+          confirmation_token: string
           created_at: string
           customer_id: string
           description: string | null
@@ -101,6 +102,7 @@ export type Database = {
           service_address: string | null
           service_type: string
           sort_order: number
+          source: string
           status: string
           technician_notes: string | null
           updated_at: string
@@ -109,6 +111,7 @@ export type Database = {
         Insert: {
           assigned_technician_id?: string | null
           board_column?: string
+          confirmation_token?: string
           created_at?: string
           customer_id: string
           description?: string | null
@@ -123,6 +126,7 @@ export type Database = {
           service_address?: string | null
           service_type: string
           sort_order?: number
+          source?: string
           status?: string
           technician_notes?: string | null
           updated_at?: string
@@ -131,6 +135,7 @@ export type Database = {
         Update: {
           assigned_technician_id?: string | null
           board_column?: string
+          confirmation_token?: string
           created_at?: string
           customer_id?: string
           description?: string | null
@@ -145,6 +150,7 @@ export type Database = {
           service_address?: string | null
           service_type?: string
           sort_order?: number
+          source?: string
           status?: string
           technician_notes?: string | null
           updated_at?: string
@@ -261,6 +267,66 @@ export type Database = {
           id?: string
           is_approved?: boolean
           post_slug?: string
+        }
+        Relationships: []
+      }
+      booking_requests: {
+        Row: {
+          confirmation_token: string
+          converted_appointment_id: string | null
+          created_at: string
+          customer_email: string | null
+          customer_name: string
+          customer_phone: string
+          description: string | null
+          id: string
+          notes: string | null
+          requested_date: string | null
+          requested_time_window: string | null
+          service_address: string | null
+          service_type: string
+          source: string
+          status: string
+          updated_at: string
+          vehicle_info: string | null
+        }
+        Insert: {
+          confirmation_token?: string
+          converted_appointment_id?: string | null
+          created_at?: string
+          customer_email?: string | null
+          customer_name: string
+          customer_phone: string
+          description?: string | null
+          id?: string
+          notes?: string | null
+          requested_date?: string | null
+          requested_time_window?: string | null
+          service_address?: string | null
+          service_type: string
+          source?: string
+          status?: string
+          updated_at?: string
+          vehicle_info?: string | null
+        }
+        Update: {
+          confirmation_token?: string
+          converted_appointment_id?: string | null
+          created_at?: string
+          customer_email?: string | null
+          customer_name?: string
+          customer_phone?: string
+          description?: string | null
+          id?: string
+          notes?: string | null
+          requested_date?: string | null
+          requested_time_window?: string | null
+          service_address?: string | null
+          service_type?: string
+          source?: string
+          status?: string
+          updated_at?: string
+          vehicle_info?: string | null
         }
         Relationships: []
       }
@@ -2158,6 +2224,7 @@ export type Database = {
         Args: { payload: Json; queue_name: string }
         Returns: number
       }
+      get_appointment_confirmation: { Args: { _token: string }; Returns: Json }
       get_estimate_by_token: { Args: { _token: string }; Returns: Json }
       get_shared_customer_summary: { Args: { _token: string }; Returns: Json }
       has_role: {
@@ -2184,6 +2251,21 @@ export type Database = {
           msg_id: number
           read_ct: number
         }[]
+      }
+      submit_booking_request: {
+        Args: {
+          _description: string
+          _email: string
+          _name: string
+          _phone: string
+          _requested_date: string
+          _requested_time_window: string
+          _service_address: string
+          _service_type: string
+          _source: string
+          _vehicle_info: string
+        }
+        Returns: Json
       }
       submit_estimate_decision:
         | {

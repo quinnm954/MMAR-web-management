@@ -93,6 +93,7 @@ const PortalAppointments = () => {
       requested_date: form.requested_date,
       requested_time_window: form.requested_time_window || null,
       status: "requested",
+      source: "in_app",
     });
     setSaving(false);
     if (error) return toast.error(error.message);
