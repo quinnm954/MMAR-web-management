@@ -32,34 +32,38 @@ const Hero = () => {
           </p>
 
           <div
-            className="flex flex-col gap-3 max-w-3xl mx-auto mb-8 md:mb-12 px-4 animate-slide-up"
+            className="flex flex-col gap-2.5 sm:gap-3 max-w-3xl mx-auto mb-8 md:mb-12 px-4 animate-slide-up"
             style={{ animationDelay: "0.2s" }}
           >
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Button variant="hero" size="lg" className="w-full sm:flex-1 min-h-[52px]" asChild>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5 sm:gap-3">
+              <Button variant="hero" size="lg" className="w-full min-h-[52px] px-3" asChild>
                 <a href="tel:8135017572" onClick={trackConversion}>
-                  <Phone className="w-5 h-5 mr-2" /> Call Now
+                  <Phone className="w-5 h-5 mr-2 shrink-0" />
+                  <span className="truncate">Call Now</span>
                 </a>
               </Button>
-              <Button variant="hero" size="lg" className="w-full sm:flex-1 min-h-[52px]" asChild>
+              <Button variant="hero" size="lg" className="w-full min-h-[52px] px-3" asChild>
                 <Link to="/book" onClick={trackConversion}>
-                  <CalendarCheck className="w-5 h-5 mr-2" /> Book Online
+                  <CalendarCheck className="w-5 h-5 mr-2 shrink-0" />
+                  <span className="truncate">Book Online</span>
                 </Link>
               </Button>
-              <Button variant="heroOutline" size="lg" className="w-full sm:flex-1 min-h-[52px]" asChild>
+              <Button variant="heroOutline" size="lg" className="w-full min-h-[52px] px-3" asChild>
                 <Link to="/services">
-                  <Wrench className="w-5 h-5 mr-2" /> View Services
+                  <Wrench className="w-5 h-5 mr-2 shrink-0" />
+                  <span className="truncate">Services</span>
                 </Link>
               </Button>
             </div>
             <Button
               variant="hero"
               size="lg"
-              className="w-full min-h-[60px] text-base sm:text-lg font-semibold bg-gradient-to-r from-accent to-accent/80 hover:from-accent/90 hover:to-accent/70 text-accent-foreground shadow-lg"
+              className="w-full min-h-[60px] text-sm sm:text-base md:text-lg font-semibold px-3 bg-gradient-to-r from-accent to-accent/80 hover:from-accent/90 hover:to-accent/70 text-accent-foreground shadow-lg"
               asChild
             >
               <Link to="/mmar-care">
-                <User className="w-5 h-5 mr-2" /> Join MMAR Care — Member Plans &amp; Benefits
+                <User className="w-5 h-5 mr-2 shrink-0" />
+                <span className="truncate">Join MMAR Care — Member Plans</span>
               </Link>
             </Button>
           </div>
