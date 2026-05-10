@@ -44,7 +44,8 @@ const MileageServiceReminderEmail = ({ customerName, vehicle, currentMileage, du
             prevents bigger repair bills down the road.
           </Text>
           <Text style={smallText}>
-            Each item below shows the typical <strong>competitor price range</strong> at local dealers
+            Each item below shows the typical <strong>competitor price range</strong> for your area
+            {priceRegionLabel ? <> (<strong>{priceRegionLabel}</strong>)</> : null} at local dealers
             and national chains (Firestone, Pep Boys, Tires Plus) so you can see what you'd pay
             elsewhere — our mobile pricing is usually well below the low end, plus the 20% discount
             stacks on top.
