@@ -3,12 +3,19 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
+import {
+  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger,
+} from '@/components/ui/dialog';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { Car, Wrench, FileText, ClipboardCheck, Receipt, Trash2 } from 'lucide-react';
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from '@/components/ui/select';
+import { Car, Wrench, FileText, ClipboardCheck, Receipt, Trash2, Plus, Loader2 } from 'lucide-react';
 import VinDecoder from './VinDecoder';
 import DeleteButton from './DeleteButton';
 import { toast } from 'sonner';
@@ -20,11 +27,19 @@ const TIMELINE_TABLE: Record<string, string> = {
   invoice: 'invoices',
 };
 
+interface CustomerOpt { id: string; full_name: string | null; email: string | null; }
+
+const blankVehicle = { owner_id: '', year: '', make: '', model: '', trim: '', vin: '', license_plate: '', current_mileage: '', color: '' };
+
 export default function AdminGarage() {
   const [vehicles, setVehicles] = useState<any[]>([]);
   const [selected, setSelected] = useState<string | null>(null);
   const [timeline, setTimeline] = useState<any[]>([]);
   const [search, setSearch] = useState('');
+  const [customers, setCustomers] = useState<CustomerOpt[]>([]);
+  const [addOpen, setAddOpen] = useState(false);
+  const [form, setForm] = useState({ ...blankVehicle });
+  const [saving, setSaving] = useState(false);
 
   const loadVehicles = async () => {
     const { data } = await supabase
@@ -35,7 +50,15 @@ export default function AdminGarage() {
     setVehicles(data ?? []);
   };
 
-  useEffect(() => { loadVehicles(); }, []);
+  const loadCustomers = async () => {
+    const { data } = await supabase
+      .from('profiles')
+      .select('id, full_name, email')
+      .order('full_name', { ascending: true });
+    setCustomers(data ?? []);
+  };
+
+  useEffect(() => { loadVehicles(); loadCustomers(); }, []);
 
   const loadTimeline = async () => {
     if (!selected) return;
@@ -64,6 +87,30 @@ export default function AdminGarage() {
     loadVehicles();
   };
 
+  const addVehicle = async () => {
+    if (!form.owner_id) return toast.error('Select a customer');
+    if (!form.year || !form.make || !form.model) return toast.error('Year, make, and model are required');
+    setSaving(true);
+    const { error } = await supabase.from('vehicles').insert({
+      owner_id: form.owner_id,
+      year: Number(form.year),
+      make: form.make.trim(),
+      model: form.model.trim(),
+      trim: form.trim.trim() || null,
+      vin: form.vin.trim() || null,
+      license_plate: form.license_plate.trim() || null,
+      current_mileage: form.current_mileage ? Number(form.current_mileage) : null,
+      color: form.color.trim() || null,
+      is_active: true,
+    });
+    setSaving(false);
+    if (error) return toast.error(error.message);
+    toast.success('Vehicle added');
+    setAddOpen(false);
+    setForm({ ...blankVehicle });
+    loadVehicles();
+  };
+
   const filtered = vehicles.filter(v =>
     !search ||
     `${v.year} ${v.make} ${v.model} ${v.license_plate} ${v.profiles?.full_name} ${v.profiles?.email}`.toLowerCase().includes(search.toLowerCase())
@@ -74,7 +121,57 @@ export default function AdminGarage() {
   return (
     <div className="grid md:grid-cols-3 gap-4">
       <div className="space-y-2">
-        <Input placeholder="Search vehicles..." value={search} onChange={e => setSearch(e.target.value)} />
+        <div className="flex gap-2">
+          <Input placeholder="Search vehicles..." value={search} onChange={e => setSearch(e.target.value)} />
+          <Dialog open={addOpen} onOpenChange={setAddOpen}>
+            <DialogTrigger asChild>
+              <Button size="sm" variant="default" className="shrink-0">
+                <Plus className="h-4 w-4 mr-1" /> Add
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Add Vehicle</DialogTitle>
+                <DialogDescription>Assign a vehicle to a customer.</DialogDescription>
+              </DialogHeader>
+              <div className="space-y-3">
+                <div>
+                  <Label>Customer</Label>
+                  <Select value={form.owner_id} onValueChange={(v) => setForm({ ...form, owner_id: v })}>
+                    <SelectTrigger><SelectValue placeholder="Select customer" /></SelectTrigger>
+                    <SelectContent className="max-h-[300px]">
+                      {customers.map(c => (
+                        <SelectItem key={c.id} value={c.id}>
+                          {c.full_name || '—'} {c.email ? `· ${c.email}` : ''}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid grid-cols-3 gap-2">
+                  <div><Label>Year</Label><Input value={form.year} onChange={e => setForm({ ...form, year: e.target.value.replace(/\D/g, '').slice(0, 4) })} /></div>
+                  <div><Label>Make</Label><Input value={form.make} onChange={e => setForm({ ...form, make: e.target.value })} /></div>
+                  <div><Label>Model</Label><Input value={form.model} onChange={e => setForm({ ...form, model: e.target.value })} /></div>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div><Label>Trim</Label><Input value={form.trim} onChange={e => setForm({ ...form, trim: e.target.value })} /></div>
+                  <div><Label>Color</Label><Input value={form.color} onChange={e => setForm({ ...form, color: e.target.value })} /></div>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div><Label>License plate</Label><Input value={form.license_plate} onChange={e => setForm({ ...form, license_plate: e.target.value })} /></div>
+                  <div><Label>Mileage</Label><Input inputMode="numeric" value={form.current_mileage} onChange={e => setForm({ ...form, current_mileage: e.target.value.replace(/\D/g, '') })} /></div>
+                </div>
+                <div><Label>VIN</Label><Input value={form.vin} onChange={e => setForm({ ...form, vin: e.target.value.toUpperCase() })} /></div>
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setAddOpen(false)}>Cancel</Button>
+                <Button onClick={addVehicle} disabled={saving}>
+                  {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Add Vehicle'}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </div>
         <div className="space-y-1 max-h-[600px] overflow-y-auto">
           {filtered.map(v => (
             <Card

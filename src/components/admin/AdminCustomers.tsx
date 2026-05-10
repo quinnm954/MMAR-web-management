@@ -2,19 +2,41 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { Loader2, Search, Mail, Car, CreditCard, Calendar, FileText, Receipt, Download } from "lucide-react";
+import {
+  Loader2, Search, Mail, Car, CreditCard, Calendar, FileText, Receipt, Download,
+  Plus, Pencil, Trash2,
+} from "lucide-react";
+import { toast } from "sonner";
 
 interface Customer {
   id: string;
   email: string | null;
   full_name: string | null;
+  phone?: string | null;
+  address_line1?: string | null;
+  address_line2?: string | null;
+  city?: string | null;
+  state?: string | null;
+  postal_code?: string | null;
   created_at: string;
   vehicle_count: number;
   membership_count: number;
 }
+
+const emptyForm = {
+  full_name: "", email: "", phone: "",
+  address_line1: "", address_line2: "", city: "", state: "FL", postal_code: "",
+};
 
 const AdminCustomers = () => {
   const [customers, setCustomers] = useState<Customer[]>([]);
@@ -24,33 +46,44 @@ const AdminCustomers = () => {
   const [details, setDetails] = useState<any>(null);
   const [detailsLoading, setDetailsLoading] = useState(false);
 
-  useEffect(() => {
-    (async () => {
-      const { data: profiles } = await supabase
-        .from("profiles")
-        .select("id, email, full_name, created_at")
-        .order("created_at", { ascending: false });
+  // add/edit dialog
+  const [editOpen, setEditOpen] = useState(false);
+  const [editing, setEditing] = useState<Customer | null>(null);
+  const [form, setForm] = useState({ ...emptyForm });
+  const [saving, setSaving] = useState(false);
 
-      const ids = (profiles ?? []).map((p) => p.id);
-      const [v, m] = await Promise.all([
-        supabase.from("vehicles").select("owner_id").in("owner_id", ids).eq("is_active", true),
-        supabase.from("memberships").select("customer_id, status").in("customer_id", ids),
-      ]);
-      const vCount: Record<string, number> = {};
-      const mCount: Record<string, number> = {};
-      (v.data ?? []).forEach((r: { owner_id: string }) => { vCount[r.owner_id] = (vCount[r.owner_id] ?? 0) + 1; });
-      (m.data ?? []).forEach((r: { customer_id: string; status: string }) => {
-        if (r.status === "active" || r.status === "pending") mCount[r.customer_id] = (mCount[r.customer_id] ?? 0) + 1;
-      });
+  // delete dialog
+  const [deleteTarget, setDeleteTarget] = useState<Customer | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
-      setCustomers((profiles ?? []).map((p) => ({
-        ...p,
-        vehicle_count: vCount[p.id] ?? 0,
-        membership_count: mCount[p.id] ?? 0,
-      })));
-      setLoading(false);
-    })();
-  }, []);
+  const loadCustomers = async () => {
+    setLoading(true);
+    const { data: profiles } = await supabase
+      .from("profiles")
+      .select("id, email, full_name, phone, address_line1, address_line2, city, state, postal_code, created_at")
+      .order("created_at", { ascending: false });
+
+    const ids = (profiles ?? []).map((p) => p.id);
+    const [v, m] = await Promise.all([
+      ids.length ? supabase.from("vehicles").select("owner_id").in("owner_id", ids).eq("is_active", true) : Promise.resolve({ data: [] as any[] }),
+      ids.length ? supabase.from("memberships").select("customer_id, status").in("customer_id", ids) : Promise.resolve({ data: [] as any[] }),
+    ]);
+    const vCount: Record<string, number> = {};
+    const mCount: Record<string, number> = {};
+    (v.data ?? []).forEach((r: { owner_id: string }) => { vCount[r.owner_id] = (vCount[r.owner_id] ?? 0) + 1; });
+    (m.data ?? []).forEach((r: { customer_id: string; status: string }) => {
+      if (r.status === "active" || r.status === "pending") mCount[r.customer_id] = (mCount[r.customer_id] ?? 0) + 1;
+    });
+
+    setCustomers((profiles ?? []).map((p) => ({
+      ...p,
+      vehicle_count: vCount[p.id] ?? 0,
+      membership_count: mCount[p.id] ?? 0,
+    })));
+    setLoading(false);
+  };
+
+  useEffect(() => { loadCustomers(); }, []);
 
   const openCustomer = async (c: Customer) => {
     setSelected(c);
@@ -71,6 +104,97 @@ const AdminCustomers = () => {
       invoices: invoices.data ?? [],
     });
     setDetailsLoading(false);
+  };
+
+  const openAdd = () => {
+    setEditing(null);
+    setForm({ ...emptyForm });
+    setEditOpen(true);
+  };
+
+  const openEdit = (c: Customer, e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    setEditing(c);
+    setForm({
+      full_name: c.full_name ?? "",
+      email: c.email ?? "",
+      phone: c.phone ?? "",
+      address_line1: c.address_line1 ?? "",
+      address_line2: c.address_line2 ?? "",
+      city: c.city ?? "",
+      state: c.state ?? "FL",
+      postal_code: c.postal_code ?? "",
+    });
+    setEditOpen(true);
+  };
+
+  const saveCustomer = async () => {
+    if (!form.full_name.trim() && !form.email.trim()) {
+      return toast.error("Name or email is required");
+    }
+    setSaving(true);
+    try {
+      if (editing) {
+        const { error } = await supabase.from("profiles").update({
+          full_name: form.full_name.trim() || null,
+          email: form.email.trim().toLowerCase() || null,
+          phone: form.phone.trim() || null,
+          address_line1: form.address_line1.trim() || null,
+          address_line2: form.address_line2.trim() || null,
+          city: form.city.trim() || null,
+          state: form.state.trim().toUpperCase() || null,
+          postal_code: form.postal_code.trim() || null,
+        }).eq("id", editing.id);
+        if (error) throw error;
+        toast.success("Customer updated");
+      } else {
+        const { data, error } = await supabase.functions.invoke("admin-create-customer", {
+          body: {
+            full_name: form.full_name.trim(),
+            email: form.email.trim().toLowerCase(),
+            phone: form.phone.trim(),
+          },
+        });
+        if (error) throw error;
+        const customerId = (data as any)?.customer_id;
+        if (customerId && (form.address_line1 || form.city || form.postal_code)) {
+          await supabase.from("profiles").update({
+            phone: form.phone.trim() || null,
+            address_line1: form.address_line1.trim() || null,
+            address_line2: form.address_line2.trim() || null,
+            city: form.city.trim() || null,
+            state: form.state.trim().toUpperCase() || null,
+            postal_code: form.postal_code.trim() || null,
+          }).eq("id", customerId);
+        }
+        toast.success((data as any)?.reused ? "Customer linked" : "Customer created");
+      }
+      setEditOpen(false);
+      loadCustomers();
+    } catch (e: any) {
+      toast.error(e.message ?? "Could not save customer");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const deleteCustomer = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    try {
+      const { error } = await supabase.functions.invoke("admin-delete-customer", {
+        body: { customer_id: deleteTarget.id },
+      });
+      if (error) throw error;
+      toast.success("Customer deleted");
+      setDeleteTarget(null);
+      if (selected?.id === deleteTarget.id) setSelected(null);
+      loadCustomers();
+    } catch (e: any) {
+      toast.error(e.message ?? "Could not delete");
+    } finally {
+      setDeleting(false);
+    }
   };
 
   const filtered = customers.filter((c) => {
@@ -111,6 +235,9 @@ const AdminCustomers = () => {
       <div className="flex items-center gap-2 flex-wrap">
         <Search className="h-4 w-4 text-muted-foreground" />
         <Input placeholder="Search by name or email…" value={q} onChange={(e) => setQ(e.target.value)} className="max-w-sm" />
+        <Button size="sm" onClick={openAdd} className="gap-1.5">
+          <Plus className="h-3.5 w-3.5" /> Add Customer
+        </Button>
         <Button variant="outline" size="sm" onClick={exportMarketingCsv} className="gap-1.5">
           <Download className="h-3.5 w-3.5" /> Marketing CSV
         </Button>
@@ -128,9 +255,27 @@ const AdminCustomers = () => {
               onClick={() => openCustomer(c)}
             >
               <CardContent className="p-4">
-                <div className="font-semibold truncate">{c.full_name || "—"}</div>
-                <div className="text-xs text-muted-foreground truncate flex items-center gap-1">
-                  <Mail className="h-3 w-3" /> {c.email}
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0 flex-1">
+                    <div className="font-semibold truncate">{c.full_name || "—"}</div>
+                    <div className="text-xs text-muted-foreground truncate flex items-center gap-1">
+                      <Mail className="h-3 w-3" /> {c.email || "(no email)"}
+                    </div>
+                  </div>
+                  <div className="flex gap-1 shrink-0">
+                    <Button size="icon" variant="ghost" className="h-7 w-7" onClick={(e) => openEdit(c, e)} title="Edit">
+                      <Pencil className="h-3.5 w-3.5" />
+                    </Button>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="h-7 w-7 text-destructive"
+                      onClick={(e) => { e.stopPropagation(); setDeleteTarget(c); }}
+                      title="Delete"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
                 </div>
                 <div className="flex gap-2 mt-3">
                   <Badge variant="secondary">{c.vehicle_count} vehicle{c.vehicle_count === 1 ? "" : "s"}</Badge>
@@ -201,6 +346,74 @@ const AdminCustomers = () => {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Add / Edit dialog */}
+      <Dialog open={editOpen} onOpenChange={setEditOpen}>
+        <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{editing ? "Edit Customer" : "Add Customer"}</DialogTitle>
+            <DialogDescription>
+              {editing ? "Update profile details." : "Creates a profile and (if email is provided) a sign-in account."}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div>
+              <Label>Full name</Label>
+              <Input value={form.full_name} onChange={e => setForm({ ...form, full_name: e.target.value })} />
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <Label>Email</Label>
+                <Input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} />
+              </div>
+              <div>
+                <Label>Phone</Label>
+                <Input value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} />
+              </div>
+            </div>
+            <div>
+              <Label>Street address</Label>
+              <Input value={form.address_line1} onChange={e => setForm({ ...form, address_line1: e.target.value })} />
+            </div>
+            <div>
+              <Label>Apt / Suite</Label>
+              <Input value={form.address_line2} onChange={e => setForm({ ...form, address_line2: e.target.value })} />
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              <div className="col-span-2"><Label>City</Label><Input value={form.city} onChange={e => setForm({ ...form, city: e.target.value })} /></div>
+              <div><Label>State</Label><Input maxLength={2} value={form.state} onChange={e => setForm({ ...form, state: e.target.value })} /></div>
+            </div>
+            <div>
+              <Label>ZIP</Label>
+              <Input inputMode="numeric" value={form.postal_code} onChange={e => setForm({ ...form, postal_code: e.target.value })} />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditOpen(false)}>Cancel</Button>
+            <Button onClick={saveCustomer} disabled={saving}>
+              {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : (editing ? "Save changes" : "Create customer")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete confirmation */}
+      <AlertDialog open={!!deleteTarget} onOpenChange={(o) => !o && !deleting && setDeleteTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete this customer?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This permanently removes <strong>{deleteTarget?.full_name || deleteTarget?.email}</strong>, their sign-in account, vehicles, and history. This cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={deleteCustomer} disabled={deleting} className="bg-destructive hover:bg-destructive/90">
+              {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Delete permanently"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
