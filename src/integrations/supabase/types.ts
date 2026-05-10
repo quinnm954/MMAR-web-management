@@ -659,6 +659,7 @@ export type Database = {
           id: string
           line_items: Json
           notes: string | null
+          review_discount_pledged: boolean
           sent_at: string | null
           shop_supplies: number
           signature_image: string | null
@@ -685,6 +686,7 @@ export type Database = {
           id?: string
           line_items?: Json
           notes?: string | null
+          review_discount_pledged?: boolean
           sent_at?: string | null
           shop_supplies?: number
           signature_image?: string | null
@@ -711,6 +713,7 @@ export type Database = {
           id?: string
           line_items?: Json
           notes?: string | null
+          review_discount_pledged?: boolean
           sent_at?: string | null
           shop_supplies?: number
           signature_image?: string | null

@@ -18,6 +18,7 @@ import BrandedDocLayout from '@/components/BrandedDocLayout';
 import DocReferences from '@/components/DocReferences';
 
 const TIME_WINDOWS = ['Morning (8a–12p)', 'Afternoon (12p–4p)', 'Evening (4p–7p)'];
+const GOOGLE_REVIEW_URL = 'https://share.google/bx2Gb42dslCITJdS8';
 
 const EstimateApproval = () => {
   const { token } = useParams();
@@ -38,6 +39,7 @@ const EstimateApproval = () => {
   const [editing, setEditing] = useState(false);
   const [decisionLogs, setDecisionLogs] = useState<any[]>([]);
   const [financingChoice, setFinancingChoice] = useState<'yes' | 'no' | null>(null);
+  const [reviewPledge, setReviewPledge] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -59,6 +61,7 @@ const EstimateApproval = () => {
       if (searchParams.get('edit') === '1' && ['approved', 'partially_approved'].includes(data?.status)) {
         setEditing(true);
       }
+      if (data?.review_discount_pledged) setReviewPledge(true);
       setLoading(false);
     })();
   }, [token, searchParams]);
@@ -100,15 +103,26 @@ const EstimateApproval = () => {
     });
     setWorking(false);
     if (error) return toast.error('Could not submit. Please contact us.');
+
+    // Persist 5-star review discount pledge for approvals
+    const willPledge = willApprove && reviewPledge;
+    if (willPledge) {
+      await supabase.from('estimates').update({ review_discount_pledged: true }).eq('id', est.id);
+      // Open Google review page so customer can leave their 5-star rating
+      try { window.open(GOOGLE_REVIEW_URL, '_blank', 'noopener,noreferrer'); } catch {}
+      toast.success('$5 review discount applied — leave us a 5-star review in the new tab!');
+    }
+
     setEst({
       ...est,
       line_items: updatedLines,
       signature_image: signature,
       signed_at: new Date().toISOString(),
       status,
+      review_discount_pledged: willPledge ? true : est.review_discount_pledged,
       ...(status === 'declined' ? { declined_at: new Date().toISOString(), decline_reason: reason || null } : { approved_at: new Date().toISOString() }),
     });
-    toast.success(status === 'declined' ? 'Response recorded' : editing ? 'Decision updated!' : 'Estimate signed!');
+    if (!willPledge) toast.success(status === 'declined' ? 'Response recorded' : editing ? 'Decision updated!' : 'Estimate signed!');
     setEditing(false);
     // Refresh decision history
     const { data: refreshed } = await supabase.rpc('get_estimate_by_token', { _token: token! });
@@ -286,6 +300,25 @@ const EstimateApproval = () => {
               </div>
               <p className="text-[11px] text-muted-foreground">We'll confirm the exact arrival time by call or text.</p>
             </div>
+          )}
+
+          {!allDeclined && (
+            <label className="flex items-start gap-3 rounded-md border-2 border-accent/60 bg-accent/10 p-3 cursor-pointer hover:bg-accent/15 transition-colors">
+              <Checkbox
+                checked={reviewPledge}
+                onCheckedChange={(v) => setReviewPledge(v === true)}
+                className="mt-0.5"
+              />
+              <div className="flex-1 text-sm">
+                <div className="font-semibold flex items-center gap-2">
+                  <span aria-hidden>⭐</span> Get $5 off for a 5-star Google review
+                </div>
+                <div className="text-xs text-muted-foreground mt-0.5">
+                  Check this box and we'll automatically take <strong>$5 off your final invoice</strong>.
+                  After you sign, our Google review page opens in a new tab — just tap the 5-star rating to claim it.
+                </div>
+              </div>
+            </label>
           )}
 
           <div>
