@@ -152,6 +152,7 @@ const AdminInvoices = () => {
     if (!form.customer_id || !form.subtotal) return toast.error("Customer and subtotal required");
     const subtotal = parseFloat(form.subtotal);
     const tax = form.tax ? parseFloat(form.tax) : 0;
+    const discount_value = form.discount_value ? parseFloat(form.discount_value) : 0;
     setSaving(true);
     const { error } = await supabase.from("invoices").insert({
       customer_id: form.customer_id,
@@ -161,12 +162,45 @@ const AdminInvoices = () => {
       total: subtotal + tax,
       due_date: form.due_date || null,
       status: "unpaid",
+      discount_type: form.discount_type,
+      discount_value,
+      discount_reason: form.discount_reason || null,
     });
     setSaving(false);
     if (error) return toast.error(error.message);
     toast.success("Invoice created");
     setOpen(false);
-    setForm({ customer_id: "", invoice_number: "", subtotal: "", tax: "", due_date: "" });
+    setForm({ customer_id: "", invoice_number: "", subtotal: "", tax: "", due_date: "", discount_type: "amount", discount_value: "", discount_reason: "" });
+    load();
+  };
+
+  const openDiscount = (inv: Invoice) => {
+    setDiscountEditing(inv.id);
+    setDiscountForm({
+      type: (inv.discount_type as "amount" | "percent") || "amount",
+      value: inv.discount_value ? String(inv.discount_value) : "",
+      reason: inv.discount_reason || "",
+    });
+  };
+
+  const saveDiscount = async () => {
+    if (!discountEditing) return;
+    setSavingDiscount(true);
+    const { error } = await supabase
+      .from("invoices")
+      .update({
+        discount_type: discountForm.type,
+        discount_value: discountForm.value ? parseFloat(discountForm.value) : 0,
+        discount_reason: discountForm.reason || null,
+        // Reset shop_supplies/tax to 0 so trigger recomputes them based on new discounted subtotal
+        shop_supplies: 0,
+        tax: 0,
+      })
+      .eq("id", discountEditing);
+    setSavingDiscount(false);
+    if (error) return toast.error(error.message);
+    toast.success("Discount applied");
+    setDiscountEditing(null);
     load();
   };
 
