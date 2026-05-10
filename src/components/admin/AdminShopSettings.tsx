@@ -128,6 +128,57 @@ const AdminShopSettings = () => {
           </div>
         </CardContent>
       </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Default Pay by Job Title</CardTitle>
+          <p className="text-xs text-muted-foreground">
+            New employees added with a given title will automatically inherit these pay defaults. Edit individual employees to override.
+          </p>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Title</TableHead>
+                <TableHead>Pay Basis</TableHead>
+                <TableHead className="w-32">Hourly Rate</TableHead>
+                <TableHead className="w-36">Salary ($/yr)</TableHead>
+                <TableHead className="w-20"></TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {TITLES.map((t) => {
+                const d = payDefaults[t] || { pay_basis: 'labor_hours', hourly_rate: 0, salary_amount: null };
+                return (
+                  <TableRow key={t}>
+                    <TableCell className="capitalize font-medium">{t.replace('_', ' ')}</TableCell>
+                    <TableCell>
+                      <Select value={d.pay_basis} onValueChange={(v) => setPayDefaults({ ...payDefaults, [t]: { ...d, pay_basis: v } })}>
+                        <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          {PAY_BASIS.map((p) => <SelectItem key={p.value} value={p.value}>{p.label}</SelectItem>)}
+                        </SelectContent>
+                      </Select>
+                    </TableCell>
+                    <TableCell>
+                      <Input type="number" step="0.01" value={d.hourly_rate}
+                        onChange={(e) => setPayDefaults({ ...payDefaults, [t]: { ...d, hourly_rate: parseFloat(e.target.value) || 0 } })} />
+                    </TableCell>
+                    <TableCell>
+                      <Input type="number" step="0.01" value={d.salary_amount ?? ''}
+                        onChange={(e) => setPayDefaults({ ...payDefaults, [t]: { ...d, salary_amount: e.target.value ? parseFloat(e.target.value) : null } })} />
+                    </TableCell>
+                    <TableCell>
+                      <Button size="sm" variant="outline" onClick={() => savePayDefault(t)}>Save</Button>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
     </div>
   );
 };
