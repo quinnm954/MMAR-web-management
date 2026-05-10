@@ -251,7 +251,21 @@ const EstimateApproval = () => {
         <div className="flex justify-between text-xs text-muted-foreground"><span>Original subtotal (before tax/supplies)</span><span>${Number(est.subtotal).toFixed(2)}</span></div>
         {Number(est.shop_supplies) > 0 && <div className="flex justify-between text-xs text-muted-foreground"><span>Shop supplies</span><span>${Number(est.shop_supplies).toFixed(2)}</span></div>}
         {Number(est.tax) > 0 && <div className="flex justify-between text-xs text-muted-foreground"><span>Tax</span><span>${Number(est.tax).toFixed(2)}</span></div>}
-        <div className="flex justify-between font-bold text-lg pt-2 border-t border-border"><span>Estimate Total</span><span>${Number(est.total).toFixed(2)}</span></div>
+        {(reviewPledge || est.review_discount_pledged) && (
+          <div className="flex justify-between text-primary font-medium">
+            <span>⭐ 5-star Google review discount</span>
+            <span>−$5.00</span>
+          </div>
+        )}
+        <div className="flex justify-between font-bold text-lg pt-2 border-t border-border">
+          <span>Estimate Total</span>
+          <span>${Math.max(0, Number(est.total) - ((reviewPledge || est.review_discount_pledged) ? 5 : 0)).toFixed(2)}</span>
+        </div>
+        {(reviewPledge || est.review_discount_pledged) && (
+          <p className="text-[11px] text-primary">
+            $5 will be automatically deducted from your final invoice once you leave a 5-star Google review.
+          </p>
+        )}
         <p className="text-[11px] text-muted-foreground">Final invoice will reflect approved items plus tax/shop supplies.</p>
       </div>
 
