@@ -13,7 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { LogOut, FileText, ShieldCheck, Users, CreditCard, Calendar, CalendarCheck, ClipboardList, Receipt, Wrench, Mail, FileSpreadsheet, ClipboardCheck, Package, Settings, KanbanSquare, Clock, BarChart3, Share2, Car, AlertTriangle, FileDown, Activity, History, UserCog, DollarSign, RefreshCw, Phone, PhoneCall, ChevronDown } from 'lucide-react';
+import { LogOut, FileText, ShieldCheck, Users, CreditCard, Calendar, CalendarCheck, ClipboardList, Receipt, Wrench, Mail, FileSpreadsheet, ClipboardCheck, Package, Settings, KanbanSquare, Clock, BarChart3, Share2, Car, AlertTriangle, FileDown, Activity, History, UserCog, DollarSign, RefreshCw, Phone, PhoneCall, ChevronDown, LayoutDashboard } from 'lucide-react';
 import AdminCalls from '@/components/admin/AdminCalls';
 import AdminPhoneSettings from '@/components/admin/AdminPhoneSettings';
 import AdminTrackingSettings from '@/components/admin/AdminTrackingSettings';
@@ -35,6 +35,7 @@ import AdminShopSettings from '@/components/admin/AdminShopSettings';
 import AdminKanban from '@/components/admin/AdminKanban';
 import AdminTimeTracking from '@/components/admin/AdminTimeTracking';
 import AdminReports from '@/components/admin/AdminReports';
+import AdminSalesDashboard from '@/components/admin/AdminSalesDashboard';
 import AdminCustomerShare from '@/components/admin/AdminCustomerShare';
 import AdminGarage from '@/components/admin/AdminGarage';
 import AdminDeclinedWork from '@/components/admin/AdminDeclinedWork';
@@ -131,16 +132,9 @@ const AdminDashboard = () => {
       </header>
 
       <main className="container mx-auto px-4 py-8 space-y-6">
-        {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <StatCard icon={Users} label="Customers" value={stats.customers} />
-          <StatCard icon={CreditCard} label="Active Memberships" value={stats.activeMemberships} accent />
-          <StatCard icon={Calendar} label="Open Appointments" value={stats.openAppointments} />
-          <StatCard icon={Receipt} label="Unpaid Invoices" value={stats.unpaidInvoices} />
-        </div>
-
         {(() => {
           const tabs: TabDef[] = [
+            { value: 'dashboard', label: 'Sales Dashboard', icon: LayoutDashboard, roles: ADMIN_ONLY, content: <AdminSalesDashboard /> },
             { value: 'reports', label: 'Reports', icon: BarChart3, roles: ADMIN_ONLY, content: <AdminReports /> },
             { value: 'kanban', label: 'Job Board', icon: KanbanSquare, roles: ALL, content: <AdminKanban /> },
             { value: 'calendar', label: 'Calendar', icon: Calendar, roles: ALL, content: <AdminCalendar /> },
@@ -176,7 +170,7 @@ const AdminDashboard = () => {
           if (visible.length === 0) {
             return <p className="text-sm text-muted-foreground">No sections available for your role ({roles.join(', ') || 'none'}).</p>;
           }
-          const defaultTab = visible.find(t => t.value === 'customers')?.value ?? visible[0].value;
+          const defaultTab = visible.find(t => t.value === 'dashboard')?.value ?? visible.find(t => t.value === 'customers')?.value ?? visible[0].value;
           const [activeTab, setActiveTab] = useState(defaultTab);
           const active = visible.find(t => t.value === activeTab) ?? visible[0];
           const ActiveIcon = active.icon;
@@ -184,7 +178,7 @@ const AdminDashboard = () => {
           const groups = [
             { label: 'Workshop', values: ['kanban','calendar','ros','service','inspections','estimates','invoices'] },
             { label: 'Front Desk', values: ['customers','garage','memberships','bookings','share','declined'] },
-            { label: 'Admin', values: ['reports','catalog','time','shifts','laborpay','productivity','quickbooks','financing','warranty','emails','audit','employees','roles','calls','phone-settings','tracking','settings'] },
+            { label: 'Admin', values: ['dashboard','reports','catalog','time','shifts','laborpay','productivity','quickbooks','financing','warranty','emails','audit','employees','roles','calls','phone-settings','tracking','settings'] },
           ];
 
           return (
