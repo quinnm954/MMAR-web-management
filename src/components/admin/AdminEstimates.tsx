@@ -15,6 +15,7 @@ import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { shareLink } from '@/lib/share';
 import { startRepairOrderFromEstimate } from '@/lib/repairOrders';
+import DeleteButton from './DeleteButton';
 
 interface LineItem { description: string; quantity: number; unit_price: number; amount: number; catalog_item_id?: string; labor_hours?: number; kind?: 'part' | 'labor' | 'fee'; unit_cost?: number; }
 const PARTS_MARKUP = 1.30; // Imported PDF parts arrive already marked up 30% — divide to recover cost
@@ -319,6 +320,7 @@ const AdminEstimates = () => {
                         <Button size="icon" variant="ghost" onClick={() => startRO(e)} title="Start Repair Order"><Wrench className="h-4 w-4 text-primary" /></Button>
                       )}
                       <Button size="icon" variant="ghost" onClick={() => setEditing(e)}><Pencil className="h-4 w-4" /></Button>
+                      <DeleteButton table="estimates" id={e.id} size="icon" label="Delete estimate" description={`Delete estimate ${e.estimate_number || ''}? This cannot be undone.`} onDeleted={load} />
                     </div>
                   </TableCell>
                 </TableRow>
