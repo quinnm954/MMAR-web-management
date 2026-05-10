@@ -50,47 +50,53 @@ const Footer = () => {
           </div>
 
           <div>
-            <h3 className="font-display text-sm uppercase tracking-wider text-gold mb-3">
-              Service Areas
-            </h3>
-            <ul className="space-y-2 text-sm">
-              {cities.map((c) => (
-                <li key={c.slug}>
+            <details className="group">
+              <summary className="font-display text-sm uppercase tracking-wider text-gold mb-3 cursor-pointer list-none flex items-center justify-between hover:text-primary">
+                Service Areas
+                <span className="text-xs transition-transform group-open:rotate-180">▾</span>
+              </summary>
+              <ul className="space-y-2 text-sm mt-2">
+                {cities.map((c) => (
+                  <li key={c.slug}>
+                    <Link
+                      to={`/areas/${c.slug}`}
+                      className="text-muted-foreground hover:text-primary"
+                    >
+                      {c.name}, {c.state}
+                    </Link>
+                  </li>
+                ))}
+                <li>
                   <Link
-                    to={`/areas/${c.slug}`}
-                    className="text-muted-foreground hover:text-primary"
+                    to="/lee-county-fl"
+                    className="text-gold hover:text-primary font-semibold"
                   >
-                    {c.name}, {c.state}
+                    All of Lee County, FL →
                   </Link>
                 </li>
-              ))}
-              <li>
-                <Link
-                  to="/lee-county-fl"
-                  className="text-gold hover:text-primary font-semibold"
-                >
-                  All of Lee County, FL →
-                </Link>
-              </li>
-            </ul>
+              </ul>
+            </details>
           </div>
 
           <div className="md:col-span-2">
-            <h3 className="font-display text-sm uppercase tracking-wider text-gold mb-3">
-              Services
-            </h3>
-            <ul className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-              {categories.map((cat) => (
-                <li key={cat.id}>
-                  <Link
-                    to={`/services/${cat.id}`}
-                    className="text-muted-foreground hover:text-primary"
-                  >
-                    {cat.title}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+            <details className="group">
+              <summary className="font-display text-sm uppercase tracking-wider text-gold mb-3 cursor-pointer list-none flex items-center justify-between hover:text-primary">
+                Services
+                <span className="text-xs transition-transform group-open:rotate-180">▾</span>
+              </summary>
+              <ul className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm mt-2">
+                {categories.map((cat) => (
+                  <li key={cat.id}>
+                    <Link
+                      to={`/services/${cat.id}`}
+                      className="text-muted-foreground hover:text-primary"
+                    >
+                      {cat.title}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </details>
           </div>
         </div>
 
