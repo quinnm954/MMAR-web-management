@@ -48,24 +48,28 @@ const AdminEstimates = () => {
   const [vehicles, setVehicles] = useState<any[]>([]);
   const [catalog, setCatalog] = useState<any[]>([]);
   const [settings, setSettings] = useState<any>(null);
+  const [defaultLaborRate, setDefaultLaborRate] = useState<number>(0);
   const [editing, setEditing] = useState<any | null>(null);
   const [importing, setImporting] = useState(false);
   const [preview, setPreview] = useState<any | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const load = async () => {
-    const [e, c, v, ca, s] = await Promise.all([
+    const [e, c, v, ca, s, lr] = await Promise.all([
       supabase.from('estimates').select('*').order('created_at', { ascending: false }),
       supabase.from('profiles').select('id, full_name, email'),
       supabase.from('vehicles').select('id, owner_id, year, make, model'),
       supabase.from('catalog_items').select('*').eq('is_active', true).order('name'),
       supabase.from('shop_settings').select('*').eq('id', 1).single(),
+      supabase.from('labor_rates').select('hourly_rate, is_default').order('is_default', { ascending: false }),
     ]);
     setEstimates(((e.data ?? []) as any[]).map(d => ({ ...d, line_items: d.line_items || [] })) as Estimate[]);
     setCustomers(c.data ?? []);
     setVehicles(v.data ?? []);
     setCatalog(ca.data ?? []);
     setSettings(s.data);
+    const def = ((lr.data ?? []) as any[]).find((r) => r.is_default) ?? (lr.data?.[0] as any);
+    setDefaultLaborRate(Number(def?.hourly_rate) || 0);
   };
   useEffect(() => { load(); }, []);
 
