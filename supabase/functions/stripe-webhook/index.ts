@@ -94,9 +94,7 @@ Deno.serve(async (req) => {
                   templateData: {
                     customerName: prof.full_name || undefined,
                     planName,
-                    portalUrl: `${new URL(req.url).origin.replace(/functions.*/, "")}`.includes("supabase")
-                      ? "https://shop-flow-home.lovable.app/portal"
-                      : "https://shop-flow-home.lovable.app/portal",
+                    portalUrl: "https://shop-flow-home.lovable.app/portal/membership",
                   },
                 },
               });
