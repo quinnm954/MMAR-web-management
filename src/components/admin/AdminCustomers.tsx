@@ -4,7 +4,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Loader2, Search, Mail, Car, CreditCard, Calendar, FileText, Receipt } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Loader2, Search, Mail, Car, CreditCard, Calendar, FileText, Receipt, Download } from "lucide-react";
 
 interface Customer {
   id: string;
@@ -78,11 +79,41 @@ const AdminCustomers = () => {
     return (c.email ?? "").toLowerCase().includes(s) || (c.full_name ?? "").toLowerCase().includes(s);
   });
 
+  const exportMarketingCsv = async () => {
+    const { data, error } = await supabase
+      .from("customer_marketing_export" as never)
+      .select("*");
+    if (error || !data) return;
+    const rows = data as Array<Record<string, unknown>>;
+    if (rows.length === 0) return;
+    const headers = [
+      "full_name","email","phone","address_line1","address_line2","city","state","postal_code",
+      "marketing_opt_in","customer_since","service_count","last_service_date","last_service_type",
+      "lifetime_spend","vehicles",
+    ];
+    const esc = (v: unknown) => {
+      if (v === null || v === undefined) return "";
+      const s = typeof v === "object" ? JSON.stringify(v) : String(v);
+      return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+    };
+    const csv = [headers.join(","), ...rows.map((r) => headers.map((h) => esc(r[h])).join(","))].join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `customer-marketing-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 flex-wrap">
         <Search className="h-4 w-4 text-muted-foreground" />
         <Input placeholder="Search by name or email…" value={q} onChange={(e) => setQ(e.target.value)} className="max-w-sm" />
+        <Button variant="outline" size="sm" onClick={exportMarketingCsv} className="gap-1.5">
+          <Download className="h-3.5 w-3.5" /> Marketing CSV
+        </Button>
         <span className="text-xs text-muted-foreground ml-auto">{filtered.length} of {customers.length}</span>
       </div>
 

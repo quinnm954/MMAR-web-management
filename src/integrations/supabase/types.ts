@@ -71,6 +71,13 @@ export type Database = {
             foreignKeyName: "ach_authorizations_customer_id_fkey"
             columns: ["customer_id"]
             isOneToOne: false
+            referencedRelation: "customer_marketing_export"
+            referencedColumns: ["customer_id"]
+          },
+          {
+            foreignKeyName: "ach_authorizations_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -148,8 +155,22 @@ export type Database = {
             foreignKeyName: "appointments_assigned_technician_id_fkey"
             columns: ["assigned_technician_id"]
             isOneToOne: false
+            referencedRelation: "customer_marketing_export"
+            referencedColumns: ["customer_id"]
+          },
+          {
+            foreignKeyName: "appointments_assigned_technician_id_fkey"
+            columns: ["assigned_technician_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointments_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customer_marketing_export"
+            referencedColumns: ["customer_id"]
           },
           {
             foreignKeyName: "appointments_customer_id_fkey"
@@ -336,8 +357,22 @@ export type Database = {
             foreignKeyName: "customer_shares_created_by_fkey"
             columns: ["created_by"]
             isOneToOne: false
+            referencedRelation: "customer_marketing_export"
+            referencedColumns: ["customer_id"]
+          },
+          {
+            foreignKeyName: "customer_shares_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_shares_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customer_marketing_export"
+            referencedColumns: ["customer_id"]
           },
           {
             foreignKeyName: "customer_shares_customer_id_fkey"
@@ -707,6 +742,13 @@ export type Database = {
             foreignKeyName: "estimates_customer_id_fkey"
             columns: ["customer_id"]
             isOneToOne: false
+            referencedRelation: "customer_marketing_export"
+            referencedColumns: ["customer_id"]
+          },
+          {
+            foreignKeyName: "estimates_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -920,8 +962,22 @@ export type Database = {
             foreignKeyName: "inspections_customer_id_fkey"
             columns: ["customer_id"]
             isOneToOne: false
+            referencedRelation: "customer_marketing_export"
+            referencedColumns: ["customer_id"]
+          },
+          {
+            foreignKeyName: "inspections_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inspections_technician_id_fkey"
+            columns: ["technician_id"]
+            isOneToOne: false
+            referencedRelation: "customer_marketing_export"
+            referencedColumns: ["customer_id"]
           },
           {
             foreignKeyName: "inspections_technician_id_fkey"
@@ -1010,6 +1066,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "invoices_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customer_marketing_export"
+            referencedColumns: ["customer_id"]
+          },
           {
             foreignKeyName: "invoices_customer_id_fkey"
             columns: ["customer_id"]
@@ -1211,6 +1274,13 @@ export type Database = {
             foreignKeyName: "memberships_customer_id_fkey"
             columns: ["customer_id"]
             isOneToOne: false
+            referencedRelation: "customer_marketing_export"
+            referencedColumns: ["customer_id"]
+          },
+          {
+            foreignKeyName: "memberships_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -1259,24 +1329,45 @@ export type Database = {
       }
       profiles: {
         Row: {
+          address_line1: string | null
+          address_line2: string | null
+          city: string | null
           created_at: string
           email: string | null
           full_name: string | null
           id: string
+          marketing_opt_in: boolean
+          phone: string | null
+          postal_code: string | null
+          state: string | null
           updated_at: string
         }
         Insert: {
+          address_line1?: string | null
+          address_line2?: string | null
+          city?: string | null
           created_at?: string
           email?: string | null
           full_name?: string | null
           id: string
+          marketing_opt_in?: boolean
+          phone?: string | null
+          postal_code?: string | null
+          state?: string | null
           updated_at?: string
         }
         Update: {
+          address_line1?: string | null
+          address_line2?: string | null
+          city?: string | null
           created_at?: string
           email?: string | null
           full_name?: string | null
           id?: string
+          marketing_opt_in?: boolean
+          phone?: string | null
+          postal_code?: string | null
+          state?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -1325,6 +1416,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "appointments"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ro_attachments_uploaded_by_fkey"
+            columns: ["uploaded_by"]
+            isOneToOne: false
+            referencedRelation: "customer_marketing_export"
+            referencedColumns: ["customer_id"]
           },
           {
             foreignKeyName: "ro_attachments_uploaded_by_fkey"
@@ -1379,6 +1477,13 @@ export type Database = {
           vehicle_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "service_recommendations_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customer_marketing_export"
+            referencedColumns: ["customer_id"]
+          },
           {
             foreignKeyName: "service_recommendations_customer_id_fkey"
             columns: ["customer_id"]
@@ -1458,6 +1563,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "appointments"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "service_records_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customer_marketing_export"
+            referencedColumns: ["customer_id"]
           },
           {
             foreignKeyName: "service_records_customer_id_fkey"
@@ -1590,6 +1702,13 @@ export type Database = {
             foreignKeyName: "sms_messages_sent_by_fkey"
             columns: ["sent_by"]
             isOneToOne: false
+            referencedRelation: "customer_marketing_export"
+            referencedColumns: ["customer_id"]
+          },
+          {
+            foreignKeyName: "sms_messages_sent_by_fkey"
+            columns: ["sent_by"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -1637,6 +1756,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "sms_threads_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customer_marketing_export"
+            referencedColumns: ["customer_id"]
+          },
           {
             foreignKeyName: "sms_threads_customer_id_fkey"
             columns: ["customer_id"]
@@ -1775,6 +1901,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "appointments"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "time_entries_technician_id_fkey"
+            columns: ["technician_id"]
+            isOneToOne: false
+            referencedRelation: "customer_marketing_export"
+            referencedColumns: ["customer_id"]
           },
           {
             foreignKeyName: "time_entries_technician_id_fkey"
@@ -1926,6 +2059,13 @@ export type Database = {
             foreignKeyName: "vehicles_owner_id_fkey"
             columns: ["owner_id"]
             isOneToOne: false
+            referencedRelation: "customer_marketing_export"
+            referencedColumns: ["customer_id"]
+          },
+          {
+            foreignKeyName: "vehicles_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -1972,7 +2112,27 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      customer_marketing_export: {
+        Row: {
+          address_line1: string | null
+          address_line2: string | null
+          city: string | null
+          customer_id: string | null
+          customer_since: string | null
+          email: string | null
+          full_name: string | null
+          last_service_date: string | null
+          last_service_type: string | null
+          lifetime_spend: number | null
+          marketing_opt_in: boolean | null
+          phone: string | null
+          postal_code: string | null
+          service_count: number | null
+          state: string | null
+          vehicles: Json | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       delete_email: {
