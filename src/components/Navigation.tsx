@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Menu, X, ChevronDown, Phone, User, LogOut, LayoutDashboard } from "lucide-react";
+import { Menu, X, ChevronDown, Phone, User, LogOut, LayoutDashboard, CalendarCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -134,6 +134,10 @@ const Navigation = () => {
               Memberships
             </NavLink>
 
+            <NavLink to="/book" className={({ isActive }) => `px-3 py-2 font-semibold transition-colors ${isActive ? "text-accent" : "text-accent/90 hover:text-accent"}`}>
+              Book
+            </NavLink>
+
             <NavLink to="/contact" className={({ isActive }) => `px-3 py-2 font-medium transition-colors ${isActive ? "text-primary" : "text-muted-foreground hover:text-primary"}`}>
               Contact
             </NavLink>
@@ -166,8 +170,13 @@ const Navigation = () => {
             )}
 
             <Button variant="hero" size="default" asChild>
+              <Link to="/book">
+                <CalendarCheck className="w-4 h-4 mr-1" /> Book
+              </Link>
+            </Button>
+            <Button variant="heroOutline" size="default" asChild>
               <a href="tel:8135017572">
-                <Phone className="w-4 h-4 mr-1" /> Call Now
+                <Phone className="w-4 h-4 mr-1" /> Call
               </a>
             </Button>
           </div>
