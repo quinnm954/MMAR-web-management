@@ -15,8 +15,7 @@ import FinancingContractsTable from '@/components/admin/FinancingContractsTable'
 import WarrantyTable from '@/components/admin/WarrantyTable';
 import AdminCustomers from '@/components/admin/AdminCustomers';
 import AdminMemberships from '@/components/admin/AdminMemberships';
-import AdminAppointments from '@/components/admin/AdminAppointments';
-import AdminBookingRequests from '@/components/admin/AdminBookingRequests';
+import AdminBookings from '@/components/admin/AdminBookings';
 import AdminServiceRecords from '@/components/admin/AdminServiceRecords';
 import AdminInvoices from '@/components/admin/AdminInvoices';
 import AdminEmails from '@/components/admin/AdminEmails';
