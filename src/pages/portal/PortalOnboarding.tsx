@@ -84,7 +84,7 @@ const today = () => new Date().toISOString().slice(0, 10);
 
 const PortalOnboarding = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, isAdmin, isStaff } = useAuth();
   const [profile, setProfile] = useState<ProfileForm>(emptyProfile);
   const [vehicles, setVehicles] = useState<VehicleDraft[]>([newVehicle(true)]);
   const [busy, setBusy] = useState(false);
