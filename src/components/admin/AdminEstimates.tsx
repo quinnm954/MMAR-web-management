@@ -416,6 +416,7 @@ const AdminEstimates = () => {
                       </SelectContent>
                     </Select>
                     <Button size="sm" variant="outline" onClick={() => addLine()}><Plus className="h-3 w-3 mr-1" /> Custom</Button>
+                    <Button size="sm" variant="outline" onClick={addDiagnosisFee}><Plus className="h-3 w-3 mr-1" /> Diagnosis Fee</Button>
                   </div>
                 </div>
                 <div className="border rounded">
