@@ -320,6 +320,7 @@ const AdminEstimates = () => {
                         <Button size="icon" variant="ghost" onClick={() => startRO(e)} title="Start Repair Order"><Wrench className="h-4 w-4 text-primary" /></Button>
                       )}
                       <Button size="icon" variant="ghost" onClick={() => setEditing(e)}><Pencil className="h-4 w-4" /></Button>
+                      <DeleteButton table="estimates" id={e.id} size="icon" label="Delete estimate" description={`Delete estimate ${e.estimate_number || ''}? This cannot be undone.`} onDeleted={load} />
                     </div>
                   </TableCell>
                 </TableRow>
