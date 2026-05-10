@@ -9,10 +9,12 @@ import { Loader2, ShieldCheck, UserPlus, X, Search } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 
-const ALL_ROLES = ["admin", "manager", "service_advisor", "technician", "parts", "customer"] as const;
+const ALL_ROLES = ["owner", "admin", "manager", "service_advisor", "technician", "parts", "customer"] as const;
 type Role = typeof ALL_ROLES[number];
 
 export default function AdminRoles() {
+  const { user: currentUser, hasRole } = useAuth();
+  const isOwner = hasRole('owner');
   const { user: currentUser } = useAuth();
   const [users, setUsers] = useState<any[]>([]);
   const [roles, setRoles] = useState<any[]>([]);
