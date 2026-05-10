@@ -7,12 +7,12 @@ import { Loader2 } from "lucide-react";
 type OnboardingState = "unknown" | "needed" | "complete";
 
 const CustomerProtectedRoute = ({ children }: { children: ReactNode }) => {
-  const { user, isLoading } = useAuth();
+  const { user, isAdmin, isStaff, isLoading } = useAuth();
   const location = useLocation();
   const [onboarding, setOnboarding] = useState<OnboardingState>("unknown");
 
   useEffect(() => {
-    if (!user) {
+    if (!user || isAdmin || isStaff) {
       setOnboarding("unknown");
       return;
     }
@@ -56,7 +56,7 @@ const CustomerProtectedRoute = ({ children }: { children: ReactNode }) => {
     return () => {
       cancelled = true;
     };
-  }, [user]);
+  }, [user, isAdmin, isStaff]);
 
   if (isLoading) {
     return (
@@ -72,6 +72,14 @@ const CustomerProtectedRoute = ({ children }: { children: ReactNode }) => {
 
   if ((user.user_metadata as any)?.must_set_password && location.pathname !== "/set-password") {
     return <Navigate to="/set-password" replace />;
+  }
+
+  if (isAdmin) {
+    return <Navigate to="/admin/dashboard" replace />;
+  }
+
+  if (isStaff) {
+    return <Navigate to="/tech" replace />;
   }
 
   // Wait for onboarding check to resolve before rendering protected content

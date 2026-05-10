@@ -47,12 +47,14 @@ const Navigation = () => {
   const navigate = useNavigate();
   const close = () => setIsOpen(false);
 
-  const portalHome = roles.includes("admin")
+  const isAdminLike = roles.includes("admin") || roles.includes("owner");
+
+  const portalHome = isAdminLike
     ? "/admin/dashboard"
     : roles.some((r) => ["technician", "service_advisor", "manager", "parts"].includes(r))
       ? "/tech"
       : "/portal/dashboard";
-  const portalLabel = roles.includes("admin")
+  const portalLabel = isAdminLike
     ? "Admin"
     : roles.some((r) => ["technician", "service_advisor", "manager", "parts"].includes(r))
       ? "Staff Portal"

@@ -42,7 +42,7 @@ const NativeBoot = () => {
 
     let target = '/login';
     if (user) {
-      if (roles.includes('admin') || roles.includes('manager')) {
+      if (roles.includes('owner') || roles.includes('admin') || roles.includes('manager')) {
         target = '/admin/dashboard';
       } else if (
         roles.includes('technician') ||
