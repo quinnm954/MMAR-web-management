@@ -41,7 +41,8 @@ const faqs = [
 ];
 
 const SeoContent = () => {
-  const handleClick = () => trackConversion();
+  const handleCall = () => trackConversion("phone_call");
+  const handleText = () => trackConversion("text_click");
 
   // Inject FAQPage JSON-LD schema for the homepage FAQ
   useEffect(() => {
@@ -257,12 +258,12 @@ const SeoContent = () => {
 
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mt-10">
           <Button variant="hero" size="lg" className="min-h-[48px]" asChild>
-            <a href="tel:8135017572" onClick={handleClick}>
+            <a href="tel:8135017572" onClick={handleCall}>
               <Phone className="mr-2" /> Call (813) 501-7572
             </a>
           </Button>
           <Button variant="heroOutline" size="lg" className="min-h-[48px]" asChild>
-            <a href="sms:8135017572" onClick={handleClick}>
+            <a href="sms:8135017572" onClick={handleText}>
               <MessageSquare className="mr-2" /> Text Us
             </a>
           </Button>

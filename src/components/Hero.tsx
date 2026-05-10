@@ -37,13 +37,13 @@ const Hero = () => {
           >
             <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5 sm:gap-3">
               <Button variant="hero" size="lg" className="w-full min-h-[52px] px-3 bg-white text-primary hover:bg-white/90 hover:text-primary border-2 border-white" asChild>
-                <a href="tel:8135017572" onClick={trackConversion}>
+                <a href="tel:8135017572" onClick={() => trackConversion("phone_call")}>
                   <Phone className="w-5 h-5 mr-2 shrink-0" />
                   <span className="truncate">Call Now</span>
                 </a>
               </Button>
               <Button variant="hero" size="lg" className="w-full min-h-[52px] px-3" asChild>
-                <Link to="/book" onClick={trackConversion}>
+                <Link to="/book" onClick={() => trackConversion("lead")}>
                   <CalendarCheck className="w-5 h-5 mr-2 shrink-0" />
                   <span className="truncate">Book Online</span>
                 </Link>
@@ -76,7 +76,7 @@ const Hero = () => {
               <MapPin className="w-5 h-5 text-primary shrink-0" />
               <span className="text-sm sm:text-base">Lehigh Acres and Fort Myers</span>
             </div>
-            <a href="tel:8135017572" onClick={trackConversion} className="flex items-center gap-2 hover:text-accent transition-colors active:scale-95">
+            <a href="tel:8135017572" onClick={() => trackConversion("phone_call")} className="flex items-center gap-2 hover:text-accent transition-colors active:scale-95">
               <Phone className="w-5 h-5 text-accent shrink-0" />
               <span className="text-sm sm:text-base font-medium">(813) 501-7572</span>
             </a>

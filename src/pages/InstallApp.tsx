@@ -170,12 +170,12 @@ const InstallApp = () => {
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Button variant="hero" size="lg" asChild>
-              <a href="tel:8135017572" onClick={trackConversion}>
+              <a href="tel:8135017572" onClick={() => trackConversion("phone_call")}>
                 <Phone className="w-5 h-5 mr-2" /> Call (813) 501-7572
               </a>
             </Button>
             <Button variant="heroOutline" size="lg" asChild>
-              <a href="sms:8135017572" onClick={trackConversion}>
+              <a href="sms:8135017572" onClick={() => trackConversion("text_click")}>
                 <MessageCircle className="w-5 h-5 mr-2" /> Text for Quote
               </a>
             </Button>

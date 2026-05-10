@@ -279,7 +279,10 @@ export type Database = {
           customer_name: string
           customer_phone: string
           description: string | null
+          gbraid: string | null
+          gclid: string | null
           id: string
+          landing_page: string | null
           notes: string | null
           requested_date: string | null
           requested_time_window: string | null
@@ -288,7 +291,14 @@ export type Database = {
           source: string
           status: string
           updated_at: string
+          user_agent: string | null
+          utm_campaign: string | null
+          utm_content: string | null
+          utm_medium: string | null
+          utm_source: string | null
+          utm_term: string | null
           vehicle_info: string | null
+          wbraid: string | null
         }
         Insert: {
           confirmation_token?: string
@@ -298,7 +308,10 @@ export type Database = {
           customer_name: string
           customer_phone: string
           description?: string | null
+          gbraid?: string | null
+          gclid?: string | null
           id?: string
+          landing_page?: string | null
           notes?: string | null
           requested_date?: string | null
           requested_time_window?: string | null
@@ -307,7 +320,14 @@ export type Database = {
           source?: string
           status?: string
           updated_at?: string
+          user_agent?: string | null
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          utm_term?: string | null
           vehicle_info?: string | null
+          wbraid?: string | null
         }
         Update: {
           confirmation_token?: string
@@ -317,7 +337,10 @@ export type Database = {
           customer_name?: string
           customer_phone?: string
           description?: string | null
+          gbraid?: string | null
+          gclid?: string | null
           id?: string
+          landing_page?: string | null
           notes?: string | null
           requested_date?: string | null
           requested_time_window?: string | null
@@ -326,7 +349,14 @@ export type Database = {
           source?: string
           status?: string
           updated_at?: string
+          user_agent?: string | null
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          utm_term?: string | null
           vehicle_info?: string | null
+          wbraid?: string | null
         }
         Relationships: []
       }
@@ -334,11 +364,14 @@ export type Database = {
         Row: {
           answered_at: string | null
           completed_at: string | null
+          conversion_uploaded_at: string | null
           created_at: string
           customer_id: string | null
           direction: string
           duration_seconds: number | null
           from_number: string | null
+          gbraid: string | null
+          gclid: string | null
           id: string
           read_at: string | null
           recording_sid: string | null
@@ -348,16 +381,22 @@ export type Database = {
           transcription: string | null
           twilio_call_sid: string | null
           updated_at: string
+          utm_campaign: string | null
+          utm_source: string | null
           voicemail: boolean
+          wbraid: string | null
         }
         Insert: {
           answered_at?: string | null
           completed_at?: string | null
+          conversion_uploaded_at?: string | null
           created_at?: string
           customer_id?: string | null
           direction?: string
           duration_seconds?: number | null
           from_number?: string | null
+          gbraid?: string | null
+          gclid?: string | null
           id?: string
           read_at?: string | null
           recording_sid?: string | null
@@ -367,16 +406,22 @@ export type Database = {
           transcription?: string | null
           twilio_call_sid?: string | null
           updated_at?: string
+          utm_campaign?: string | null
+          utm_source?: string | null
           voicemail?: boolean
+          wbraid?: string | null
         }
         Update: {
           answered_at?: string | null
           completed_at?: string | null
+          conversion_uploaded_at?: string | null
           created_at?: string
           customer_id?: string | null
           direction?: string
           duration_seconds?: number | null
           from_number?: string | null
+          gbraid?: string | null
+          gclid?: string | null
           id?: string
           read_at?: string | null
           recording_sid?: string | null
@@ -386,7 +431,10 @@ export type Database = {
           transcription?: string | null
           twilio_call_sid?: string | null
           updated_at?: string
+          utm_campaign?: string | null
+          utm_source?: string | null
           voicemail?: boolean
+          wbraid?: string | null
         }
         Relationships: []
       }
@@ -2098,6 +2146,51 @@ export type Database = {
           },
         ]
       }
+      tracking_settings: {
+        Row: {
+          created_at: string
+          dni_enabled: boolean
+          enhanced_conversions: boolean
+          google_ads_conversion_id: string | null
+          id: number
+          lead_label: string | null
+          phone_call_label: string | null
+          quote_submit_label: string | null
+          text_click_label: string | null
+          updated_at: string
+          wcc_conversion_id: string | null
+          wcc_phone_number: string | null
+        }
+        Insert: {
+          created_at?: string
+          dni_enabled?: boolean
+          enhanced_conversions?: boolean
+          google_ads_conversion_id?: string | null
+          id?: number
+          lead_label?: string | null
+          phone_call_label?: string | null
+          quote_submit_label?: string | null
+          text_click_label?: string | null
+          updated_at?: string
+          wcc_conversion_id?: string | null
+          wcc_phone_number?: string | null
+        }
+        Update: {
+          created_at?: string
+          dni_enabled?: boolean
+          enhanced_conversions?: boolean
+          google_ads_conversion_id?: string | null
+          id?: number
+          lead_label?: string | null
+          phone_call_label?: string | null
+          quote_submit_label?: string | null
+          text_click_label?: string | null
+          updated_at?: string
+          wcc_conversion_id?: string | null
+          wcc_phone_number?: string | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -2363,6 +2456,10 @@ export type Database = {
           msg_id: number
           read_ct: number
         }[]
+      }
+      set_booking_attribution: {
+        Args: { _attribution: Json; _token: string }
+        Returns: undefined
       }
       submit_booking_request: {
         Args: {
