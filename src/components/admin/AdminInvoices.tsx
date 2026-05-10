@@ -331,8 +331,18 @@ const AdminInvoices = () => {
                   <div className="flex items-center gap-3">
                     <div className="text-right">
                       <div className="font-bold">${i.total.toFixed(2)}</div>
+                      {(i.discount_amount ?? 0) > 0 && (
+                        <div className="text-xs text-primary">
+                          −${Number(i.discount_amount).toFixed(2)} discount
+                          {i.discount_type === "percent" && i.discount_value ? ` (${i.discount_value}%)` : ""}
+                        </div>
+                      )}
                       {i.amount_paid > 0 && <div className="text-xs text-muted-foreground">Paid ${i.amount_paid.toFixed(2)}</div>}
                     </div>
+                    <Button size="sm" variant="ghost" onClick={() => openDiscount(i)} title="Edit discount">
+                      <Tag className="h-3 w-3 mr-1" />
+                      Discount
+                    </Button>
                     <Button size="sm" variant="outline" onClick={() => window.open(`/portal/invoices/${i.id}`, "_blank")} title="Open invoice page">
                       <ExternalLink className="h-3 w-3 mr-1" />
                       View
