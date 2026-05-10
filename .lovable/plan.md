@@ -1,88 +1,83 @@
-# MMAR Care — Native Mobile App Plan
+## Goal
+Rank Mike's Mobile Auto Repair in the Google Map Pack across Lee County, FL for every mechanical service except bodywork. Map Pack ranking is driven mostly by **Google Business Profile (GBP) signals + reviews + citations**, supported by **on-page local SEO**. I'll handle all on-page work and give you a GBP checklist for what only you can do.
 
-Goal: ship MMAR Care as a real native app on the **Apple App Store** and **Google Play Store**, opening straight into the customer portal with push + SMS appointment reminders.
+## Scope (per your answers)
+- **Services (mechanical, no bodywork):** Engine, Oil & Fluids, Brakes, Electrical & Battery, AC & Heating, Cooling, Transmission & Drivetrain, Suspension & Steering, Tires & Wheels (mount/rotate/TPMS — no alignment rack), Fuel & Exhaust, Inspections & Fleet, plus standalone "Mobile Mechanic" hub.
+- **Cities (Top 5 in Lee County):** Fort Myers, Cape Coral, Lehigh Acres, Bonita Springs, Estero. (Fort Myers + Lehigh already exist.)
+- **Structure:** Service × City matrix → ~12 services × 5 cities = ~60 location-service pages, plus 5 city hubs and 12 service hubs.
 
-We already have `capacitor.config.ts` in the repo, the customer portal is fully built, Twilio SMS is wired up, and Lovable Cloud handles auth + database. This plan adds the native wrapper, the smart launch redirect, and an automated reminder pipeline.
+## On-Page Build
 
----
+### 1. City data — add 3 new cities
+Extend `src/data/cities.ts` with full profiles for Cape Coral, Bonita Springs, Estero (zips, geo coords, neighborhoods + notes, intro, 5–6 unique long paragraphs each, pricing, FAQs). Same depth as existing Lehigh Acres / Fort Myers entries (Google rewards unique long-form local content).
 
-## What you'll need (one-time, outside Lovable)
+### 2. Matrix landing pages — programmatic generator
+Add `src/data/serviceCityMatrix.ts` that generates a page for every (service-category × city) combo not already hand-written in `localLandingPages.ts`. Each generated page composes:
+- City-specific opening (uses city neighborhoods, ZIPs, climate notes)
+- Service-specific procedure block (pulled from `serviceCategories.ts`)
+- City pricing table
+- 4–6 unique FAQs blending service + city
+- LocalBusiness + Service + FAQPage + BreadcrumbList JSON-LD with city geo coords (critical for map pack)
 
-You can't ship to the stores from inside Lovable's preview — you'll do these once on your own machine:
+URL pattern: `/{service-slug}-{city-slug}` (e.g. `/brake-repair-cape-coral`) — matches existing convention so hand-written pages take precedence.
 
-- A Mac with **Xcode** (for iOS) and/or **Android Studio** (for Android)
-- **Apple Developer account** — $99/year
-- **Google Play Console account** — $25 one-time
-- Your project exported to GitHub (Lovable's "Export to GitHub" button)
+### 3. Routing & hubs
+- City pages (`/areas/:city`) — list all 12 services with internal links to that city's matrix page.
+- Service hub pages (`/services/:slug`) — list all 5 cities with internal links to each city's matrix page.
+- Add `/lee-county-fl` master hub page linking everything (county-level keyword).
 
-I'll handle everything inside the codebase. You'll handle the store submissions.
+### 4. Schema (Map Pack critical)
+Every city + matrix page gets:
+- `AutoRepair` LocalBusiness with **city-specific geo coordinates** (different lat/lng per page — Google uses this for proximity ranking)
+- `areaServed` listing the city + ZIPs
+- `Service` schema per page
+- `FAQPage` schema
+- `BreadcrumbList`
+- Aggregate review schema pulled from existing reviews
 
----
+### 5. Sitemap + robots
+Regenerate `public/sitemap-locations.xml` with all ~80 URLs. Confirm `robots.txt` allows everything and references sitemap-index.
 
-## Phase 1 — Native shell (Capacitor)
+### 6. Internal linking
+- Footer: link to all 5 city pages + `/lee-county-fl`.
+- City page → all 12 services in that city.
+- Service page → all 5 cities for that service.
+- Home → "Service Areas" anchor with all 5 cities.
 
-1. **Install Capacitor packages**: `@capacitor/core`, `@capacitor/cli`, `@capacitor/ios`, `@capacitor/android`, `@capacitor/push-notifications`, `@capacitor/app`, `@capacitor/status-bar`, `@capacitor/splash-screen`.
-2. **Update `capacitor.config.ts`**:
-   - `appId`: `app.lovable.6370c0499e634e0c894716857b255272`
-   - `appName`: `MMAR Care`
-   - Splash screen: dark background (`#0F172A`-ish per design tokens), MMAR logo
-   - Status bar: dark style
-   - `server.url` pointed at the Lovable preview for hot-reload during development (you'll comment this out before building production binaries)
-3. **App icons & splash**: generate iOS and Android icon sets from the existing `mmar-logo.jpeg` (1024×1024 master) and a dark splash screen.
-4. **Smart launch redirect**: a tiny `<NativeBoot>` component that runs on app launch and routes:
-   - signed-in customer → `/portal/dashboard`
-   - signed-in staff/admin → their respective dashboard
-   - signed-out → `/portal/login`
-   - Web visitors are unaffected — the redirect only fires when running inside Capacitor (`Capacitor.isNativePlatform()`).
-5. **Tighten the portal for app feel**:
-   - Hide the marketing top nav inside Capacitor so it looks like an app, not a website.
-   - Respect iOS safe-area insets (notch/home indicator) on the portal layout.
-   - Add Capacitor `App` listener for back-button handling on Android.
+### 7. Meta + canonical hygiene
+- Unique `<title>` and `<meta description>` per page (templated with city + service variables — never duplicated).
+- Canonical URL per page.
+- `og:image`, `og:locale=en_US`, geo meta tags per city page.
 
-## Phase 2 — Push notifications
+## GBP Checklist (your side — biggest map-pack lever)
+On-page SEO alone won't get you in the Map Pack. You'll need to:
 
-1. **Capacitor side**: register the device on first portal load, store the FCM/APNs token against the user.
-2. **New table `device_tokens`** (user_id, token, platform, last_seen_at) with RLS so users only manage their own tokens.
-3. **Edge function `send-push`**: accepts `{ user_id, title, body, data }`, looks up tokens, sends via Firebase Cloud Messaging (FCM handles both Android and iOS via APNs). You'll need an **FCM server key** added as a secret — I'll request it when we get there.
-4. Customers can disable push from a new "Notifications" section in `/portal/dashboard`.
+1. **Service Area Business setup:** GBP listed as service-area (no storefront), service area set to all 5 cities + Lee County.
+2. **Categories:** Primary = "Auto Repair Shop" + "Mobile Mechanic" if available. Add secondaries: Brake Shop, Oil Change Service, Auto Air Conditioning Service, Auto Electrical Service, Tire Shop, Transmission Shop, Engine Rebuilding Service.
+3. **Services:** Add every individual service from your menu inside GBP (matches your site's matrix).
+4. **Reviews:** Aim for 50+ Google reviews with 4.7+ average. Ask every customer via your existing `/review` link — text it after each completed job. Reply to every review mentioning city + service ("Thanks for trusting us with your brake job in Cape Coral!").
+5. **Photos:** Upload 30+ geotagged photos of service truck at customer locations across all 5 cities (each photo's EXIF location = a proximity signal).
+6. **Posts:** 1 GBP Post/week — service tips, before/after, seasonal offers.
+7. **Q&A:** Pre-seed 10 common questions and answer them yourself.
+8. **Citations / NAP consistency:** List the business on Yelp, BBB, MechanicAdvisor, RepairPal, Angi, NextDoor, Apple Maps, Bing Places — same exact name/phone/address (or service-area config).
+9. **Local backlinks:** Local sponsorships, Lee County chamber, partner with auto-parts stores or insurance offices in each city.
 
-## Phase 3 — Appointment reminders (push + SMS)
+## Technical Notes (devs only)
+- Pages render client-side (Vite SPA). Already shipping `useSeo` for dynamic meta, plus pre-built sitemap. For maximum crawler reliability, the existing static sitemap + per-page JSON-LD via `useSeo` is sufficient for Google (it executes JS), but I'll keep raw URLs in the sitemap so discovery is instant.
+- Existing `localLandingPages.ts` hand-written pages are preserved — generator only fills gaps.
+- All schema uses semantic HSL tokens / no design changes.
 
-1. **New edge function `send-appointment-reminders`** that runs hourly via `pg_cron`:
-   - Finds appointments scheduled 24h out and 2h out that haven't been reminded yet.
-   - Sends a **push** (if the customer has a device token) and an **SMS** via your existing Twilio integration as a fallback / belt-and-suspenders.
-   - Marks `reminder_sent_24h` / `reminder_sent_2h` columns on the appointment so we don't double-send.
-2. **Migration** adds those two boolean columns to `appointments`.
-3. **Cron job** scheduled with `pg_cron` to call the function every hour.
-4. Customer can opt out per channel from their portal Notifications page.
+## What I'll Touch
+- `src/data/cities.ts` — add 3 cities
+- `src/data/serviceCityMatrix.ts` — new generator
+- `src/data/localLandingPages.ts` — wire generator output into existing lookup
+- `src/pages/CityPage.tsx`, `src/pages/ServiceCategory.tsx` — add cross-link grids
+- `src/pages/LeeCounty.tsx` — new county hub
+- `src/App.tsx` — register `/lee-county-fl` route
+- `src/components/Footer.tsx` — service area links
+- `public/sitemap-locations.xml` — regenerate
 
-## Phase 4 — Build & ship
-
-I'll write you a plain-English `MOBILE_APP_README.md` with the exact commands to:
-- Pull the project from GitHub
-- `npm install` → `npx cap add ios` / `npx cap add android` → `npm run build` → `npx cap sync`
-- Open in Xcode / Android Studio, set signing certificates, archive, and upload to App Store Connect / Play Console
-- App Store / Play Store listing copy (description, keywords, screenshots checklist)
-
----
-
-## Technical details
-
-- **Hot reload during dev**: `server.url` points at the Lovable preview so app changes show up in the simulator instantly. This URL is removed before producing release binaries.
-- **Auth**: existing `useAuth` + Supabase client work unchanged in Capacitor. Sessions persist via `localStorage`, which Capacitor's WebView preserves between launches.
-- **Deep links**: Universal Links (iOS) / App Links (Android) for `/estimate/:token`, `/share/:token`, etc., so SMS links open the app instead of Safari/Chrome when installed. Configured via `apple-app-site-association` and `assetlinks.json` files served from the website.
-- **Push provider**: Firebase Cloud Messaging — single backend for both platforms, free tier is plenty for this scale.
-- **No backend changes to existing portal code** — the native shell wraps the same React app; only adds the boot redirect and a notifications settings panel.
-
----
-
-## What I won't do in this pass (ask separately if you want them)
-
-- In-app booking calendar UI (you currently use SMS/call to request)
-- Apple Pay / Google Pay native checkout (Stripe Checkout already works in the WebView)
-- Offline mode for vehicles/records (you opted not to include it)
-- App Store screenshots — I can generate them in a follow-up if you want
-
----
-
-Approve this and I'll start with Phase 1 (Capacitor wrapper + smart redirect + app polish), then move through phases 2–4. Each phase is independently testable.
+## Out of Scope
+- Bodywork, paint, detail, alignment-rack-only services.
+- GBP management itself (you do this).
+- Paid ads.
