@@ -48,24 +48,28 @@ const AdminEstimates = () => {
   const [vehicles, setVehicles] = useState<any[]>([]);
   const [catalog, setCatalog] = useState<any[]>([]);
   const [settings, setSettings] = useState<any>(null);
+  const [defaultLaborRate, setDefaultLaborRate] = useState<number>(0);
   const [editing, setEditing] = useState<any | null>(null);
   const [importing, setImporting] = useState(false);
   const [preview, setPreview] = useState<any | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const load = async () => {
-    const [e, c, v, ca, s] = await Promise.all([
+    const [e, c, v, ca, s, lr] = await Promise.all([
       supabase.from('estimates').select('*').order('created_at', { ascending: false }),
       supabase.from('profiles').select('id, full_name, email'),
       supabase.from('vehicles').select('id, owner_id, year, make, model'),
       supabase.from('catalog_items').select('*').eq('is_active', true).order('name'),
       supabase.from('shop_settings').select('*').eq('id', 1).single(),
+      supabase.from('labor_rates').select('hourly_rate, is_default').order('is_default', { ascending: false }),
     ]);
     setEstimates(((e.data ?? []) as any[]).map(d => ({ ...d, line_items: d.line_items || [] })) as Estimate[]);
     setCustomers(c.data ?? []);
     setVehicles(v.data ?? []);
     setCatalog(ca.data ?? []);
     setSettings(s.data);
+    const def = ((lr.data ?? []) as any[]).find((r) => r.is_default) ?? (lr.data?.[0] as any);
+    setDefaultLaborRate(Number(def?.hourly_rate) || 0);
   };
   useEffect(() => { load(); }, []);
 
@@ -111,19 +115,50 @@ const AdminEstimates = () => {
         );
       }
 
+      const docLaborRate = Number(ex.labor_rate) || 0;
+      const fallbackLaborRate = docLaborRate > 0 ? docLaborRate : defaultLaborRate;
+      const LABOR_KEYWORDS = /\b(labor|labour|hours?|hrs?|tech\s*time|shop\s*labor|diagnostic|diag\b)\b/i;
+
       const lines: LineItem[] = (ex.line_items || []).map((li: any) => {
-        const qty = Number(li.quantity) || 1;
-        const price = Number(li.unit_price) || 0;
-        const laborHrs = Number(li.labor_hours) || 0;
-        const kind: 'part' | 'labor' | 'fee' = li.kind === 'labor' || li.kind === 'fee'
-          ? li.kind
-          : (laborHrs > 0 ? 'labor' : 'part');
+        let qty = Number(li.quantity) || 0;
+        let price = Number(li.unit_price) || 0;
+        const lineTotal = Number(li.line_total) || 0;
+        let laborHrs = Number(li.labor_hours) || 0;
+        const desc = String(li.description || '');
+        const looksLikeLabor = LABOR_KEYWORDS.test(desc);
+
+        let kind: 'part' | 'labor' | 'fee';
+        if (li.kind === 'labor' || li.kind === 'fee' || li.kind === 'part') {
+          kind = li.kind;
+        } else {
+          kind = laborHrs > 0 || looksLikeLabor ? 'labor' : 'part';
+        }
+
+        if (kind === 'labor') {
+          // Normalize: quantity = hours, unit_price = hourly rate, labor_hours mirrors qty.
+          if (laborHrs <= 0 && qty > 0) laborHrs = qty;
+          if (laborHrs <= 0 && lineTotal > 0 && fallbackLaborRate > 0) {
+            laborHrs = +(lineTotal / fallbackLaborRate).toFixed(2);
+          }
+          if (qty <= 0) qty = laborHrs;
+          if (price <= 0) {
+            if (lineTotal > 0 && qty > 0) price = +(lineTotal / qty).toFixed(2);
+            else price = fallbackLaborRate;
+          }
+          if (qty <= 0 && lineTotal > 0 && price > 0) qty = +(lineTotal / price).toFixed(2);
+        } else {
+          if (qty <= 0) qty = 1;
+          if (price <= 0 && lineTotal > 0 && qty > 0) price = +(lineTotal / qty).toFixed(2);
+          laborHrs = 0;
+        }
+
+        const amount = +(qty * price).toFixed(2);
         const unit_cost = kind === 'part' ? +(price / PARTS_MARKUP).toFixed(2) : 0;
         return {
-          description: li.description || '',
+          description: desc,
           quantity: qty,
           unit_price: price,
-          amount: qty * price,
+          amount,
           labor_hours: laborHrs,
           kind,
           unit_cost,

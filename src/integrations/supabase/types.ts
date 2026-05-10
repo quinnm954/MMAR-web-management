@@ -465,6 +465,30 @@ export type Database = {
         }
         Relationships: []
       }
+      employee_pay_defaults: {
+        Row: {
+          employee_type: string
+          hourly_rate: number
+          pay_basis: string
+          salary_amount: number | null
+          updated_at: string
+        }
+        Insert: {
+          employee_type: string
+          hourly_rate?: number
+          pay_basis?: string
+          salary_amount?: number | null
+          updated_at?: string
+        }
+        Update: {
+          employee_type?: string
+          hourly_rate?: number
+          pay_basis?: string
+          salary_amount?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       employee_shifts: {
         Row: {
           clock_in: string

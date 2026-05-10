@@ -64,25 +64,41 @@ export default function AdminEmployees() {
   const [form, setForm] = useState<Employee>(empty);
   const [createLogin, setCreateLogin] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [payDefaults, setPayDefaults] = useState<Record<string, any>>({});
 
   const load = async () => {
-    const { data, error } = await supabase
-      .from('employees' as any)
-      .select('*')
-      .order('full_name');
+    const [{ data, error }, defaults] = await Promise.all([
+      supabase.from('employees' as any).select('*').order('full_name'),
+      supabase.from('employee_pay_defaults' as any).select('*'),
+    ]);
     if (error) {
       toast.error(error.message);
       return;
     }
     setRows((data ?? []) as any);
+    const map: Record<string, any> = {};
+    ((defaults.data ?? []) as any[]).forEach((d) => { map[d.employee_type] = d; });
+    setPayDefaults(map);
   };
 
   useEffect(() => {
     load();
   }, []);
 
+  const applyDefaults = (type: string, base: Employee): Employee => {
+    const d = payDefaults[type];
+    if (!d) return { ...base, employee_type: type };
+    return {
+      ...base,
+      employee_type: type,
+      pay_basis: d.pay_basis ?? base.pay_basis,
+      hourly_rate: Number(d.hourly_rate) || 0,
+      salary_amount: d.salary_amount ?? null,
+    };
+  };
+
   const openNew = () => {
-    setForm(empty);
+    setForm(applyDefaults('technician', empty));
     setCreateLogin(false);
     setOpen(true);
   };
@@ -90,6 +106,11 @@ export default function AdminEmployees() {
     setForm(e);
     setCreateLogin(false);
     setOpen(true);
+  };
+
+  const onTypeChange = (v: string) => {
+    // Only auto-fill defaults when creating a new employee
+    setForm(form.id ? { ...form, employee_type: v } : applyDefaults(v, form));
   };
 
   const save = async () => {
@@ -208,7 +229,7 @@ export default function AdminEmployees() {
               <div className="grid grid-cols-2 gap-2">
                 <div>
                   <Label>Type</Label>
-                  <Select value={form.employee_type} onValueChange={(v) => setForm({ ...form, employee_type: v })}>
+                  <Select value={form.employee_type} onValueChange={onTypeChange}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>{TYPES.map((t) => <SelectItem key={t} value={t}>{t.replace('_', ' ')}</SelectItem>)}</SelectContent>
                   </Select>

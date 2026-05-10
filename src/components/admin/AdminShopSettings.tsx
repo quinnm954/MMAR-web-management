@@ -4,23 +4,38 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Plus, Trash2 } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
 
+const TITLES = ['technician', 'service_advisor', 'manager', 'parts', 'admin', 'other'];
+const PAY_BASIS = [
+  { value: 'labor_hours', label: 'Per Labor Hour' },
+  { value: 'hourly_clock', label: 'Hourly (clock in/out)' },
+  { value: 'salary', label: 'Salary' },
+  { value: 'flat', label: 'Flat / Per Job' },
+];
+
 const AdminShopSettings = () => {
   const [settings, setSettings] = useState<any>(null);
   const [rates, setRates] = useState<any[]>([]);
   const [newRate, setNewRate] = useState({ name: '', hourly_rate: 0 });
+  const [payDefaults, setPayDefaults] = useState<Record<string, any>>({});
 
   const load = async () => {
-    const [s, r] = await Promise.all([
+    const [s, r, p] = await Promise.all([
       supabase.from('shop_settings').select('*').eq('id', 1).single(),
       supabase.from('labor_rates').select('*').order('created_at'),
+      supabase.from('employee_pay_defaults' as any).select('*'),
     ]);
     setSettings(s.data);
     setRates(r.data ?? []);
+    const map: Record<string, any> = {};
+    TITLES.forEach((t) => { map[t] = { employee_type: t, pay_basis: 'labor_hours', hourly_rate: 0, salary_amount: null }; });
+    ((p.data ?? []) as any[]).forEach((d) => { map[d.employee_type] = d; });
+    setPayDefaults(map);
   };
   useEffect(() => { load(); }, []);
 
@@ -29,6 +44,18 @@ const AdminShopSettings = () => {
     const { error } = await supabase.from('shop_settings').update({ ...up, updated_at: new Date().toISOString() }).eq('id', 1);
     if (error) return toast.error(error.message);
     toast.success('Settings saved');
+  };
+
+  const savePayDefault = async (t: string) => {
+    const d = payDefaults[t];
+    const { error } = await supabase.from('employee_pay_defaults' as any).upsert({
+      employee_type: t,
+      pay_basis: d.pay_basis,
+      hourly_rate: Number(d.hourly_rate) || 0,
+      salary_amount: d.salary_amount ? Number(d.salary_amount) : null,
+    }, { onConflict: 'employee_type' });
+    if (error) return toast.error(error.message);
+    toast.success(`${t.replace('_', ' ')} pay defaults saved`);
   };
 
   const addRate = async () => {
@@ -99,6 +126,57 @@ const AdminShopSettings = () => {
             <div className="w-32"><Label>$/hr</Label><Input type="number" step="0.01" value={newRate.hourly_rate} onChange={e => setNewRate({ ...newRate, hourly_rate: parseFloat(e.target.value) || 0 })} /></div>
             <Button onClick={addRate}><Plus className="h-4 w-4 mr-1" /> Add</Button>
           </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Default Pay by Job Title</CardTitle>
+          <p className="text-xs text-muted-foreground">
+            New employees added with a given title will automatically inherit these pay defaults. Edit individual employees to override.
+          </p>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Title</TableHead>
+                <TableHead>Pay Basis</TableHead>
+                <TableHead className="w-32">Hourly Rate</TableHead>
+                <TableHead className="w-36">Salary ($/yr)</TableHead>
+                <TableHead className="w-20"></TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {TITLES.map((t) => {
+                const d = payDefaults[t] || { pay_basis: 'labor_hours', hourly_rate: 0, salary_amount: null };
+                return (
+                  <TableRow key={t}>
+                    <TableCell className="capitalize font-medium">{t.replace('_', ' ')}</TableCell>
+                    <TableCell>
+                      <Select value={d.pay_basis} onValueChange={(v) => setPayDefaults({ ...payDefaults, [t]: { ...d, pay_basis: v } })}>
+                        <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          {PAY_BASIS.map((p) => <SelectItem key={p.value} value={p.value}>{p.label}</SelectItem>)}
+                        </SelectContent>
+                      </Select>
+                    </TableCell>
+                    <TableCell>
+                      <Input type="number" step="0.01" value={d.hourly_rate}
+                        onChange={(e) => setPayDefaults({ ...payDefaults, [t]: { ...d, hourly_rate: parseFloat(e.target.value) || 0 } })} />
+                    </TableCell>
+                    <TableCell>
+                      <Input type="number" step="0.01" value={d.salary_amount ?? ''}
+                        onChange={(e) => setPayDefaults({ ...payDefaults, [t]: { ...d, salary_amount: e.target.value ? parseFloat(e.target.value) : null } })} />
+                    </TableCell>
+                    <TableCell>
+                      <Button size="sm" variant="outline" onClick={() => savePayDefault(t)}>Save</Button>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
         </CardContent>
       </Card>
     </div>

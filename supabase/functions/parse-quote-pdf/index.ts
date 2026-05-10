@@ -23,15 +23,17 @@ const tool = {
           items: {
             type: "object",
             properties: {
-              description: { type: "string" },
-              quantity: { type: "number" },
-              unit_price: { type: "number" },
-              labor_hours: { type: "number" },
-              kind: { type: "string", enum: ["part", "labor", "fee"], description: "Whether this line is a part, labor, or fee/other" },
+              description: { type: "string", description: "What this line item is for. For labor lines, include the operation/job name (e.g. 'Replace front brake pads')." },
+              quantity: { type: "number", description: "For parts: number of units. For labor: ALWAYS the number of billable LABOR HOURS (e.g. 1.5)." },
+              unit_price: { type: "number", description: "For parts: price per unit. For labor: the hourly LABOR RATE (price per hour). Never put the line total here for labor lines." },
+              labor_hours: { type: "number", description: "For labor lines, the billable labor hours. Should equal `quantity` when kind = 'labor'. Use 0 for parts/fees." },
+              line_total: { type: "number", description: "Optional. The line subtotal as printed on the document (quantity × unit_price)." },
+              kind: { type: "string", enum: ["part", "labor", "fee"], description: "Classify each line. Use 'labor' for any line that represents technician time, hours, labor charges, diagnostic time, or 'shop labor'. Use 'part' for parts/materials. Use 'fee' for shop supplies, hazmat, environmental, taxes, or other charges." },
             },
-            required: ["description", "quantity", "unit_price"],
+            required: ["description", "quantity", "unit_price", "kind"],
           },
         },
+        labor_rate: { type: "number", description: "The default labor rate ($/hr) printed on the quote, if shown anywhere." },
       },
       required: ["line_items"],
     },
@@ -58,7 +60,7 @@ Deno.serve(async (req) => {
           {
             role: "system",
             content:
-              "You extract auto-repair quote/estimate data from PDF documents. Return clean line items (parts & labor), customer info, and vehicle info. Use numeric values (no $ signs). If a field is missing, omit it.",
+              "You extract auto-repair quote/estimate data from PDF documents. Return clean line items (parts, LABOR, fees), customer info, and vehicle info.\n\nCRITICAL labor rules:\n- Identify EVERY labor/time line on the quote — keywords: 'labor', 'hours', 'hrs', 'time', 'tech time', 'shop labor', 'diagnostic'.\n- For labor lines: set kind='labor', set quantity = labor hours, set unit_price = hourly labor rate, set labor_hours = same value as quantity.\n- Never collapse labor into a single dollar amount — always express it as hours × rate.\n- If only the labor TOTAL is shown and you can detect the shop's labor rate, derive hours = total / rate.\n- If a line clearly represents work performed but no hours are shown, still mark kind='labor' and set labor_hours / quantity to the best estimate (0 if truly unknown).\n\nUse numeric values (no $ signs). If a field is missing, omit it.",
           },
           {
             role: "user",
