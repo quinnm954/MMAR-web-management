@@ -25,6 +25,10 @@ interface Invoice {
   shop_supplies: number;
   tax: number;
   total: number;
+  discount_amount?: number | null;
+  discount_value?: number | null;
+  discount_type?: string | null;
+  discount_reason?: string | null;
   amount_paid: number;
   due_date: string | null;
   paid_at: string | null;
