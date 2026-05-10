@@ -10,8 +10,23 @@ import { Car, CreditCard, Calendar, ArrowRight } from "lucide-react";
 
 const PortalDashboard = () => {
   const { user } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [counts, setCounts] = useState({ vehicles: 0, memberships: 0, appointments: 0 });
   const [name, setName] = useState("");
+
+  useEffect(() => {
+    const status = searchParams.get("membership");
+    if (status === "success") {
+      toast.success("Payment received — your membership is active!");
+      searchParams.delete("membership");
+      setSearchParams(searchParams, { replace: true });
+    } else if (status === "canceled") {
+      toast("Checkout canceled. You can resume anytime.", { description: "No charges were made." });
+      searchParams.delete("membership");
+      setSearchParams(searchParams, { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (!user) return;
