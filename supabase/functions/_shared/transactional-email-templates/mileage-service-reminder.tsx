@@ -4,6 +4,7 @@ import type { TemplateEntry } from './registry.ts'
 
 const SITE_NAME = "Mike's Mobile Auto Repair"
 const PHONE = '813-501-7572'
+const SITE_URL = 'https://mikesmautorepair.com'
 
 interface DueService {
   name: string
