@@ -6,13 +6,32 @@ import { useAuth } from "@/hooks/useAuth";
 import PortalLayout from "@/components/portal/PortalLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Car, CreditCard, Calendar, ArrowRight } from "lucide-react";
+import { Car, CreditCard, Calendar, ArrowRight, RefreshCw } from "lucide-react";
 
 const PortalDashboard = () => {
   const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const [counts, setCounts] = useState({ vehicles: 0, memberships: 0, appointments: 0 });
   const [name, setName] = useState("");
+  const [refreshing, setRefreshing] = useState(false);
+
+  const refresh = async () => {
+    if (!user) return;
+    setRefreshing(true);
+    const [v, m, a, p] = await Promise.all([
+      supabase.from("vehicles").select("id", { count: "exact", head: true }).eq("owner_id", user.id),
+      supabase.from("memberships").select("id", { count: "exact", head: true }).eq("customer_id", user.id).eq("status", "active"),
+      supabase.from("appointments").select("id", { count: "exact", head: true }).eq("customer_id", user.id).in("status", ["requested", "scheduled"]),
+      supabase.from("profiles").select("full_name").eq("id", user.id).maybeSingle(),
+    ]);
+    setCounts({
+      vehicles: v.count ?? 0,
+      memberships: m.count ?? 0,
+      appointments: a.count ?? 0,
+    });
+    setName(p.data?.full_name ?? "");
+    setRefreshing(false);
+  };
 
   useEffect(() => {
     const status = searchParams.get("membership");
@@ -30,20 +49,15 @@ const PortalDashboard = () => {
 
   useEffect(() => {
     if (!user) return;
-    (async () => {
-      const [v, m, a, p] = await Promise.all([
-        supabase.from("vehicles").select("id", { count: "exact", head: true }).eq("owner_id", user.id),
-        supabase.from("memberships").select("id", { count: "exact", head: true }).eq("customer_id", user.id).eq("status", "active"),
-        supabase.from("appointments").select("id", { count: "exact", head: true }).eq("customer_id", user.id).in("status", ["requested", "scheduled"]),
-        supabase.from("profiles").select("full_name").eq("id", user.id).maybeSingle(),
-      ]);
-      setCounts({
-        vehicles: v.count ?? 0,
-        memberships: m.count ?? 0,
-        appointments: a.count ?? 0,
-      });
-      setName(p.data?.full_name ?? "");
-    })();
+    refresh();
+    const onFocus = () => { if (document.visibilityState === 'visible') refresh(); };
+    document.addEventListener('visibilitychange', onFocus);
+    window.addEventListener('focus', onFocus);
+    return () => {
+      document.removeEventListener('visibilitychange', onFocus);
+      window.removeEventListener('focus', onFocus);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   return (
