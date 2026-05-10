@@ -8,31 +8,34 @@ const corsHeaders = {
 // Standard mileage-based service intervals (miles).
 // Match logic: a service_record counts toward an interval when its
 // service_type contains any of the keywords (case-insensitive).
-const INTERVALS: Array<{ name: string; intervalMiles: number; keywords: string[] }> = [
-  { name: 'Oil & filter change', intervalMiles: 5000, keywords: ['oil change', 'oil & filter', 'oil and filter', 'oil service'] },
-  { name: 'Tire rotation', intervalMiles: 7500, keywords: ['tire rotation', 'rotate tires'] },
-  { name: 'Multi-point inspection', intervalMiles: 10000, keywords: ['multi-point', 'multi point inspection', 'vehicle inspection'] },
-  { name: 'Wheel alignment check', intervalMiles: 15000, keywords: ['alignment'] },
-  { name: 'Brake inspection', intervalMiles: 15000, keywords: ['brake inspection', 'brake check'] },
-  { name: 'Cabin air filter', intervalMiles: 20000, keywords: ['cabin air filter', 'cabin filter'] },
-  { name: 'Battery test', intervalMiles: 25000, keywords: ['battery test', 'battery service'] },
-  { name: 'Fuel system cleaning', intervalMiles: 30000, keywords: ['fuel system', 'fuel injector', 'induction service'] },
-  { name: 'Engine air filter', intervalMiles: 30000, keywords: ['air filter', 'engine air filter'] },
-  { name: 'Brake fluid flush', intervalMiles: 30000, keywords: ['brake fluid'] },
-  { name: 'A/C system performance check', intervalMiles: 30000, keywords: ['a/c service', 'ac service', 'air conditioning'] },
-  { name: 'Brake pads & rotors', intervalMiles: 40000, keywords: ['brake pad', 'brake rotor', 'brakes replaced'] },
-  { name: 'Power steering fluid flush', intervalMiles: 50000, keywords: ['power steering'] },
-  { name: 'Transmission fluid service', intervalMiles: 60000, keywords: ['transmission fluid', 'trans fluid'] },
-  { name: 'Coolant flush', intervalMiles: 60000, keywords: ['coolant', 'antifreeze'] },
-  { name: 'Spark plug replacement', intervalMiles: 60000, keywords: ['spark plug'] },
-  { name: 'Differential fluid service', intervalMiles: 60000, keywords: ['differential'] },
-  { name: 'Transfer case fluid (4WD/AWD)', intervalMiles: 60000, keywords: ['transfer case'] },
-  { name: 'PCV valve replacement', intervalMiles: 60000, keywords: ['pcv'] },
-  { name: 'Serpentine belt inspection', intervalMiles: 60000, keywords: ['serpentine belt', 'drive belt'] },
-  { name: 'Fuel filter replacement', intervalMiles: 60000, keywords: ['fuel filter'] },
-  { name: 'Shocks & struts inspection', intervalMiles: 75000, keywords: ['shocks', 'struts'] },
-  { name: 'Timing belt replacement', intervalMiles: 90000, keywords: ['timing belt'] },
-  { name: 'Oxygen sensor replacement', intervalMiles: 100000, keywords: ['oxygen sensor', 'o2 sensor'] },
+// Competitor price ranges = typical SW Florida dealer / national chain (e.g. Firestone,
+// Pep Boys, Tires Plus) pricing per RepairPal & KBB Service estimates. Used purely
+// to show customers what they'd pay elsewhere — Mike's mobile pricing is usually lower.
+const INTERVALS: Array<{ name: string; intervalMiles: number; keywords: string[]; competitorPriceRange: [number, number] }> = [
+  { name: 'Oil & filter change', intervalMiles: 5000, keywords: ['oil change', 'oil & filter', 'oil and filter', 'oil service'], competitorPriceRange: [60, 120] },
+  { name: 'Tire rotation', intervalMiles: 7500, keywords: ['tire rotation', 'rotate tires'], competitorPriceRange: [25, 50] },
+  { name: 'Multi-point inspection', intervalMiles: 10000, keywords: ['multi-point', 'multi point inspection', 'vehicle inspection'], competitorPriceRange: [40, 90] },
+  { name: 'Wheel alignment check', intervalMiles: 15000, keywords: ['alignment'], competitorPriceRange: [89, 150] },
+  { name: 'Brake inspection', intervalMiles: 15000, keywords: ['brake inspection', 'brake check'], competitorPriceRange: [40, 90] },
+  { name: 'Cabin air filter', intervalMiles: 20000, keywords: ['cabin air filter', 'cabin filter'], competitorPriceRange: [50, 110] },
+  { name: 'Battery test', intervalMiles: 25000, keywords: ['battery test', 'battery service'], competitorPriceRange: [25, 60] },
+  { name: 'Fuel system cleaning', intervalMiles: 30000, keywords: ['fuel system', 'fuel injector', 'induction service'], competitorPriceRange: [120, 250] },
+  { name: 'Engine air filter', intervalMiles: 30000, keywords: ['air filter', 'engine air filter'], competitorPriceRange: [40, 95] },
+  { name: 'Brake fluid flush', intervalMiles: 30000, keywords: ['brake fluid'], competitorPriceRange: [110, 175] },
+  { name: 'A/C system performance check', intervalMiles: 30000, keywords: ['a/c service', 'ac service', 'air conditioning'], competitorPriceRange: [80, 180] },
+  { name: 'Brake pads & rotors', intervalMiles: 40000, keywords: ['brake pad', 'brake rotor', 'brakes replaced'], competitorPriceRange: [350, 750] },
+  { name: 'Power steering fluid flush', intervalMiles: 50000, keywords: ['power steering'], competitorPriceRange: [110, 175] },
+  { name: 'Transmission fluid service', intervalMiles: 60000, keywords: ['transmission fluid', 'trans fluid'], competitorPriceRange: [180, 350] },
+  { name: 'Coolant flush', intervalMiles: 60000, keywords: ['coolant', 'antifreeze'], competitorPriceRange: [120, 220] },
+  { name: 'Spark plug replacement', intervalMiles: 60000, keywords: ['spark plug'], competitorPriceRange: [180, 450] },
+  { name: 'Differential fluid service', intervalMiles: 60000, keywords: ['differential'], competitorPriceRange: [110, 220] },
+  { name: 'Transfer case fluid (4WD/AWD)', intervalMiles: 60000, keywords: ['transfer case'], competitorPriceRange: [120, 230] },
+  { name: 'PCV valve replacement', intervalMiles: 60000, keywords: ['pcv'], competitorPriceRange: [60, 130] },
+  { name: 'Serpentine belt inspection', intervalMiles: 60000, keywords: ['serpentine belt', 'drive belt'], competitorPriceRange: [125, 250] },
+  { name: 'Fuel filter replacement', intervalMiles: 60000, keywords: ['fuel filter'], competitorPriceRange: [80, 200] },
+  { name: 'Shocks & struts inspection', intervalMiles: 75000, keywords: ['shocks', 'struts'], competitorPriceRange: [50, 120] },
+  { name: 'Timing belt replacement', intervalMiles: 90000, keywords: ['timing belt'], competitorPriceRange: [600, 1200] },
+  { name: 'Oxygen sensor replacement', intervalMiles: 100000, keywords: ['oxygen sensor', 'o2 sensor'], competitorPriceRange: [220, 500] },
 ];
 
 // Show items overdue OR coming due within this many miles
@@ -102,7 +105,7 @@ Deno.serve(async (req) => {
           : null;
         const baseline = lastMiles ?? 0;
         const overdueBy = (v.current_mileage as number) - (baseline + cfg.intervalMiles);
-        return { name: cfg.name, intervalMiles: cfg.intervalMiles, lastServiceMiles: lastMiles, overdueBy };
+        return { name: cfg.name, intervalMiles: cfg.intervalMiles, lastServiceMiles: lastMiles, overdueBy, competitorPriceRange: cfg.competitorPriceRange };
       })
         .filter((s) => s.overdueBy >= -DUE_SOON_WINDOW)
         .sort((a, b) => b.overdueBy - a.overdueBy);

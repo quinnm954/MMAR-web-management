@@ -11,6 +11,7 @@ interface DueService {
   intervalMiles: number
   lastServiceMiles: number | null
   overdueBy: number
+  competitorPriceRange?: [number, number]
 }
 
 interface Props {
@@ -41,6 +42,12 @@ const MileageServiceReminderEmail = ({ customerName, vehicle, currentMileage, du
             following mileage-based services are due or overdue. Keeping up with these protects your warranty and
             prevents bigger repair bills down the road.
           </Text>
+          <Text style={smallText}>
+            Each item below shows the typical <strong>competitor price range</strong> at local dealers
+            and national chains (Firestone, Pep Boys, Tires Plus) so you can see what you'd pay
+            elsewhere — our mobile pricing is usually well below the low end, plus the 20% discount
+            stacks on top.
+          </Text>
 
           <Section style={card}>
             {dueServices.map((s, i) => {
@@ -51,16 +58,29 @@ const MileageServiceReminderEmail = ({ customerName, vehicle, currentMileage, du
                   ? 'due now'
                   : `due in ${fmt(Math.abs(s.overdueBy))} mi`
               return (
-                <Text key={i} style={detail}>
-                  <span style={isOverdue ? badgeOverdue : badgeDueSoon}>
-                    {isOverdue ? 'OVERDUE' : 'DUE SOON'}
-                  </span>{' '}
-                  <strong>{s.name}</strong> — every {fmt(s.intervalMiles)} mi
-                  {s.lastServiceMiles != null
-                    ? ` · last done at ${fmt(s.lastServiceMiles)} mi`
-                    : ' · no record on file'}
-                  {' · '}{statusLabel}
-                </Text>
+                <Section key={i} style={itemBlock}>
+                  <Text style={itemTitle}>
+                    <span style={isOverdue ? badgeOverdue : badgeDueSoon}>
+                      {isOverdue ? 'OVERDUE' : 'DUE SOON'}
+                    </span>{' '}
+                    <strong>{s.name}</strong>
+                  </Text>
+                  <Text style={itemMeta}>
+                    every {fmt(s.intervalMiles)} mi
+                    {s.lastServiceMiles != null
+                      ? ` · last done at ${fmt(s.lastServiceMiles)} mi`
+                      : ' · no record on file'}
+                    {' · '}{statusLabel}
+                  </Text>
+                  {s.competitorPriceRange && (
+                    <Text style={priceRow}>
+                      <span style={priceLabel}>Competitor price:</span>{' '}
+                      <span style={priceValue}>
+                        ${fmt(s.competitorPriceRange[0])}–${fmt(s.competitorPriceRange[1])}
+                      </span>
+                    </Text>
+                  )}
+                </Section>
               )
             })}
           </Section>
@@ -109,27 +129,27 @@ export const template = {
     vehicle: '2018 Honda Civic',
     currentMileage: 92000,
     dueServices: [
-      { name: 'Oil & filter change', intervalMiles: 5000, lastServiceMiles: 85000, overdueBy: 2000 },
-      { name: 'Tire rotation', intervalMiles: 7500, lastServiceMiles: 80000, overdueBy: 4500 },
-      { name: 'Multi-point inspection', intervalMiles: 10000, lastServiceMiles: 80000, overdueBy: 2000 },
-      { name: 'Wheel alignment check', intervalMiles: 15000, lastServiceMiles: 70000, overdueBy: 7000 },
-      { name: 'Brake inspection', intervalMiles: 15000, lastServiceMiles: 75000, overdueBy: 2000 },
-      { name: 'Cabin air filter', intervalMiles: 20000, lastServiceMiles: 70000, overdueBy: 2000 },
-      { name: 'Battery test', intervalMiles: 25000, lastServiceMiles: null, overdueBy: 67000 },
-      { name: 'Engine air filter', intervalMiles: 30000, lastServiceMiles: 60000, overdueBy: 2000 },
-      { name: 'Brake fluid flush', intervalMiles: 30000, lastServiceMiles: null, overdueBy: 62000 },
-      { name: 'A/C system performance check', intervalMiles: 30000, lastServiceMiles: null, overdueBy: 62000 },
-      { name: 'Brake pads & rotors', intervalMiles: 40000, lastServiceMiles: 50000, overdueBy: 2000 },
-      { name: 'Power steering fluid flush', intervalMiles: 50000, lastServiceMiles: null, overdueBy: 42000 },
-      { name: 'Transmission fluid service', intervalMiles: 60000, lastServiceMiles: null, overdueBy: 32000 },
-      { name: 'Coolant flush', intervalMiles: 60000, lastServiceMiles: null, overdueBy: 32000 },
-      { name: 'Spark plug replacement', intervalMiles: 60000, lastServiceMiles: null, overdueBy: 32000 },
-      { name: 'Differential fluid service', intervalMiles: 60000, lastServiceMiles: null, overdueBy: 32000 },
-      { name: 'Serpentine belt inspection', intervalMiles: 60000, lastServiceMiles: null, overdueBy: 32000 },
-      { name: 'Fuel filter replacement', intervalMiles: 60000, lastServiceMiles: null, overdueBy: 32000 },
-      { name: 'Shocks & struts inspection', intervalMiles: 75000, lastServiceMiles: null, overdueBy: 17000 },
-      { name: 'Timing belt replacement', intervalMiles: 90000, lastServiceMiles: null, overdueBy: 2000 },
-      { name: 'Oxygen sensor replacement', intervalMiles: 100000, lastServiceMiles: null, overdueBy: -8000 },
+      { name: 'Oil & filter change', intervalMiles: 5000, lastServiceMiles: 85000, overdueBy: 2000, competitorPriceRange: [60, 120] },
+      { name: 'Tire rotation', intervalMiles: 7500, lastServiceMiles: 80000, overdueBy: 4500, competitorPriceRange: [25, 50] },
+      { name: 'Multi-point inspection', intervalMiles: 10000, lastServiceMiles: 80000, overdueBy: 2000, competitorPriceRange: [40, 90] },
+      { name: 'Wheel alignment check', intervalMiles: 15000, lastServiceMiles: 70000, overdueBy: 7000, competitorPriceRange: [89, 150] },
+      { name: 'Brake inspection', intervalMiles: 15000, lastServiceMiles: 75000, overdueBy: 2000, competitorPriceRange: [40, 90] },
+      { name: 'Cabin air filter', intervalMiles: 20000, lastServiceMiles: 70000, overdueBy: 2000, competitorPriceRange: [50, 110] },
+      { name: 'Battery test', intervalMiles: 25000, lastServiceMiles: null, overdueBy: 67000, competitorPriceRange: [25, 60] },
+      { name: 'Engine air filter', intervalMiles: 30000, lastServiceMiles: 60000, overdueBy: 2000, competitorPriceRange: [40, 95] },
+      { name: 'Brake fluid flush', intervalMiles: 30000, lastServiceMiles: null, overdueBy: 62000, competitorPriceRange: [110, 175] },
+      { name: 'A/C system performance check', intervalMiles: 30000, lastServiceMiles: null, overdueBy: 62000, competitorPriceRange: [80, 180] },
+      { name: 'Brake pads & rotors', intervalMiles: 40000, lastServiceMiles: 50000, overdueBy: 2000, competitorPriceRange: [350, 750] },
+      { name: 'Power steering fluid flush', intervalMiles: 50000, lastServiceMiles: null, overdueBy: 42000, competitorPriceRange: [110, 175] },
+      { name: 'Transmission fluid service', intervalMiles: 60000, lastServiceMiles: null, overdueBy: 32000, competitorPriceRange: [180, 350] },
+      { name: 'Coolant flush', intervalMiles: 60000, lastServiceMiles: null, overdueBy: 32000, competitorPriceRange: [120, 220] },
+      { name: 'Spark plug replacement', intervalMiles: 60000, lastServiceMiles: null, overdueBy: 32000, competitorPriceRange: [180, 450] },
+      { name: 'Differential fluid service', intervalMiles: 60000, lastServiceMiles: null, overdueBy: 32000, competitorPriceRange: [110, 220] },
+      { name: 'Serpentine belt inspection', intervalMiles: 60000, lastServiceMiles: null, overdueBy: 32000, competitorPriceRange: [125, 250] },
+      { name: 'Fuel filter replacement', intervalMiles: 60000, lastServiceMiles: null, overdueBy: 32000, competitorPriceRange: [80, 200] },
+      { name: 'Shocks & struts inspection', intervalMiles: 75000, lastServiceMiles: null, overdueBy: 17000, competitorPriceRange: [50, 120] },
+      { name: 'Timing belt replacement', intervalMiles: 90000, lastServiceMiles: null, overdueBy: 2000, competitorPriceRange: [600, 1200] },
+      { name: 'Oxygen sensor replacement', intervalMiles: 100000, lastServiceMiles: null, overdueBy: -8000, competitorPriceRange: [220, 500] },
     ],
   },
 } satisfies TemplateEntry
@@ -151,3 +171,9 @@ const promoHeadline = { fontSize: '20px', fontWeight: 'bold' as const, color: '#
 const promoSubtext = { fontSize: '13px', color: '#5b4a14', lineHeight: '1.5', margin: '0' }
 const badgeOverdue = { display: 'inline-block', backgroundColor: '#dc2626', color: '#ffffff', fontSize: '10px', fontWeight: 'bold' as const, padding: '2px 6px', borderRadius: '3px', letterSpacing: '0.5px', verticalAlign: 'middle' }
 const badgeDueSoon = { display: 'inline-block', backgroundColor: '#f5b400', color: '#0a1628', fontSize: '10px', fontWeight: 'bold' as const, padding: '2px 6px', borderRadius: '3px', letterSpacing: '0.5px', verticalAlign: 'middle' }
+const itemBlock = { padding: '10px 0', borderBottom: '1px solid #e2e8f0', margin: '0' }
+const itemTitle = { fontSize: '14px', color: '#0a1628', margin: '0 0 4px', lineHeight: '1.4' }
+const itemMeta = { fontSize: '12px', color: '#64748b', margin: '0 0 4px', lineHeight: '1.4' }
+const priceRow = { fontSize: '12px', margin: '2px 0 0', lineHeight: '1.4' }
+const priceLabel = { color: '#64748b', fontStyle: 'italic' as const }
+const priceValue = { color: '#0a1628', fontWeight: 'bold' as const }
