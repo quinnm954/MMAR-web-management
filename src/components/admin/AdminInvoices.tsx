@@ -271,7 +271,31 @@ const AdminInvoices = () => {
               <div><Label>Invoice Number</Label><Input value={form.invoice_number} onChange={(e) => setForm({ ...form, invoice_number: e.target.value })} placeholder="auto-generated" /></div>
               <div className="grid grid-cols-2 gap-3">
                 <div><Label>Subtotal *</Label><Input type="number" step="0.01" value={form.subtotal} onChange={(e) => setForm({ ...form, subtotal: e.target.value })} /></div>
-                <div><Label>Tax</Label><Input type="number" step="0.01" value={form.tax} onChange={(e) => setForm({ ...form, tax: e.target.value })} /></div>
+                <div><Label>Tax (auto if blank)</Label><Input type="number" step="0.01" value={form.tax} onChange={(e) => setForm({ ...form, tax: e.target.value })} /></div>
+              </div>
+              <div className="rounded-md border border-border/50 p-3 space-y-2 bg-muted/20">
+                <Label className="text-xs uppercase tracking-wide text-muted-foreground">Discount (optional)</Label>
+                <div className="grid grid-cols-2 gap-3">
+                  <Select value={form.discount_type} onValueChange={(v) => setForm({ ...form, discount_type: v as "amount" | "percent" })}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="amount">$ Amount</SelectItem>
+                      <SelectItem value="percent">% Percent</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    placeholder={form.discount_type === "percent" ? "e.g. 10" : "e.g. 25.00"}
+                    value={form.discount_value}
+                    onChange={(e) => setForm({ ...form, discount_value: e.target.value })}
+                  />
+                </div>
+                <Input
+                  placeholder="Reason (e.g. loyalty, promo)"
+                  value={form.discount_reason}
+                  onChange={(e) => setForm({ ...form, discount_reason: e.target.value })}
+                />
               </div>
               <div><Label>Due Date</Label><Input type="date" value={form.due_date} onChange={(e) => setForm({ ...form, due_date: e.target.value })} /></div>
             </div>
