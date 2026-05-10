@@ -178,9 +178,11 @@ const AdminEstimates = () => {
     if (!preview) return;
     const { extracted: ex, matchedVehicle, lines } = preview;
     let { matchedCustomer } = preview;
-    const subtotal = lines.reduce((s: number, i: LineItem) => s + i.amount, 0);
-    const shop = Math.min(subtotal * (settings?.shop_supplies_pct ?? 0.05), settings?.shop_supplies_max ?? 50);
-    const tax = (subtotal + shop) * (settings?.tax_rate ?? 0.07);
+    const taxableSubtotal = lines.reduce((s: number, i: LineItem) => i.kind === 'fee' ? s : s + i.amount, 0);
+    const feeSubtotal = lines.reduce((s: number, i: LineItem) => i.kind === 'fee' ? s + i.amount : s, 0);
+    const subtotal = taxableSubtotal + feeSubtotal;
+    const shop = Math.min(taxableSubtotal * (settings?.shop_supplies_pct ?? 0.05), settings?.shop_supplies_max ?? 50);
+    const tax = (taxableSubtotal + shop) * (settings?.tax_rate ?? 0.07);
     const valid_until = settings ? new Date(Date.now() + (settings.estimate_valid_days || 14) * 86400000).toISOString().slice(0, 10) : null;
 
     // Auto-create customer when no match was found and we have any identifying info.
@@ -240,9 +242,11 @@ const AdminEstimates = () => {
   };
 
   const recalc = (li: LineItem[]) => {
-    const subtotal = li.reduce((s, i) => s + (Number(i.quantity) * Number(i.unit_price)), 0);
-    const shop = Math.min(subtotal * (settings?.shop_supplies_pct ?? 0.05), settings?.shop_supplies_max ?? 50);
-    const tax = (subtotal + shop) * (settings?.tax_rate ?? 0.07);
+    const taxableSubtotal = li.reduce((s, i) => i.kind === 'fee' ? s : s + (Number(i.quantity) * Number(i.unit_price)), 0);
+    const feeSubtotal = li.reduce((s, i) => i.kind === 'fee' ? s + (Number(i.quantity) * Number(i.unit_price)) : s, 0);
+    const subtotal = taxableSubtotal + feeSubtotal;
+    const shop = Math.min(taxableSubtotal * (settings?.shop_supplies_pct ?? 0.05), settings?.shop_supplies_max ?? 50);
+    const tax = (taxableSubtotal + shop) * (settings?.tax_rate ?? 0.07);
     return { subtotal, shop_supplies: shop, tax, total: subtotal + shop + tax };
   };
 
@@ -258,6 +262,12 @@ const AdminEstimates = () => {
       : { description: '', quantity: 1, unit_price: 0, amount: 0, labor_hours: 0 };
     updateLines([...(editing.line_items || []), line]);
   };
+
+  const addDiagnosisFee = () => {
+    const line: LineItem = { description: 'Diagnosis Fee', quantity: 1, unit_price: 0, amount: 0, labor_hours: 0, kind: 'fee' };
+    updateLines([...(editing.line_items || []), line]);
+  };
+
 
   const updateLine = (idx: number, patch: Partial<LineItem>) => {
     const lines = [...editing.line_items];
@@ -406,6 +416,7 @@ const AdminEstimates = () => {
                       </SelectContent>
                     </Select>
                     <Button size="sm" variant="outline" onClick={() => addLine()}><Plus className="h-3 w-3 mr-1" /> Custom</Button>
+                    <Button size="sm" variant="outline" onClick={addDiagnosisFee}><Plus className="h-3 w-3 mr-1" /> Diagnosis Fee</Button>
                   </div>
                 </div>
                 <div className="border rounded">
@@ -423,7 +434,10 @@ const AdminEstimates = () => {
                     <TableBody>
                       {(editing.line_items || []).map((l: LineItem, i: number) => (
                         <TableRow key={i}>
-                          <TableCell><Input value={l.description} onChange={e => updateLine(i, { description: e.target.value })} /></TableCell>
+                          <TableCell>
+                            <Input value={l.description} onChange={e => updateLine(i, { description: e.target.value })} />
+                            {l.kind === 'fee' && <span className="text-[10px] text-muted-foreground ml-1">Flat fee · no tax/shop</span>}
+                          </TableCell>
                           <TableCell><Input type="number" step="0.5" value={l.quantity} onChange={e => updateLine(i, { quantity: parseFloat(e.target.value) || 0 })} /></TableCell>
                           <TableCell><Input type="number" step="0.1" value={l.labor_hours ?? 0} onChange={e => updateLine(i, { labor_hours: parseFloat(e.target.value) || 0 })} title="Billable labor hours" /></TableCell>
                           <TableCell><Input type="number" step="0.01" value={l.unit_price} onChange={e => updateLine(i, { unit_price: parseFloat(e.target.value) || 0 })} /></TableCell>
