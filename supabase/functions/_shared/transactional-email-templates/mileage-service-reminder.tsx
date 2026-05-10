@@ -24,9 +24,9 @@ const fmt = (n: number) => n.toLocaleString('en-US')
 
 const MileageServiceReminderEmail = ({ customerName, vehicle, currentMileage, dueServices = [] }: Props) => {
   const serviceList = dueServices.map((s) => s.name).join(', ')
-  const quoteBody = `Hi Mike — I'd like a quote for: ${serviceList || 'recommended maintenance'}${vehicle ? ` on my ${vehicle}` : ''}.`
+  const quoteBody = `Hi Mike — I'd like a quote for: ${serviceList || 'recommended maintenance'}${vehicle ? ` on my ${vehicle}` : ''}. Please apply my 20% mileage reminder discount.`
   const smsQuoteHref = `sms:${PHONE}?&body=${encodeURIComponent(quoteBody)}`
-  const webQuoteHref = `${SITE_URL}/contact?services=${encodeURIComponent(serviceList)}${vehicle ? `&vehicle=${encodeURIComponent(vehicle)}` : ''}`
+  const webQuoteHref = `${SITE_URL}/contact?services=${encodeURIComponent(serviceList)}${vehicle ? `&vehicle=${encodeURIComponent(vehicle)}` : ''}&promo=MILEAGE20`
 
   return (
     <Html lang="en">
@@ -54,12 +54,22 @@ const MileageServiceReminderEmail = ({ customerName, vehicle, currentMileage, du
             ))}
           </Section>
 
+          <Section style={promoCard}>
+            <Text style={promoBadge}>LIMITED TIME</Text>
+            <Text style={promoHeadline}>20% OFF any service from this reminder</Text>
+            <Text style={promoSubtext}>
+              Mention this email when you book and we'll take 20% off labor on any of the
+              recommended services above. One discount per visit.
+            </Text>
+          </Section>
+
           <Text style={text}>
             Want pricing before you book? Tap below to request a free quote on the services listed above —
-            we'll text you back with a transparent estimate. We come to you, no shop drop-off needed.
+            we'll text you back with a transparent estimate that already includes your 20% off. We come to
+            you, no shop drop-off needed.
           </Text>
 
-          <Button href={smsQuoteHref} style={button}>Get a quote for these services</Button>
+          <Button href={smsQuoteHref} style={button}>Claim 20% off — get a quote</Button>
 
           <Text style={text}>
             Prefer the web?{' '}
@@ -67,7 +77,7 @@ const MileageServiceReminderEmail = ({ customerName, vehicle, currentMileage, du
           </Text>
 
           <Text style={smallText}>
-            Or call/text <strong>{PHONE}</strong> any time.
+            Or call/text <strong>{PHONE}</strong> any time and reference your 20% mileage reminder discount.
           </Text>
 
           <Hr style={hr} />
@@ -106,3 +116,7 @@ const hr = { borderColor: '#e2e8f0', margin: '24px 0' }
 const footer = { fontSize: '12px', color: '#94a3b8' }
 const link = { color: '#3aa6e0', textDecoration: 'underline', fontWeight: 'bold' as const }
 const smallText = { fontSize: '13px', color: '#64748b', lineHeight: '1.5', margin: '0 0 12px' }
+const promoCard = { backgroundColor: '#fff8e1', border: '2px dashed #f5b400', padding: '16px 20px', margin: '20px 0', borderRadius: '6px', textAlign: 'center' as const }
+const promoBadge = { fontSize: '11px', fontWeight: 'bold' as const, color: '#a07400', letterSpacing: '1px', margin: '0 0 6px' }
+const promoHeadline = { fontSize: '20px', fontWeight: 'bold' as const, color: '#0a1628', margin: '0 0 8px' }
+const promoSubtext = { fontSize: '13px', color: '#5b4a14', lineHeight: '1.5', margin: '0' }

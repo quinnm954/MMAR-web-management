@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
-import { Loader2, Plus, Receipt, MessageSquare, Link2, Share2, ExternalLink } from "lucide-react";
+import { Loader2, Plus, Receipt, MessageSquare, Link2, Share2, ExternalLink, Tag } from "lucide-react";
 import { toast } from "sonner";
 import { shareLink } from "@/lib/share";
 import DeleteButton from "@/components/admin/DeleteButton";
@@ -21,6 +21,10 @@ interface Invoice {
   tax: number;
   total: number;
   amount_paid: number;
+  discount_type?: string | null;
+  discount_value?: number | null;
+  discount_amount?: number | null;
+  discount_reason?: string | null;
   due_date: string | null;
   paid_at: string | null;
   created_at: string;
@@ -51,7 +55,13 @@ const AdminInvoices = () => {
     subtotal: "",
     tax: "",
     due_date: "",
+    discount_type: "amount" as "amount" | "percent",
+    discount_value: "",
+    discount_reason: "",
   });
+  const [discountEditing, setDiscountEditing] = useState<string | null>(null);
+  const [discountForm, setDiscountForm] = useState({ type: "amount" as "amount" | "percent", value: "", reason: "" });
+  const [savingDiscount, setSavingDiscount] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -142,6 +152,7 @@ const AdminInvoices = () => {
     if (!form.customer_id || !form.subtotal) return toast.error("Customer and subtotal required");
     const subtotal = parseFloat(form.subtotal);
     const tax = form.tax ? parseFloat(form.tax) : 0;
+    const discount_value = form.discount_value ? parseFloat(form.discount_value) : 0;
     setSaving(true);
     const { error } = await supabase.from("invoices").insert({
       customer_id: form.customer_id,
@@ -151,12 +162,45 @@ const AdminInvoices = () => {
       total: subtotal + tax,
       due_date: form.due_date || null,
       status: "unpaid",
+      discount_type: form.discount_type,
+      discount_value,
+      discount_reason: form.discount_reason || null,
     });
     setSaving(false);
     if (error) return toast.error(error.message);
     toast.success("Invoice created");
     setOpen(false);
-    setForm({ customer_id: "", invoice_number: "", subtotal: "", tax: "", due_date: "" });
+    setForm({ customer_id: "", invoice_number: "", subtotal: "", tax: "", due_date: "", discount_type: "amount", discount_value: "", discount_reason: "" });
+    load();
+  };
+
+  const openDiscount = (inv: Invoice) => {
+    setDiscountEditing(inv.id);
+    setDiscountForm({
+      type: (inv.discount_type as "amount" | "percent") || "amount",
+      value: inv.discount_value ? String(inv.discount_value) : "",
+      reason: inv.discount_reason || "",
+    });
+  };
+
+  const saveDiscount = async () => {
+    if (!discountEditing) return;
+    setSavingDiscount(true);
+    const { error } = await supabase
+      .from("invoices")
+      .update({
+        discount_type: discountForm.type,
+        discount_value: discountForm.value ? parseFloat(discountForm.value) : 0,
+        discount_reason: discountForm.reason || null,
+        // Reset shop_supplies/tax to 0 so trigger recomputes them based on new discounted subtotal
+        shop_supplies: 0,
+        tax: 0,
+      })
+      .eq("id", discountEditing);
+    setSavingDiscount(false);
+    if (error) return toast.error(error.message);
+    toast.success("Discount applied");
+    setDiscountEditing(null);
     load();
   };
 
@@ -227,7 +271,31 @@ const AdminInvoices = () => {
               <div><Label>Invoice Number</Label><Input value={form.invoice_number} onChange={(e) => setForm({ ...form, invoice_number: e.target.value })} placeholder="auto-generated" /></div>
               <div className="grid grid-cols-2 gap-3">
                 <div><Label>Subtotal *</Label><Input type="number" step="0.01" value={form.subtotal} onChange={(e) => setForm({ ...form, subtotal: e.target.value })} /></div>
-                <div><Label>Tax</Label><Input type="number" step="0.01" value={form.tax} onChange={(e) => setForm({ ...form, tax: e.target.value })} /></div>
+                <div><Label>Tax (auto if blank)</Label><Input type="number" step="0.01" value={form.tax} onChange={(e) => setForm({ ...form, tax: e.target.value })} /></div>
+              </div>
+              <div className="rounded-md border border-border/50 p-3 space-y-2 bg-muted/20">
+                <Label className="text-xs uppercase tracking-wide text-muted-foreground">Discount (optional)</Label>
+                <div className="grid grid-cols-2 gap-3">
+                  <Select value={form.discount_type} onValueChange={(v) => setForm({ ...form, discount_type: v as "amount" | "percent" })}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="amount">$ Amount</SelectItem>
+                      <SelectItem value="percent">% Percent</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    placeholder={form.discount_type === "percent" ? "e.g. 10" : "e.g. 25.00"}
+                    value={form.discount_value}
+                    onChange={(e) => setForm({ ...form, discount_value: e.target.value })}
+                  />
+                </div>
+                <Input
+                  placeholder="Reason (e.g. loyalty, promo)"
+                  value={form.discount_reason}
+                  onChange={(e) => setForm({ ...form, discount_reason: e.target.value })}
+                />
               </div>
               <div><Label>Due Date</Label><Input type="date" value={form.due_date} onChange={(e) => setForm({ ...form, due_date: e.target.value })} /></div>
             </div>
@@ -263,8 +331,18 @@ const AdminInvoices = () => {
                   <div className="flex items-center gap-3">
                     <div className="text-right">
                       <div className="font-bold">${i.total.toFixed(2)}</div>
+                      {(i.discount_amount ?? 0) > 0 && (
+                        <div className="text-xs text-primary">
+                          −${Number(i.discount_amount).toFixed(2)} discount
+                          {i.discount_type === "percent" && i.discount_value ? ` (${i.discount_value}%)` : ""}
+                        </div>
+                      )}
                       {i.amount_paid > 0 && <div className="text-xs text-muted-foreground">Paid ${i.amount_paid.toFixed(2)}</div>}
                     </div>
+                    <Button size="sm" variant="ghost" onClick={() => openDiscount(i)} title="Edit discount">
+                      <Tag className="h-3 w-3 mr-1" />
+                      Discount
+                    </Button>
                     <Button size="sm" variant="outline" onClick={() => window.open(`/portal/invoices/${i.id}`, "_blank")} title="Open invoice page">
                       <ExternalLink className="h-3 w-3 mr-1" />
                       View
@@ -314,6 +392,51 @@ const AdminInvoices = () => {
           })}
         </div>
       )}
+
+      <Dialog open={!!discountEditing} onOpenChange={(o) => !o && setDiscountEditing(null)}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>Apply Discount</DialogTitle></DialogHeader>
+          <div className="space-y-3">
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label>Type</Label>
+                <Select value={discountForm.type} onValueChange={(v) => setDiscountForm({ ...discountForm, type: v as "amount" | "percent" })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="amount">$ Amount</SelectItem>
+                    <SelectItem value="percent">% Percent</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>Value</Label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  placeholder={discountForm.type === "percent" ? "e.g. 20" : "e.g. 50.00"}
+                  value={discountForm.value}
+                  onChange={(e) => setDiscountForm({ ...discountForm, value: e.target.value })}
+                />
+              </div>
+            </div>
+            <div>
+              <Label>Reason</Label>
+              <Input
+                placeholder="e.g. loyalty, mileage reminder promo"
+                value={discountForm.reason}
+                onChange={(e) => setDiscountForm({ ...discountForm, reason: e.target.value })}
+              />
+            </div>
+            <p className="text-xs text-muted-foreground">Tax and shop supplies will be recalculated against the discounted subtotal.</p>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDiscountEditing(null)}>Cancel</Button>
+            <Button variant="hero" onClick={saveDiscount} disabled={savingDiscount}>
+              {savingDiscount ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

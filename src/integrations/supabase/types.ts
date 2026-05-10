@@ -1000,6 +1000,10 @@ export type Database = {
           amount_paid: number
           created_at: string
           customer_id: string
+          discount_amount: number
+          discount_reason: string | null
+          discount_type: string
+          discount_value: number
           due_date: string | null
           id: string
           invoice_number: string | null
@@ -1023,6 +1027,10 @@ export type Database = {
           amount_paid?: number
           created_at?: string
           customer_id: string
+          discount_amount?: number
+          discount_reason?: string | null
+          discount_type?: string
+          discount_value?: number
           due_date?: string | null
           id?: string
           invoice_number?: string | null
@@ -1046,6 +1054,10 @@ export type Database = {
           amount_paid?: number
           created_at?: string
           customer_id?: string
+          discount_amount?: number
+          discount_reason?: string | null
+          discount_type?: string
+          discount_value?: number
           due_date?: string | null
           id?: string
           invoice_number?: string | null
