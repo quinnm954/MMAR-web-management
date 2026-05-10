@@ -181,6 +181,176 @@ export const cities: City[] = [
       },
     ],
   },
+  {
+    slug: "cape-coral",
+    name: "Cape Coral",
+    state: "FL",
+    zips: ["33904", "33909", "33914", "33990", "33991", "33993"],
+    geo: { lat: 26.5629, lng: -81.9495 },
+    neighborhoods: [
+      "Pelican",
+      "Cape Harbour",
+      "Tarpon Point",
+      "Sandoval",
+      "Burnt Store",
+      "Hancock",
+      "Country Club",
+      "Pine Island Road corridor",
+    ],
+    neighborhoodNotes: [
+      { name: "Cape Harbour & Tarpon Point", note: "Waterfront salt-air territory — brake hardware, exhaust hangers, and electrical connectors corrode fast. We default to stainless brake kits and dielectric-greased connectors here." },
+      { name: "Pelican & Country Club", note: "Established neighborhoods with longer-tenured vehicles. AC compressors, alternators, and water pumps are the steady drumbeat of work." },
+      { name: "Sandoval & Burnt Store", note: "Newer construction, longer commutes south to Bonita and east to Fort Myers. Brake and CVT wear runs hot — we see a lot of fluid flushes and pad/rotor jobs." },
+      { name: "Pine Island Road corridor", note: "Stop-and-go retail traffic punishes brakes and transmissions. We schedule a lot of mobile work in office parking lots while customers are at work." },
+      { name: "Hancock", note: "Mix of single-family and rentals — multi-vehicle households we can knock out in one visit." },
+    ],
+    intro:
+      "Mike's Mobile Auto Repair brings dealer-level diagnostics and on-site mechanical repair to driveways across Cape Coral, FL. From Pelican to Burnt Store, our service truck arrives with bidirectional scan tools, OE-spec parts, and the corrosion-resistant hardware that Cape Coral's salt-air environment demands.",
+    paragraphs: [
+      "Cape Coral spans more than 120 square miles of canals, waterfront, and master-planned neighborhoods. Most homes have two vehicles, and the drive to a brick-and-mortar shop — plus the wait, plus the second-car shuffle — eats half a day. We come to you. Coverage runs all six core ZIPs (33904, 33909, 33914, 33990, 33991, 33993) and we routinely service homes off Cape Coral Parkway, Del Prado, Pine Island Road, Veterans Parkway, and Burnt Store Road.",
+      "Salt air is the single biggest variable on a Cape Coral repair. Within roughly two miles of the Caloosahatchee or the Gulf, brake hardware seizes 3–4x faster than inland averages, exhaust hangers crack at the welds, ground straps corrode through, and connector pins develop high resistance that the OBD-II port never reports. Our default Cape Coral procedure: stainless brake hardware kits, anti-seize on every threaded fastener we touch, dielectric grease on every connector we open, and a visual inspection of grounds anytime we're chasing an electrical fault. Standard zinc-plated parts-store hardware is a comeback waiting to happen on the south side.",
+      "Brake work is high-volume here because of stop-and-go on Cape Coral Parkway, Del Prado, and Pine Island Road. Procedure is the same as anywhere we work: pad measurement to the discard spec, rotor thickness with a micrometer, lateral runout under 0.002\" verified with a dial indicator, G3500-grade carbon castings on replacement rotors, caliper slide pins cleaned and re-greased with high-temp synthetic. Brake fluid is moisture-tested with a refractometer; >3% triggers a full DOT 4 flush — and Cape Coral humidity drives moisture intrusion fast.",
+      "AC service is year-round demand in Cape Coral. We carry separate R-134a and R-1234yf machines to prevent cross-contamination, identify the refrigerant before any service, evacuate to 29 in Hg with a 30-minute hold, then charge by weight to OE spec — never by sight glass or low-side pressure. Compressor replacements always include receiver/drier, orifice tube or expansion valve, system flush, and PAG oil charge calculated to OE volume. Cutting any of those corners is what turns a $900 compressor job into a $2,400 comeback.",
+      "Electrical diagnostics in Cape Coral lean heavily on parasitic-draw testing and ground-circuit voltage drops. Salt corrosion on a single body ground can produce phantom no-starts, intermittent stalls, ABS faults, and infotainment glitches that no parts swap will fix. We isolate with an inductive amp clamp (target <50 mA after 40-minute module sleep) and a 20-amp DVOM on each ground point, and we replace corroded ring terminals with marine-grade tinned copper.",
+      "Same-day windows are normally available across all Cape Coral ZIPs for batteries, brakes, AC service, alternators, starters, and no-start diagnostics. Call or text (813) 501-7572 — a real technician answers, not a dispatcher.",
+    ],
+    faqs: [
+      {
+        question: "Do you really come to my house in Cape Coral, including the south Cape and Cape Harbour?",
+        answer: "Yes — every Cape Coral ZIP, including the south Cape, Cape Harbour, Tarpon Point, Burnt Store, and Pelican. We service waterfront homes routinely; salt-air corrosion is part of our default procedure here.",
+      },
+      {
+        question: "Why does brake hardware fail so fast on the Cape?",
+        answer: "Salt-laden humid air migrates into the caliper slide bores and onto unprotected hardware. We install stainless hardware kits, use anti-seize on all threaded fasteners, and re-grease slide pins with high-temp synthetic — not the generic chassis grease that liquefies in Florida heat.",
+      },
+      {
+        question: "Can you handle a no-start at my house in Cape Coral?",
+        answer: "Yes. No-start diagnosis is a default service. We bring a load tester, a parasitic-draw clamp, a scope for cranking-waveform analysis, and starter/alternator replacements in stock for most domestic and import vehicles. Most no-starts are diagnosed and repaired in a single visit.",
+      },
+      {
+        question: "AC repair on R-1234yf vehicles — do you have the equipment?",
+        answer: "Yes. We carry a dedicated R-1234yf recovery, vacuum, and recharge machine separate from our R-134a unit. Refrigerant is identified before any service to prevent cross-contamination, which is the fastest way to destroy a compressor.",
+      },
+      {
+        question: "Same-day mobile mechanic in Cape Coral?",
+        answer: "Yes — almost always for in-stock work like batteries, brakes, AC service, alternators, and no-start diagnosis. Special-order parts may push to next day. Call or text (813) 501-7572.",
+      },
+      {
+        question: "Do you do fleet work for Cape Coral businesses?",
+        answer: "Yes. We service contractor vans, landscape trucks, plumbing, HVAC, and last-mile delivery fleets across Cape Coral on scheduled PM windows so trucks aren't pulled from revenue.",
+      },
+    ],
+  },
+  {
+    slug: "bonita-springs",
+    name: "Bonita Springs",
+    state: "FL",
+    zips: ["34134", "34135"],
+    geo: { lat: 26.3398, lng: -81.7787 },
+    neighborhoods: [
+      "Bonita Beach",
+      "Pelican Landing",
+      "Bonita Bay",
+      "Worthington",
+      "San Carlos Estates",
+      "Spring Creek",
+      "Imperial Parkway",
+    ],
+    neighborhoodNotes: [
+      { name: "Bonita Beach & Pelican Landing", note: "Waterfront salt-air zone — corrosion-resistant hardware and dielectric-greased connectors are the default here." },
+      { name: "Bonita Bay & Worthington", note: "Country-club homes with garaged vehicles — typically lower mileage, higher-trim cars where OE-spec parts and documented procedure matter." },
+      { name: "San Carlos Estates", note: "Larger lots, longer driveways, plenty of room for bigger jobs like timing chains and water pumps." },
+      { name: "Imperial Parkway corridor", note: "Stop-and-go between Bonita and Estero/Naples — brake and AC work runs hot in this corridor year round." },
+      { name: "Spring Creek", note: "Mix of seasonal residents and full-timers; we routinely service vehicles that sit for months and need a full recommission before the next season." },
+    ],
+    intro:
+      "Mike's Mobile Auto Repair delivers on-site mechanical service across Bonita Springs, FL — from Bonita Beach to Worthington and the Imperial Parkway corridor. We arrive with dealer-level scan tools, OE-spec parts, and the salt-air-resistant hardware that southwest Lee County demands.",
+    paragraphs: [
+      "Bonita Springs sits at the south edge of Lee County and shares the same coastal corrosion environment as Naples and Estero. The two core ZIPs (34134 east of US-41, 34135 west) cover roughly 41 square miles between Estero and the Collier County line. Our service truck handles every mechanical service except bodywork on driveways from Bonita Beach to San Carlos Estates.",
+      "Seasonal residency is the variable that defines a lot of Bonita Springs work. A vehicle that sits in a garage from May through October needs a real recommission, not just a battery jump. We test fuel for ethanol-water phase separation, pull coolant for pH, check tire age (date code on the sidewall — anything over 6 years gets replaced regardless of tread), pressure-test the cooling system for slow leaks that emptied the reservoir while the car sat, and refresh brake fluid that has been sitting in 90°F humidity for half a year.",
+      "Salt-air corrosion is identical to Cape Coral and Fort Myers Beach. Within two miles of the Gulf, we install stainless brake hardware, marine-grade tinned-copper ring terminals, dielectric grease on every connector we open, and anti-seize on every threaded fastener. A standard zinc brake hardware kit will seize within 24 months in this environment.",
+      "AC work is a year-round demand in Bonita. R-134a and R-1234yf machines are kept separate. We identify refrigerant before service, evacuate to 29 in Hg with a 30-minute hold, charge by weight to OE spec, and on compressor replacements we always include receiver/drier, expansion valve or orifice tube, full system flush, and PAG oil charged to OE volume. Cutting corners on the flush or the drier is the #1 reason an AC system comes back within a year.",
+      "Brake jobs in Bonita Springs are dictated by Imperial Parkway, Bonita Beach Road, and US-41 stop-and-go. Pad selection is matched to driving profile — ceramic for daily commuters, semi-metallic for trucks and SUVs that tow. Rotors are measured against the discard spec stamped on the hat, and lateral runout is verified with a dial indicator before reassembly. Brake fluid is moisture-tested with a refractometer; >3% triggers a DOT 4 flush.",
+      "Same-day mobile mechanic windows are typical across both Bonita ZIPs. Call or text (813) 501-7572 — a real ASE-grade technician answers and quotes in writing before any work begins.",
+    ],
+    faqs: [
+      {
+        question: "Do you cover both 34134 and 34135 in Bonita Springs?",
+        answer: "Yes — every neighborhood in Bonita Springs, from Bonita Beach and Pelican Landing on the west to Worthington, San Carlos Estates, and the Imperial Parkway corridor on the east.",
+      },
+      {
+        question: "I'm a seasonal resident — can you recommission my car when I get back to Bonita?",
+        answer: "Yes. Seasonal recommission is a defined service: we check fuel for phase separation, coolant pH, tire age (date code on the sidewall), brake fluid moisture, AC performance after a long sit, battery state-of-health, and pressure-test the cooling system for slow leaks. Most cars are road-ready in a single visit.",
+      },
+      {
+        question: "Salt-air corrosion — what do you do differently for waterfront homes?",
+        answer: "Stainless brake hardware kits, marine-grade tinned-copper ring terminals on grounds we replace, dielectric grease on every connector we open, and anti-seize on threaded fasteners. Standard zinc parts-store hardware will seize within 18–24 months this close to the Gulf.",
+      },
+      {
+        question: "Can you do major work like timing chains or water pumps on a driveway in Bonita?",
+        answer: "Yes — provided the driveway has level ground and a safe work area. We've done timing chains, water pumps, head gaskets, and transmission services on driveways from Pelican Landing to San Carlos Estates.",
+      },
+      {
+        question: "What's your warranty in Bonita Springs?",
+        answer: "12 months / 12,000 miles on parts and labor for most repairs, in writing. Coastal corrosion-related exclusions are documented up front — we tell you before the job, not after.",
+      },
+    ],
+  },
+  {
+    slug: "estero",
+    name: "Estero",
+    state: "FL",
+    zips: ["33928", "33967", "34134", "34135"],
+    geo: { lat: 26.4381, lng: -81.8068 },
+    neighborhoods: [
+      "Coconut Point",
+      "Grandezza",
+      "The Brooks",
+      "West Bay",
+      "Fountain Lakes",
+      "Pelican Sound",
+      "Corkscrew Road corridor",
+      "Miromar Lakes",
+    ],
+    neighborhoodNotes: [
+      { name: "Coconut Point & Miromar", note: "High-end retail and restaurant traffic — we handle a lot of mobile work in office and retail parking lots while customers are inside." },
+      { name: "The Brooks & Grandezza", note: "Country-club neighborhoods with garaged, low-mileage vehicles — OE-spec parts and dealer-level scan procedure are the default here." },
+      { name: "West Bay & Pelican Sound", note: "Closer to the Gulf — we use stainless brake hardware and dielectric-grease connectors on coastal jobs." },
+      { name: "Fountain Lakes & Corkscrew Road corridor", note: "Long commuter routes east to I-75 and west to US-41 punish brakes and CVTs — a steady stream of pad/rotor and fluid-flush work." },
+    ],
+    intro:
+      "Mike's Mobile Auto Repair serves Estero, FL — from Coconut Point and Miromar Lakes to Grandezza and the Corkscrew Road corridor — with on-site mechanical diagnostics and repair. Dealer-level scan tools, OE-spec parts, transparent up-front quotes.",
+    paragraphs: [
+      "Estero sits between Bonita Springs and south Fort Myers, straddling I-75 with retail, country-club, and waterfront neighborhoods. We cover all four ZIPs that touch Estero (33928, 33967, plus the Bonita-overlap 34134/34135) and routinely service driveways, retail parking lots, and small-business yards from Coconut Point to Corkscrew Road.",
+      "Estero's vehicle workload skews newer and higher-trim. Many homes are seasonal or country-club — vehicles spend more time garaged but accumulate short-trip, low-RPM use that depletes oil additive packs early and lets carbon build on direct-injection intake valves. Severe-service oil intervals apply almost universally here. We also see a lot of CVT fluid services on Nissans and Subarus that the dealer marked as 'lifetime fill' — that fill is rated for ideal conditions, not Florida heat plus stop-and-go.",
+      "Brake work in Estero is driven by Corkscrew Road, US-41, and the I-75 corridor. Same procedure as everywhere we work: pad measurement to discard spec, rotor thickness with a micrometer, lateral runout under 0.002\" verified with a dial indicator, G3500-grade carbon castings on replacement rotors, and high-temp synthetic on slide pins. Brake fluid is moisture-tested with a refractometer.",
+      "AC service is year-round. Separate R-134a and R-1234yf machines, refrigerant identified before service, vacuum to 29 in Hg with 30-minute hold, charge by weight. Compressor replacements always include receiver/drier, expansion device, system flush, and PAG oil to OE volume.",
+      "Electrical diagnostics — alternator, starter, parasitic draw, no-start — are a defined service in Estero. We use bidirectional scan tools (Autel MS909, Snap-on Zeus) plus a scope for AC ripple and cranking-waveform analysis. Counter-style 'bench tests' miss diode failures and intermittent windings routinely; we don't.",
+      "Same-day windows are normally available across all Estero ZIPs. Call or text (813) 501-7572 — real technician, real quote, in writing before any work starts.",
+    ],
+    faqs: [
+      {
+        question: "Do you service Coconut Point and Miromar Lakes?",
+        answer: "Yes — Coconut Point, Miromar Lakes, Grandezza, The Brooks, West Bay, Pelican Sound, and the Corkscrew Road corridor. We routinely service vehicles in retail and office parking lots while customers are inside.",
+      },
+      {
+        question: "My country-club community has rules about service vehicles — is that a problem?",
+        answer: "Almost never. Our truck is unmarked enough to satisfy most HOAs and clean enough to satisfy the rest. We follow gate procedures, work quietly, and clean up after ourselves. If your association needs prior notice, we can text the gate ahead of arrival.",
+      },
+      {
+        question: "Can you do a CVT fluid service in Estero?",
+        answer: "Yes. CVT fluid is one of the most underserved fluids in southwest Florida — most dealers mark it 'lifetime' even on platforms (Nissan, Subaru, Honda) where the manufacturer's severe-service interval is closer to 30k–60k miles. We use OE-spec CVT fluid and the correct fill procedure for each transmission.",
+      },
+      {
+        question: "Do you charge a trip fee in Estero?",
+        answer: "No trip fee inside our standard service area, which includes all of Estero. Diagnostic time is billed normally and is waived if you book the repair.",
+      },
+      {
+        question: "Same-day mobile mechanic in Estero?",
+        answer: "Almost always for in-stock work — batteries, brakes, AC service, alternators, starters, no-start diagnostics. Special-order parts may push to next day.",
+      },
+    ],
+  },
 ];
 
 
