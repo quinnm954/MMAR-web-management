@@ -11,7 +11,7 @@ import { isNative } from '@/lib/native';
  *     signed-in admin/manager → /admin/dashboard
  *     signed-in staff (tech, advisor, parts) → /tech
  *     signed-in customer → /portal/dashboard
- *     signed-out → /portal/login
+ *     signed-out → /login
  *
  * - Browser/web visitors are never redirected — they see the marketing site as usual.
  *
@@ -40,7 +40,7 @@ const NativeBoot = () => {
       return;
     }
 
-    let target = '/portal/login';
+    let target = '/login';
     if (user) {
       if (roles.includes('admin') || roles.includes('manager')) {
         target = '/admin/dashboard';

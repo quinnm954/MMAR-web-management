@@ -160,7 +160,7 @@ const MmarCare = () => {
               </p>
               <div className="flex flex-wrap gap-3 mb-6">
                 <Button variant="hero" size="lg" asChild>
-                  <Link to="/portal/signup">
+                  <Link to="/login?tab=signup">
                     Create Free Account <ArrowRight className="w-4 h-4 ml-1" />
                   </Link>
                 </Button>
@@ -225,7 +225,7 @@ const MmarCare = () => {
                     </button>
                     <p className="text-sm text-center text-muted-foreground">
                       New here?{" "}
-                      <Link to="/portal/signup" className="text-primary font-medium hover:underline">
+                      <Link to="/login?tab=signup" className="text-primary font-medium hover:underline">
                         Create an account
                       </Link>
                     </p>
@@ -297,7 +297,7 @@ const MmarCare = () => {
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Button variant="hero" size="lg" asChild>
-                  <Link to="/portal/signup">
+                  <Link to="/login?tab=signup">
                     Create Free Account <ArrowRight className="w-4 h-4 ml-1" />
                   </Link>
                 </Button>

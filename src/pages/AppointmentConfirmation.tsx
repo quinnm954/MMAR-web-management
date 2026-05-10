@@ -201,7 +201,7 @@ const AppointmentConfirmation = () => {
                   <a href="tel:8135017572"><Phone className="h-4 w-4 mr-2" /> Call 813-501-7572</a>
                 </Button>
                 <Button asChild variant="outline" size="lg">
-                  <Link to="/portal/signup">Create an account to track</Link>
+                  <Link to="/login?tab=signup">Create an account to track</Link>
                 </Button>
               </div>
 

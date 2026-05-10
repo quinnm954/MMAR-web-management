@@ -164,15 +164,9 @@ const Navigation = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <span className="text-xs text-muted-foreground space-x-2">
-                <Link to="/staff/login" className="hover:text-primary underline-offset-2 hover:underline">
-                  Staff
-                </Link>
-                <span>·</span>
-                <Link to="/admin/login" className="hover:text-primary underline-offset-2 hover:underline">
-                  Admin
-                </Link>
-              </span>
+              <Link to="/login" className="text-xs text-muted-foreground hover:text-primary underline-offset-2 hover:underline">
+                Sign in
+              </Link>
             )}
 
             <Button variant="hero" size="default" asChild>
@@ -269,14 +263,9 @@ const Navigation = () => {
                   </button>
                 </>
               ) : (
-                <div className="flex flex-col gap-1">
-                  <Link to="/staff/login" onClick={close} className="text-muted-foreground hover:text-primary text-sm py-2 px-2 rounded-lg">
-                    Staff sign-in
-                  </Link>
-                  <Link to="/admin/login" onClick={close} className="text-muted-foreground hover:text-primary text-sm py-2 px-2 rounded-lg">
-                    Admin sign-in
-                  </Link>
-                </div>
+                <Link to="/login" onClick={close} className="text-muted-foreground hover:text-primary text-sm py-2 px-2 rounded-lg">
+                  Sign in
+                </Link>
               )}
 
               <Button variant="hero" size="lg" asChild className="mt-3 min-h-[48px]">

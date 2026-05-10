@@ -81,7 +81,7 @@ const TAG_INTROS: Record<string, { title: string; intro: string; related: { href
       { href: "/mmar-care", label: "Open MMAR Care" },
       { href: "/memberships", label: "Membership Plans" },
       { href: "/fleet", label: "Fleet (5+ Vehicles)" },
-      { href: "/portal/signup", label: "Create Free Account" },
+      { href: "/login?tab=signup", label: "Create Free Account" },
     ],
   },
 };
@@ -222,7 +222,7 @@ const BlogTag = () => {
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Link
-                  to="/portal/signup"
+                  to="/login?tab=signup"
                   className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-primary text-primary-foreground font-semibold hover:opacity-90 transition-opacity"
                 >
                   Create Free Account <ArrowRight className="w-4 h-4" />
