@@ -205,7 +205,7 @@ const AdminDashboard = () => {
                       const groupTabs = visible.filter(t => g.values.includes(t.value));
                       if (groupTabs.length === 0) return null;
                       return (
-                        <React.Fragment key={g.label}>
+                        <>
                           {gi > 0 && <DropdownMenuSeparator />}
                           <DropdownMenuLabel>{g.label}</DropdownMenuLabel>
                           <DropdownMenuGroup>
@@ -223,7 +223,7 @@ const AdminDashboard = () => {
                               );
                             })}
                           </DropdownMenuGroup>
-                        </React.Fragment>
+                        </>
                       );
                     })}
                     {/* Fallback: any visible tabs not in a group */}
