@@ -89,12 +89,12 @@ const App = () => (
             <Route path="/blog" element={<Blog />} />
             <Route path="/blog/tag/:tag" element={<BlogTag />} />
             <Route path="/blog/:slug" element={<BlogPost />} />
-            <Route path="/admin/login" element={<AdminLogin />} />
+            <Route path="/admin/login" element={<Navigate to="/login" replace />} />
             <Route path="/memberships" element={<Memberships />} />
             <Route path="/mmar-care" element={<MmarCare />} />
             <Route path="/fleet" element={<Fleet />} />
-            <Route path="/portal/login" element={<PortalLogin />} />
-            <Route path="/portal/signup" element={<PortalSignup />} />
+            <Route path="/portal/login" element={<Navigate to="/login" replace />} />
+            <Route path="/portal/signup" element={<Navigate to="/login?tab=signup" replace />} />
             <Route path="/portal/membership-signup" element={<MembershipSignup />} />
             <Route path="/portal/onboarding" element={<CustomerProtectedRoute><PortalOnboarding /></CustomerProtectedRoute>} />
             <Route path="/portal/dashboard" element={<CustomerProtectedRoute><PortalDashboard /></CustomerProtectedRoute>} />
@@ -122,8 +122,8 @@ const App = () => (
             <Route path="/tech/inspections" element={<TechProtectedRoute><TechInspections /></TechProtectedRoute>} />
             <Route path="/estimate/:token" element={<EstimateApproval />} />
             <Route path="/inspection/:token" element={<InspectionReport />} />
-            <Route path="/staff/login" element={<StaffLogin />} />
-            <Route path="/login" element={<PortalLogin />} />
+            <Route path="/staff/login" element={<Navigate to="/login" replace />} />
+            <Route path="/login" element={<Login />} />
             <Route path="/set-password" element={<SetPassword />} />
             <Route path="/share/:token" element={<SharedCustomerSummary />} />
             <Route path="/book" element={<Book />} />
