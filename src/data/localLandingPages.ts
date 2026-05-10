@@ -16,7 +16,13 @@ export type LocalLandingPage = {
   faqs: FAQ[];
 };
 
-const ALLOWED_CITY_SLUGS = new Set(["lehigh-acres", "fort-myers"]);
+const ALLOWED_CITY_SLUGS = new Set([
+  "lehigh-acres",
+  "fort-myers",
+  "cape-coral",
+  "bonita-springs",
+  "estero",
+]);
 
 const _allLocalLandingPages: LocalLandingPage[] = [
   // ============================================================
