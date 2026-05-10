@@ -54,12 +54,22 @@ const MileageServiceReminderEmail = ({ customerName, vehicle, currentMileage, du
             ))}
           </Section>
 
+          <Section style={promoCard}>
+            <Text style={promoBadge}>LIMITED TIME</Text>
+            <Text style={promoHeadline}>20% OFF any service from this reminder</Text>
+            <Text style={promoSubtext}>
+              Mention this email when you book and we'll take 20% off labor on any of the
+              recommended services above. One discount per visit.
+            </Text>
+          </Section>
+
           <Text style={text}>
             Want pricing before you book? Tap below to request a free quote on the services listed above —
-            we'll text you back with a transparent estimate. We come to you, no shop drop-off needed.
+            we'll text you back with a transparent estimate that already includes your 20% off. We come to
+            you, no shop drop-off needed.
           </Text>
 
-          <Button href={smsQuoteHref} style={button}>Get a quote for these services</Button>
+          <Button href={smsQuoteHref} style={button}>Claim 20% off — get a quote</Button>
 
           <Text style={text}>
             Prefer the web?{' '}
@@ -67,7 +77,7 @@ const MileageServiceReminderEmail = ({ customerName, vehicle, currentMileage, du
           </Text>
 
           <Text style={smallText}>
-            Or call/text <strong>{PHONE}</strong> any time.
+            Or call/text <strong>{PHONE}</strong> any time and reference your 20% mileage reminder discount.
           </Text>
 
           <Hr style={hr} />
