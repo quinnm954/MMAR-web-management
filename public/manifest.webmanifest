@@ -1,7 +1,7 @@
 {
-  "name": "Mike's Mobile Auto Repair",
-  "short_name": "Mike's Auto",
-  "description": "Mobile mechanic in Lehigh Acres & Fort Myers, FL. Tap to call or text (813) 501-7572.",
+  "name": "Garage Ace",
+  "short_name": "Garage Ace",
+  "description": "Garage Ace — sign in to manage your MMAR Care membership, vehicles, appointments, and invoices.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

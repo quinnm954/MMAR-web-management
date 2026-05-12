@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { isNative, nativePlatform } from '@/lib/native';
 
 /**
- * Registers the device for push notifications inside the native MMAR Care app
+ * Registers the device for push notifications inside the native Garage Ace app
  * and stores the resulting APNs/FCM token against the signed-in user.
  *
  * Safe to mount inside any portal layout — does nothing on the web.

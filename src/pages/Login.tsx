@@ -148,8 +148,8 @@ const Login = () => {
           <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-2">
             <Wrench className="h-6 w-6 text-primary" />
           </div>
-          <CardTitle className="text-2xl">MMAR Care</CardTitle>
-          <CardDescription>Sign in to your account or create a new one</CardDescription>
+          <CardTitle className="text-2xl">Garage Ace</CardTitle>
+          <CardDescription>For MMAR Care customers and staff — sign in or create an account</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <Tabs value={tab} onValueChange={(v) => setTab(v as any)}>

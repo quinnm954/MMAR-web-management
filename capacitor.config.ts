@@ -2,7 +2,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'app.lovable.6370c0499e634e0c894716857b255272',
-  appName: 'MMAR Care',
+  appName: 'Garage Ace',
   webDir: 'dist',
   // Hot-reload from the Lovable preview during development.
   // Comment out the entire `server` block before producing release builds for the App Store / Play Store.
