@@ -20,7 +20,7 @@ const TechLayout = ({ children }: { children: ReactNode }) => {
           <div className="flex items-center gap-2">
             <Wrench className="h-5 w-5 text-primary" />
             <div>
-              <h1 className="text-base font-bold leading-tight">Technician Portal</h1>
+              <h1 className="text-base font-bold leading-tight">Garage Ace · Tech</h1>
               <p className="text-[10px] text-muted-foreground">Mike's Mobile Auto Repair</p>
             </div>
           </div>

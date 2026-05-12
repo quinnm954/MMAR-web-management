@@ -5,7 +5,7 @@ import { isNative } from '@/lib/native';
 
 /**
  * Mounted once (inside <AuthProvider>) to handle launch-time routing
- * for the native MMAR Care app.
+ * for the native Garage Ace app (used by MMAR Care customers and staff).
  *
  * - On a fresh native launch from `/`, send the user to the right place:
  *     signed-in admin/manager → /admin/dashboard

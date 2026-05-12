@@ -64,9 +64,9 @@ const PortalLayout = ({ children }: { children: ReactNode }) => {
             <img src={mmarLogo} alt="MMAR" className="h-9 w-auto rounded shrink-0" />
             <div className="min-w-0">
               <div className="font-bold text-sm flex items-center gap-1.5">
-                <Wrench className="h-3.5 w-3.5 text-primary" /> MMAR Care
+                <Wrench className="h-3.5 w-3.5 text-primary" /> Garage Ace
               </div>
-              <div className="text-xs text-muted-foreground truncate">{user?.email ?? "Powered by MMAR"}</div>
+              <div className="text-xs text-muted-foreground truncate">{user?.email ?? "MMAR Care customer portal"}</div>
             </div>
           </div>
           <Button variant="ghost" size="sm" className="shrink-0" onClick={handleSignOut}>
@@ -112,9 +112,9 @@ const PortalLayout = ({ children }: { children: ReactNode }) => {
           <img src={mmarLogo} alt="MMAR" className="h-10 w-auto rounded shrink-0" />
           <div className="min-w-0">
             <div className="font-bold text-sm flex items-center gap-1.5">
-              <Wrench className="h-3.5 w-3.5 text-primary" /> MMAR Care
+              <Wrench className="h-3.5 w-3.5 text-primary" /> Garage Ace
             </div>
-            <div className="text-xs text-muted-foreground truncate">{user?.email ?? "Powered by MMAR"}</div>
+            <div className="text-xs text-muted-foreground truncate">{user?.email ?? "MMAR Care customer portal"}</div>
           </div>
         </div>
         <nav className="p-4 flex flex-col gap-1 flex-1">

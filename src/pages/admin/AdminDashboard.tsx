@@ -115,7 +115,7 @@ const AdminDashboard = () => {
             </Link>
             <div>
               <h1 className="text-xl font-display flex items-center gap-2">
-                <Wrench className="h-5 w-5 text-primary" /> MMAR Care Admin
+                <Wrench className="h-5 w-5 text-primary" /> Garage Ace Admin
               </h1>
               <p className="text-sm text-muted-foreground">{user?.email}</p>
             </div>
