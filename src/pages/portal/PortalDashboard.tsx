@@ -65,7 +65,7 @@ const PortalDashboard = () => {
       <div className="mb-8 flex items-start justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Welcome{name ? `, ${name.split(" ")[0]}` : ""}</h1>
-          <p className="text-muted-foreground mt-1">Here's your MMAR Care overview.</p>
+          <p className="text-muted-foreground mt-1">Here's an overview of your account.</p>
         </div>
         <Button variant="ghost" size="icon" onClick={refresh} disabled={refreshing} aria-label="Refresh">
           <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
