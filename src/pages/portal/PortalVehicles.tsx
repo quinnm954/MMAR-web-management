@@ -170,7 +170,7 @@ const PortalVehicles = () => {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-3xl font-bold">My Vehicles</h1>
-          <p className="text-muted-foreground mt-1">Vehicles linked to your MMAR Care account.</p>
+          <p className="text-muted-foreground mt-1">Vehicles linked to your account.</p>
         </div>
         <Dialog
           open={open}
