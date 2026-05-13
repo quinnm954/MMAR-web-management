@@ -8,6 +8,7 @@ import SignaturePad from "@/components/financing/SignaturePad";
 import { toast } from "sonner";
 import { Loader2, FileText } from "lucide-react";
 import type { WizardData } from "@/pages/portal/MembershipSignup";
+import { portalStrings } from "@/lib/portalStrings";
 
 interface Plan {
   id: string;
@@ -110,7 +111,7 @@ const StepAgreement = ({ data, setData, onComplete, onBack }: Props) => {
 
       <div className="rounded-lg border border-border bg-muted/30 p-4 text-sm space-y-3 max-h-72 overflow-y-auto">
         <div>
-          <div className="font-semibold mb-1">MMAR Care Membership Agreement</div>
+          <div className="font-semibold mb-1">{portalStrings.product.membershipAgreementTitle}</div>
           <div className="text-xs text-muted-foreground">Mike's Mobile Auto Repair (MMAR) — operated by Capital Services Management, INC.</div>
         </div>
 
@@ -136,7 +137,7 @@ const StepAgreement = ({ data, setData, onComplete, onBack }: Props) => {
 
       <label className="flex items-start gap-2 cursor-pointer">
         <Checkbox checked={agreed} onCheckedChange={(v) => setAgreed(!!v)} className="mt-0.5" />
-        <span className="text-sm">I have read and agree to the MMAR Care Membership Agreement.</span>
+        <span className="text-sm">{portalStrings.product.membershipAgreementConsent}</span>
       </label>
 
       <div>

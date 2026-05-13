@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { CreditCard, Loader2, Calendar, Car, FileText } from "lucide-react";
+import { portalStrings } from "@/lib/portalStrings";
 
 interface Membership {
   id: string;
@@ -72,7 +73,7 @@ const PortalMembership = () => {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-3xl font-bold">My Membership</h1>
-          <p className="text-muted-foreground mt-1">Your MMAR Care plans and billing.</p>
+          <p className="text-muted-foreground mt-1">{portalStrings.product.membershipPageSubtitle}</p>
         </div>
         <Button variant="hero" asChild>
           <Link to="/portal/membership-signup">Add Membership</Link>

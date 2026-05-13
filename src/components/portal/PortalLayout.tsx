@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { portalStrings } from "@/lib/portalStrings";
 import { useNativePushRegistration } from "@/hooks/useNativePushRegistration";
 import { Button } from "@/components/ui/button";
 import {
@@ -64,9 +65,9 @@ const PortalLayout = ({ children }: { children: ReactNode }) => {
             <img src={mmarLogo} alt="MMAR" className="h-9 w-auto rounded shrink-0" />
             <div className="min-w-0">
               <div className="font-bold text-sm flex items-center gap-1.5">
-                <Wrench className="h-3.5 w-3.5 text-primary" /> Garage Ace
+                <Wrench className="h-3.5 w-3.5 text-primary" /> {portalStrings.platform.name}
               </div>
-              <div className="text-xs text-muted-foreground truncate">{user?.email ?? "MMAR Care customer portal"}</div>
+              <div className="text-xs text-muted-foreground truncate">{user?.email ?? portalStrings.platform.headerTagline}</div>
             </div>
           </div>
           <Button variant="ghost" size="sm" className="shrink-0" onClick={handleSignOut}>
@@ -112,9 +113,9 @@ const PortalLayout = ({ children }: { children: ReactNode }) => {
           <img src={mmarLogo} alt="MMAR" className="h-10 w-auto rounded shrink-0" />
           <div className="min-w-0">
             <div className="font-bold text-sm flex items-center gap-1.5">
-              <Wrench className="h-3.5 w-3.5 text-primary" /> Garage Ace
+              <Wrench className="h-3.5 w-3.5 text-primary" /> {portalStrings.platform.name}
             </div>
-            <div className="text-xs text-muted-foreground truncate">{user?.email ?? "MMAR Care customer portal"}</div>
+            <div className="text-xs text-muted-foreground truncate">{user?.email ?? portalStrings.platform.headerTagline}</div>
           </div>
         </div>
         <nav className="p-4 flex flex-col gap-1 flex-1">

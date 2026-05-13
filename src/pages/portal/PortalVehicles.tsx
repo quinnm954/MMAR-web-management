@@ -18,6 +18,7 @@ import {
 import { decodeVin } from "@/lib/nhtsa";
 import { toast } from "sonner";
 import { Car, Plus, Loader2, Search, Trash2, Wrench, ChevronDown, ChevronRight } from "lucide-react";
+import { portalStrings } from "@/lib/portalStrings";
 import { MAINTENANCE_INTERVALS, SELF_REPORTED_NOTE } from "@/data/maintenanceIntervals";
 
 interface Vehicle {
@@ -170,7 +171,7 @@ const PortalVehicles = () => {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-3xl font-bold">My Vehicles</h1>
-          <p className="text-muted-foreground mt-1">Vehicles linked to your account.</p>
+          <p className="text-muted-foreground mt-1">{portalStrings.account.vehiclesSubtitle}</p>
         </div>
         <Dialog
           open={open}

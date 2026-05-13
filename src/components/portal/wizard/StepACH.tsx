@@ -9,6 +9,7 @@ import SignaturePad from "@/components/financing/SignaturePad";
 import { toast } from "sonner";
 import { Loader2, ShieldCheck } from "lucide-react";
 import type { WizardData } from "@/pages/portal/MembershipSignup";
+import { portalStrings } from "@/lib/portalStrings";
 
 interface Props {
   data: WizardData;
@@ -30,8 +31,7 @@ const StepACH = ({ data, setData, onNext, onBack }: Props) => {
   const [signature, setSignature] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
-  const authText =
-    "I authorize Mike's Mobile Auto Repair (MMAR), operating MMAR Care, to electronically debit my bank account via ACH for the recurring monthly membership fee, applicable deposits, and any service charges I authorize. This authorization remains in effect until I revoke it in writing with at least 7 business days notice.";
+  const authText = portalStrings.product.achAuthorization;
 
   const handleSubmit = async () => {
     if (!user) return toast.error("Please sign in");

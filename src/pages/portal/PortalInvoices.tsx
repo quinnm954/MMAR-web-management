@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Receipt, Loader2, FileText, CreditCard } from "lucide-react";
+import { portalStrings } from "@/lib/portalStrings";
 import { toast } from "sonner";
 
 interface Invoice {
@@ -81,7 +82,7 @@ const PortalInvoices = () => {
     <PortalLayout>
       <div className="mb-6">
         <h1 className="text-3xl font-bold">Invoices</h1>
-        <p className="text-muted-foreground mt-1">Billing history for your account.</p>
+        <p className="text-muted-foreground mt-1">{portalStrings.account.invoicesSubtitle}</p>
       </div>
 
       {totalDue > 0 && (
