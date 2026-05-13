@@ -179,6 +179,104 @@ const GarageAce = () => {
         </div>
       </section>
 
+      {/* Sign-in (admin / staff / customer) */}
+      <section id="signin" className="py-12 md:py-16 border-y border-border bg-card/30">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center max-w-5xl mx-auto">
+            <div>
+              <div className="inline-flex items-center gap-2 text-xs font-semibold text-primary mb-3 bg-primary/10 px-3 py-1 rounded-full">
+                <LogIn className="h-3.5 w-3.5" /> Sign in
+              </div>
+              <h2 className="text-3xl md:text-4xl font-bold mb-3">
+                Admin, staff & customers — sign in here.
+              </h2>
+              <p className="text-muted-foreground mb-4">
+                One door into Garage Ace. We route you to the right place after sign-in:
+              </p>
+              <ul className="space-y-2 text-sm">
+                <li className="flex items-start gap-2"><ShieldCheck className="h-4 w-4 text-accent mt-0.5 shrink-0" /> Admins → Admin dashboard</li>
+                <li className="flex items-start gap-2"><Wrench className="h-4 w-4 text-accent mt-0.5 shrink-0" /> Techs & advisors → Tech app</li>
+                <li className="flex items-start gap-2"><Users className="h-4 w-4 text-accent mt-0.5 shrink-0" /> Customers → MMAR Care portal</li>
+              </ul>
+            </div>
+
+            <Card className="border-border/60">
+              <CardHeader>
+                <CardTitle className="text-xl flex items-center gap-2">
+                  <Wrench className="h-5 w-5 text-primary" /> Sign in to Garage Ace
+                </CardTitle>
+                <CardDescription>For admins, staff, and MMAR Care customers</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {isLoading ? (
+                  <div className="flex justify-center py-6">
+                    <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                  </div>
+                ) : (
+                  <>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full"
+                      onClick={handleGoogle}
+                      disabled={busy}
+                    >
+                      Continue with Google
+                    </Button>
+                    <div className="relative text-center">
+                      <span className="bg-card px-2 text-xs text-muted-foreground relative z-10">or</span>
+                      <div className="absolute inset-x-0 top-1/2 h-px bg-border -z-0" />
+                    </div>
+                    <form onSubmit={handleSignIn} className="space-y-3">
+                      <div className="space-y-1.5">
+                        <Label htmlFor="ga-email">Email</Label>
+                        <Input
+                          id="ga-email"
+                          type="email"
+                          autoComplete="email"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          required
+                        />
+                      </div>
+                      <div className="space-y-1.5">
+                        <div className="flex items-center justify-between">
+                          <Label htmlFor="ga-password">Password</Label>
+                          <button
+                            type="button"
+                            onClick={handleForgotPassword}
+                            className="text-xs text-muted-foreground hover:text-primary"
+                          >
+                            Forgot?
+                          </button>
+                        </div>
+                        <Input
+                          id="ga-password"
+                          type="password"
+                          autoComplete="current-password"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          required
+                        />
+                      </div>
+                      <Button type="submit" variant="hero" className="w-full" disabled={busy}>
+                        {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : "Sign in"}
+                      </Button>
+                    </form>
+                    <div className="text-xs text-center text-muted-foreground">
+                      New customer?{" "}
+                      <Link to="/login?tab=signup" className="text-primary hover:underline">
+                        Create an account
+                      </Link>
+                    </div>
+                  </>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
       {/* Features */}
       <section className="py-16 md:py-20">
         <div className="container mx-auto px-4">
