@@ -98,7 +98,7 @@ const MmarCare = () => {
       setLoading(false);
       return;
     }
-    toast.success("Welcome back to MMAR Care");
+    toast.success("Welcome back to Garage Ace");
     navigate("/portal/dashboard", { replace: true });
   };
 
