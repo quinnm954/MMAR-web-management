@@ -253,6 +253,9 @@ const Navigation = () => {
               <Link to="/book" onClick={close} className="text-accent hover:text-accent/80 font-semibold py-3 px-2 rounded-lg flex items-center gap-2">
                 <CalendarCheck className="w-4 h-4" /> Book Online
               </Link>
+              <Link to="/garage-ace" onClick={close} className="text-foreground hover:text-primary font-medium py-3 px-2 rounded-lg flex items-center gap-2">
+                <Wrench className="w-4 h-4" /> Garage Ace
+              </Link>
               <Link to="/contact" onClick={close} className="text-foreground hover:text-primary font-medium py-3 px-2 rounded-lg">Contact</Link>
               {user ? (
                 <>
