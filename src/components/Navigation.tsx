@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Menu, X, ChevronDown, Phone, User, LogOut, LayoutDashboard, CalendarCheck } from "lucide-react";
+import { Menu, X, ChevronDown, Phone, User, LogOut, LayoutDashboard, CalendarCheck, Wrench } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -140,6 +140,10 @@ const Navigation = () => {
               Book
             </NavLink>
 
+            <NavLink to="/garage-ace" className={({ isActive }) => `px-3 py-2 font-medium transition-colors ${isActive ? "text-primary" : "text-muted-foreground hover:text-primary"}`}>
+              Garage Ace
+            </NavLink>
+
             <NavLink to="/contact" className={({ isActive }) => `px-3 py-2 font-medium transition-colors ${isActive ? "text-primary" : "text-muted-foreground hover:text-primary"}`}>
               Contact
             </NavLink>
@@ -248,6 +252,9 @@ const Navigation = () => {
               
               <Link to="/book" onClick={close} className="text-accent hover:text-accent/80 font-semibold py-3 px-2 rounded-lg flex items-center gap-2">
                 <CalendarCheck className="w-4 h-4" /> Book Online
+              </Link>
+              <Link to="/garage-ace" onClick={close} className="text-foreground hover:text-primary font-medium py-3 px-2 rounded-lg flex items-center gap-2">
+                <Wrench className="w-4 h-4" /> Garage Ace
               </Link>
               <Link to="/contact" onClick={close} className="text-foreground hover:text-primary font-medium py-3 px-2 rounded-lg">Contact</Link>
               {user ? (
