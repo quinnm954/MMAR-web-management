@@ -18,6 +18,7 @@ import {
 import { decodeVin } from "@/lib/nhtsa";
 import { toast } from "sonner";
 import { Car, Plus, Loader2, Search, Trash2, Wrench, ChevronDown, ChevronRight } from "lucide-react";
+import { portalStrings } from "@/lib/portalStrings";
 import { MAINTENANCE_INTERVALS, SELF_REPORTED_NOTE } from "@/data/maintenanceIntervals";
 
 interface Vehicle {
