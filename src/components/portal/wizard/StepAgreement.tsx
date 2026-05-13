@@ -111,7 +111,7 @@ const StepAgreement = ({ data, setData, onComplete, onBack }: Props) => {
 
       <div className="rounded-lg border border-border bg-muted/30 p-4 text-sm space-y-3 max-h-72 overflow-y-auto">
         <div>
-          <div className="font-semibold mb-1">MMAR Care Membership Agreement</div>
+          <div className="font-semibold mb-1">{portalStrings.product.membershipAgreementTitle}</div>
           <div className="text-xs text-muted-foreground">Mike's Mobile Auto Repair (MMAR) — operated by Capital Services Management, INC.</div>
         </div>
 
