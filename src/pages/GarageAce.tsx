@@ -1,8 +1,11 @@
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Wrench,
   CalendarCheck,
@@ -16,9 +19,15 @@ import {
   Smartphone,
   BarChart3,
   Phone,
+  Loader2,
+  LogIn,
 } from "lucide-react";
+import { toast } from "sonner";
 import { useSeo } from "@/lib/useSeo";
 import { PLATFORM_BRAND } from "@/lib/brand";
+import { useAuth } from "@/hooks/useAuth";
+import { lovable } from "@/integrations/lovable";
+import { supabase } from "@/integrations/supabase/client";
 
 const FEATURES = [
   { icon: ClipboardList, title: "Repair orders & estimates", text: "Build estimates, get digital approvals, convert to ROs and invoices in one flow." },
