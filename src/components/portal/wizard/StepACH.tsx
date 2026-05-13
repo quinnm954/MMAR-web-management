@@ -9,6 +9,7 @@ import SignaturePad from "@/components/financing/SignaturePad";
 import { toast } from "sonner";
 import { Loader2, ShieldCheck } from "lucide-react";
 import type { WizardData } from "@/pages/portal/MembershipSignup";
+import { portalStrings } from "@/lib/portalStrings";
 
 interface Props {
   data: WizardData;
