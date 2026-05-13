@@ -1,8 +1,11 @@
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Wrench,
   CalendarCheck,
@@ -16,9 +19,15 @@ import {
   Smartphone,
   BarChart3,
   Phone,
+  Loader2,
+  LogIn,
 } from "lucide-react";
+import { toast } from "sonner";
 import { useSeo } from "@/lib/useSeo";
 import { PLATFORM_BRAND } from "@/lib/brand";
+import { useAuth } from "@/hooks/useAuth";
+import { lovable } from "@/integrations/lovable";
+import { supabase } from "@/integrations/supabase/client";
 
 const FEATURES = [
   { icon: ClipboardList, title: "Repair orders & estimates", text: "Build estimates, get digital approvals, convert to ROs and invoices in one flow." },
@@ -60,11 +69,55 @@ const FAQ = [
 
 const GarageAce = () => {
   const canonical = "https://shop-flow-home.lovable.app/garage-ace";
+  const navigate = useNavigate();
+  const { signIn, user, isAdmin, isStaff, isLoading } = useAuth();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  // Auto-route signed-in users to their portal
+  useEffect(() => {
+    if (isLoading || !user) return;
+    if (isAdmin) navigate("/admin/dashboard", { replace: true });
+    else if (isStaff) navigate("/tech", { replace: true });
+    else navigate("/portal/dashboard", { replace: true });
+  }, [user, isAdmin, isStaff, isLoading, navigate]);
+
+  const handleSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setBusy(true);
+    const { error } = await signIn(email, password);
+    setBusy(false);
+    if (error) toast.error(error.message || "Sign in failed");
+    else toast.success("Welcome back");
+  };
+
+  const handleGoogle = async () => {
+    setBusy(true);
+    const result = await lovable.auth.signInWithOAuth("google", {
+      redirect_uri: window.location.origin,
+    });
+    if (result.error) {
+      toast.error("Google sign-in failed");
+      setBusy(false);
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    if (!email) return toast.error("Enter your email above first");
+    setBusy(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin + "/set-password",
+    });
+    setBusy(false);
+    if (error) toast.error(error.message);
+    else toast.success("Password reset email sent. Check your inbox.");
+  };
 
   useSeo({
-    title: "Garage Ace — Shop Management Software for Auto Repair Shops",
+    title: "Garage Ace — Shop Management Software & Staff Login",
     description:
-      "Garage Ace is modern shop-management software for auto repair shops: repair orders, estimates, invoicing, online booking, memberships, and a branded customer app — built by a working mobile mechanic.",
+      "Garage Ace is modern shop-management software for auto repair shops: repair orders, estimates, invoicing, online booking, memberships, and a branded customer app. Sign in for admin, staff, and customer portals.",
     canonical,
     breadcrumbs: [
       { name: "Home", url: "https://shop-flow-home.lovable.app/" },
@@ -122,6 +175,104 @@ const GarageAce = () => {
             <p className="text-xs text-muted-foreground mt-4">
               Currently in production with MMAR Care in Fort Myers · Onboarding new shops in waves.
             </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Sign-in (admin / staff / customer) */}
+      <section id="signin" className="py-12 md:py-16 border-y border-border bg-card/30">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center max-w-5xl mx-auto">
+            <div>
+              <div className="inline-flex items-center gap-2 text-xs font-semibold text-primary mb-3 bg-primary/10 px-3 py-1 rounded-full">
+                <LogIn className="h-3.5 w-3.5" /> Sign in
+              </div>
+              <h2 className="text-3xl md:text-4xl font-bold mb-3">
+                Admin, staff & customers — sign in here.
+              </h2>
+              <p className="text-muted-foreground mb-4">
+                One door into Garage Ace. We route you to the right place after sign-in:
+              </p>
+              <ul className="space-y-2 text-sm">
+                <li className="flex items-start gap-2"><ShieldCheck className="h-4 w-4 text-accent mt-0.5 shrink-0" /> Admins → Admin dashboard</li>
+                <li className="flex items-start gap-2"><Wrench className="h-4 w-4 text-accent mt-0.5 shrink-0" /> Techs & advisors → Tech app</li>
+                <li className="flex items-start gap-2"><Users className="h-4 w-4 text-accent mt-0.5 shrink-0" /> Customers → MMAR Care portal</li>
+              </ul>
+            </div>
+
+            <Card className="border-border/60">
+              <CardHeader>
+                <CardTitle className="text-xl flex items-center gap-2">
+                  <Wrench className="h-5 w-5 text-primary" /> Sign in to Garage Ace
+                </CardTitle>
+                <CardDescription>For admins, staff, and MMAR Care customers</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {isLoading ? (
+                  <div className="flex justify-center py-6">
+                    <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                  </div>
+                ) : (
+                  <>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full"
+                      onClick={handleGoogle}
+                      disabled={busy}
+                    >
+                      Continue with Google
+                    </Button>
+                    <div className="relative text-center">
+                      <span className="bg-card px-2 text-xs text-muted-foreground relative z-10">or</span>
+                      <div className="absolute inset-x-0 top-1/2 h-px bg-border -z-0" />
+                    </div>
+                    <form onSubmit={handleSignIn} className="space-y-3">
+                      <div className="space-y-1.5">
+                        <Label htmlFor="ga-email">Email</Label>
+                        <Input
+                          id="ga-email"
+                          type="email"
+                          autoComplete="email"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          required
+                        />
+                      </div>
+                      <div className="space-y-1.5">
+                        <div className="flex items-center justify-between">
+                          <Label htmlFor="ga-password">Password</Label>
+                          <button
+                            type="button"
+                            onClick={handleForgotPassword}
+                            className="text-xs text-muted-foreground hover:text-primary"
+                          >
+                            Forgot?
+                          </button>
+                        </div>
+                        <Input
+                          id="ga-password"
+                          type="password"
+                          autoComplete="current-password"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          required
+                        />
+                      </div>
+                      <Button type="submit" variant="hero" className="w-full" disabled={busy}>
+                        {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : "Sign in"}
+                      </Button>
+                    </form>
+                    <div className="text-xs text-center text-muted-foreground">
+                      New customer?{" "}
+                      <Link to="/login?tab=signup" className="text-primary hover:underline">
+                        Create an account
+                      </Link>
+                    </div>
+                  </>
+                )}
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>

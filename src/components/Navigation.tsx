@@ -170,7 +170,7 @@ const Navigation = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Link to="/login" className="text-xs text-muted-foreground hover:text-primary underline-offset-2 hover:underline">
+              <Link to="/garage-ace#signin" className="text-xs text-muted-foreground hover:text-primary underline-offset-2 hover:underline">
                 Sign in
               </Link>
             )}
@@ -272,7 +272,7 @@ const Navigation = () => {
                   </button>
                 </>
               ) : (
-                <Link to="/login" onClick={close} className="text-muted-foreground hover:text-primary text-sm py-2 px-2 rounded-lg">
+                <Link to="/garage-ace#signin" onClick={close} className="text-muted-foreground hover:text-primary text-sm py-2 px-2 rounded-lg">
                   Sign in
                 </Link>
               )}
