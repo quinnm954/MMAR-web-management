@@ -69,11 +69,55 @@ const FAQ = [
 
 const GarageAce = () => {
   const canonical = "https://shop-flow-home.lovable.app/garage-ace";
+  const navigate = useNavigate();
+  const { signIn, user, isAdmin, isStaff, isLoading } = useAuth();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  // Auto-route signed-in users to their portal
+  useEffect(() => {
+    if (isLoading || !user) return;
+    if (isAdmin) navigate("/admin/dashboard", { replace: true });
+    else if (isStaff) navigate("/tech", { replace: true });
+    else navigate("/portal/dashboard", { replace: true });
+  }, [user, isAdmin, isStaff, isLoading, navigate]);
+
+  const handleSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setBusy(true);
+    const { error } = await signIn(email, password);
+    setBusy(false);
+    if (error) toast.error(error.message || "Sign in failed");
+    else toast.success("Welcome back");
+  };
+
+  const handleGoogle = async () => {
+    setBusy(true);
+    const result = await lovable.auth.signInWithOAuth("google", {
+      redirect_uri: window.location.origin,
+    });
+    if (result.error) {
+      toast.error("Google sign-in failed");
+      setBusy(false);
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    if (!email) return toast.error("Enter your email above first");
+    setBusy(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin + "/set-password",
+    });
+    setBusy(false);
+    if (error) toast.error(error.message);
+    else toast.success("Password reset email sent. Check your inbox.");
+  };
 
   useSeo({
-    title: "Garage Ace — Shop Management Software for Auto Repair Shops",
+    title: "Garage Ace — Shop Management Software & Staff Login",
     description:
-      "Garage Ace is modern shop-management software for auto repair shops: repair orders, estimates, invoicing, online booking, memberships, and a branded customer app — built by a working mobile mechanic.",
+      "Garage Ace is modern shop-management software for auto repair shops: repair orders, estimates, invoicing, online booking, memberships, and a branded customer app. Sign in for admin, staff, and customer portals.",
     canonical,
     breadcrumbs: [
       { name: "Home", url: "https://shop-flow-home.lovable.app/" },
