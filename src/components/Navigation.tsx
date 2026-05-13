@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Menu, X, ChevronDown, Phone, User, LogOut, LayoutDashboard, CalendarCheck } from "lucide-react";
+import { Menu, X, ChevronDown, Phone, User, LogOut, LayoutDashboard, CalendarCheck, Wrench } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
