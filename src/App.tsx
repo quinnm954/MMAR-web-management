@@ -52,6 +52,7 @@ import InspectionReport from "./pages/InspectionReport";
 import SetPassword from "./pages/SetPassword";
 import SharedCustomerSummary from "./pages/SharedCustomerSummary";
 import MmarCare from "./pages/MmarCare";
+import GarageAce from "./pages/GarageAce";
 import Fleet from "./pages/Fleet";
 import Book from "./pages/Book";
 import AppointmentConfirmation from "./pages/AppointmentConfirmation";
