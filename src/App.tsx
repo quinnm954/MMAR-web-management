@@ -94,6 +94,7 @@ const App = () => (
             <Route path="/memberships" element={<Memberships />} />
             <Route path="/mmar-care" element={<MmarCare />} />
             <Route path="/fleet" element={<Fleet />} />
+            <Route path="/garage-ace" element={<GarageAce />} />
             <Route path="/portal/login" element={<Navigate to="/login" replace />} />
             <Route path="/portal/signup" element={<Navigate to="/login?tab=signup" replace />} />
             <Route path="/portal/membership-signup" element={<MembershipSignup />} />
