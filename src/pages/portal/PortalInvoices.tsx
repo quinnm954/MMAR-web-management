@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Receipt, Loader2, FileText, CreditCard } from "lucide-react";
+import { portalStrings } from "@/lib/portalStrings";
 import { toast } from "sonner";
 
 interface Invoice {
