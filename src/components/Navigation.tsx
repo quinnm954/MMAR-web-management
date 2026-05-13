@@ -170,7 +170,7 @@ const Navigation = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Link to="/login" className="text-xs text-muted-foreground hover:text-primary underline-offset-2 hover:underline">
+              <Link to="/garage-ace#signin" className="text-xs text-muted-foreground hover:text-primary underline-offset-2 hover:underline">
                 Sign in
               </Link>
             )}
