@@ -137,7 +137,7 @@ const StepAgreement = ({ data, setData, onComplete, onBack }: Props) => {
 
       <label className="flex items-start gap-2 cursor-pointer">
         <Checkbox checked={agreed} onCheckedChange={(v) => setAgreed(!!v)} className="mt-0.5" />
-        <span className="text-sm">I have read and agree to the MMAR Care Membership Agreement.</span>
+        <span className="text-sm">{portalStrings.product.membershipAgreementConsent}</span>
       </label>
 
       <div>
