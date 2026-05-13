@@ -11,6 +11,7 @@ import StepAccount from "@/components/portal/wizard/StepAccount";
 import StepVehicle from "@/components/portal/wizard/StepVehicle";
 import StepPlan from "@/components/portal/wizard/StepPlan";
 import StepAgreement from "@/components/portal/wizard/StepAgreement";
+import { portalStrings } from "@/lib/portalStrings";
 
 export interface WizardData {
   vehicle: {
