@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { CreditCard, Loader2, Calendar, Car, FileText } from "lucide-react";
+import { portalStrings } from "@/lib/portalStrings";
 
 interface Membership {
   id: string;
