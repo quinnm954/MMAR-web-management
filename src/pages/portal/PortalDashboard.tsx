@@ -7,6 +7,7 @@ import PortalLayout from "@/components/portal/PortalLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Car, CreditCard, Calendar, ArrowRight, RefreshCw } from "lucide-react";
+import { portalStrings } from "@/lib/portalStrings";
 
 const PortalDashboard = () => {
   const { user } = useAuth();
