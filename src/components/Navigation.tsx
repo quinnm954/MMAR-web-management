@@ -272,7 +272,7 @@ const Navigation = () => {
                   </button>
                 </>
               ) : (
-                <Link to="/login" onClick={close} className="text-muted-foreground hover:text-primary text-sm py-2 px-2 rounded-lg">
+                <Link to="/garage-ace#signin" onClick={close} className="text-muted-foreground hover:text-primary text-sm py-2 px-2 rounded-lg">
                   Sign in
                 </Link>
               )}
