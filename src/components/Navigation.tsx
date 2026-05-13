@@ -140,6 +140,10 @@ const Navigation = () => {
               Book
             </NavLink>
 
+            <NavLink to="/garage-ace" className={({ isActive }) => `px-3 py-2 font-medium transition-colors ${isActive ? "text-primary" : "text-muted-foreground hover:text-primary"}`}>
+              Garage Ace
+            </NavLink>
+
             <NavLink to="/contact" className={({ isActive }) => `px-3 py-2 font-medium transition-colors ${isActive ? "text-primary" : "text-muted-foreground hover:text-primary"}`}>
               Contact
             </NavLink>
