@@ -37,7 +37,7 @@ const PortalDashboard = () => {
   useEffect(() => {
     const status = searchParams.get("membership");
     if (status === "success") {
-      toast.success("Payment received — your membership is active!");
+      toast.success(portalStrings.account.membershipActivatedToast);
       searchParams.delete("membership");
       setSearchParams(searchParams, { replace: true });
     } else if (status === "canceled") {
