@@ -151,6 +151,14 @@ const QuoteRequestDialog = ({
     if (token) {
       const attr = { ...getAttribution(), user_agent: navigator.userAgent };
       void supabase.rpc("set_booking_attribution", { _token: token, _attribution: attr }).then(() => {}, () => {});
+
+      // Auto-create a customer account (profile + login) when an email is provided.
+      // Fire-and-forget — failures don't block the booking confirmation.
+      if (email.trim()) {
+        void supabase.functions
+          .invoke("bootstrap-customer-from-booking", { body: { token } })
+          .catch(() => {});
+      }
     }
 
     // Fire Google Ads "quote submit" conversion
