@@ -185,27 +185,32 @@ const GarageAce = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center max-w-5xl mx-auto">
             <div>
               <div className="inline-flex items-center gap-2 text-xs font-semibold text-primary mb-3 bg-primary/10 px-3 py-1 rounded-full">
-                <LogIn className="h-3.5 w-3.5" /> Sign in
+                <LogIn className="h-3.5 w-3.5" /> Staff sign in
               </div>
               <h2 className="text-3xl md:text-4xl font-bold mb-3">
-                Admin, staff & customers — sign in here.
+                Admin & staff sign in.
               </h2>
               <p className="text-muted-foreground mb-4">
-                One door into Garage Ace. We route you to the right place after sign-in:
+                Garage Ace operator access for shop admins, technicians, and service advisors.
               </p>
               <ul className="space-y-2 text-sm">
                 <li className="flex items-start gap-2"><ShieldCheck className="h-4 w-4 text-accent mt-0.5 shrink-0" /> Admins → Admin dashboard</li>
                 <li className="flex items-start gap-2"><Wrench className="h-4 w-4 text-accent mt-0.5 shrink-0" /> Techs & advisors → Tech app</li>
-                <li className="flex items-start gap-2"><Users className="h-4 w-4 text-accent mt-0.5 shrink-0" /> Customers → MMAR Care portal</li>
               </ul>
+              <p className="text-sm text-muted-foreground mt-4">
+                MMAR Care customer?{" "}
+                <Link to="/mmar-care" className="text-primary hover:underline font-medium">
+                  Sign in on the MMAR Care page →
+                </Link>
+              </p>
             </div>
 
             <Card className="border-border/60">
               <CardHeader>
                 <CardTitle className="text-xl flex items-center gap-2">
-                  <Wrench className="h-5 w-5 text-primary" /> Sign in to Garage Ace
+                  <Wrench className="h-5 w-5 text-primary" /> Staff sign in
                 </CardTitle>
-                <CardDescription>For admins, staff, and MMAR Care customers</CardDescription>
+                <CardDescription>Admin, technicians & service advisors</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {isLoading ? (
@@ -264,9 +269,9 @@ const GarageAce = () => {
                       </Button>
                     </form>
                     <div className="text-xs text-center text-muted-foreground">
-                      New customer?{" "}
-                      <Link to="/login?tab=signup" className="text-primary hover:underline">
-                        Create an account
+                      Customer looking for the portal?{" "}
+                      <Link to="/mmar-care" className="text-primary hover:underline">
+                        Go to MMAR Care
                       </Link>
                     </div>
                   </>

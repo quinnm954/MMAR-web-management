@@ -169,11 +169,7 @@ const Navigation = () => {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-            ) : (
-              <Link to="/garage-ace#signin" className="text-xs text-muted-foreground hover:text-primary underline-offset-2 hover:underline">
-                Sign in
-              </Link>
-            )}
+            ) : null}
 
             <Button variant="hero" size="default" asChild>
               <Link to="/book">
@@ -271,11 +267,7 @@ const Navigation = () => {
                     <LogOut className="w-4 h-4" /> Sign Out
                   </button>
                 </>
-              ) : (
-                <Link to="/garage-ace#signin" onClick={close} className="text-muted-foreground hover:text-primary text-sm py-2 px-2 rounded-lg">
-                  Sign in
-                </Link>
-              )}
+              ) : null}
 
               <Button variant="hero" size="lg" asChild className="mt-3 min-h-[48px]">
                 <Link to="/book" onClick={close}>
