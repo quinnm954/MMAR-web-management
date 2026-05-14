@@ -115,9 +115,9 @@ const GarageAce = () => {
   };
 
   useSeo({
-    title: "Garage Ace — Shop Management Software & Staff Login",
+    title: "Garage Ace — Shop Management Software & Admin/Staff Login",
     description:
-      "Garage Ace is modern shop-management software for auto repair shops: repair orders, estimates, invoicing, online booking, memberships, and a branded customer app. Sign in for admin, staff, and customer portals.",
+      "Garage Ace is modern shop-management software for auto repair shops: repair orders, estimates, invoicing, online booking, memberships, and a branded customer app. Admin and staff sign-in only.",
     canonical,
     breadcrumbs: [
       { name: "Home", url: "https://shop-flow-home.lovable.app/" },
