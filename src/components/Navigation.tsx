@@ -197,16 +197,16 @@ const Navigation = () => {
         {isOpen && (
           <div className="lg:hidden py-2 border-t border-border animate-fade-in max-h-[calc(100vh-4rem)] overflow-y-auto overscroll-contain">
             <div className="flex flex-col gap-0.5 pb-[env(safe-area-inset-bottom)]">
-              <Link to="/" onClick={close} className="text-foreground hover:text-primary font-medium py-3 px-2 rounded-lg">Home</Link>
-              <Link to="/about" onClick={close} className="text-foreground hover:text-primary font-medium py-3 px-2 rounded-lg">About MMAR</Link>
+              <Link to="/" onClick={close} className="text-foreground hover:text-primary font-medium py-2 px-2 rounded-lg">Home</Link>
+              <Link to="/about" onClick={close} className="text-foreground hover:text-primary font-medium py-2 px-2 rounded-lg">About MMAR</Link>
 
               <Accordion type="multiple" className="w-full">
                 <AccordionItem value="services" className="border-none">
-                  <AccordionTrigger className="px-2 py-3 hover:no-underline font-medium text-foreground">Services</AccordionTrigger>
-                  <AccordionContent className="pb-2">
+                  <AccordionTrigger className="px-2 py-2 hover:no-underline font-medium text-foreground">Services</AccordionTrigger>
+                  <AccordionContent className="pb-1">
                     <div className="flex flex-col">
                       {SERVICES.map((s) => (
-                        <Link key={s.to} to={s.to} onClick={close} className="text-muted-foreground hover:text-primary py-2.5 px-4 rounded-lg">
+                        <Link key={s.to} to={s.to} onClick={close} className="text-muted-foreground hover:text-primary py-1.5 px-4 rounded-lg text-sm">
                           {s.label}
                         </Link>
                       ))}
@@ -215,11 +215,11 @@ const Navigation = () => {
                 </AccordionItem>
 
                 <AccordionItem value="areas" className="border-none">
-                  <AccordionTrigger className="px-2 py-3 hover:no-underline font-medium text-foreground">Service Areas</AccordionTrigger>
-                  <AccordionContent className="pb-2">
+                  <AccordionTrigger className="px-2 py-2 hover:no-underline font-medium text-foreground">Service Areas</AccordionTrigger>
+                  <AccordionContent className="pb-1">
                     <div className="flex flex-col">
                       {AREAS.map((a) => (
-                        <Link key={a.to} to={a.to} onClick={close} className="text-muted-foreground hover:text-primary py-2.5 px-4 rounded-lg">
+                        <Link key={a.to} to={a.to} onClick={close} className="text-muted-foreground hover:text-primary py-1.5 px-4 rounded-lg text-sm">
                           {a.label}
                         </Link>
                       ))}
@@ -228,11 +228,11 @@ const Navigation = () => {
                 </AccordionItem>
 
                 <AccordionItem value="resources" className="border-none">
-                  <AccordionTrigger className="px-2 py-3 hover:no-underline font-medium text-foreground">Resources</AccordionTrigger>
-                  <AccordionContent className="pb-2">
+                  <AccordionTrigger className="px-2 py-2 hover:no-underline font-medium text-foreground">Resources</AccordionTrigger>
+                  <AccordionContent className="pb-1">
                     <div className="flex flex-col">
                       {RESOURCES.map((r) => (
-                        <Link key={r.to} to={r.to} onClick={close} className="text-muted-foreground hover:text-primary py-2.5 px-4 rounded-lg">
+                        <Link key={r.to} to={r.to} onClick={close} className="text-muted-foreground hover:text-primary py-1.5 px-4 rounded-lg text-sm">
                           {r.label}
                         </Link>
                       ))}
@@ -241,43 +241,42 @@ const Navigation = () => {
                 </AccordionItem>
               </Accordion>
 
-              <Link to="/mmar-care" onClick={close} className="text-foreground hover:text-primary font-semibold py-3 px-2 rounded-lg flex items-center gap-2">
+              <Link to="/mmar-care" onClick={close} className="text-foreground hover:text-primary font-semibold py-2 px-2 rounded-lg flex items-center gap-2">
                 <User className="w-4 h-4" /> MMAR Care
               </Link>
-              <Link to="/memberships" onClick={close} className="text-accent hover:text-accent/80 font-semibold py-3 px-2 rounded-lg">Memberships</Link>
-              
-              <Link to="/book" onClick={close} className="text-accent hover:text-accent/80 font-semibold py-3 px-2 rounded-lg flex items-center gap-2">
-                <CalendarCheck className="w-4 h-4" /> Book Online
-              </Link>
-              <Link to="/garage-ace" onClick={close} className="text-foreground hover:text-primary font-medium py-3 px-2 rounded-lg flex items-center gap-2">
+              <Link to="/memberships" onClick={close} className="text-accent hover:text-accent/80 font-semibold py-2 px-2 rounded-lg">Memberships</Link>
+              <Link to="/garage-ace" onClick={close} className="text-foreground hover:text-primary font-medium py-2 px-2 rounded-lg flex items-center gap-2">
                 <Wrench className="w-4 h-4" /> Garage Ace
               </Link>
-              <Link to="/contact" onClick={close} className="text-foreground hover:text-primary font-medium py-3 px-2 rounded-lg">Contact</Link>
+              <Link to="/contact" onClick={close} className="text-foreground hover:text-primary font-medium py-2 px-2 rounded-lg">Contact</Link>
               {user ? (
                 <>
-                  <Link to={portalHome} onClick={close} className="text-foreground hover:text-primary font-medium py-3 px-2 rounded-lg flex items-center gap-2">
+                  <Link to={portalHome} onClick={close} className="text-foreground hover:text-primary font-medium py-2 px-2 rounded-lg flex items-center gap-2">
                     <LayoutDashboard className="w-4 h-4" /> {portalLabel}
                   </Link>
                   <div className="px-2 text-xs text-muted-foreground truncate">Signed in as {user.email}</div>
                   <button
                     type="button"
                     onClick={handleSignOut}
-                    className="text-destructive hover:text-destructive/80 font-medium py-3 px-2 rounded-lg flex items-center gap-2 text-left"
+                    className="text-destructive hover:text-destructive/80 font-medium py-2 px-2 rounded-lg flex items-center gap-2 text-left"
                   >
                     <LogOut className="w-4 h-4" /> Sign Out
                   </button>
                 </>
               ) : null}
 
-              <Button variant="hero" size="lg" asChild className="mt-3 min-h-[48px]">
-                <Link to="/book" onClick={close}>
-                  <CalendarCheck className="w-4 h-4 mr-2" /> Book Online
-                </Link>
-              </Button>
-              <Button variant="heroOutline" size="lg" asChild className="min-h-[48px]">
-                <a href="tel:8135017572" onClick={close}>
-                  <Phone className="w-4 h-4 mr-2" /> Call (813) 501-7572
-                </a>
+              <div className="grid grid-cols-2 gap-2 mt-2">
+                <Button variant="hero" size="default" asChild className="min-h-[44px]">
+                  <Link to="/book" onClick={close}>
+                    <CalendarCheck className="w-4 h-4 mr-1" /> Book
+                  </Link>
+                </Button>
+                <Button variant="heroOutline" size="default" asChild className="min-h-[44px]">
+                  <a href="tel:8135017572" onClick={close}>
+                    <Phone className="w-4 h-4 mr-1" /> Call
+                  </a>
+                </Button>
+              </div>
               </Button>
             </div>
           </div>
