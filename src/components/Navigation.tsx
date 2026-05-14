@@ -195,8 +195,8 @@ const Navigation = () => {
 
         {/* Mobile nav */}
         {isOpen && (
-          <div className="lg:hidden py-4 border-t border-border animate-fade-in max-h-[calc(100vh-4rem)] overflow-y-auto">
-            <div className="flex flex-col gap-1">
+          <div className="lg:hidden py-2 border-t border-border animate-fade-in max-h-[calc(100vh-4rem)] overflow-y-auto overscroll-contain">
+            <div className="flex flex-col gap-0.5 pb-[env(safe-area-inset-bottom)]">
               <Link to="/" onClick={close} className="text-foreground hover:text-primary font-medium py-3 px-2 rounded-lg">Home</Link>
               <Link to="/about" onClick={close} className="text-foreground hover:text-primary font-medium py-3 px-2 rounded-lg">About MMAR</Link>
 
