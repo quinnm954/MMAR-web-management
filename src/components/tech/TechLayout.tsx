@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { Wrench, Clock, ClipboardCheck, LogOut, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -31,19 +31,21 @@ const TechLayout = ({ children }: { children: ReactNode }) => {
         </div>
         {/* Desktop top tabs */}
         <nav className="hidden lg:flex container mx-auto px-2 pb-2 gap-1 overflow-x-auto">
-          {items.map((l) => {
-            const Icon = l.icon;
-            return (
-              <a
-                key={l.to}
-                href={l.to}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm whitespace-nowrap text-muted-foreground hover:bg-muted"
-              >
-                <Icon className="h-4 w-4" />
-                {l.label}
-              </a>
-            );
-          })}
+          {items.map((l) => (
+            <NavLink
+              key={l.to}
+              to={l.to}
+              end={l.end}
+              className={({ isActive }) =>
+                `flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm whitespace-nowrap ${
+                  isActive ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted"
+                }`
+              }
+            >
+              <l.icon className="h-4 w-4" />
+              {l.label}
+            </NavLink>
+          ))}
         </nav>
       </header>
       <div className="container mx-auto px-4 py-6 pb-mobile-nav lg:pb-6">{children}</div>
