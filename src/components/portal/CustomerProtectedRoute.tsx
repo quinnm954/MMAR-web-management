@@ -74,8 +74,11 @@ const CustomerProtectedRoute = ({ children }: { children: ReactNode }) => {
     return <Navigate to="/set-password" replace />;
   }
 
-  // Admin/staff can view portal pages directly (e.g. opening an invoice from the admin area).
+  // Admin/staff should not land on the customer home, but can view specific portal pages directly.
   if (isAdmin || isStaff) {
+    if (location.pathname === "/portal/dashboard" || location.pathname === "/portal/onboarding") {
+      return <Navigate to={isAdmin ? "/admin/dashboard" : "/tech"} replace />;
+    }
     return <>{children}</>;
   }
 
