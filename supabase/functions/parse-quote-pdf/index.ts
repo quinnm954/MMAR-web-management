@@ -90,6 +90,35 @@ Deno.serve(async (req) => {
     const args = call?.function?.arguments ? JSON.parse(call.function.arguments) : null;
     if (!args) throw new Error("No structured output returned");
 
+    // Log AI usage (estimated cost). Gemini 2.5 Flash ≈ $0.30/M input, $2.50/M output tokens.
+    try {
+      const usage = data?.usage || {};
+      const pt = Number(usage.prompt_tokens || 0);
+      const ct = Number(usage.completion_tokens || 0);
+      const cost = (pt / 1_000_000) * 0.30 + (ct / 1_000_000) * 2.50;
+      const SB_URL = Deno.env.get("SUPABASE_URL");
+      const SB_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+      if (SB_URL && SB_KEY) {
+        await fetch(`${SB_URL}/rest/v1/ai_usage_log`, {
+          method: "POST",
+          headers: {
+            apikey: SB_KEY,
+            Authorization: `Bearer ${SB_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            function_name: "parse-quote-pdf",
+            model: "google/gemini-2.5-flash",
+            cost_usd: Number(cost.toFixed(6)),
+            prompt_tokens: pt,
+            completion_tokens: ct,
+          }),
+        });
+      }
+    } catch (logErr) {
+      console.warn("ai usage log failed", logErr);
+    }
+
     return new Response(JSON.stringify({ extracted: args }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
