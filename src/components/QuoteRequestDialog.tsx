@@ -146,6 +146,7 @@ const QuoteRequestDialog = ({
     }
 
     const token = (data as { token?: string })?.token;
+    const requestId = (data as { id?: string })?.id;
 
     // Attach Google Ads attribution (gclid / utm) for offline conversion uploads
     if (token) {
@@ -159,6 +160,42 @@ const QuoteRequestDialog = ({
           .invoke("bootstrap-customer-from-booking", { body: { token } })
           .catch(() => {});
       }
+    }
+
+    // Fire transactional emails (fire-and-forget).
+    if (requestId) {
+      const { sendNotification } = await import("@/lib/notify");
+      const sharedData = {
+        customerName: name.trim(),
+        customerPhone: phone.trim(),
+        customerEmail: email.trim() || undefined,
+        serviceType: finalService,
+        vehicle: vehicle || undefined,
+        requestedDate: requestedDate || undefined,
+        requestedTimeWindow: timeWindow || undefined,
+        serviceAddress: location.trim() || undefined,
+        description: description || undefined,
+        source: "in_app",
+      };
+      // Customer confirmation (only if email provided)
+      if (email.trim()) {
+        void sendNotification({
+          templateName: "booking-request-received",
+          recipientEmail: email.trim(),
+          idempotencyKey: `booking-req-customer-${requestId}`,
+          templateData: sharedData,
+        });
+      }
+      // Admin alert
+      void sendNotification({
+        templateName: "admin-new-booking-request",
+        recipientEmail: "quinnm954@gmail.com",
+        idempotencyKey: `booking-req-admin-${requestId}`,
+        templateData: {
+          ...sharedData,
+          adminUrl: `${window.location.origin}/admin/bookings`,
+        },
+      });
     }
 
     // Fire Google Ads "quote submit" conversion
