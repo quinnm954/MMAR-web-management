@@ -20,9 +20,9 @@ import {
   LogOut,
   Wrench,
   FileText,
-  Menu,
   ChevronDown,
 } from "lucide-react";
+import MobileBottomNav from "@/components/shell/MobileBottomNav";
 import mmarLogo from "@/assets/mmar-logo.jpeg";
 
 const navItems = [
