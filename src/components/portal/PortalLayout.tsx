@@ -23,6 +23,7 @@ import {
   ChevronDown,
 } from "lucide-react";
 import MobileBottomNav from "@/components/shell/MobileBottomNav";
+import InstallAppBanner from "@/components/shell/InstallAppBanner";
 import mmarLogo from "@/assets/mmar-logo.jpeg";
 
 const navItems = [
@@ -154,6 +155,7 @@ const PortalLayout = ({ children }: { children: ReactNode }) => {
       </aside>
 
       <main className="flex-1 p-4 lg:p-8 max-w-6xl pb-mobile-nav lg:pb-8">
+        <InstallAppBanner />
         {children}
       </main>
 
