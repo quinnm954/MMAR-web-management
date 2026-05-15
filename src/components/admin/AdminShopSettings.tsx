@@ -81,6 +81,7 @@ const AdminShopSettings = () => {
 
   return (
     <div className="space-y-4">
+      <AiCreditsBar />
       <Card>
         <CardHeader><CardTitle>Shop Settings</CardTitle></CardHeader>
         <CardContent className="grid grid-cols-2 gap-3">
