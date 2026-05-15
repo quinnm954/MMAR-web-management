@@ -1,77 +1,58 @@
-## Goal
+# Garage Ace Mobile Enhancement Plan
 
-Cleanly separate two brands inside one codebase, with no functional changes:
+You picked a large scope (admin + tech + portal + global shell) with three improvement types (layout/ergonomics, PWA install, native Capacitor). This is too much for one pass and would create a giant unreviewable change. Here is the proposed phased rollout — confirm and I'll start with Phase 1.
 
-- **MMAR Care** = the *product* — your subscription/care plans + the public marketing site (mobile mechanic in SW Florida). This is what end customers buy.
-- **Garage Ace** = the *platform* — the app shell where everything happens: login, customer portal (where they manage their MMAR Care subscription, vehicles, invoices, etc.), employee/tech app, and admin dashboard. This is what other shops will eventually buy.
+## Phase 1 — Touch ergonomics & responsive cleanup (biggest impact, lowest risk)
 
-This is brand-only for now. No multi-tenancy, no DB changes, no Stripe changes, no auth changes. Everything keeps working exactly as it does today.
+Global shell
+- Sticky bottom tab bar on mobile for Admin and Tech (Dashboard / Bookings / RO / Customers / More) and for Portal (Dashboard / Vehicles / Estimates / Invoices / More).
+- Collapse current sidebar into a slide-over drawer on phones; full-height tap targets.
+- Top bar: condense to logo + page title + single overflow menu on mobile.
+- Safe-area padding (`env(safe-area-inset-*)`) so content clears the iOS notch and home indicator.
+- 44px minimum tap targets across primary buttons, list rows, icon buttons.
 
-## Brand mapping (the important flip)
+Admin area
+- Convert wide tables (Bookings, Customers, Invoices, Estimates) to responsive card lists below `sm`.
+- Kanban: horizontal scroll-snap columns on phones with column dots indicator.
+- Modals/sheets: full-screen Sheet on phones instead of centered Dialog.
+- Sticky bottom action bar on edit screens (Save / Cancel) so primary actions are always reachable.
 
-Today the project memory says "the platform is MMAR Care, never Garage Ace." We're inverting that:
+Technician area
+- RO detail: collapse meta into accordion; sticky "Clock In/Out" and "Add Photo" floating actions.
+- Inspection items: larger pass/fail/recommend toggle row, swipe between items.
+- Photo upload: trigger native camera via `<input capture="environment">`.
 
-| Surface | Today | After |
-|---|---|---|
-| Public homepage, services, areas, blog, booking | MMAR Care | **MMAR Care** (unchanged) |
-| Subscription plans (`/memberships`, `/mmar-care`) | MMAR Care | **MMAR Care** (unchanged) |
-| Login page chrome | MMAR Care | **Garage Ace** |
-| Customer portal (`/portal/*`) header/title/emails | MMAR Care | **Garage Ace** (with "Your MMAR Care membership" inside) |
-| Admin dashboard (`/admin/*`) | MMAR Care | **Garage Ace** |
-| Tech app (`/tech/*`) | MMAR Care | **Garage Ace** |
-| Native app shell name + push notifications | MMAR Care | **Garage Ace** |
-| Footer copyright | Capital Services Management, INC. | unchanged |
+Customer portal
+- Stat cards already trimmed; carry the same compact pattern to lists (estimates, ROs, invoices) with bigger row tap targets and stickied filter chips.
+- Pull-to-refresh affordance via the existing refresh button moved to a sticky position.
 
-Rule of thumb: if a customer is *buying or learning about service*, they see MMAR Care. If they're *signed in and using the app*, they see Garage Ace (with their MMAR Care plan referenced inside).
+## Phase 2 — Installable PWA (manifest-only, no service worker)
 
-## What changes
+Per Lovable guidance, **no `vite-plugin-pwa` and no service worker** — just a web manifest so users can "Add to Home Screen" on iOS/Android with an app icon, splash background, and standalone display mode. This avoids preview-iframe cache issues and gives you a real installable app feel without offline complexity.
 
-### 1. Brand config module
-Create `src/lib/brand.ts` with two exports:
-- `PLATFORM_BRAND` = `{ name: "Garage Ace", tagline: "Shop management, simplified", logo: ... }`
-- `PRODUCT_BRAND` = `{ name: "MMAR Care", tagline: "Mobile mechanic care plans", logo: ... }`
+- Add `public/manifest.webmanifest` with name "Garage Ace", short_name, theme/background colors from the design tokens, icons (192/512), `display: "standalone"`.
+- Add `<link rel="manifest">`, apple-touch-icon, theme-color, and viewport-fit=cover meta tags in `index.html`.
+- Add a `/install` page with platform-aware instructions and the `beforeinstallprompt` flow on Android/Chrome.
 
-All platform-shell components import from here so future renames (or per-tenant branding later) are one-file changes.
+## Phase 3 — Native wrapper (Capacitor) for App Store / Play Store
 
-### 2. Rebrand the platform shell
-- `src/pages/Login.tsx` — replace "MMAR Care" headings/logos with Garage Ace, add small "for MMAR Care customers and staff" subline.
-- `src/components/portal/PortalLayout.tsx` — header brand → Garage Ace; keep "MMAR Care membership" wording inside the membership card on `PortalMembership.tsx`, `PortalDashboard.tsx`.
-- `src/pages/admin/AdminDashboard.tsx` + `src/components/admin/*` page titles → Garage Ace.
-- `src/components/tech/TechLayout.tsx` → Garage Ace.
-- `src/components/NativeBoot.tsx` JSDoc + `src/hooks/useNativePushRegistration.tsx` strings → Garage Ace.
-- `src/components/BrandedDocLayout.tsx` / `DocReferences.tsx` — document headers stay MMAR Care (they're customer-facing legal docs).
+Scaffolding only — the user runs `npx cap add ios/android` from their own machine after exporting to GitHub.
 
-### 3. Public site untouched
-`Hero.tsx`, `AboutPage.tsx`, `Memberships.tsx`, `MmarCare.tsx`, `Book.tsx`, `Blog*`, sitemaps, blog posts, navigation for logged-out users → all stay MMAR Care.
+- Install `@capacitor/core`, `@capacitor/cli`, `@capacitor/ios`, `@capacitor/android`.
+- `capacitor.config.ts` with appId `app.lovable.6370c0499e634e0c894716857b255272`, appName `shop-flow-home`, hot-reload server URL pointing at the sandbox preview.
+- Add `@capacitor/push-notifications`, `@capacitor/camera`, `@capacitor/status-bar`, `@capacitor/splash-screen` and a thin `src/lib/native.ts` that no-ops in the browser and uses native plugins when running inside Capacitor.
+- Hook camera into the inspection photo flow, push tokens into the existing `device_tokens` table.
+- Document the local steps (export to GitHub → `npm i` → `npx cap add ios/android` → `npx cap sync` → `npx cap run ios`) — read the Capacitor blog post for full setup.
 
-### 4. Native app + manifest
-- `capacitor.config.ts` `appName` → "Garage Ace" (the installed app icon label is the platform).
-- `public/manifest.webmanifest` `name` / `short_name` → Garage Ace (PWA install = the app, not the membership).
-- iOS/Android display name docs in `MOBILE_APP_README.md` updated.
-- App icons: keep current visual; just relabel. (Logo asset swap is a follow-up if you want a distinct Garage Ace mark.)
+## Suggested order
 
-### 5. Document titles & SEO
-- Logged-in routes (`/portal/*`, `/admin/*`, `/tech/*`, `/login`) → `<title>` uses Garage Ace.
-- Public routes → `<title>` keeps MMAR Care.
-- `robots.txt` already disallows `/portal`, `/admin`, `/tech` — no SEO bleed.
+1. Phase 1 — shipped now, immediate UX win on the phones you already use.
+2. Phase 2 — quick follow-up so staff/customers can install the app icon.
+3. Phase 3 — when you are ready to publish to the App Store / Play Store.
 
-### 6. Email templates
-Keep transactional emails (`appointment-confirmed`, `invoice-issued`, etc.) signed as **MMAR Care** because they're about the service the customer bought. Only the *portal-access* email ("set your password", "welcome to your account") gets Garage Ace branding so customers learn the app name.
+## Confirm
 
-### 7. Memory update
-Rewrite `mem://branding/platform-name` and the Core memory line to reflect:
-> Platform/app shell = Garage Ace. Service product + public marketing site + subscription plans = MMAR Care. Inside the app, refer to the user's plan as their "MMAR Care membership."
-
-## What does NOT change
-- Database schema, RLS, edge functions, Stripe products, Twilio, auth flow, routes, URLs.
-- The `/mmar-care` and `/memberships` marketing pages.
-- Phone number, service areas, financing/warranty terms, footer copyright.
-- Google Ads tracking and sitemaps.
-
-## Future (not in this plan, just so you know where it leads)
-- Add a `tenants` table and a Garage Ace marketing/sales site so other shops can sign up.
-- Extract MMAR Care–specific copy (phone number, service areas, plan SKUs) into a tenant config so the same Garage Ace app can power multiple shops.
-- Separate domain: `app.garageace.com` for the platform vs. `mmarcare.com` for this shop's marketing.
-
-## Files touched (estimate)
-~25 files, all string/branding swaps + one new `src/lib/brand.ts`. No migrations. No new dependencies.
+Reply with one of:
+- "Go" — I'll start Phase 1.
+- "Just shell + portal first" (or any subset) — I'll narrow Phase 1.
+- "Skip to Phase 2/3" — I'll jump ahead.
