@@ -3,13 +3,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CalendarCheck, Calendar } from "lucide-react";
 import AdminBookingRequests from "./AdminBookingRequests";
 import AdminAppointments from "./AdminAppointments";
-import AiCreditsBar from "./AiCreditsBar";
 
 const AdminBookings = () => {
   const [tab, setTab] = useState("requests");
   return (
     <div className="space-y-4">
-      <AiCreditsBar />
       <Tabs value={tab} onValueChange={setTab} className="w-full">
         <TabsList>
           <TabsTrigger value="requests" className="gap-2">
