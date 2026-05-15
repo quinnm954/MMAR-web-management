@@ -160,11 +160,8 @@ const PushNotificationCard = () => {
         // iOS: app-settings: deep-links straight to this app's Settings page.
         window.location.href = "app-settings:";
       } else {
-        // Android: open the app's notification settings via Browser plugin.
-        const { Browser } = await import("@capacitor/browser");
-        await Browser.open({
-          url: `package:${"app.lovable.6370c0499e634e0c894716857b255272"}`,
-        });
+        // Android fallback: jump to the app's settings page.
+        window.location.href = "package:app.lovable.6370c0499e634e0c894716857b255272";
       }
     } catch (err) {
       console.error("openNativeSettings failed", err);
