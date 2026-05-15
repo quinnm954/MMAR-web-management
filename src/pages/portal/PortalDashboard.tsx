@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Car, CreditCard, Calendar, ArrowRight, RefreshCw } from "lucide-react";
 import { portalStrings } from "@/lib/portalStrings";
 import PushNotificationCard from "@/components/shell/PushNotificationCard";
+import VehicleHealthCard from "@/components/portal/VehicleHealthCard";
 
 const PortalDashboard = () => {
   const { user } = useAuth();
