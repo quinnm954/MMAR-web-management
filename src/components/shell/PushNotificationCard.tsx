@@ -125,8 +125,9 @@ const PushNotificationCard = () => {
     }
   };
 
-  if (status === "granted") return null;
-  if (status === "unsupported" && !native) return null;
+  // Hide the card entirely once notifications are enabled.
+  if ((status as PushStatus) === "granted") return null;
+  if ((status as PushStatus) === "unsupported" && !native) return null;
 
   const StatusBadge = () => {
     if (checking) {
