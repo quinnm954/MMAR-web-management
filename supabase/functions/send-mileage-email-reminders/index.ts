@@ -108,7 +108,7 @@ Deno.serve(async (req) => {
   // Pull all vehicles with mileage info + owner
   const { data: vehicles, error: vErr } = await sb
     .from('vehicles')
-    .select('id, owner_id, year, make, model, current_mileage')
+    .select('id, owner_id, year, make, model, current_mileage, avg_miles_per_day, last_mileage_update_at')
     .not('current_mileage', 'is', null)
     .gt('current_mileage', 0);
 
@@ -172,9 +172,8 @@ Deno.serve(async (req) => {
         .eq('vehicle_id', v.id)
         .not('mileage_at_service', 'is', null);
 
+      const avgPerDay = Number(v.avg_miles_per_day) || 0;
       const dueServices = INTERVALS.map((cfg) => {
-        // Match by configured keywords OR by exact canonical name
-        // (the portal stores `service_type = cfg.name` for self-reported services).
         const allKeywords = [...cfg.keywords, cfg.name.toLowerCase()];
         const matches = (records || []).filter((r) => {
           const t = (r.service_type || '').toLowerCase();
@@ -185,11 +184,19 @@ Deno.serve(async (req) => {
           : null;
         const baseline = lastMiles ?? 0;
         const overdueBy = (v.current_mileage as number) - (baseline + cfg.intervalMiles);
+        // Project a due date when we have an average miles/day signal
+        let projectedDueDate: string | undefined;
+        if (avgPerDay > 0 && overdueBy < 0) {
+          const daysOut = Math.round(Math.abs(overdueBy) / avgPerDay);
+          const d = new Date(Date.now() + daysOut * 86400000);
+          projectedDueDate = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        }
         return {
           name: cfg.name,
           intervalMiles: cfg.intervalMiles,
           lastServiceMiles: lastMiles,
           overdueBy,
+          projectedDueDate,
           competitorPriceRange: applyRegion(cfg.competitorPriceRange, region.multiplier),
           importance: cfg.importance,
         };
