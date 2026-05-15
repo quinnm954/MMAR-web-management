@@ -303,7 +303,7 @@ export default function RepairOrderDetail({ appointmentId, open, onClose }: Prop
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-5xl w-screen h-[100dvh] sm:h-auto sm:max-h-[90vh] sm:w-auto p-4 sm:p-6 overflow-y-auto rounded-none sm:rounded-lg safe-pt safe-pb">
         <DialogHeader>
           <DialogTitle className="flex items-center justify-between gap-2 pr-8">
             <span className="flex items-center gap-2">
