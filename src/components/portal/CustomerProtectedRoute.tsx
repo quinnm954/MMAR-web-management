@@ -74,12 +74,9 @@ const CustomerProtectedRoute = ({ children }: { children: ReactNode }) => {
     return <Navigate to="/set-password" replace />;
   }
 
-  if (isAdmin) {
-    return <Navigate to="/admin/dashboard" replace />;
-  }
-
-  if (isStaff) {
-    return <Navigate to="/tech" replace />;
+  // Admin/staff can view portal pages directly (e.g. opening an invoice from the admin area).
+  if (isAdmin || isStaff) {
+    return <>{children}</>;
   }
 
   // Wait for onboarding check to resolve before rendering protected content
