@@ -337,9 +337,9 @@ const AdminInvoices = () => {
             return (
             <Card key={i.id} className="border-border/50">
               <CardContent className="p-4 space-y-3">
-                <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center sm:justify-between gap-3">
                   <div className="flex items-center gap-3">
-                    <Receipt className="h-5 w-5 text-primary" />
+                    <Receipt className="h-5 w-5 text-primary shrink-0" />
                     <div>
                       <div className="font-mono text-sm">{i.invoice_number}</div>
                       <div className="text-xs text-muted-foreground">{i.customer?.full_name || i.customer?.email}</div>
@@ -349,8 +349,8 @@ const AdminInvoices = () => {
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <div className="text-right">
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                    <div className="text-right ml-auto sm:ml-0">
                       <div className="font-bold">${i.total.toFixed(2)}</div>
                       {(i.discount_amount ?? 0) > 0 && (
                         <div className="text-xs text-primary">
