@@ -118,14 +118,12 @@ const StatCard = ({
 }) => (
   <Link to={link}>
     <Card className="hover:border-primary/40 transition-colors h-full">
-      <CardContent className="p-3 flex items-center gap-3">
-        <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-          <Icon className="h-4 w-4 text-primary" />
+      <CardContent className="p-2 sm:p-3 flex flex-col items-center text-center gap-1">
+        <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center">
+          <Icon className="h-3.5 w-3.5 text-primary" />
         </div>
-        <div className="min-w-0">
-          <div className="text-lg font-semibold leading-none">{value}</div>
-          <div className="text-xs text-muted-foreground mt-1 truncate">{label}</div>
-        </div>
+        <div className="text-base font-semibold leading-none">{value}</div>
+        <div className="text-[10px] sm:text-xs text-muted-foreground leading-tight truncate w-full">{label}</div>
       </CardContent>
     </Card>
   </Link>
