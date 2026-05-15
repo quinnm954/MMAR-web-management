@@ -131,4 +131,20 @@ const StatCard = ({
   </Link>
 );
 
+const QuickLink = ({ icon: Icon, label, to }: { icon: typeof Car; label: string; to: string }) => (
+  <Link to={to}>
+    <Card className="hover:border-primary/40 hover:bg-primary/5 transition-colors h-full">
+      <CardContent className="p-4 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center">
+            <Icon className="h-4 w-4 text-primary" />
+          </div>
+          <div className="font-medium">{label}</div>
+        </div>
+        <ArrowRight className="h-4 w-4 text-muted-foreground" />
+      </CardContent>
+    </Card>
+  </Link>
+);
+
 export default PortalDashboard;
