@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Pencil, Check, X } from "lucide-react";
+import { Sparkles, Pencil, Check, X, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 
 const fmt = (n: number) =>
