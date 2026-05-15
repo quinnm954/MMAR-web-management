@@ -211,11 +211,48 @@ const AdminEmails = () => {
               onChange={(e) => { setSearch(e.target.value); setPage(0); }}
             />
           </div>
+          <Button variant="outline" size="sm" onClick={() => setTestOpen(true)} className="gap-1.5">
+            <Send className="h-4 w-4" /> Send test
+          </Button>
           <Button variant="outline" size="icon" onClick={load} disabled={loading}>
             <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
           </Button>
         </CardContent>
       </Card>
+
+      {/* Send Test dialog */}
+      <Dialog open={testOpen} onOpenChange={setTestOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Send Test Email</DialogTitle>
+            <DialogDescription>
+              Verify the email pipeline end-to-end. The send is queued and should appear in the log below within a few seconds.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3 py-2">
+            <div className="space-y-1.5">
+              <Label htmlFor="test-template">Template</Label>
+              <Select value={testTemplate} onValueChange={setTestTemplate}>
+                <SelectTrigger id="test-template"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {TEMPLATE_NAMES.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="test-email">Recipient</Label>
+              <Input id="test-email" type="email" value={testEmail} onChange={(e) => setTestEmail(e.target.value)} placeholder="you@example.com" />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setTestOpen(false)} disabled={testBusy}>Cancel</Button>
+            <Button onClick={sendTest} disabled={testBusy || !testEmail} className="gap-1.5">
+              {testBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+              Send test
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Table */}
       <Card>
