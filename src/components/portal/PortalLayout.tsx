@@ -56,11 +56,19 @@ const PortalLayout = ({ children }: { children: ReactNode }) => {
         : location.pathname.startsWith(i.to)
     ) ?? navItems[0];
 
+  const bottomNavItems = [
+    { to: "/portal/dashboard", label: "Home", icon: LayoutDashboard, end: true },
+    { to: "/portal/vehicles", label: "Vehicles", icon: Car },
+    { to: "/portal/estimates", label: "Estimates", icon: FileText },
+    { to: "/portal/repair-orders", label: "Repairs", icon: Wrench },
+    { to: "/portal/invoices", label: "Invoices", icon: Receipt },
+  ];
+
   return (
     <div className="min-h-screen bg-background flex flex-col lg:flex-row">
       {/* Mobile top bar with dropdown menu */}
-      <div className="lg:hidden border-b border-border bg-card/50 backdrop-blur">
-        <div className="p-4 flex items-center justify-between gap-3">
+      <div className="lg:hidden border-b border-border bg-card/50 backdrop-blur safe-pt">
+        <div className="px-4 py-3 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
             <img src={mmarLogo} alt="MMAR" className="h-9 w-auto rounded shrink-0" />
             <div className="min-w-0">
@@ -70,14 +78,14 @@ const PortalLayout = ({ children }: { children: ReactNode }) => {
               <div className="text-xs text-muted-foreground truncate">{user?.email ?? portalStrings.platform.headerTagline}</div>
             </div>
           </div>
-          <Button variant="ghost" size="sm" className="shrink-0" onClick={handleSignOut}>
-            <LogOut className="h-4 w-4 mr-1" /> Sign Out
+          <Button variant="ghost" size="sm" className="shrink-0 tap-44" onClick={handleSignOut} aria-label="Sign out">
+            <LogOut className="h-4 w-4" />
           </Button>
         </div>
         <div className="px-4 pb-3">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="w-full justify-between">
+              <Button variant="outline" className="w-full justify-between tap-44">
                 <span className="flex items-center gap-2">
                   <currentItem.icon className="h-4 w-4 text-primary" />
                   {currentItem.label}
@@ -145,9 +153,11 @@ const PortalLayout = ({ children }: { children: ReactNode }) => {
         </div>
       </aside>
 
-      <main className="flex-1 p-4 lg:p-8 max-w-6xl">
+      <main className="flex-1 p-4 lg:p-8 max-w-6xl pb-mobile-nav lg:pb-8">
         {children}
       </main>
+
+      <MobileBottomNav items={bottomNavItems} />
     </div>
   );
 };
