@@ -44,10 +44,19 @@ Deno.serve(async (req) => {
     const phone = (booking.customer_phone || "").trim();
     const rawEmail = (booking.customer_email || "").trim().toLowerCase();
 
+    // No email -> create a profile-only customer record (no auth login) so the
+    // customer still appears in the admin Customers list. They can be linked to
+    // an auth account later if/when they provide an email.
     if (!rawEmail) {
-      // No email -> we cannot create a login. Skip silently (booking still recorded).
+      const profileOnlyId = crypto.randomUUID();
+      await admin.from("profiles").upsert({
+        id: profileOnlyId,
+        email: null,
+        full_name: fullName || null,
+        phone: phone || null,
+      });
       return new Response(
-        JSON.stringify({ created: false, reason: "no_email" }),
+        JSON.stringify({ created: true, has_login: false, customer_id: profileOnlyId }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }

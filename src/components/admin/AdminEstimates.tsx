@@ -93,7 +93,17 @@ const AdminEstimates = () => {
       const { data, error } = await supabase.functions.invoke('parse-quote-pdf', {
         body: { pdf_base64, mime_type: file.type || 'application/pdf' },
       });
-      if (error) throw error;
+      if (error) {
+        // Try to surface the function's JSON error message (e.g. AI credits exhausted)
+        let serverMsg = '';
+        try {
+          const ctx: any = (error as any).context;
+          if (ctx?.json) serverMsg = (await ctx.json())?.error || '';
+          else if (ctx?.text) serverMsg = await ctx.text();
+        } catch {}
+        throw new Error(serverMsg || error.message || 'PDF import failed');
+      }
+      if (data?.error) throw new Error(data.error);
       const ex = data?.extracted;
       if (!ex) throw new Error('Nothing extracted');
 
