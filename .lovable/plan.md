@@ -1,58 +1,47 @@
-# Garage Ace Mobile Enhancement Plan
+## Current state
 
-You picked a large scope (admin + tech + portal + global shell) with three improvement types (layout/ergonomics, PWA install, native Capacitor). This is too much for one pass and would create a giant unreviewable change. Here is the proposed phased rollout — confirm and I'll start with Phase 1.
+- Email domain `notify.mail.mikesmautorepair.com` is verified ✅
+- Queue cron `process-email-queue` is active (every 5s) ✅
+- 8 transactional templates registered (appointment, service-completed, invoice, membership, estimate, inspection, mileage-reminder, paid-receipt) ✅
+- Admin → Emails dashboard exists with stats/filters/table ✅
+- **But `email_send_log` is empty** — zero emails ever sent in the last 7 days. No customer-facing trigger has fired yet.
 
-## Phase 1 — Touch ergonomics & responsive cleanup (biggest impact, lowest risk)
+## What's missing
 
-Global shell
-- Sticky bottom tab bar on mobile for Admin and Tech (Dashboard / Bookings / RO / Customers / More) and for Portal (Dashboard / Vehicles / Estimates / Invoices / More).
-- Collapse current sidebar into a slide-over drawer on phones; full-height tap targets.
-- Top bar: condense to logo + page title + single overflow menu on mobile.
-- Safe-area padding (`env(safe-area-inset-*)`) so content clears the iOS notch and home indicator.
-- 44px minimum tap targets across primary buttons, list rows, icon buttons.
+1. **No way to verify the pipeline works.** Admin has no "send test" button — they have to wait for an organic event.
+2. **Booking requests don't email anyone.** When a customer submits via `QuoteRequestDialog` (calls `submit_booking_request` RPC), neither the customer nor the admin gets an email.
+3. **No new-booking alert to the shop.** Admin only finds out by checking the dashboard.
 
-Admin area
-- Convert wide tables (Bookings, Customers, Invoices, Estimates) to responsive card lists below `sm`.
-- Kanban: horizontal scroll-snap columns on phones with column dots indicator.
-- Modals/sheets: full-screen Sheet on phones instead of centered Dialog.
-- Sticky bottom action bar on edit screens (Save / Cancel) so primary actions are always reachable.
+## Plan
 
-Technician area
-- RO detail: collapse meta into accordion; sticky "Clock In/Out" and "Add Photo" floating actions.
-- Inspection items: larger pass/fail/recommend toggle row, swipe between items.
-- Photo upload: trigger native camera via `<input capture="environment">`.
+### 1. Add "Send test email" button to AdminEmails dashboard
+- Button next to the refresh icon, opens a small dialog with: recipient email (defaults to current admin's email) + template picker (lists registered templates).
+- Invokes `send-transactional-email` with a synthetic `idempotencyKey` (`test-{template}-{timestamp}`) and the template's `previewData`.
+- Toast shows success/failure; the new row appears in the log within ~5s.
 
-Customer portal
-- Stat cards already trimmed; carry the same compact pattern to lists (estimates, ROs, invoices) with bigger row tap targets and stickied filter chips.
-- Pull-to-refresh affordance via the existing refresh button moved to a sticky position.
+### 2. Add two new templates + wire them to the booking flow
+- `booking-request-received` — sent to the customer ("We got your request, we'll call you shortly"). Includes service type, vehicle, requested date.
+- `admin-new-booking-request` — sent to the shop owner email ("New booking request from {name}"). Includes all request details + a link to `/admin/bookings`.
 
-## Phase 2 — Installable PWA (manifest-only, no service worker)
+Wiring: in `QuoteRequestDialog.tsx`, after `submit_booking_request` succeeds, fire both `sendNotification` calls (fire-and-forget, won't block UI). Idempotency keys: `booking-req-customer-{id}` and `booking-req-admin-{id}`.
 
-Per Lovable guidance, **no `vite-plugin-pwa` and no service worker** — just a web manifest so users can "Add to Home Screen" on iOS/Android with an app icon, splash background, and standalone display mode. This avoids preview-iframe cache issues and gives you a real installable app feel without offline complexity.
+### 3. Owner email lookup
+- Add a helper that reads the owner email from `user_roles` joined with `auth.users` (already accessible via existing `profiles` table for the owner — `quinnm954@gmail.com` per the bootstrap function). Fall back to a hardcoded constant if lookup fails.
 
-- Add `public/manifest.webmanifest` with name "Garage Ace", short_name, theme/background colors from the design tokens, icons (192/512), `display: "standalone"`.
-- Add `<link rel="manifest">`, apple-touch-icon, theme-color, and viewport-fit=cover meta tags in `index.html`.
-- Add a `/install` page with platform-aware instructions and the `beforeinstallprompt` flow on Android/Chrome.
+### 4. Verify end-to-end
+After deploy, send one test from the new button to confirm a row lands in `email_send_log` with status `sent`.
 
-## Phase 3 — Native wrapper (Capacitor) for App Store / Play Store
+## Technical notes
 
-Scaffolding only — the user runs `npx cap add ios/android` from their own machine after exporting to GitHub.
+- All new templates follow the existing brand styling pattern in `_shared/transactional-email-templates/` (white body, brand blue accents, `MMAR Care` / shop sign-off).
+- Update `registry.ts` to import + register the two new templates.
+- No DB migrations needed — uses existing `email_send_log` / queue infra.
+- Redeploy `send-transactional-email` after adding templates (REQUIRED — Edge Functions serve last-deployed code).
 
-- Install `@capacitor/core`, `@capacitor/cli`, `@capacitor/ios`, `@capacitor/android`.
-- `capacitor.config.ts` with appId `app.lovable.6370c0499e634e0c894716857b255272`, appName `shop-flow-home`, hot-reload server URL pointing at the sandbox preview.
-- Add `@capacitor/push-notifications`, `@capacitor/camera`, `@capacitor/status-bar`, `@capacitor/splash-screen` and a thin `src/lib/native.ts` that no-ops in the browser and uses native plugins when running inside Capacitor.
-- Hook camera into the inspection photo flow, push tokens into the existing `device_tokens` table.
-- Document the local steps (export to GitHub → `npm i` → `npx cap add ios/android` → `npx cap sync` → `npx cap run ios`) — read the Capacitor blog post for full setup.
+## Files touched
 
-## Suggested order
-
-1. Phase 1 — shipped now, immediate UX win on the phones you already use.
-2. Phase 2 — quick follow-up so staff/customers can install the app icon.
-3. Phase 3 — when you are ready to publish to the App Store / Play Store.
-
-## Confirm
-
-Reply with one of:
-- "Go" — I'll start Phase 1.
-- "Just shell + portal first" (or any subset) — I'll narrow Phase 1.
-- "Skip to Phase 2/3" — I'll jump ahead.
+- NEW `supabase/functions/_shared/transactional-email-templates/booking-request-received.tsx`
+- NEW `supabase/functions/_shared/transactional-email-templates/admin-new-booking-request.tsx`
+- EDIT `supabase/functions/_shared/transactional-email-templates/registry.ts`
+- EDIT `src/components/QuoteRequestDialog.tsx` (fire 2 emails after submit)
+- EDIT `src/components/admin/AdminEmails.tsx` (add Send Test dialog)
