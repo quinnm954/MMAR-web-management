@@ -6,7 +6,7 @@ import { useAuth } from "@/hooks/useAuth";
 import PortalLayout from "@/components/portal/PortalLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Car, CreditCard, Calendar, ArrowRight, RefreshCw, FileText, Wrench, Receipt } from "lucide-react";
+import { Car, CreditCard, Calendar, ArrowRight, RefreshCw } from "lucide-react";
 import { portalStrings } from "@/lib/portalStrings";
 import PushNotificationCard from "@/components/shell/PushNotificationCard";
 
@@ -82,14 +82,6 @@ const PortalDashboard = () => {
 
       <PushNotificationCard />
 
-      <div className="mb-8">
-        <div className="text-sm font-medium text-muted-foreground mb-2">Quick links</div>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <QuickLink icon={FileText} label="Estimates" to="/portal/estimates" />
-          <QuickLink icon={Wrench} label="Repair Orders" to="/portal/repair-orders" />
-          <QuickLink icon={Receipt} label="Invoices" to="/portal/invoices" />
-        </div>
-      </div>
 
       <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5">
         <CardHeader>
@@ -132,20 +124,5 @@ const StatCard = ({
   </Link>
 );
 
-const QuickLink = ({ icon: Icon, label, to }: { icon: typeof Car; label: string; to: string }) => (
-  <Link to={to}>
-    <Card className="hover:border-primary/40 hover:bg-primary/5 transition-colors h-full">
-      <CardContent className="p-4 flex items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center">
-            <Icon className="h-4 w-4 text-primary" />
-          </div>
-          <div className="font-medium">{label}</div>
-        </div>
-        <ArrowRight className="h-4 w-4 text-muted-foreground" />
-      </CardContent>
-    </Card>
-  </Link>
-);
 
 export default PortalDashboard;
