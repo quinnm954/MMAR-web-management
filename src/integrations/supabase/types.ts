@@ -83,6 +83,36 @@ export type Database = {
           },
         ]
       }
+      ai_usage_log: {
+        Row: {
+          completion_tokens: number | null
+          cost_usd: number
+          created_at: string
+          function_name: string
+          id: string
+          model: string | null
+          prompt_tokens: number | null
+        }
+        Insert: {
+          completion_tokens?: number | null
+          cost_usd?: number
+          created_at?: string
+          function_name: string
+          id?: string
+          model?: string | null
+          prompt_tokens?: number | null
+        }
+        Update: {
+          completion_tokens?: number | null
+          cost_usd?: number
+          created_at?: string
+          function_name?: string
+          id?: string
+          model?: string | null
+          prompt_tokens?: number | null
+        }
+        Relationships: []
+      }
       appointments: {
         Row: {
           assigned_technician_id: string | null
@@ -1853,6 +1883,7 @@ export type Database = {
       }
       shop_settings: {
         Row: {
+          ai_budget_usd: number
           estimate_valid_days: number
           id: number
           labor_cost_per_hour: number
@@ -1862,6 +1893,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          ai_budget_usd?: number
           estimate_valid_days?: number
           id?: number
           labor_cost_per_hour?: number
@@ -1871,6 +1903,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          ai_budget_usd?: number
           estimate_valid_days?: number
           id?: number
           labor_cost_per_hour?: number
