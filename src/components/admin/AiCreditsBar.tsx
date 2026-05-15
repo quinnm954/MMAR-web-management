@@ -65,31 +65,46 @@ const AiCreditsBar = () => {
           <Sparkles className="h-4 w-4 text-primary" />
           AI credits this month
         </div>
-        {editing ? (
-          <div className="flex items-center gap-1">
-            <span className="text-xs text-muted-foreground">$</span>
-            <Input
-              value={draft}
-              onChange={(e) => setDraft(e.target.value)}
-              className="h-7 w-20 text-sm"
-              inputMode="decimal"
-            />
-            <Button size="icon" variant="ghost" className="h-7 w-7" onClick={save}>
-              <Check className="h-4 w-4" />
-            </Button>
-            <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => { setEditing(false); setDraft(String(budget)); }}>
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
-        ) : (
-          <button
-            type="button"
-            onClick={() => setEditing(true)}
-            className="text-xs text-muted-foreground hover:text-foreground inline-flex items-center gap-1"
-          >
-            Budget {fmt(budget)} <Pencil className="h-3 w-3" />
-          </button>
-        )}
+        <div className="flex items-center gap-1">
+          {editing ? (
+            <>
+              <span className="text-xs text-muted-foreground">$</span>
+              <Input
+                value={draft}
+                onChange={(e) => setDraft(e.target.value)}
+                className="h-7 w-20 text-sm"
+                inputMode="decimal"
+              />
+              <Button size="icon" variant="ghost" className="h-7 w-7" onClick={save}>
+                <Check className="h-4 w-4" />
+              </Button>
+              <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => { setEditing(false); setDraft(String(budget)); }}>
+                <X className="h-4 w-4" />
+              </Button>
+            </>
+          ) : (
+            <>
+              <button
+                type="button"
+                onClick={() => setEditing(true)}
+                className="text-xs text-muted-foreground hover:text-foreground inline-flex items-center gap-1"
+              >
+                Budget {fmt(budget)} <Pencil className="h-3 w-3" />
+              </button>
+              <Button
+                size="icon"
+                variant="ghost"
+                className="h-7 w-7"
+                onClick={load}
+                disabled={loading}
+                aria-label="Refresh balance"
+                title="Refresh balance after topping up"
+              >
+                <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+              </Button>
+            </>
+          )}
+        </div>
       </div>
       <Progress value={pctUsed} className="h-2" />
       <div className="flex items-center justify-between text-xs">
