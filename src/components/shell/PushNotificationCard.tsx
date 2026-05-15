@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { toast } from "sonner";
-import { Bell, BellOff, BellRing, Loader2 } from "lucide-react";
+import { Bell, BellOff, BellRing, Loader2, Settings, Smartphone, ExternalLink } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -10,12 +11,29 @@ import { supabase } from "@/integrations/supabase/client";
 
 type PushStatus = "granted" | "denied" | "prompt" | "unsupported";
 
+const isIosUA = () =>
+  typeof navigator !== "undefined" &&
+  (/iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (navigator.platform === "MacIntel" && (navigator as Navigator & { maxTouchPoints?: number }).maxTouchPoints! > 1));
+
+const isStandalonePWA = () =>
+  typeof window !== "undefined" &&
+  (window.matchMedia?.("(display-mode: standalone)").matches ||
+    (window.navigator as Navigator & { standalone?: boolean }).standalone === true);
+
 const PushNotificationCard = () => {
   const { user } = useAuth();
   const [status, setStatus] = useState<PushStatus>("prompt");
   const [busy, setBusy] = useState(false);
   const [checking, setChecking] = useState(true);
   const native = isNative();
+  const platform = useMemo(() => nativePlatform(), []);
+  const isIos = native ? platform === "ios" : isIosUA();
+  const installedPwa = isStandalonePWA();
+  // iOS Safari requires the site to be installed to the Home Screen before
+  // Notification.permission can ever become "granted" (iOS 16.4+).
+  const iosWebNeedsInstall = !native && isIos && !installedPwa;
+
 
   const refreshStatus = async () => {
     setChecking(true);
