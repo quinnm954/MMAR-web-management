@@ -188,7 +188,18 @@ export default function RepairOrderDetail({ appointmentId, open, onClose }: Prop
 
   const issueInvoice = async () => {
     if (!appt || !approvedEstimate) return;
-    const approvedLines = (approvedEstimate.line_items || []).filter((l: any) => l.status !== 'declined');
+    // Only include line items the customer actually approved.
+    // - If the estimate is fully 'approved' and items have no per-line status, treat all as approved.
+    // - For 'partially_approved' (or any item with explicit per-line status), require status === 'approved'.
+    const allLines: any[] = approvedEstimate.line_items || [];
+    const hasPerLineStatus = allLines.some((l: any) => typeof l?.status === 'string' && l.status.length > 0);
+    const approvedLines = hasPerLineStatus
+      ? allLines.filter((l: any) => l.status === 'approved')
+      : (approvedEstimate.status === 'approved' ? allLines : allLines.filter((l: any) => l.status === 'approved'));
+    if (approvedLines.length === 0) {
+      toast.error('No approved line items on this estimate to invoice.');
+      return;
+    }
     const total = approvedLines.reduce((s: number, l: any) => s + Number(l.amount || (Number(l.quantity) * Number(l.unit_price))), 0);
     setIssuing(true);
     try {
