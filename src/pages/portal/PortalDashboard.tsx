@@ -82,14 +82,6 @@ const PortalDashboard = () => {
 
       <PushNotificationCard />
 
-      <div className="mb-8">
-        <div className="text-sm font-medium text-muted-foreground mb-2">Quick links</div>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <QuickLink icon={FileText} label="Estimates" to="/portal/estimates" />
-          <QuickLink icon={Wrench} label="Repair Orders" to="/portal/repair-orders" />
-          <QuickLink icon={Receipt} label="Invoices" to="/portal/invoices" />
-        </div>
-      </div>
 
       <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5">
         <CardHeader>
