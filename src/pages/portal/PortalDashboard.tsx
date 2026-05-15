@@ -73,10 +73,19 @@ const PortalDashboard = () => {
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
         <StatCard icon={Car} label="Vehicles" value={counts.vehicles} link="/portal/vehicles" />
         <StatCard icon={CreditCard} label="Active Memberships" value={counts.memberships} link="/portal/membership" />
         <StatCard icon={Calendar} label="Upcoming Appointments" value={counts.appointments} link="/portal/appointments" />
+      </div>
+
+      <div className="mb-8">
+        <div className="text-sm font-medium text-muted-foreground mb-2">Quick links</div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <QuickLink icon={FileText} label="Estimates" to="/portal/estimates" />
+          <QuickLink icon={Wrench} label="Repair Orders" to="/portal/repair-orders" />
+          <QuickLink icon={Receipt} label="Invoices" to="/portal/invoices" />
+        </div>
       </div>
 
       <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5">
