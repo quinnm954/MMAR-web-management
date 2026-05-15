@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { toast } from "sonner";
-import { Bell, BellOff, BellRing, Loader2 } from "lucide-react";
+import { Bell, BellOff, BellRing, Loader2, Settings, Smartphone, ExternalLink } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -10,12 +11,29 @@ import { supabase } from "@/integrations/supabase/client";
 
 type PushStatus = "granted" | "denied" | "prompt" | "unsupported";
 
+const isIosUA = () =>
+  typeof navigator !== "undefined" &&
+  (/iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (navigator.platform === "MacIntel" && (navigator as Navigator & { maxTouchPoints?: number }).maxTouchPoints! > 1));
+
+const isStandalonePWA = () =>
+  typeof window !== "undefined" &&
+  (window.matchMedia?.("(display-mode: standalone)").matches ||
+    (window.navigator as Navigator & { standalone?: boolean }).standalone === true);
+
 const PushNotificationCard = () => {
   const { user } = useAuth();
   const [status, setStatus] = useState<PushStatus>("prompt");
   const [busy, setBusy] = useState(false);
   const [checking, setChecking] = useState(true);
   const native = isNative();
+  const platform = useMemo(() => nativePlatform(), []);
+  const isIos = native ? platform === "ios" : isIosUA();
+  const installedPwa = isStandalonePWA();
+  // iOS Safari requires the site to be installed to the Home Screen before
+  // Notification.permission can ever become "granted" (iOS 16.4+).
+  const iosWebNeedsInstall = !native && isIos && !installedPwa;
+
 
   const refreshStatus = async () => {
     setChecking(true);
@@ -136,6 +154,48 @@ const PushNotificationCard = () => {
     );
   };
 
+  const openNativeSettings = async () => {
+    try {
+      if (isIos) {
+        // iOS: app-settings: deep-links straight to this app's Settings page.
+        window.location.href = "app-settings:";
+      } else {
+        // Android fallback: jump to the app's settings page.
+        window.location.href = "package:app.lovable.6370c0499e634e0c894716857b255272";
+      }
+    } catch (err) {
+      console.error("openNativeSettings failed", err);
+      toast.error("Couldn't open Settings", {
+        description: isIos
+          ? "Open the Settings app, then tap Garage Ace → Notifications."
+          : "Open Settings → Apps → Garage Ace → Notifications.",
+      });
+    }
+  };
+
+
+  const description = (() => {
+    if (status === "granted") {
+      return `You're all set${native ? ` on ${platform}` : ""}. We'll notify you about estimates, repair updates and invoices.`;
+    }
+    if (status === "denied") {
+      if (native && isIos) {
+        return "Notifications are off for Garage Ace. Tap Open Settings, then turn on Allow Notifications.";
+      }
+      if (native) {
+        return "Notifications are off. Tap Open Settings, then enable notifications for Garage Ace.";
+      }
+      if (isIos) {
+        return "Notifications are blocked in Safari. Open Settings → Safari → Advanced → Website Data is not enough — you'll need to install this site to your Home Screen first, then re-enable here.";
+      }
+      return "Notifications are blocked in your browser. Allow them in site settings (lock icon → Notifications → Allow) and re-check.";
+    }
+    if (iosWebNeedsInstall) {
+      return "On iPhone, push notifications only work after you add Garage Ace to your Home Screen. Tap How to install, then come back here to enable.";
+    }
+    return "Get instant updates when an estimate is ready, your repair status changes, or an invoice is sent.";
+  })();
+
   return (
     <Card className="mb-6">
       <CardHeader className="pb-3">
@@ -146,30 +206,81 @@ const PushNotificationCard = () => {
           <StatusBadge />
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <p className="text-sm text-muted-foreground">
-          {status === "granted"
-            ? `You're all set${native ? ` on ${nativePlatform()}` : ""}. We'll notify you about estimates, repair updates and invoices.`
-            : status === "denied"
-              ? native
-                ? "Notifications are blocked. Open your device Settings → Garage Ace → Notifications to allow them."
-                : "Notifications are blocked in your browser. Allow them in site settings to re-enable."
-              : "Get instant updates when an estimate is ready, your repair status changes, or an invoice is sent."}
-        </p>
-        {status !== "granted" && status !== "denied" && (
-          <Button onClick={enable} disabled={busy || checking} className="tap-44 shrink-0">
-            {busy ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Bell className="h-4 w-4 mr-2" />}
-            Enable
-          </Button>
+      <CardContent className="flex flex-col gap-3">
+        <p className="text-sm text-muted-foreground">{description}</p>
+
+        {isIos && status !== "granted" && (
+          <div className="rounded-md border border-border bg-muted/30 p-3 text-xs text-muted-foreground space-y-1">
+            <div className="font-medium text-foreground flex items-center gap-1.5">
+              <Smartphone className="h-3.5 w-3.5" /> iPhone &amp; iPad steps
+            </div>
+            {native ? (
+              <ol className="list-decimal pl-4 space-y-0.5">
+                <li>Tap <span className="font-medium">Open Settings</span> below.</li>
+                <li>Tap <span className="font-medium">Notifications</span>.</li>
+                <li>Turn on <span className="font-medium">Allow Notifications</span> (Banners, Sounds, Badges).</li>
+                <li>Return here and tap <span className="font-medium">Re-check</span>.</li>
+              </ol>
+            ) : iosWebNeedsInstall ? (
+              <ol className="list-decimal pl-4 space-y-0.5">
+                <li>Tap the <span className="font-medium">Share</span> icon in Safari.</li>
+                <li>Choose <span className="font-medium">Add to Home Screen</span>.</li>
+                <li>Open Garage Ace from your Home Screen.</li>
+                <li>Come back to this card and tap <span className="font-medium">Enable</span>.</li>
+              </ol>
+            ) : (
+              <ol className="list-decimal pl-4 space-y-0.5">
+                <li>Open <span className="font-medium">Settings → Notifications</span>.</li>
+                <li>Find <span className="font-medium">Garage Ace</span> and turn on Allow Notifications.</li>
+                <li>Return here and tap <span className="font-medium">Re-check</span>.</li>
+              </ol>
+            )}
+          </div>
         )}
-        {status === "denied" && (
-          <Button variant="outline" onClick={refreshStatus} disabled={checking} className="tap-44 shrink-0">
-            Re-check
-          </Button>
-        )}
+
+        <div className="flex flex-wrap gap-2">
+          {status !== "granted" && status !== "denied" && !iosWebNeedsInstall && (
+            <Button onClick={enable} disabled={busy || checking} className="tap-44">
+              {busy ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Bell className="h-4 w-4 mr-2" />}
+              Enable
+            </Button>
+          )}
+          {iosWebNeedsInstall && (
+            <Button asChild className="tap-44">
+              <Link to="/install">
+                <Smartphone className="h-4 w-4 mr-2" /> How to install
+              </Link>
+            </Button>
+          )}
+          {status === "denied" && native && (
+            <Button onClick={openNativeSettings} className="tap-44">
+              <Settings className="h-4 w-4 mr-2" /> Open Settings
+            </Button>
+          )}
+          {status === "denied" && !native && isIos && !installedPwa && (
+            <Button asChild className="tap-44">
+              <Link to="/install">
+                <Smartphone className="h-4 w-4 mr-2" /> How to install
+              </Link>
+            </Button>
+          )}
+          {status === "denied" && !native && (!isIos || installedPwa) && (
+            <Button asChild variant="outline" className="tap-44">
+              <a href="https://support.google.com/chrome/answer/3220216" target="_blank" rel="noreferrer">
+                <ExternalLink className="h-4 w-4 mr-2" /> Browser help
+              </a>
+            </Button>
+          )}
+          {(status === "denied" || status === "granted") && (
+            <Button variant="outline" onClick={refreshStatus} disabled={checking} className="tap-44">
+              Re-check
+            </Button>
+          )}
+        </div>
       </CardContent>
     </Card>
   );
 };
 
 export default PushNotificationCard;
+
