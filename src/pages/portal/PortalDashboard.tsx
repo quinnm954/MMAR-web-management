@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Car, CreditCard, Calendar, ArrowRight, RefreshCw, FileText, Wrench, Receipt } from "lucide-react";
 import { portalStrings } from "@/lib/portalStrings";
+import PushNotificationCard from "@/components/shell/PushNotificationCard";
 
 const PortalDashboard = () => {
   const { user } = useAuth();
@@ -78,6 +79,8 @@ const PortalDashboard = () => {
         <StatCard icon={CreditCard} label="Memberships" value={counts.memberships} link="/portal/membership" />
         <StatCard icon={Calendar} label="Appointments" value={counts.appointments} link="/portal/appointments" />
       </div>
+
+      <PushNotificationCard />
 
       <div className="mb-8">
         <div className="text-sm font-medium text-muted-foreground mb-2">Quick links</div>
