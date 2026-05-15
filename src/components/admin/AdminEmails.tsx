@@ -62,6 +62,7 @@ const statusBadge = (status: string) => {
 };
 
 const AdminEmails = () => {
+  const { user } = useAuth();
   const [rows, setRows] = useState<EmailLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [rangeHours, setRangeHours] = useState(24 * 7);
@@ -69,7 +70,36 @@ const AdminEmails = () => {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(0);
+  const [testOpen, setTestOpen] = useState(false);
+  const [testTemplate, setTestTemplate] = useState<string>(TEMPLATE_NAMES[0]);
+  const [testEmail, setTestEmail] = useState<string>('');
+  const [testBusy, setTestBusy] = useState(false);
   const PAGE_SIZE = 50;
+
+  useEffect(() => {
+    if (user?.email && !testEmail) setTestEmail(user.email);
+  }, [user?.email]);
+
+  const sendTest = async () => {
+    if (!testEmail || !testTemplate) return;
+    setTestBusy(true);
+    const { error } = await supabase.functions.invoke('send-transactional-email', {
+      body: {
+        templateName: testTemplate,
+        recipientEmail: testEmail,
+        idempotencyKey: `test-${testTemplate}-${Date.now()}`,
+      },
+    });
+    setTestBusy(false);
+    if (error) {
+      toast.error(`Send failed: ${error.message}`);
+    } else {
+      toast.success('Queued! It should appear in the log within a few seconds.');
+      setTestOpen(false);
+      setTimeout(load, 4000);
+    }
+  };
+
 
   const load = async () => {
     setLoading(true);
