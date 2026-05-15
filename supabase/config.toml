@@ -35,3 +35,6 @@ verify_jwt = false
 
 [functions.twilio-voice-transcription]
 verify_jwt = false
+
+[functions.record-mileage-from-token]
+verify_jwt = false

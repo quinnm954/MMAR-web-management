@@ -10,6 +10,7 @@ import { Car, CreditCard, Calendar, ArrowRight, RefreshCw } from "lucide-react";
 import { portalStrings } from "@/lib/portalStrings";
 import PushNotificationCard from "@/components/shell/PushNotificationCard";
 import VehicleHealthCard from "@/components/portal/VehicleHealthCard";
+import MileageQuickUpdate from "@/components/portal/MileageQuickUpdate";
 
 const PortalDashboard = () => {
   const { user } = useAuth();
@@ -80,6 +81,8 @@ const PortalDashboard = () => {
         <StatCard icon={CreditCard} label="Memberships" value={counts.memberships} link="/portal/membership" />
         <StatCard icon={Calendar} label="Appointments" value={counts.appointments} link="/portal/appointments" />
       </div>
+
+      <MileageQuickUpdate />
 
       <VehicleHealthCard />
 

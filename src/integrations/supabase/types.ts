@@ -1519,6 +1519,44 @@ export type Database = {
           },
         ]
       }
+      mileage_update_tokens: {
+        Row: {
+          channel: string
+          created_at: string
+          customer_id: string
+          expires_at: string
+          token: string
+          used_at: string | null
+          vehicle_id: string
+        }
+        Insert: {
+          channel?: string
+          created_at?: string
+          customer_id: string
+          expires_at?: string
+          token?: string
+          used_at?: string | null
+          vehicle_id: string
+        }
+        Update: {
+          channel?: string
+          created_at?: string
+          customer_id?: string
+          expires_at?: string
+          token?: string
+          used_at?: string | null
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mileage_update_tokens_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notification_preferences: {
         Row: {
           appointment_reminders: boolean
@@ -2245,6 +2283,47 @@ export type Database = {
         }
         Relationships: []
       }
+      vehicle_mileage_logs: {
+        Row: {
+          created_at: string
+          customer_id: string
+          id: string
+          mileage: number
+          notes: string | null
+          recorded_at: string
+          source: string
+          vehicle_id: string
+        }
+        Insert: {
+          created_at?: string
+          customer_id: string
+          id?: string
+          mileage: number
+          notes?: string | null
+          recorded_at?: string
+          source?: string
+          vehicle_id: string
+        }
+        Update: {
+          created_at?: string
+          customer_id?: string
+          id?: string
+          mileage?: number
+          notes?: string | null
+          recorded_at?: string
+          source?: string
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_mileage_logs_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vehicle_parts_catalog: {
         Row: {
           created_at: string
@@ -2301,12 +2380,14 @@ export type Database = {
       }
       vehicles: {
         Row: {
+          avg_miles_per_day: number | null
           color: string | null
           created_at: string
           current_mileage: number | null
           engine: string | null
           id: string
           is_active: boolean
+          last_mileage_update_at: string | null
           license_plate: string | null
           make: string | null
           model: string | null
@@ -2321,12 +2402,14 @@ export type Database = {
           year: number | null
         }
         Insert: {
+          avg_miles_per_day?: number | null
           color?: string | null
           created_at?: string
           current_mileage?: number | null
           engine?: string | null
           id?: string
           is_active?: boolean
+          last_mileage_update_at?: string | null
           license_plate?: string | null
           make?: string | null
           model?: string | null
@@ -2341,12 +2424,14 @@ export type Database = {
           year?: number | null
         }
         Update: {
+          avg_miles_per_day?: number | null
           color?: string | null
           created_at?: string
           current_mileage?: number | null
           engine?: string | null
           id?: string
           is_active?: boolean
+          last_mileage_update_at?: string | null
           license_plate?: string | null
           make?: string | null
           model?: string | null
@@ -2489,6 +2574,10 @@ export type Database = {
           msg_id: number
           read_ct: number
         }[]
+      }
+      redeem_mileage_token: {
+        Args: { _miles: number; _token: string }
+        Returns: Json
       }
       set_booking_attribution: {
         Args: { _attribution: Json; _token: string }
