@@ -125,6 +125,7 @@ const PushNotificationCard = () => {
     }
   };
 
+  if (status === "granted") return null;
   if (status === "unsupported" && !native) return null;
 
   const StatusBadge = () => {
