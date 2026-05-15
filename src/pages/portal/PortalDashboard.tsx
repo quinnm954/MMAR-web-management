@@ -81,6 +81,8 @@ const PortalDashboard = () => {
         <StatCard icon={Calendar} label="Appointments" value={counts.appointments} link="/portal/appointments" />
       </div>
 
+      <VehicleHealthCard />
+
       <PushNotificationCard />
 
 
