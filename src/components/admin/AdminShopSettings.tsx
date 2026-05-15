@@ -9,6 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Plus, Trash2 } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
+import AiCreditsBar from './AiCreditsBar';
 
 const TITLES = ['technician', 'service_advisor', 'manager', 'parts', 'admin', 'other'];
 const PAY_BASIS = [
