@@ -1,13 +1,30 @@
 import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Mail, RefreshCw, Search } from 'lucide-react';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Mail, RefreshCw, Search, Send, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
+import { toast } from 'sonner';
+
+const TEMPLATE_NAMES = [
+  'appointment-confirmed',
+  'service-completed',
+  'invoice-issued',
+  'membership-welcome',
+  'estimate-ready',
+  'inspection-ready',
+  'mileage-service-reminder',
+  'invoice-paid-receipt',
+  'booking-request-received',
+  'admin-new-booking-request',
+];
 
 interface EmailLog {
   id: string;
