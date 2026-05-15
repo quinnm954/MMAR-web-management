@@ -1,13 +1,30 @@
 import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Mail, RefreshCw, Search } from 'lucide-react';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Mail, RefreshCw, Search, Send, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
+import { toast } from 'sonner';
+
+const TEMPLATE_NAMES = [
+  'appointment-confirmed',
+  'service-completed',
+  'invoice-issued',
+  'membership-welcome',
+  'estimate-ready',
+  'inspection-ready',
+  'mileage-service-reminder',
+  'invoice-paid-receipt',
+  'booking-request-received',
+  'admin-new-booking-request',
+];
 
 interface EmailLog {
   id: string;
@@ -45,6 +62,7 @@ const statusBadge = (status: string) => {
 };
 
 const AdminEmails = () => {
+  const { user } = useAuth();
   const [rows, setRows] = useState<EmailLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [rangeHours, setRangeHours] = useState(24 * 7);
@@ -52,7 +70,36 @@ const AdminEmails = () => {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(0);
+  const [testOpen, setTestOpen] = useState(false);
+  const [testTemplate, setTestTemplate] = useState<string>(TEMPLATE_NAMES[0]);
+  const [testEmail, setTestEmail] = useState<string>('');
+  const [testBusy, setTestBusy] = useState(false);
   const PAGE_SIZE = 50;
+
+  useEffect(() => {
+    if (user?.email && !testEmail) setTestEmail(user.email);
+  }, [user?.email]);
+
+  const sendTest = async () => {
+    if (!testEmail || !testTemplate) return;
+    setTestBusy(true);
+    const { error } = await supabase.functions.invoke('send-transactional-email', {
+      body: {
+        templateName: testTemplate,
+        recipientEmail: testEmail,
+        idempotencyKey: `test-${testTemplate}-${Date.now()}`,
+      },
+    });
+    setTestBusy(false);
+    if (error) {
+      toast.error(`Send failed: ${error.message}`);
+    } else {
+      toast.success('Queued! It should appear in the log within a few seconds.');
+      setTestOpen(false);
+      setTimeout(load, 4000);
+    }
+  };
+
 
   const load = async () => {
     setLoading(true);
@@ -164,11 +211,48 @@ const AdminEmails = () => {
               onChange={(e) => { setSearch(e.target.value); setPage(0); }}
             />
           </div>
+          <Button variant="outline" size="sm" onClick={() => setTestOpen(true)} className="gap-1.5">
+            <Send className="h-4 w-4" /> Send test
+          </Button>
           <Button variant="outline" size="icon" onClick={load} disabled={loading}>
             <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
           </Button>
         </CardContent>
       </Card>
+
+      {/* Send Test dialog */}
+      <Dialog open={testOpen} onOpenChange={setTestOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Send Test Email</DialogTitle>
+            <DialogDescription>
+              Verify the email pipeline end-to-end. The send is queued and should appear in the log below within a few seconds.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3 py-2">
+            <div className="space-y-1.5">
+              <Label htmlFor="test-template">Template</Label>
+              <Select value={testTemplate} onValueChange={setTestTemplate}>
+                <SelectTrigger id="test-template"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {TEMPLATE_NAMES.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="test-email">Recipient</Label>
+              <Input id="test-email" type="email" value={testEmail} onChange={(e) => setTestEmail(e.target.value)} placeholder="you@example.com" />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setTestOpen(false)} disabled={testBusy}>Cancel</Button>
+            <Button onClick={sendTest} disabled={testBusy || !testEmail} className="gap-1.5">
+              {testBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+              Send test
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Table */}
       <Card>
