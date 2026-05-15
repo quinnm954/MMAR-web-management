@@ -37,8 +37,9 @@ const Login = () => {
   useEffect(() => {
     if (isLoading || !user) return;
     const explicit = params.get("redirect");
+    const isExplicitPortalRedirect = explicit?.startsWith("/portal") ?? false;
     let target: string;
-    if (explicit) {
+    if (explicit && !(isExplicitPortalRedirect && (isAdmin || isStaff))) {
       target = explicit;
     } else if (isAdmin) {
       target = "/admin/dashboard";
