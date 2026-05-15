@@ -51,7 +51,11 @@ const Login = () => {
     try {
       const stored = sessionStorage.getItem("postLoginRedirect");
       if (stored) {
-        target = stored;
+        // Ignore a stale portal redirect for admin/staff — they belong in admin/tech.
+        const isPortalRedirect = stored.startsWith("/portal");
+        if (!(isPortalRedirect && (isAdmin || isStaff))) {
+          target = stored;
+        }
         sessionStorage.removeItem("postLoginRedirect");
       }
     } catch {}
