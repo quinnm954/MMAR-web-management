@@ -80,6 +80,8 @@ const PortalDashboard = () => {
         <StatCard icon={Calendar} label="Appointments" value={counts.appointments} link="/portal/appointments" />
       </div>
 
+      <PushNotificationCard />
+
       <div className="mb-8">
         <div className="text-sm font-medium text-muted-foreground mb-2">Quick links</div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
