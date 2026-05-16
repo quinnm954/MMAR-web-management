@@ -232,6 +232,10 @@ const AdminEmails = () => {
               onChange={(e) => { setSearch(e.target.value); setPage(0); }}
             />
           </div>
+          <Button variant="outline" size="sm" onClick={sendReminders} disabled={remindersBusy} className="gap-1.5">
+            {remindersBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : <BellRing className="h-4 w-4" />}
+            Send reminders
+          </Button>
           <Button variant="outline" size="sm" onClick={() => setTestOpen(true)} className="gap-1.5">
             <Send className="h-4 w-4" /> Send test
           </Button>
