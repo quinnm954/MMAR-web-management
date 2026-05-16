@@ -188,9 +188,10 @@ const AdminEstimates = () => {
     if (!preview) return;
     const { extracted: ex, matchedVehicle, lines } = preview;
     let { matchedCustomer } = preview;
-    const taxableSubtotal = lines.reduce((s: number, i: LineItem) => i.kind === 'fee' ? s : s + i.amount, 0);
-    const feeSubtotal = lines.reduce((s: number, i: LineItem) => i.kind === 'fee' ? s + i.amount : s, 0);
-    const subtotal = taxableSubtotal + feeSubtotal;
+    // Only parts are taxable / accrue shop supplies. Labor and fees never do.
+    const taxableSubtotal = lines.reduce((s: number, i: LineItem) => (i.kind ?? 'part') === 'part' ? s + i.amount : s, 0);
+    const nonTaxableSubtotal = lines.reduce((s: number, i: LineItem) => (i.kind ?? 'part') === 'part' ? s : s + i.amount, 0);
+    const subtotal = taxableSubtotal + nonTaxableSubtotal;
     const shop = Math.min(taxableSubtotal * (settings?.shop_supplies_pct ?? 0.05), settings?.shop_supplies_max ?? 50);
     const tax = (taxableSubtotal + shop) * (settings?.tax_rate ?? 0.07);
     const valid_until = settings ? new Date(Date.now() + (settings.estimate_valid_days || 14) * 86400000).toISOString().slice(0, 10) : null;
@@ -252,9 +253,10 @@ const AdminEstimates = () => {
   };
 
   const recalc = (li: LineItem[]) => {
-    const taxableSubtotal = li.reduce((s, i) => i.kind === 'fee' ? s : s + (Number(i.quantity) * Number(i.unit_price)), 0);
-    const feeSubtotal = li.reduce((s, i) => i.kind === 'fee' ? s + (Number(i.quantity) * Number(i.unit_price)) : s, 0);
-    const subtotal = taxableSubtotal + feeSubtotal;
+    // Only parts are taxable / accrue shop supplies. Labor and fees never do.
+    const taxableSubtotal = li.reduce((s, i) => (i.kind ?? 'part') === 'part' ? s + (Number(i.quantity) * Number(i.unit_price)) : s, 0);
+    const nonTaxableSubtotal = li.reduce((s, i) => (i.kind ?? 'part') === 'part' ? s : s + (Number(i.quantity) * Number(i.unit_price)), 0);
+    const subtotal = taxableSubtotal + nonTaxableSubtotal;
     const shop = Math.min(taxableSubtotal * (settings?.shop_supplies_pct ?? 0.05), settings?.shop_supplies_max ?? 50);
     const tax = (taxableSubtotal + shop) * (settings?.tax_rate ?? 0.07);
     return { subtotal, shop_supplies: shop, tax, total: subtotal + shop + tax };
@@ -447,6 +449,7 @@ const AdminEstimates = () => {
                           <TableCell>
                             <Input value={l.description} onChange={e => updateLine(i, { description: e.target.value })} />
                             {l.kind === 'fee' && <span className="text-[10px] text-muted-foreground ml-1">Flat fee · no tax/shop</span>}
+                            {l.kind === 'labor' && <span className="text-[10px] text-muted-foreground ml-1">Labor · no tax/shop</span>}
                           </TableCell>
                           <TableCell><Input type="number" step="0.5" value={l.quantity} onChange={e => updateLine(i, { quantity: parseFloat(e.target.value) || 0 })} /></TableCell>
                           <TableCell><Input type="number" step="0.1" value={l.labor_hours ?? 0} onChange={e => updateLine(i, { labor_hours: parseFloat(e.target.value) || 0 })} title="Billable labor hours" /></TableCell>
