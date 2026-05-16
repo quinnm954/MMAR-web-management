@@ -290,6 +290,9 @@ const AdminBookingRequests = () => {
                   <Button size="sm" variant="outline" onClick={() => openEdit(r)}>
                     <Pencil className="h-4 w-4 mr-1" /> Edit
                   </Button>
+                  <Button size="sm" variant="ghost" className="text-destructive hover:text-destructive" onClick={() => removeRequest(r)}>
+                    <Trash2 className="h-4 w-4 mr-1" /> Delete
+                  </Button>
                   <Button size="sm" variant="ghost" asChild>
                     <Link to={`/appointments/${r.confirmation_token}`} target="_blank">
                       <ExternalLink className="h-3 w-3 mr-1" /> Customer view
