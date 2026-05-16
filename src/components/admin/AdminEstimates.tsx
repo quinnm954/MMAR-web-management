@@ -253,9 +253,10 @@ const AdminEstimates = () => {
   };
 
   const recalc = (li: LineItem[]) => {
-    const taxableSubtotal = li.reduce((s, i) => i.kind === 'fee' ? s : s + (Number(i.quantity) * Number(i.unit_price)), 0);
-    const feeSubtotal = li.reduce((s, i) => i.kind === 'fee' ? s + (Number(i.quantity) * Number(i.unit_price)) : s, 0);
-    const subtotal = taxableSubtotal + feeSubtotal;
+    // Only parts are taxable / accrue shop supplies. Labor and fees never do.
+    const taxableSubtotal = li.reduce((s, i) => (i.kind ?? 'part') === 'part' ? s + (Number(i.quantity) * Number(i.unit_price)) : s, 0);
+    const nonTaxableSubtotal = li.reduce((s, i) => (i.kind ?? 'part') === 'part' ? s : s + (Number(i.quantity) * Number(i.unit_price)), 0);
+    const subtotal = taxableSubtotal + nonTaxableSubtotal;
     const shop = Math.min(taxableSubtotal * (settings?.shop_supplies_pct ?? 0.05), settings?.shop_supplies_max ?? 50);
     const tax = (taxableSubtotal + shop) * (settings?.tax_rate ?? 0.07);
     return { subtotal, shop_supplies: shop, tax, total: subtotal + shop + tax };
