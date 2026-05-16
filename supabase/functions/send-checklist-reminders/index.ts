@@ -18,8 +18,8 @@ async function sendTxEmail(body: Record<string, unknown>): Promise<{ error?: str
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${SB_SERVICE_KEY}`,
-        apikey: SB_SERVICE_KEY,
+        Authorization: `Bearer ${SB_ANON_KEY}`,
+        apikey: SB_ANON_KEY,
       },
       body: JSON.stringify(body),
     });
