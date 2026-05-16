@@ -239,10 +239,10 @@ Deno.serve(async (req) => {
         reference_id: v.id,
         message: `Mileage reminder: ${dueServices.length} service(s) due`,
         status: invErr ? 'failed' : 'sent',
-        error: invErr?.message,
+        error: invErr,
       });
 
-      if (invErr) errors.push({ vehicle_id: v.id, error: invErr.message });
+      if (invErr) errors.push({ vehicle_id: v.id, error: invErr });
       else sent.push({ vehicle_id: v.id, due_count: dueServices.length });
     } catch (e: any) {
       errors.push({ vehicle_id: v.id, error: e?.message || String(e) });
