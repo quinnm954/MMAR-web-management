@@ -20,6 +20,7 @@ import { template as mileageUpdateRequest } from './mileage-update-request.tsx'
 import { template as invoicePaidReceipt } from './invoice-paid-receipt.tsx'
 import { template as bookingRequestReceived } from './booking-request-received.tsx'
 import { template as adminNewBookingRequest } from './admin-new-booking-request.tsx'
+import { template as maintenanceChecklistReminder } from './maintenance-checklist-reminder.tsx'
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   'appointment-confirmed': appointmentConfirmed,
