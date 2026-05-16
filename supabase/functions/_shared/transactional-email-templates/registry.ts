@@ -34,4 +34,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'invoice-paid-receipt': invoicePaidReceipt,
   'booking-request-received': bookingRequestReceived,
   'admin-new-booking-request': adminNewBookingRequest,
+  'maintenance-checklist-reminder': maintenanceChecklistReminder,
 }
