@@ -125,17 +125,6 @@ Deno.serve(async (req) => {
       });
 
       if (invErr) errors.push({ owner_id: ownerId, error: invErr });
-
-      await sb.from('service_reminders_sent').insert({
-        customer_id: ownerId,
-        reminder_type: REMINDER_TYPE,
-        reference_id: primary.id,
-        message: 'Maintenance checklist reminder (no service history on file)',
-        status: invErr ? 'failed' : 'sent',
-        error: invErr?.message,
-      });
-
-      if (invErr) errors.push({ owner_id: ownerId, error: invErr.message });
       else sent.push({ owner_id: ownerId, vehicle_count: ownerVehicles.length });
     } catch (e: any) {
       errors.push({ owner_id: ownerId, error: e?.message || String(e) });
