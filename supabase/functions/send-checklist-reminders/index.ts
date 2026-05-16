@@ -8,11 +8,31 @@ const corsHeaders = {
 const REMINDER_TYPE = 'checklist_email_reminder';
 const REMINDER_COOLDOWN_DAYS = 14;
 const SITE_URL = Deno.env.get('SITE_URL') || 'https://mikesmautorepair.com';
+const SB_URL = Deno.env.get('SUPABASE_URL')!;
+const SB_SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+
+async function sendTxEmail(body: Record<string, unknown>): Promise<{ error?: string }> {
+  try {
+    const r = await fetch(`${SB_URL}/functions/v1/send-transactional-email`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${SB_SERVICE_KEY}`,
+        apikey: SB_SERVICE_KEY,
+      },
+      body: JSON.stringify(body),
+    });
+    if (!r.ok) return { error: `send-transactional-email ${r.status}: ${(await r.text()).slice(0, 200)}` };
+    return {};
+  } catch (e: any) {
+    return { error: e?.message || String(e) };
+  }
+}
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
-  const sb = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
+  const sb = createClient(SB_URL, SB_SERVICE_KEY);
   const sent: any[] = [];
   const skipped: any[] = [];
   const errors: any[] = [];
