@@ -10,6 +10,7 @@ const REMINDER_COOLDOWN_DAYS = 14;
 const SITE_URL = Deno.env.get('SITE_URL') || 'https://mikesmautorepair.com';
 const SB_URL = Deno.env.get('SUPABASE_URL')!;
 const SB_SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+const SB_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY')!;
 
 async function sendTxEmail(body: Record<string, unknown>): Promise<{ error?: string }> {
   try {
