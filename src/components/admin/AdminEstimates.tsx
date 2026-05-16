@@ -461,37 +461,57 @@ const AdminEstimates = () => {
                         {catalog.map(c => <SelectItem key={c.id} value={c.id}>{c.name} (${Number(c.unit_price).toFixed(2)})</SelectItem>)}
                       </SelectContent>
                     </Select>
-                    <Button size="sm" variant="outline" onClick={() => addLine()}><Plus className="h-3 w-3 mr-1" /> Custom</Button>
+                    <Button size="sm" variant="outline" onClick={() => addLine()}><Plus className="h-3 w-3 mr-1" /> Part</Button>
+                    <Button size="sm" variant="outline" onClick={addLaborLine}><Plus className="h-3 w-3 mr-1" /> Labor</Button>
                     <Button size="sm" variant="outline" onClick={addDiagnosisFee}><Plus className="h-3 w-3 mr-1" /> Diagnosis Fee</Button>
                   </div>
                 </div>
-                <div className="border rounded">
+                <div className="border rounded overflow-x-auto">
                   <Table>
                     <TableHeader>
                       <TableRow>
+                        <TableHead className="w-28">Type</TableHead>
                         <TableHead>Description</TableHead>
                         <TableHead className="w-20">Qty</TableHead>
                         <TableHead className="w-20">Hrs</TableHead>
                         <TableHead className="w-28">Unit Price</TableHead>
+                        <TableHead className="w-24">Unit Cost</TableHead>
                         <TableHead className="w-24 text-right">Amount</TableHead>
                         <TableHead className="w-12"></TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {(editing.line_items || []).map((l: LineItem, i: number) => (
-                        <TableRow key={i}>
-                          <TableCell>
-                            <Input value={l.description} onChange={e => updateLine(i, { description: e.target.value })} />
-                            {l.kind === 'fee' && <span className="text-[10px] text-muted-foreground ml-1">Flat fee · no tax/shop</span>}
-                            {l.kind === 'labor' && <span className="text-[10px] text-muted-foreground ml-1">Labor · no tax/shop</span>}
-                          </TableCell>
-                          <TableCell><Input type="number" step="0.5" value={l.quantity} onChange={e => updateLine(i, { quantity: parseFloat(e.target.value) || 0 })} /></TableCell>
-                          <TableCell><Input type="number" step="0.1" value={l.labor_hours ?? 0} onChange={e => updateLine(i, { labor_hours: parseFloat(e.target.value) || 0 })} title="Billable labor hours" /></TableCell>
-                          <TableCell><Input type="number" step="0.01" value={l.unit_price} onChange={e => updateLine(i, { unit_price: parseFloat(e.target.value) || 0 })} /></TableCell>
-                          <TableCell className="text-right">${l.amount.toFixed(2)}</TableCell>
-                          <TableCell><Button size="icon" variant="ghost" onClick={() => removeLine(i)}><Trash2 className="h-4 w-4" /></Button></TableCell>
-                        </TableRow>
-                      ))}
+                      {(editing.line_items || []).map((l: LineItem, i: number) => {
+                        const kind = l.kind ?? 'part';
+                        return (
+                          <TableRow key={i}>
+                            <TableCell>
+                              <Select value={kind} onValueChange={(v) => updateLine(i, { kind: v as 'part' | 'labor' | 'fee' })}>
+                                <SelectTrigger className="h-8"><SelectValue /></SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="part">Part</SelectItem>
+                                  <SelectItem value="labor">Labor</SelectItem>
+                                  <SelectItem value="fee">Fee</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </TableCell>
+                            <TableCell>
+                              <Input value={l.description} onChange={e => updateLine(i, { description: e.target.value })} />
+                              {kind === 'fee' && <span className="text-[10px] text-muted-foreground ml-1">Flat fee · no tax/shop</span>}
+                              {kind === 'labor' && <span className="text-[10px] text-muted-foreground ml-1">Labor · no tax/shop</span>}
+                              {kind === 'part' && <span className="text-[10px] text-muted-foreground ml-1">Auto-saved to catalog</span>}
+                            </TableCell>
+                            <TableCell><Input type="number" step="0.5" value={l.quantity} onChange={e => updateLine(i, { quantity: parseFloat(e.target.value) || 0 })} /></TableCell>
+                            <TableCell><Input type="number" step="0.1" value={l.labor_hours ?? 0} onChange={e => updateLine(i, { labor_hours: parseFloat(e.target.value) || 0 })} title="Billable labor hours" disabled={kind === 'part'} /></TableCell>
+                            <TableCell><Input type="number" step="0.01" value={l.unit_price} onChange={e => updateLine(i, { unit_price: parseFloat(e.target.value) || 0 })} /></TableCell>
+                            <TableCell>
+                              <Input type="number" step="0.01" value={l.unit_cost ?? 0} onChange={e => updateLine(i, { unit_cost: parseFloat(e.target.value) || 0 })} disabled={kind !== 'part'} title="Part cost (for margin & catalog)" />
+                            </TableCell>
+                            <TableCell className="text-right">${l.amount.toFixed(2)}</TableCell>
+                            <TableCell><Button size="icon" variant="ghost" onClick={() => removeLine(i)}><Trash2 className="h-4 w-4" /></Button></TableCell>
+                          </TableRow>
+                        );
+                      })}
                     </TableBody>
                   </Table>
                 </div>
