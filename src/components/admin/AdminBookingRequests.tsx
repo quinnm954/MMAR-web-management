@@ -14,7 +14,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { CalendarCheck, CheckCircle2, XCircle, Phone, Loader2, RefreshCw, ExternalLink, Pencil } from "lucide-react";
+import { CalendarCheck, CheckCircle2, XCircle, Phone, Loader2, RefreshCw, ExternalLink, Pencil, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
 
 interface BookingRequest {
@@ -183,6 +183,17 @@ const AdminBookingRequests = () => {
     load();
   };
 
+  const removeRequest = async (r: BookingRequest) => {
+    if (!confirm(`Delete booking request from ${r.customer_name}? This cannot be undone.`)) return;
+    const { error } = await supabase.from("booking_requests").delete().eq("id", r.id);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success("Booking request deleted.");
+    load();
+  };
+
   const visible = filter === "pending"
     ? rows.filter((r) => r.status === "new" || r.status === "contacted")
     : rows;
@@ -278,6 +289,9 @@ const AdminBookingRequests = () => {
                   )}
                   <Button size="sm" variant="outline" onClick={() => openEdit(r)}>
                     <Pencil className="h-4 w-4 mr-1" /> Edit
+                  </Button>
+                  <Button size="sm" variant="ghost" className="text-destructive hover:text-destructive" onClick={() => removeRequest(r)}>
+                    <Trash2 className="h-4 w-4 mr-1" /> Delete
                   </Button>
                   <Button size="sm" variant="ghost" asChild>
                     <Link to={`/appointments/${r.confirmation_token}`} target="_blank">
