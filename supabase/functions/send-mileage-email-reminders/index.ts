@@ -209,7 +209,7 @@ Deno.serve(async (req) => {
       const vehicleLabel = [v.year, v.make, v.model].filter(Boolean).join(' ') || 'your vehicle';
 
       const sbUrl = Deno.env.get('SUPABASE_URL')!;
-      const sbKey = Deno.env.get('SUPABASE_ANON_KEY')!;
+      const sbKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im93Z3B4dWpmeXRza2RmbXJoamdrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU4MTQ5NDMsImV4cCI6MjA4MTM5MDk0M30.6zEygmSkP74HP3J8jrzIUmnZ82pMQc0FgbG6qeo_bFc';
       let invErr: string | undefined;
       try {
         const r = await fetch(`${sbUrl}/functions/v1/send-transactional-email`, {

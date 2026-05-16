@@ -10,7 +10,7 @@ const REMINDER_COOLDOWN_DAYS = 14;
 const SITE_URL = Deno.env.get('SITE_URL') || 'https://mikesmautorepair.com';
 const SB_URL = Deno.env.get('SUPABASE_URL')!;
 const SB_SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-const SB_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY')!;
+const SB_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im93Z3B4dWpmeXRza2RmbXJoamdrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU4MTQ5NDMsImV4cCI6MjA4MTM5MDk0M30.6zEygmSkP74HP3J8jrzIUmnZ82pMQc0FgbG6qeo_bFc';
 
 async function sendTxEmail(body: Record<string, unknown>): Promise<{ error?: string }> {
   try {
