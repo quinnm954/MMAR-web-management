@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { Mail, RefreshCw, Search, Send, Loader2 } from 'lucide-react';
+import { Mail, RefreshCw, Search, Send, Loader2, BellRing } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 
@@ -74,6 +74,7 @@ const AdminEmails = () => {
   const [testTemplate, setTestTemplate] = useState<string>(TEMPLATE_NAMES[0]);
   const [testEmail, setTestEmail] = useState<string>('');
   const [testBusy, setTestBusy] = useState(false);
+  const [remindersBusy, setRemindersBusy] = useState(false);
   const PAGE_SIZE = 50;
 
   useEffect(() => {
@@ -100,6 +101,26 @@ const AdminEmails = () => {
     }
   };
 
+  const sendReminders = async () => {
+    setRemindersBusy(true);
+    toast.info('Scanning customers and queuing reminders...');
+    const [mileage, checklist] = await Promise.all([
+      supabase.functions.invoke('send-mileage-email-reminders', { body: {} }),
+      supabase.functions.invoke('send-checklist-reminders', { body: {} }),
+    ]);
+    setRemindersBusy(false);
+    const errs: string[] = [];
+    if (mileage.error) errs.push(`mileage: ${mileage.error.message}`);
+    if (checklist.error) errs.push(`checklist: ${checklist.error.message}`);
+    if (errs.length) {
+      toast.error(`Reminder errors — ${errs.join('; ')}`);
+    } else {
+      const mSent = (mileage.data as any)?.sent ?? (mileage.data as any)?.count ?? 0;
+      const cSent = (checklist.data as any)?.sent ?? (checklist.data as any)?.count ?? 0;
+      toast.success(`Reminders queued — mileage: ${mSent}, checklist: ${cSent}`);
+    }
+    setTimeout(load, 4000);
+  };
 
   const load = async () => {
     setLoading(true);
@@ -211,6 +232,10 @@ const AdminEmails = () => {
               onChange={(e) => { setSearch(e.target.value); setPage(0); }}
             />
           </div>
+          <Button variant="outline" size="sm" onClick={sendReminders} disabled={remindersBusy} className="gap-1.5">
+            {remindersBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : <BellRing className="h-4 w-4" />}
+            Send reminders
+          </Button>
           <Button variant="outline" size="sm" onClick={() => setTestOpen(true)} className="gap-1.5">
             <Send className="h-4 w-4" /> Send test
           </Button>
