@@ -208,20 +208,30 @@ Deno.serve(async (req) => {
 
       const vehicleLabel = [v.year, v.make, v.model].filter(Boolean).join(' ') || 'your vehicle';
 
-      const { error: invErr } = await sb.functions.invoke('send-transactional-email', {
-        body: {
-          templateName: 'mileage-service-reminder',
-          recipientEmail: profile.email,
-          idempotencyKey: `mileage-reminder-${v.id}-${new Date().toISOString().slice(0, 10)}`,
-          templateData: {
-            customerName: profile.full_name?.split(' ')[0] || undefined,
-            vehicle: vehicleLabel,
-            currentMileage: v.current_mileage,
-            dueServices,
-            priceRegionLabel: region.label,
-          },
-        },
-      });
+      const sbUrl = Deno.env.get('SUPABASE_URL')!;
+      const sbKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im93Z3B4dWpmeXRza2RmbXJoamdrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU4MTQ5NDMsImV4cCI6MjA4MTM5MDk0M30.6zEygmSkP74HP3J8jrzIUmnZ82pMQc0FgbG6qeo_bFc';
+      let invErr: string | undefined;
+      try {
+        const r = await fetch(`${sbUrl}/functions/v1/send-transactional-email`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${sbKey}`, apikey: sbKey },
+          body: JSON.stringify({
+            templateName: 'mileage-service-reminder',
+            recipientEmail: profile.email,
+            idempotencyKey: `mileage-reminder-${v.id}-${new Date().toISOString().slice(0, 10)}`,
+            templateData: {
+              customerName: profile.full_name?.split(' ')[0] || undefined,
+              vehicle: vehicleLabel,
+              currentMileage: v.current_mileage,
+              dueServices,
+              priceRegionLabel: region.label,
+            },
+          }),
+        });
+        if (!r.ok) invErr = `send-transactional-email ${r.status}: ${(await r.text()).slice(0, 200)}`;
+      } catch (e: any) {
+        invErr = e?.message || String(e);
+      }
 
       await sb.from('service_reminders_sent').insert({
         customer_id: v.owner_id,
@@ -229,10 +239,10 @@ Deno.serve(async (req) => {
         reference_id: v.id,
         message: `Mileage reminder: ${dueServices.length} service(s) due`,
         status: invErr ? 'failed' : 'sent',
-        error: invErr?.message,
+        error: invErr,
       });
 
-      if (invErr) errors.push({ vehicle_id: v.id, error: invErr.message });
+      if (invErr) errors.push({ vehicle_id: v.id, error: invErr });
       else sent.push({ vehicle_id: v.id, due_count: dueServices.length });
     } catch (e: any) {
       errors.push({ vehicle_id: v.id, error: e?.message || String(e) });

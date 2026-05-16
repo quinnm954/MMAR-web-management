@@ -8,11 +8,32 @@ const corsHeaders = {
 const REMINDER_TYPE = 'checklist_email_reminder';
 const REMINDER_COOLDOWN_DAYS = 14;
 const SITE_URL = Deno.env.get('SITE_URL') || 'https://mikesmautorepair.com';
+const SB_URL = Deno.env.get('SUPABASE_URL')!;
+const SB_SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+const SB_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im93Z3B4dWpmeXRza2RmbXJoamdrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU4MTQ5NDMsImV4cCI6MjA4MTM5MDk0M30.6zEygmSkP74HP3J8jrzIUmnZ82pMQc0FgbG6qeo_bFc';
+
+async function sendTxEmail(body: Record<string, unknown>): Promise<{ error?: string }> {
+  try {
+    const r = await fetch(`${SB_URL}/functions/v1/send-transactional-email`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${SB_ANON_KEY}`,
+        apikey: SB_ANON_KEY,
+      },
+      body: JSON.stringify(body),
+    });
+    if (!r.ok) return { error: `send-transactional-email ${r.status}: ${(await r.text()).slice(0, 200)}` };
+    return {};
+  } catch (e: any) {
+    return { error: e?.message || String(e) };
+  }
+}
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
-  const sb = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
+  const sb = createClient(SB_URL, SB_SERVICE_KEY);
   const sent: any[] = [];
   const skipped: any[] = [];
   const errors: any[] = [];
@@ -84,16 +105,14 @@ Deno.serve(async (req) => {
       const primary = ownerVehicles[0];
       const vehicleLabel = [primary.year, primary.make, primary.model].filter(Boolean).join(' ') || 'your vehicle';
 
-      const { error: invErr } = await sb.functions.invoke('send-transactional-email', {
-        body: {
-          templateName: 'maintenance-checklist-reminder',
-          recipientEmail: profile.email,
-          idempotencyKey: `checklist-reminder-${ownerId}-${new Date().toISOString().slice(0, 10)}`,
-          templateData: {
-            customerName: profile.full_name?.split(' ')[0] || undefined,
-            vehicle: vehicleLabel,
-            checklistUrl: `${SITE_URL}/portal/maintenance`,
-          },
+      const { error: invErr } = await sendTxEmail({
+        templateName: 'maintenance-checklist-reminder',
+        recipientEmail: profile.email,
+        idempotencyKey: `checklist-reminder-${ownerId}-${new Date().toISOString().slice(0, 10)}`,
+        templateData: {
+          customerName: profile.full_name?.split(' ')[0] || undefined,
+          vehicle: vehicleLabel,
+          checklistUrl: `${SITE_URL}/portal/maintenance`,
         },
       });
 
@@ -103,10 +122,10 @@ Deno.serve(async (req) => {
         reference_id: primary.id,
         message: 'Maintenance checklist reminder (no service history on file)',
         status: invErr ? 'failed' : 'sent',
-        error: invErr?.message,
+        error: invErr,
       });
 
-      if (invErr) errors.push({ owner_id: ownerId, error: invErr.message });
+      if (invErr) errors.push({ owner_id: ownerId, error: invErr });
       else sent.push({ owner_id: ownerId, vehicle_count: ownerVehicles.length });
     } catch (e: any) {
       errors.push({ owner_id: ownerId, error: e?.message || String(e) });
