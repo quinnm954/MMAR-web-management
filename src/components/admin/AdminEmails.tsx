@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { Mail, RefreshCw, Search, Send, Loader2 } from 'lucide-react';
+import { Mail, RefreshCw, Search, Send, Loader2, BellRing } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 
