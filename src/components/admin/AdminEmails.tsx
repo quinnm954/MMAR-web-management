@@ -74,6 +74,7 @@ const AdminEmails = () => {
   const [testTemplate, setTestTemplate] = useState<string>(TEMPLATE_NAMES[0]);
   const [testEmail, setTestEmail] = useState<string>('');
   const [testBusy, setTestBusy] = useState(false);
+  const [remindersBusy, setRemindersBusy] = useState(false);
   const PAGE_SIZE = 50;
 
   useEffect(() => {
