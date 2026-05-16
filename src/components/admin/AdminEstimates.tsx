@@ -296,6 +296,33 @@ const AdminEstimates = () => {
 
   const removeLine = (idx: number) => updateLines(editing.line_items.filter((_: any, i: number) => i !== idx));
 
+  const syncPartsToCatalog = async (lines: LineItem[]) => {
+    const parts = (lines || []).filter(
+      (l) => (l.kind ?? 'part') === 'part' && l.description && l.description.trim().length > 0 && Number(l.unit_price) > 0
+    );
+    for (const p of parts) {
+      const name = p.description.trim();
+      const unit_price = Number(p.unit_price) || 0;
+      const cost = Number(p.unit_cost) || 0;
+      try {
+        if (p.catalog_item_id) {
+          await supabase.from('catalog_items').update({ unit_price, cost, type: 'part' }).eq('id', p.catalog_item_id);
+        } else {
+          const { data: existing } = await supabase
+            .from('catalog_items').select('id').ilike('name', name).limit(1).maybeSingle();
+          if (existing?.id) {
+            await supabase.from('catalog_items').update({ unit_price, cost, type: 'part', is_active: true }).eq('id', existing.id);
+          } else {
+            await supabase.from('catalog_items').insert({ name, type: 'part', unit_price, cost, is_active: true });
+          }
+        }
+      } catch (e) {
+        // Non-fatal — keep saving the estimate even if catalog sync fails.
+        console.warn('catalog sync failed for', name, e);
+      }
+    }
+  };
+
   const save = async () => {
     if (!editing.customer_id) return toast.error('Select customer');
     if (!editing.id) {
@@ -307,6 +334,7 @@ const AdminEstimates = () => {
       const { error } = await supabase.from('estimates').update(update).eq('id', id);
       if (error) return toast.error(error.message);
     }
+    await syncPartsToCatalog(editing.line_items || []);
     toast.success('Saved');
     setEditing(null);
     load();
