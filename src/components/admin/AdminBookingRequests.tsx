@@ -183,6 +183,17 @@ const AdminBookingRequests = () => {
     load();
   };
 
+  const removeRequest = async (r: BookingRequest) => {
+    if (!confirm(`Delete booking request from ${r.customer_name}? This cannot be undone.`)) return;
+    const { error } = await supabase.from("booking_requests").delete().eq("id", r.id);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success("Booking request deleted.");
+    load();
+  };
+
   const visible = filter === "pending"
     ? rows.filter((r) => r.status === "new" || r.status === "contacted")
     : rows;
