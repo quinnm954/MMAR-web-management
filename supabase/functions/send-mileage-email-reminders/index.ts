@@ -208,20 +208,30 @@ Deno.serve(async (req) => {
 
       const vehicleLabel = [v.year, v.make, v.model].filter(Boolean).join(' ') || 'your vehicle';
 
-      const { error: invErr } = await sb.functions.invoke('send-transactional-email', {
-        body: {
-          templateName: 'mileage-service-reminder',
-          recipientEmail: profile.email,
-          idempotencyKey: `mileage-reminder-${v.id}-${new Date().toISOString().slice(0, 10)}`,
-          templateData: {
-            customerName: profile.full_name?.split(' ')[0] || undefined,
-            vehicle: vehicleLabel,
-            currentMileage: v.current_mileage,
-            dueServices,
-            priceRegionLabel: region.label,
-          },
-        },
-      });
+      const sbUrl = Deno.env.get('SUPABASE_URL')!;
+      const sbKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+      let invErr: string | undefined;
+      try {
+        const r = await fetch(`${sbUrl}/functions/v1/send-transactional-email`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${sbKey}`, apikey: sbKey },
+          body: JSON.stringify({
+            templateName: 'mileage-service-reminder',
+            recipientEmail: profile.email,
+            idempotencyKey: `mileage-reminder-${v.id}-${new Date().toISOString().slice(0, 10)}`,
+            templateData: {
+              customerName: profile.full_name?.split(' ')[0] || undefined,
+              vehicle: vehicleLabel,
+              currentMileage: v.current_mileage,
+              dueServices,
+              priceRegionLabel: region.label,
+            },
+          }),
+        });
+        if (!r.ok) invErr = `send-transactional-email ${r.status}: ${(await r.text()).slice(0, 200)}`;
+      } catch (e: any) {
+        invErr = e?.message || String(e);
+      }
 
       await sb.from('service_reminders_sent').insert({
         customer_id: v.owner_id,
