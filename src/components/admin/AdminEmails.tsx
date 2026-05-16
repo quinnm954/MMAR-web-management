@@ -101,6 +101,26 @@ const AdminEmails = () => {
     }
   };
 
+  const sendReminders = async () => {
+    setRemindersBusy(true);
+    toast.info('Scanning customers and queuing reminders...');
+    const [mileage, checklist] = await Promise.all([
+      supabase.functions.invoke('send-mileage-email-reminders', { body: {} }),
+      supabase.functions.invoke('send-checklist-reminders', { body: {} }),
+    ]);
+    setRemindersBusy(false);
+    const errs: string[] = [];
+    if (mileage.error) errs.push(`mileage: ${mileage.error.message}`);
+    if (checklist.error) errs.push(`checklist: ${checklist.error.message}`);
+    if (errs.length) {
+      toast.error(`Reminder errors — ${errs.join('; ')}`);
+    } else {
+      const mSent = (mileage.data as any)?.sent ?? (mileage.data as any)?.count ?? 0;
+      const cSent = (checklist.data as any)?.sent ?? (checklist.data as any)?.count ?? 0;
+      toast.success(`Reminders queued — mileage: ${mSent}, checklist: ${cSent}`);
+    }
+    setTimeout(load, 4000);
+  };
 
   const load = async () => {
     setLoading(true);
