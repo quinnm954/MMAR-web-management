@@ -269,9 +269,15 @@ const AdminEstimates = () => {
 
   const addLine = (catalogId?: string) => {
     const item = catalog.find(c => c.id === catalogId);
+    const kind: 'part' | 'labor' | 'fee' = item?.type === 'labor' ? 'labor' : item?.type === 'fee' ? 'fee' : 'part';
     const line: LineItem = item
-      ? { description: item.name, quantity: 1, unit_price: Number(item.unit_price), amount: Number(item.unit_price), catalog_item_id: item.id, labor_hours: Number(item.labor_hours) || 0 }
-      : { description: '', quantity: 1, unit_price: 0, amount: 0, labor_hours: 0 };
+      ? { description: item.name, quantity: 1, unit_price: Number(item.unit_price), amount: Number(item.unit_price), catalog_item_id: item.id, labor_hours: Number(item.labor_hours) || 0, unit_cost: Number(item.cost) || 0, kind }
+      : { description: '', quantity: 1, unit_price: 0, amount: 0, labor_hours: 0, unit_cost: 0, kind: 'part' };
+    updateLines([...(editing.line_items || []), line]);
+  };
+
+  const addLaborLine = () => {
+    const line: LineItem = { description: 'Labor', quantity: 1, unit_price: defaultLaborRate || 0, amount: defaultLaborRate || 0, labor_hours: 1, kind: 'labor' };
     updateLines([...(editing.line_items || []), line]);
   };
 
