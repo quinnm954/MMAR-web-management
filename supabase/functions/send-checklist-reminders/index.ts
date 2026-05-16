@@ -104,18 +104,27 @@ Deno.serve(async (req) => {
       const primary = ownerVehicles[0];
       const vehicleLabel = [primary.year, primary.make, primary.model].filter(Boolean).join(' ') || 'your vehicle';
 
-      const { error: invErr } = await sb.functions.invoke('send-transactional-email', {
-        body: {
-          templateName: 'maintenance-checklist-reminder',
-          recipientEmail: profile.email,
-          idempotencyKey: `checklist-reminder-${ownerId}-${new Date().toISOString().slice(0, 10)}`,
-          templateData: {
-            customerName: profile.full_name?.split(' ')[0] || undefined,
-            vehicle: vehicleLabel,
-            checklistUrl: `${SITE_URL}/portal/maintenance`,
-          },
+      const { error: invErr } = await sendTxEmail({
+        templateName: 'maintenance-checklist-reminder',
+        recipientEmail: profile.email,
+        idempotencyKey: `checklist-reminder-${ownerId}-${new Date().toISOString().slice(0, 10)}`,
+        templateData: {
+          customerName: profile.full_name?.split(' ')[0] || undefined,
+          vehicle: vehicleLabel,
+          checklistUrl: `${SITE_URL}/portal/maintenance`,
         },
       });
+
+      await sb.from('service_reminders_sent').insert({
+        customer_id: ownerId,
+        reminder_type: REMINDER_TYPE,
+        reference_id: primary.id,
+        message: 'Maintenance checklist reminder (no service history on file)',
+        status: invErr ? 'failed' : 'sent',
+        error: invErr,
+      });
+
+      if (invErr) errors.push({ owner_id: ownerId, error: invErr });
 
       await sb.from('service_reminders_sent').insert({
         customer_id: ownerId,
