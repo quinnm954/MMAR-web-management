@@ -14,7 +14,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { CalendarCheck, CheckCircle2, XCircle, Phone, Loader2, RefreshCw, ExternalLink, Pencil } from "lucide-react";
+import { CalendarCheck, CheckCircle2, XCircle, Phone, Loader2, RefreshCw, ExternalLink, Pencil, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
 
 interface BookingRequest {
