@@ -24,6 +24,9 @@ type Template = {
   customer_visible: boolean;
   is_active: boolean;
   created_at: string;
+  service_type_match: string[] | null;
+  auto_attach: boolean;
+  focus_area: string | null;
 };
 
 type TemplateItem = {
