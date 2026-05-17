@@ -52,7 +52,7 @@ const AdminVehicleHealth = () => {
           <p className="text-sm text-muted-foreground">
             Master checklist per vehicle. Auto-synced from tech inspections. Edit anything; the customer sees the result in their portal.
           </p>
-          <div className="grid gap-2 sm:grid-cols-[1fr_2fr]">
+          <div className="grid gap-2 grid-cols-1 sm:grid-cols-[1fr_2fr]">
             <Input placeholder="Filter by vehicle, owner, plate…" value={filter} onChange={(e) => setFilter(e.target.value)} />
             <Select value={vehicleId} onValueChange={setVehicleId}>
               <SelectTrigger><SelectValue placeholder={`Choose vehicle (${filtered.length})`} /></SelectTrigger>
