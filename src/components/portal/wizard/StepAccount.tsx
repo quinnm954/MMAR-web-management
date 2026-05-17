@@ -108,45 +108,45 @@ const StepAccount = ({ onComplete }: { onComplete: () => void }) => {
         </TabsList>
         <TabsContent value="signup">
           <form onSubmit={handleSignUp} className="space-y-3">
-            <div>
+            <div className="space-y-1.5">
               <Label htmlFor="fullName">Full Name</Label>
-              <Input id="fullName" required value={signup.fullName} onChange={set("fullName")} />
+              <Input id="fullName" autoComplete="name" autoCapitalize="words" required value={signup.fullName} onChange={set("fullName")} />
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
+              <div className="space-y-1.5">
                 <Label htmlFor="su-email">Email</Label>
-                <Input id="su-email" type="email" required value={signup.email} onChange={set("email")} />
+                <Input id="su-email" type="email" inputMode="email" autoComplete="email" autoCapitalize="none" autoCorrect="off" spellCheck={false} required value={signup.email} onChange={set("email")} />
               </div>
-              <div>
+              <div className="space-y-1.5">
                 <Label htmlFor="su-phone">Phone</Label>
-                <Input id="su-phone" type="tel" required value={signup.phone} onChange={set("phone")} placeholder="(813) 555-0123" />
+                <Input id="su-phone" type="tel" inputMode="tel" autoComplete="tel" required value={signup.phone} onChange={set("phone")} placeholder="(813) 555-0123" />
               </div>
             </div>
-            <div>
+            <div className="space-y-1.5">
               <Label htmlFor="su-pw">Password (8+ chars)</Label>
-              <Input id="su-pw" type="password" minLength={8} required value={signup.password} onChange={set("password")} />
+              <Input id="su-pw" type="password" autoComplete="new-password" minLength={8} required value={signup.password} onChange={set("password")} />
             </div>
-            <div>
+            <div className="space-y-1.5">
               <Label htmlFor="su-addr1">Street Address</Label>
-              <Input id="su-addr1" required value={signup.address_line1} onChange={set("address_line1")} />
+              <Input id="su-addr1" autoComplete="address-line1" required value={signup.address_line1} onChange={set("address_line1")} />
             </div>
-            <div>
+            <div className="space-y-1.5">
               <Label htmlFor="su-addr2">Apt / Suite (optional)</Label>
-              <Input id="su-addr2" value={signup.address_line2} onChange={set("address_line2")} />
+              <Input id="su-addr2" autoComplete="address-line2" value={signup.address_line2} onChange={set("address_line2")} />
             </div>
-            <div className="grid grid-cols-3 gap-3">
-              <div className="col-span-2">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="sm:col-span-2 space-y-1.5">
                 <Label htmlFor="su-city">City</Label>
-                <Input id="su-city" required value={signup.city} onChange={set("city")} />
+                <Input id="su-city" autoComplete="address-level2" required value={signup.city} onChange={set("city")} />
               </div>
-              <div>
+              <div className="space-y-1.5">
                 <Label htmlFor="su-state">State</Label>
-                <Input id="su-state" required maxLength={2} value={signup.state} onChange={set("state")} />
+                <Input id="su-state" autoComplete="address-level1" autoCapitalize="characters" required maxLength={2} value={signup.state} onChange={set("state")} />
               </div>
             </div>
-            <div>
+            <div className="space-y-1.5">
               <Label htmlFor="su-zip">ZIP</Label>
-              <Input id="su-zip" required value={signup.postal_code} onChange={set("postal_code")} />
+              <Input id="su-zip" inputMode="numeric" pattern="\d*" autoComplete="postal-code" required value={signup.postal_code} onChange={set("postal_code")} />
             </div>
             <Button type="submit" variant="hero" className="w-full" disabled={busy}>
               {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : "Continue"}
@@ -155,13 +155,13 @@ const StepAccount = ({ onComplete }: { onComplete: () => void }) => {
         </TabsContent>
         <TabsContent value="login">
           <form onSubmit={handleSignIn} className="space-y-3">
-            <div>
+            <div className="space-y-1.5">
               <Label htmlFor="li-email">Email</Label>
-              <Input id="li-email" type="email" required value={login.email} onChange={(e) => setLogin({ ...login, email: e.target.value })} />
+              <Input id="li-email" type="email" inputMode="email" autoComplete="email" autoCapitalize="none" autoCorrect="off" spellCheck={false} required value={login.email} onChange={(e) => setLogin({ ...login, email: e.target.value })} />
             </div>
-            <div>
+            <div className="space-y-1.5">
               <Label htmlFor="li-pw">Password</Label>
-              <Input id="li-pw" type="password" required value={login.password} onChange={(e) => setLogin({ ...login, password: e.target.value })} />
+              <Input id="li-pw" type="password" autoComplete="current-password" required value={login.password} onChange={(e) => setLogin({ ...login, password: e.target.value })} />
             </div>
             <Button type="submit" variant="hero" className="w-full" disabled={busy}>
               {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : "Sign In & Continue"}
