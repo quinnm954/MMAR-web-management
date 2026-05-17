@@ -16,6 +16,19 @@ type Checklist = {
 };
 type Item = {
   id: string; label: string; description: string | null; status: string; notes: string | null; sort_order: number;
+  severity: string | null; recommended: boolean;
+};
+
+const severityBadge = (s: string | null) => {
+  if (!s) return null;
+  const map: Record<string, string> = {
+    good: "bg-green-600 text-white",
+    monitor: "bg-yellow-500 text-black",
+    needs_service: "bg-orange-500 text-white",
+    urgent: "bg-destructive text-destructive-foreground",
+  };
+  const labels: Record<string, string> = { good: "Good", monitor: "Monitor", needs_service: "Needs service", urgent: "Urgent" };
+  return <Badge className={map[s] ?? ""}>{labels[s] ?? s}</Badge>;
 };
 
 const statusIcon = (s: string) => {
