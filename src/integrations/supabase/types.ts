@@ -534,6 +534,8 @@ export type Database = {
           description: string | null
           id: string
           label: string
+          price_high: number | null
+          price_low: number | null
           required: boolean
           sort_order: number
           template_id: string
@@ -543,6 +545,8 @@ export type Database = {
           description?: string | null
           id?: string
           label: string
+          price_high?: number | null
+          price_low?: number | null
           required?: boolean
           sort_order?: number
           template_id: string
@@ -552,6 +556,8 @@ export type Database = {
           description?: string | null
           id?: string
           label?: string
+          price_high?: number | null
+          price_low?: number | null
           required?: boolean
           sort_order?: number
           template_id?: string
@@ -1921,6 +1927,8 @@ export type Database = {
           id: string
           label: string
           notes: string | null
+          price_high: number | null
+          price_low: number | null
           recommended: boolean
           recommended_at: string | null
           recommended_by: string | null
@@ -1940,6 +1948,8 @@ export type Database = {
           id?: string
           label: string
           notes?: string | null
+          price_high?: number | null
+          price_low?: number | null
           recommended?: boolean
           recommended_at?: string | null
           recommended_by?: string | null
@@ -1959,6 +1969,8 @@ export type Database = {
           id?: string
           label?: string
           notes?: string | null
+          price_high?: number | null
+          price_low?: number | null
           recommended?: boolean
           recommended_at?: string | null
           recommended_by?: string | null
