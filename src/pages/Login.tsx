@@ -174,13 +174,13 @@ const Login = () => {
                 </div>
               </div>
               <form onSubmit={handleSignIn} className="space-y-3">
-                <div>
+                <div className="space-y-1.5">
                   <Label htmlFor="signin-email">Email</Label>
-                  <Input id="signin-email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+                  <Input id="signin-email" type="email" inputMode="email" autoComplete="email" autoCapitalize="none" autoCorrect="off" spellCheck={false} required value={email} onChange={(e) => setEmail(e.target.value)} />
                 </div>
-                <div>
+                <div className="space-y-1.5">
                   <Label htmlFor="signin-password">Password</Label>
-                  <Input id="signin-password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
+                  <Input id="signin-password" type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} />
                 </div>
                 <Button type="submit" variant="hero" className="w-full" disabled={busy}>
                   {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : "Sign In"}
@@ -207,21 +207,21 @@ const Login = () => {
                 </div>
               </div>
               <form onSubmit={handleSignUp} className="space-y-3">
-                <div>
+                <div className="space-y-1.5">
                   <Label htmlFor="signup-name">Full Name</Label>
-                  <Input id="signup-name" required value={signupForm.fullName} onChange={(e) => setSignupForm({ ...signupForm, fullName: e.target.value })} />
+                  <Input id="signup-name" autoComplete="name" autoCapitalize="words" required value={signupForm.fullName} onChange={(e) => setSignupForm({ ...signupForm, fullName: e.target.value })} />
                 </div>
-                <div>
+                <div className="space-y-1.5">
                   <Label htmlFor="signup-email">Email</Label>
-                  <Input id="signup-email" type="email" required value={signupForm.email} onChange={(e) => setSignupForm({ ...signupForm, email: e.target.value })} />
+                  <Input id="signup-email" type="email" inputMode="email" autoComplete="email" autoCapitalize="none" autoCorrect="off" spellCheck={false} required value={signupForm.email} onChange={(e) => setSignupForm({ ...signupForm, email: e.target.value })} />
                 </div>
-                <div>
+                <div className="space-y-1.5">
                   <Label htmlFor="signup-phone">Phone (optional)</Label>
-                  <Input id="signup-phone" type="tel" value={signupForm.phone} onChange={(e) => setSignupForm({ ...signupForm, phone: e.target.value })} />
+                  <Input id="signup-phone" type="tel" inputMode="tel" autoComplete="tel" value={signupForm.phone} onChange={(e) => setSignupForm({ ...signupForm, phone: e.target.value })} />
                 </div>
-                <div>
+                <div className="space-y-1.5">
                   <Label htmlFor="signup-password">Password</Label>
-                  <Input id="signup-password" type="password" required minLength={8} value={signupForm.password} onChange={(e) => setSignupForm({ ...signupForm, password: e.target.value })} />
+                  <Input id="signup-password" type="password" autoComplete="new-password" required minLength={8} value={signupForm.password} onChange={(e) => setSignupForm({ ...signupForm, password: e.target.value })} />
                 </div>
                 <Button type="submit" variant="hero" className="w-full" disabled={busy}>
                   {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : "Create Account"}
