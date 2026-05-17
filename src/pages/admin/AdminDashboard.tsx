@@ -45,6 +45,7 @@ import AdminCalendar from '@/components/admin/AdminCalendar';
 import AdminTechProductivity from '@/components/admin/AdminTechProductivity';
 import AdminShifts from '@/components/admin/AdminShifts';
 import AdminTechLaborPay from '@/components/admin/AdminTechLaborPay';
+import AdminChecklists from '@/components/admin/AdminChecklists';
 import { supabase } from '@/integrations/supabase/client';
 import mmarLogo from '@/assets/mmar-logo.jpeg';
 import type { AppRole } from '@/hooks/useAuth';
@@ -146,6 +147,7 @@ const AdminDashboard = () => {
             { value: 'service', label: 'Service Records', icon: ClipboardList, roles: ADVISOR, content: <AdminServiceRecords /> },
             { value: 'estimates', label: 'Estimates', icon: FileSpreadsheet, roles: ADVISOR, content: <AdminEstimates /> },
             { value: 'inspections', label: 'Inspections', icon: ClipboardCheck, roles: ALL, content: <AdminInspections /> },
+            { value: 'checklists', label: 'Checklists', icon: ClipboardList, roles: ALL, content: <AdminChecklists /> },
             { value: 'invoices', label: 'Invoices', icon: Receipt, roles: ADVISOR, content: <AdminInvoices /> },
             { value: 'catalog', label: 'Catalog', icon: Package, roles: PARTS, content: <AdminCatalog /> },
             { value: 'time', label: 'RO Time', icon: Clock, roles: ADMIN_ONLY, content: <AdminTimeTracking /> },
@@ -187,7 +189,7 @@ const AdminDashboard = () => {
           };
 
           const groups = [
-            { label: 'Workshop', values: ['kanban','calendar','ros','service','inspections','estimates','invoices','time','shifts','productivity'] },
+            { label: 'Workshop', values: ['kanban','calendar','ros','service','inspections','checklists','estimates','invoices','time','shifts','productivity'] },
             { label: 'Front Desk', values: ['customers','garage','memberships','bookings','share','declined','calls'] },
             { label: 'Admin', values: ['dashboard','reports','catalog','laborpay','quickbooks','financing','warranty','emails','audit','employees','roles','phone-settings','tracking','settings'] },
           ];

@@ -1,27 +1,53 @@
 ## Goal
-Replace the current analytics-style Admin → Emails page with a Gmail-style mailbox for admin↔customer communication.
+Add a full service checklist system: admin-managed reusable templates, per-vehicle/per-RO instances that technicians fill out, plus a read-only customer view so customers can see what was done and what's coming up (including their MMAR Care plan items).
 
-## What ships in this pass
-1. **Inbox layout** — left rail (folders: Inbox, Sent, Drafts, All), middle list pane (subject + recipient + snippet + time), right reading pane with full HTML body, status badge, and reply/forward actions.
-2. **Compose** — modal/sheet to send a free-form email to any customer (recipient picker pulls from `profiles`, free email input also allowed). Sends via existing `send-transactional-email` using a new generic `admin-message` template.
-3. **Reply** — opens compose pre-filled with recipient + `Re:` subject + quoted body, tracked by an in-app thread id (we set a stable `message_id` so replies group together in the list).
-4. **Threading** — group messages in the list by a `thread_id` we store in `email_send_log.metadata` (falls back to subject normalization when missing).
-5. **Drafts** — new `email_drafts` table so admins can save in-progress messages.
-6. **Inbound (stubbed)** — new `inbound_messages` table + a `receive-inbound-email` edge function that accepts a JSON webhook payload (Cloudflare Email Routing-compatible) and inserts a row. Inbox view merges these rows with sent rows. Setup instructions surfaced in a small "Connect inbound" panel — actual MX wiring is done outside Lovable.
+## Database (new tables)
 
-## Out of scope (will call out in UI)
-- Attachments, labels/folders beyond the defaults, search across full body text, marketing-grade analytics (the existing log table remains the underlying source).
+1. **`checklist_templates`** — admin-defined reusable templates
+   - `name`, `description`, `category` (`oil_change` | `brake_job` | `inspection` | `membership` | `maintenance` | `custom`)
+   - `plan_id` (nullable FK → `membership_plans`, used for "MMAR Care plan checklist")
+   - `customer_visible` (bool, default true)
+   - `is_active`, timestamps
 
-## Files
-- **DB migration** — `email_drafts`, `inbound_messages` tables + RLS (admin only).
-- **Edge functions**
-  - `supabase/functions/receive-inbound-email/index.ts` (new) — webhook, no JWT verify, validates a shared secret header.
-  - `supabase/functions/_shared/transactional-email-templates/admin-message.tsx` + registry entry.
-- **Frontend** — rewrite `src/components/admin/AdminEmails.tsx` into a 3-pane mailbox: folder rail, message list, reading pane, compose sheet. Keep route mount as-is.
+2. **`checklist_template_items`** — items inside a template
+   - `template_id`, `label`, `description`, `sort_order`, `required` bool
+
+3. **`service_checklists`** — instance attached to a job / vehicle / membership cycle
+   - `template_id` (nullable — instance can be ad-hoc)
+   - `appointment_id` (nullable), `customer_id`, `vehicle_id`, `membership_id` (nullable)
+   - `assigned_technician_id`, `status` (`open` | `in_progress` | `completed`)
+   - `title`, `notes`, `started_at`, `completed_at`, timestamps
+
+4. **`service_checklist_items`** — items on an instance
+   - `checklist_id`, `label`, `description`, `sort_order`
+   - `status` (`pending` | `done` | `na` | `issue`)
+   - `notes`, `completed_by`, `completed_at`
+
+**RLS**
+- Admins: full manage on all 4 tables.
+- Technicians: read/update `service_checklists` (and items) where `assigned_technician_id = auth.uid()`. Read templates (to use as picker).
+- Customers: read-only on their own `service_checklists` + items (where `customer_id = auth.uid()` and parent template is `customer_visible`).
+
+## Frontend
+
+1. **`src/components/admin/AdminChecklists.tsx`** — new admin page with two tabs:
+   - **Templates** — list/create/edit templates, manage items (drag to reorder, required toggle), set category and optional membership plan link, toggle customer-visible.
+   - **Active checklists** — table of all `service_checklists` (filter by status, technician, customer). Click row → drawer to view/edit items, reassign tech, mark complete.
+   - Mount on `/admin/checklists` and add nav entry in admin dashboard sidebar.
+
+2. **Tech dashboard** — add a "My checklists" card/section on `src/pages/tech/TechDashboard.tsx` listing instances assigned to the logged-in tech. Click → full-screen check-off view (`/tech/checklists/:id`) with large tap targets to set each item to done / na / issue, add notes, and mark the checklist complete.
+
+3. **Customer portal** — add a small read-only "Service checklist" card on `src/components/portal/VehicleHealthCard.tsx` (or new section on PortalDashboard) that shows the most recent + in-progress checklist for each vehicle, plus a dedicated page `/portal/checklists` to browse history.
+
+4. **Per-RO integration (lightweight)** — on the existing repair order / appointment detail in admin, add a "Checklists" panel showing checklists tied to that appointment with a button to attach a template (creates a new instance from the template). No full RO rewrite — just a panel.
+
+## Out of scope this pass
+- Photos on checklist items (we can add later — `inspections` already covers photo-heavy flows)
+- Automated recurrence (e.g. "create a new membership checklist every quarter") — admins create them manually for now
+- Email/SMS notifications when a checklist is completed
 
 ## Technical notes
-- Threading key: `metadata.thread_id` (uuid we mint on first compose; replies reuse parent's).
-- "Inbox" pane = `inbound_messages` rows (newest first).
-- "Sent" pane = `email_send_log` deduped on `message_id`, latest status per email.
-- Reply sender is the verified Lovable Emails domain; we set `Reply-To` and `In-Reply-To` headers via the existing template path.
-- All actions admin-gated by existing `ProtectedRoute` + RLS.
+- Instances copy items from the template at creation time (snapshot) so editing a template later doesn't mutate in-flight jobs.
+- Membership plan checklists: when admin opens a membership, they can spawn a new instance from the template linked to that plan.
+- All status transitions stamp `completed_by = auth.uid()` and `completed_at = now()` via simple client updates (RLS enforces who can do it).
+- Reuse existing shadcn primitives (Table, Sheet, Tabs, Badge, Checkbox).

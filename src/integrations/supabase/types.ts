@@ -528,6 +528,88 @@ export type Database = {
         }
         Relationships: []
       }
+      checklist_template_items: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          label: string
+          required: boolean
+          sort_order: number
+          template_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          label: string
+          required?: boolean
+          sort_order?: number
+          template_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          label?: string
+          required?: boolean
+          sort_order?: number
+          template_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "checklist_template_items_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "checklist_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      checklist_templates: {
+        Row: {
+          category: string
+          created_at: string
+          customer_visible: boolean
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          plan_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          customer_visible?: boolean
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          plan_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          customer_visible?: boolean
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          plan_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "checklist_templates_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "membership_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customer_shares: {
         Row: {
           created_at: string
@@ -1819,6 +1901,135 @@ export type Database = {
           },
         ]
       }
+      service_checklist_items: {
+        Row: {
+          checklist_id: string
+          completed_at: string | null
+          completed_by: string | null
+          created_at: string
+          description: string | null
+          id: string
+          label: string
+          notes: string | null
+          required: boolean
+          sort_order: number
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          checklist_id: string
+          completed_at?: string | null
+          completed_by?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          label: string
+          notes?: string | null
+          required?: boolean
+          sort_order?: number
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          checklist_id?: string
+          completed_at?: string | null
+          completed_by?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          label?: string
+          notes?: string | null
+          required?: boolean
+          sort_order?: number
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_checklist_items_checklist_id_fkey"
+            columns: ["checklist_id"]
+            isOneToOne: false
+            referencedRelation: "service_checklists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      service_checklists: {
+        Row: {
+          appointment_id: string | null
+          assigned_technician_id: string | null
+          completed_at: string | null
+          created_at: string
+          customer_id: string
+          customer_visible: boolean
+          id: string
+          membership_id: string | null
+          notes: string | null
+          started_at: string | null
+          status: string
+          template_id: string | null
+          title: string
+          updated_at: string
+          vehicle_id: string | null
+        }
+        Insert: {
+          appointment_id?: string | null
+          assigned_technician_id?: string | null
+          completed_at?: string | null
+          created_at?: string
+          customer_id: string
+          customer_visible?: boolean
+          id?: string
+          membership_id?: string | null
+          notes?: string | null
+          started_at?: string | null
+          status?: string
+          template_id?: string | null
+          title: string
+          updated_at?: string
+          vehicle_id?: string | null
+        }
+        Update: {
+          appointment_id?: string | null
+          assigned_technician_id?: string | null
+          completed_at?: string | null
+          created_at?: string
+          customer_id?: string
+          customer_visible?: boolean
+          id?: string
+          membership_id?: string | null
+          notes?: string | null
+          started_at?: string | null
+          status?: string
+          template_id?: string | null
+          title?: string
+          updated_at?: string
+          vehicle_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_checklists_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "service_checklists_membership_id_fkey"
+            columns: ["membership_id"]
+            isOneToOne: false
+            referencedRelation: "memberships"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "service_checklists_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "checklist_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       service_recommendations: {
         Row: {
           created_at: string
@@ -2628,6 +2839,18 @@ export type Database = {
       admin_decline_booking_request: {
         Args: { _id: string; _reason?: string }
         Returns: Json
+      }
+      create_checklist_from_template: {
+        Args: {
+          _appointment_id?: string
+          _assigned_technician_id?: string
+          _customer_id: string
+          _membership_id?: string
+          _template_id: string
+          _title_override?: string
+          _vehicle_id?: string
+        }
+        Returns: string
       }
       delete_email: {
         Args: { message_id: number; queue_name: string }

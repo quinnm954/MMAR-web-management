@@ -47,6 +47,8 @@ import MileageUpdate from "./pages/MileageUpdate";
 import TechDashboard from "./pages/tech/TechDashboard";
 import TechClock from "./pages/tech/TechClock";
 import TechInspections from "./pages/tech/TechInspections";
+import TechChecklists from "./pages/tech/TechChecklists";
+import PortalChecklists from "./pages/portal/PortalChecklists";
 import TechProtectedRoute from "./components/tech/TechProtectedRoute";
 import EstimateApproval from "./pages/EstimateApproval";
 import InspectionReport from "./pages/InspectionReport";
@@ -124,6 +126,10 @@ const App = () => (
             <Route path="/tech" element={<TechProtectedRoute><TechDashboard /></TechProtectedRoute>} />
             <Route path="/tech/clock" element={<TechProtectedRoute><TechClock /></TechProtectedRoute>} />
             <Route path="/tech/inspections" element={<TechProtectedRoute><TechInspections /></TechProtectedRoute>} />
+            <Route path="/tech/checklists" element={<TechProtectedRoute><TechChecklists /></TechProtectedRoute>} />
+            <Route path="/tech/checklists/:id" element={<TechProtectedRoute><TechChecklists /></TechProtectedRoute>} />
+            <Route path="/portal/checklists" element={<CustomerProtectedRoute><PortalChecklists /></CustomerProtectedRoute>} />
+            <Route path="/portal/checklists/:id" element={<CustomerProtectedRoute><PortalChecklists /></CustomerProtectedRoute>} />
             <Route path="/estimate/:token" element={<EstimateApproval />} />
             <Route path="/inspection/:token" element={<InspectionReport />} />
             <Route path="/staff/login" element={<Navigate to="/login" replace />} />

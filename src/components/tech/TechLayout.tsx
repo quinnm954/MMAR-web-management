@@ -1,12 +1,13 @@
 import { ReactNode } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { Wrench, Clock, ClipboardCheck, LogOut, LayoutDashboard } from "lucide-react";
+import { Wrench, Clock, ClipboardCheck, ClipboardList, LogOut, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import MobileBottomNav from "@/components/shell/MobileBottomNav";
 
 const items = [
   { to: "/tech", label: "Jobs", icon: LayoutDashboard, end: true },
+  { to: "/tech/checklists", label: "Checklists", icon: ClipboardList },
   { to: "/tech/clock", label: "Clock", icon: Clock },
   { to: "/tech/inspections", label: "Inspections", icon: ClipboardCheck },
 ];
