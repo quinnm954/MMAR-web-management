@@ -16,6 +16,8 @@ type Rec = {
   severity: "needs_service" | "urgent" | "monitor" | "good" | null;
   recommended: boolean;
   recommended_at: string | null;
+  price_low: number | null;
+  price_high: number | null;
   checklist_id: string;
   checklist_title: string;
   checklist_created_at: string;
@@ -75,7 +77,7 @@ const PortalChecklists = () => {
       }
       const { data: items } = await supabase
         .from("service_checklist_items")
-        .select("id, label, description, notes, severity, recommended, recommended_at, checklist_id")
+        .select("id, label, description, notes, severity, recommended, recommended_at, price_low, price_high, checklist_id")
         .in("checklist_id", listIds);
 
       const filtered: Rec[] = (items ?? [])
