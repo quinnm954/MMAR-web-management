@@ -179,6 +179,8 @@ const TechChecklistDetail = ({ id }: { id: string }) => {
 const RecommendDialog = ({ item, onClose }: { item: Item; onClose: (ok: boolean) => void }) => {
   const [hours, setHours] = useState("1");
   const [price, setPrice] = useState("0");
+  const [priceLow, setPriceLow] = useState("");
+  const [priceHigh, setPriceHigh] = useState("");
   const [note, setNote] = useState("");
   const [saving, setSaving] = useState(false);
 
@@ -190,6 +192,12 @@ const RecommendDialog = ({ item, onClose }: { item: Item; onClose: (ok: boolean)
       _unit_price: Number(price) || 0,
       _note: note || null,
     });
+    if (!error) {
+      await supabase.from("service_checklist_items").update({
+        price_low: priceLow === "" ? null : Number(priceLow),
+        price_high: priceHigh === "" ? null : Number(priceHigh),
+      }).eq("id", item.id);
+    }
     setSaving(false);
     if (error) return toast.error(error.message);
     toast.success("Added to draft estimate");
@@ -204,6 +212,15 @@ const RecommendDialog = ({ item, onClose }: { item: Item; onClose: (ok: boolean)
           <div className="grid grid-cols-2 gap-3">
             <div><Label>Labor hours</Label><Input type="number" step="0.25" value={hours} onChange={e => setHours(e.target.value)} /></div>
             <div><Label>Price ($)</Label><Input type="number" step="0.01" value={price} onChange={e => setPrice(e.target.value)} /></div>
+          </div>
+          <div>
+            <Label>Local shop price range shown to customer ($)</Label>
+            <div className="flex items-center gap-2 mt-1">
+              <Input type="number" step="1" placeholder="low" value={priceLow} onChange={e => setPriceLow(e.target.value)} />
+              <span className="text-xs text-muted-foreground">to</span>
+              <Input type="number" step="1" placeholder="high" value={priceHigh} onChange={e => setPriceHigh(e.target.value)} />
+            </div>
+            <p className="text-[11px] text-muted-foreground mt-1">Typical range at nearby shops. Shown to customer with a "not a quote" disclaimer.</p>
           </div>
           <div><Label>Note (optional)</Label><Input value={note} onChange={e => setNote(e.target.value)} placeholder="e.g. left CV boot torn" /></div>
           <p className="text-xs text-muted-foreground">Adds a line to a draft estimate for this customer/vehicle. Admin will review and send.</p>
