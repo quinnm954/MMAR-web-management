@@ -12,8 +12,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Pencil, Trash2, GripVertical, Loader2, FileText, ListChecks, ArrowUp, ArrowDown } from "lucide-react";
+import { Plus, Pencil, Trash2, GripVertical, Loader2, FileText, ListChecks, ArrowUp, ArrowDown, AlertTriangle, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
+import { auditServiceTypeTemplates, type ServiceTemplateAudit } from "@/lib/auditServiceTypeTemplates";
 
 type Template = {
   id: string;
@@ -87,15 +88,18 @@ const TemplatesPanel = () => {
   const [loading, setLoading] = useState(true);
   const [plans, setPlans] = useState<{ id: string; name: string }[]>([]);
   const [editor, setEditor] = useState<Template | null>(null);
+  const [audit, setAudit] = useState<ServiceTemplateAudit | null>(null);
 
   const load = async () => {
     setLoading(true);
-    const [{ data: tpls }, { data: pl }] = await Promise.all([
+    const [{ data: tpls }, { data: pl }, auditResult] = await Promise.all([
       supabase.from("checklist_templates").select("*").order("created_at", { ascending: false }),
       supabase.from("membership_plans").select("id, name").order("sort_order"),
+      auditServiceTypeTemplates().catch((e) => { console.error("audit failed", e); return null; }),
     ]);
     setRows((tpls as any) ?? []);
     setPlans((pl as any) ?? []);
+    setAudit(auditResult);
     setLoading(false);
   };
   useEffect(() => { load(); }, []);
@@ -120,6 +124,35 @@ const TemplatesPanel = () => {
 
   return (
     <div className="space-y-3">
+      {audit && (
+        audit.ok ? (
+          <div className="flex items-start gap-2 rounded border border-green-600/40 bg-green-600/10 p-3 text-xs">
+            <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
+            <div>
+              <div className="font-medium text-foreground">All service types map to a checklist template.</div>
+              <div className="text-muted-foreground mt-0.5">
+                {audit.mapping.filter(m => m.templateName).length} mapped · {audit.mapping.filter(m => !m.templateName).length} intentionally unmapped (Diagnostic / Other).
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="flex items-start gap-2 rounded border border-destructive/50 bg-destructive/10 p-3 text-xs">
+            <AlertTriangle className="h-4 w-4 text-destructive mt-0.5 shrink-0" />
+            <div className="flex-1 space-y-1">
+              <div className="font-medium text-foreground">Checklist coverage problems detected</div>
+              <ul className="list-disc list-inside text-muted-foreground space-y-0.5">
+                {audit.issues.map((i, idx) =>
+                  i.kind === "missing" ? (
+                    <li key={idx}><span className="text-foreground">{i.serviceType}</span> — no auto-attach template. Create one or add a matching keyword.</li>
+                  ) : (
+                    <li key={idx}><span className="text-foreground">{i.serviceType}</span> — matches multiple templates: {i.templates.join(", ")}. Narrow the keywords.</li>
+                  )
+                )}
+              </ul>
+            </div>
+          </div>
+        )
+      )}
       <div className="flex items-center justify-between">
         <h3 className="font-semibold">Checklist templates</h3>
         <Button size="sm" onClick={create}><Plus className="h-4 w-4 mr-1" /> New template</Button>
