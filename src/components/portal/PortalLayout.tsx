@@ -21,6 +21,7 @@ import {
   Wrench,
   FileText,
   ChevronDown,
+  AlertTriangle,
 } from "lucide-react";
 import MobileBottomNav from "@/components/shell/MobileBottomNav";
 import InstallAppBanner from "@/components/shell/InstallAppBanner";
@@ -35,7 +36,7 @@ const navItems = [
   { to: "/portal/estimates", label: "Estimates", icon: FileText },
   { to: "/portal/repair-orders", label: "Repair Orders", icon: Wrench },
   { to: "/portal/service-history", label: "Service History", icon: ClipboardList },
-  { to: "/portal/checklists", label: "Checklists", icon: ClipboardList },
+  { to: "/portal/checklists", label: "Recommendations", icon: AlertTriangle },
   { to: "/portal/invoices", label: "Invoices", icon: Receipt },
   { to: "/portal/financing", label: "Financing", icon: CreditCard },
 ];
