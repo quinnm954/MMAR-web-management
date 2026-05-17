@@ -36,6 +36,8 @@ type TemplateItem = {
   description: string | null;
   sort_order: number;
   required: boolean;
+  price_low: number | null;
+  price_high: number | null;
 };
 
 type Checklist = {
@@ -269,15 +271,27 @@ const TemplateEditor = ({ template, plans, onClose }: { template: Template; plan
             {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : (
               <div className="space-y-2">
                 {items.map((it, idx) => (
-                  <div key={it.id} className="flex items-center gap-2 border rounded p-2">
-                    <GripVertical className="h-4 w-4 text-muted-foreground shrink-0" />
-                    <Input value={it.label} onChange={(e) => setItems(items.map(x => x.id === it.id ? { ...x, label: e.target.value } : x))} onBlur={(e) => e.target.value !== template.name && updateItem(it.id, { label: e.target.value })} className="h-8" />
-                    <div className="flex items-center gap-1 text-xs">
-                      <Switch checked={it.required} onCheckedChange={(v) => updateItem(it.id, { required: v })} /> req
+                  <div key={it.id} className="flex flex-col gap-2 border rounded p-2">
+                    <div className="flex items-center gap-2">
+                      <GripVertical className="h-4 w-4 text-muted-foreground shrink-0" />
+                      <Input value={it.label} onChange={(e) => setItems(items.map(x => x.id === it.id ? { ...x, label: e.target.value } : x))} onBlur={(e) => e.target.value !== template.name && updateItem(it.id, { label: e.target.value })} className="h-8" />
+                      <div className="flex items-center gap-1 text-xs">
+                        <Switch checked={it.required} onCheckedChange={(v) => updateItem(it.id, { required: v })} /> req
+                      </div>
+                      <Button size="icon" variant="ghost" onClick={() => move(idx, -1)}><ArrowUp className="h-3 w-3" /></Button>
+                      <Button size="icon" variant="ghost" onClick={() => move(idx, 1)}><ArrowDown className="h-3 w-3" /></Button>
+                      <Button size="icon" variant="ghost" onClick={() => removeItem(it.id)}><Trash2 className="h-3 w-3" /></Button>
                     </div>
-                    <Button size="icon" variant="ghost" onClick={() => move(idx, -1)}><ArrowUp className="h-3 w-3" /></Button>
-                    <Button size="icon" variant="ghost" onClick={() => move(idx, 1)}><ArrowDown className="h-3 w-3" /></Button>
-                    <Button size="icon" variant="ghost" onClick={() => removeItem(it.id)}><Trash2 className="h-3 w-3" /></Button>
+                    <div className="flex items-center gap-2 pl-6">
+                      <span className="text-[11px] text-muted-foreground shrink-0">Local price range $</span>
+                      <Input type="number" step="1" placeholder="low" value={it.price_low ?? ""} className="h-7 w-20"
+                        onChange={(e) => setItems(items.map(x => x.id === it.id ? { ...x, price_low: e.target.value === "" ? null : Number(e.target.value) } : x))}
+                        onBlur={(e) => updateItem(it.id, { price_low: e.target.value === "" ? null : Number(e.target.value) })} />
+                      <span className="text-xs text-muted-foreground">–</span>
+                      <Input type="number" step="1" placeholder="high" value={it.price_high ?? ""} className="h-7 w-20"
+                        onChange={(e) => setItems(items.map(x => x.id === it.id ? { ...x, price_high: e.target.value === "" ? null : Number(e.target.value) } : x))}
+                        onBlur={(e) => updateItem(it.id, { price_high: e.target.value === "" ? null : Number(e.target.value) })} />
+                    </div>
                   </div>
                 ))}
                 <div className="flex gap-2">

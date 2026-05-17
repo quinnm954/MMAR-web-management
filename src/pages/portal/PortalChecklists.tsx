@@ -16,6 +16,8 @@ type Rec = {
   severity: "needs_service" | "urgent" | "monitor" | "good" | null;
   recommended: boolean;
   recommended_at: string | null;
+  price_low: number | null;
+  price_high: number | null;
   checklist_id: string;
   checklist_title: string;
   checklist_created_at: string;
@@ -75,7 +77,7 @@ const PortalChecklists = () => {
       }
       const { data: items } = await supabase
         .from("service_checklist_items")
-        .select("id, label, description, notes, severity, recommended, recommended_at, checklist_id")
+        .select("id, label, description, notes, severity, recommended, recommended_at, price_low, price_high, checklist_id")
         .in("checklist_id", listIds);
 
       const filtered: Rec[] = (items ?? [])
@@ -150,6 +152,18 @@ const PortalChecklists = () => {
                     {severityBadge(r.severity)}
                   </div>
                   {r.description && <p className="text-xs text-muted-foreground">{r.description}</p>}
+                  {(r.price_low != null || r.price_high != null) && (
+                    <div className="rounded border border-border bg-muted/30 p-2">
+                      <div className="text-sm font-semibold">
+                        Typical local price: {r.price_low != null ? `$${r.price_low}` : "?"}
+                        {" – "}
+                        {r.price_high != null ? `$${r.price_high}` : "?"}
+                      </div>
+                      <div className="text-[10px] text-muted-foreground leading-snug mt-0.5">
+                        Estimated range from local shops in your area. This is not a quote from us — request an official estimate for our price.
+                      </div>
+                    </div>
+                  )}
                   {r.notes && (
                     <p className="text-xs bg-muted/50 rounded p-2">
                       <span className="font-medium">Tech note: </span>{r.notes}
