@@ -147,6 +147,7 @@ const AdminDashboard = () => {
             { value: 'service', label: 'Service Records', icon: ClipboardList, roles: ADVISOR, content: <AdminServiceRecords /> },
             { value: 'estimates', label: 'Estimates', icon: FileSpreadsheet, roles: ADVISOR, content: <AdminEstimates /> },
             { value: 'inspections', label: 'Inspections', icon: ClipboardCheck, roles: ALL, content: <AdminInspections /> },
+            { value: 'checklists', label: 'Checklists', icon: ClipboardList, roles: ALL, content: <AdminChecklists /> },
             { value: 'invoices', label: 'Invoices', icon: Receipt, roles: ADVISOR, content: <AdminInvoices /> },
             { value: 'catalog', label: 'Catalog', icon: Package, roles: PARTS, content: <AdminCatalog /> },
             { value: 'time', label: 'RO Time', icon: Clock, roles: ADMIN_ONLY, content: <AdminTimeTracking /> },
