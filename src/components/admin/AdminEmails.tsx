@@ -95,11 +95,16 @@ const AdminEmails = () => {
       unread: !r.read_at,
     }));
 
-    // Dedupe sent by message_id (latest status wins)
+    // Dedupe sent by message_id (latest status wins, merge metadata across rows)
     const seen = new Map<string, any>();
     for (const r of (sent.data ?? [])) {
       const key = r.message_id || r.id;
-      if (!seen.has(key)) seen.set(key, r);
+      const existing = seen.get(key);
+      if (!existing) {
+        seen.set(key, { ...r });
+      } else if (r.metadata && !existing.metadata) {
+        existing.metadata = r.metadata;
+      }
     }
     const sentItems: MailItem[] = Array.from(seen.values()).map((r: any) => ({
       id: `out:${r.id}`,
