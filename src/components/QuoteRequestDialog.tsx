@@ -23,6 +23,7 @@ import { CalendarCheck, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { trackConversion, getAttribution } from "@/lib/gtag";
+import { SERVICE_TYPES } from "@/lib/serviceTypes";
 
 const currentYear = new Date().getFullYear();
 const digitsOnly = (v: string) => v.replace(/\D/g, "");
@@ -229,17 +230,26 @@ const QuoteRequestDialog = ({
           {!serviceName && (
             <div className="space-y-1.5">
               <Label htmlFor="service">Service needed</Label>
-              <Input
-                id="service"
-                placeholder="e.g. Brake service, oil change…"
+              <Select
                 value={serviceTypeOverride}
-                aria-invalid={!!errors.service}
-                className={errors.service ? "border-destructive focus-visible:ring-destructive" : ""}
-                onChange={(e) => {
-                  setServiceTypeOverride(e.target.value);
+                onValueChange={(v) => {
+                  setServiceTypeOverride(v);
                   if (errors.service) setErrors((p) => ({ ...p, service: "" }));
                 }}
-              />
+              >
+                <SelectTrigger
+                  id="service"
+                  aria-invalid={!!errors.service}
+                  className={errors.service ? "border-destructive focus-visible:ring-destructive" : ""}
+                >
+                  <SelectValue placeholder="Choose a service" />
+                </SelectTrigger>
+                <SelectContent>
+                  {SERVICE_TYPES.map((s) => (
+                    <SelectItem key={s} value={s}>{s}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               {errors.service && <p className="text-xs text-destructive">{errors.service}</p>}
             </div>
           )}
