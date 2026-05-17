@@ -617,6 +617,42 @@ export type Database = {
         }
         Relationships: []
       }
+      email_drafts: {
+        Row: {
+          author_id: string
+          body: string | null
+          created_at: string
+          id: string
+          in_reply_to_id: string | null
+          recipient_email: string | null
+          subject: string | null
+          thread_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          author_id: string
+          body?: string | null
+          created_at?: string
+          id?: string
+          in_reply_to_id?: string | null
+          recipient_email?: string | null
+          subject?: string | null
+          thread_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string
+          body?: string | null
+          created_at?: string
+          id?: string
+          in_reply_to_id?: string | null
+          recipient_email?: string | null
+          subject?: string | null
+          thread_id?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       email_send_log: {
         Row: {
           created_at: string
@@ -1064,6 +1100,60 @@ export type Database = {
           updated_at?: string
           user_agent?: string | null
           vehicle_info?: string | null
+        }
+        Relationships: []
+      }
+      inbound_messages: {
+        Row: {
+          archived_at: string | null
+          body_html: string | null
+          body_text: string | null
+          created_at: string
+          from_email: string
+          from_name: string | null
+          id: string
+          in_reply_to: string | null
+          message_id: string | null
+          raw: Json | null
+          read_at: string | null
+          received_at: string
+          subject: string | null
+          thread_id: string | null
+          to_email: string | null
+        }
+        Insert: {
+          archived_at?: string | null
+          body_html?: string | null
+          body_text?: string | null
+          created_at?: string
+          from_email: string
+          from_name?: string | null
+          id?: string
+          in_reply_to?: string | null
+          message_id?: string | null
+          raw?: Json | null
+          read_at?: string | null
+          received_at?: string
+          subject?: string | null
+          thread_id?: string | null
+          to_email?: string | null
+        }
+        Update: {
+          archived_at?: string | null
+          body_html?: string | null
+          body_text?: string | null
+          created_at?: string
+          from_email?: string
+          from_name?: string | null
+          id?: string
+          in_reply_to?: string | null
+          message_id?: string | null
+          raw?: Json | null
+          read_at?: string | null
+          received_at?: string
+          subject?: string | null
+          thread_id?: string | null
+          to_email?: string | null
         }
         Relationships: []
       }
