@@ -26,16 +26,7 @@ interface Appointment {
   vehicle: Vehicle | null;
 }
 
-const SERVICE_TYPES = [
-  "Oil Change",
-  "Brake Service",
-  "Battery Replacement",
-  "Diagnostic",
-  "Tune-Up",
-  "Tire Rotation",
-  "Cooling System",
-  "Other",
-];
+import { SERVICE_TYPES } from "@/lib/serviceTypes";
 
 const TIME_WINDOWS = ["Morning (8am-12pm)", "Afternoon (12pm-4pm)", "Evening (4pm-7pm)"];
 
