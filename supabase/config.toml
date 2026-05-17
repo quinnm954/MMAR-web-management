@@ -38,3 +38,6 @@ verify_jwt = false
 
 [functions.record-mileage-from-token]
 verify_jwt = false
+
+[functions.receive-inbound-email]
+verify_jwt = false
