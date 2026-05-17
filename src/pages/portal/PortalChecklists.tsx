@@ -152,6 +152,18 @@ const PortalChecklists = () => {
                     {severityBadge(r.severity)}
                   </div>
                   {r.description && <p className="text-xs text-muted-foreground">{r.description}</p>}
+                  {(r.price_low != null || r.price_high != null) && (
+                    <div className="rounded border border-border bg-muted/30 p-2">
+                      <div className="text-sm font-semibold">
+                        Typical local price: {r.price_low != null ? `$${r.price_low}` : "?"}
+                        {" – "}
+                        {r.price_high != null ? `$${r.price_high}` : "?"}
+                      </div>
+                      <div className="text-[10px] text-muted-foreground leading-snug mt-0.5">
+                        Estimated range from local shops in your area. This is not a quote from us — request an official estimate for our price.
+                      </div>
+                    </div>
+                  )}
                   {r.notes && (
                     <p className="text-xs bg-muted/50 rounded p-2">
                       <span className="font-medium">Tech note: </span>{r.notes}
