@@ -298,7 +298,7 @@ const ChecklistsPanel = () => {
       supabase.from("user_roles").select("user_id").eq("role", "technician"),
     ]);
     setTemplates((tpls as any) ?? []);
-    const tIds = Array.from(new Set((roleRows ?? []).map((r: any) => r.user_id)));
+    const tIds = Array.from(new Set((roleRows ?? []).map((r: any) => r.user_id))) as string[];
     if (tIds.length) {
       const { data: tp } = await supabase.from("profiles").select("id, full_name, email").in("id", tIds);
       setTechs((tp as any) ?? []);
