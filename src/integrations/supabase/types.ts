@@ -1935,6 +1935,7 @@ export type Database = {
           required: boolean
           severity: string | null
           sort_order: number
+          source_template_item_id: string | null
           status: string
           updated_at: string
         }
@@ -1956,6 +1957,7 @@ export type Database = {
           required?: boolean
           severity?: string | null
           sort_order?: number
+          source_template_item_id?: string | null
           status?: string
           updated_at?: string
         }
@@ -1977,6 +1979,7 @@ export type Database = {
           required?: boolean
           severity?: string | null
           sort_order?: number
+          source_template_item_id?: string | null
           status?: string
           updated_at?: string
         }
@@ -1986,6 +1989,13 @@ export type Database = {
             columns: ["checklist_id"]
             isOneToOne: false
             referencedRelation: "service_checklists"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "service_checklist_items_source_template_item_id_fkey"
+            columns: ["source_template_item_id"]
+            isOneToOne: false
+            referencedRelation: "checklist_template_items"
             referencedColumns: ["id"]
           },
         ]
@@ -2620,6 +2630,89 @@ export type Database = {
         }
         Relationships: []
       }
+      vehicle_master_checklist_items: {
+        Row: {
+          category: string
+          created_at: string
+          customer_id: string
+          customer_note: string | null
+          description: string | null
+          id: string
+          is_hidden: boolean
+          label: string
+          label_key: string | null
+          last_checked_at: string | null
+          last_checked_by: string | null
+          last_source: string
+          measurement: string | null
+          price_high: number | null
+          price_low: number | null
+          severity_note: string | null
+          sort_order: number
+          source_template_id: string | null
+          source_template_item_id: string | null
+          status: string
+          updated_at: string
+          vehicle_id: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          customer_id: string
+          customer_note?: string | null
+          description?: string | null
+          id?: string
+          is_hidden?: boolean
+          label: string
+          label_key?: string | null
+          last_checked_at?: string | null
+          last_checked_by?: string | null
+          last_source?: string
+          measurement?: string | null
+          price_high?: number | null
+          price_low?: number | null
+          severity_note?: string | null
+          sort_order?: number
+          source_template_id?: string | null
+          source_template_item_id?: string | null
+          status?: string
+          updated_at?: string
+          vehicle_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          customer_id?: string
+          customer_note?: string | null
+          description?: string | null
+          id?: string
+          is_hidden?: boolean
+          label?: string
+          label_key?: string | null
+          last_checked_at?: string | null
+          last_checked_by?: string | null
+          last_source?: string
+          measurement?: string | null
+          price_high?: number | null
+          price_low?: number | null
+          severity_note?: string | null
+          sort_order?: number
+          source_template_id?: string | null
+          source_template_item_id?: string | null
+          status?: string
+          updated_at?: string
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_master_checklist_items_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vehicle_mileage_logs: {
         Row: {
           created_at: string
@@ -2936,6 +3029,10 @@ export type Database = {
       redeem_mileage_token: {
         Args: { _miles: number; _token: string }
         Returns: Json
+      }
+      seed_vehicle_master_checklist: {
+        Args: { _vehicle_id: string }
+        Returns: number
       }
       set_booking_attribution: {
         Args: { _attribution: Json; _token: string }

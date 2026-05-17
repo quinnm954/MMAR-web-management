@@ -49,6 +49,7 @@ import TechClock from "./pages/tech/TechClock";
 import TechInspections from "./pages/tech/TechInspections";
 import TechChecklists from "./pages/tech/TechChecklists";
 import PortalChecklists from "./pages/portal/PortalChecklists";
+import PortalVehicleHealth from "./pages/portal/PortalVehicleHealth";
 import TechProtectedRoute from "./components/tech/TechProtectedRoute";
 import EstimateApproval from "./pages/EstimateApproval";
 import InspectionReport from "./pages/InspectionReport";
@@ -113,6 +114,7 @@ const App = () => (
             <Route path="/portal/estimates" element={<CustomerProtectedRoute><PortalEstimates /></CustomerProtectedRoute>} />
             <Route path="/portal/repair-orders" element={<CustomerProtectedRoute><PortalRepairOrders /></CustomerProtectedRoute>} />
             <Route path="/portal/financing" element={<CustomerProtectedRoute><PortalFinancing /></CustomerProtectedRoute>} />
+            <Route path="/portal/vehicle-health" element={<CustomerProtectedRoute><PortalVehicleHealth /></CustomerProtectedRoute>} />
             <Route
               path="/admin/dashboard"
               element={

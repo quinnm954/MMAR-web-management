@@ -46,6 +46,7 @@ import AdminTechProductivity from '@/components/admin/AdminTechProductivity';
 import AdminShifts from '@/components/admin/AdminShifts';
 import AdminTechLaborPay from '@/components/admin/AdminTechLaborPay';
 import AdminChecklists from '@/components/admin/AdminChecklists';
+import AdminVehicleHealth from '@/components/admin/AdminVehicleHealth';
 import { supabase } from '@/integrations/supabase/client';
 import mmarLogo from '@/assets/mmar-logo.jpeg';
 import type { AppRole } from '@/hooks/useAuth';
@@ -148,6 +149,7 @@ const AdminDashboard = () => {
             { value: 'estimates', label: 'Estimates', icon: FileSpreadsheet, roles: ADVISOR, content: <AdminEstimates /> },
             { value: 'inspections', label: 'Inspections', icon: ClipboardCheck, roles: ALL, content: <AdminInspections /> },
             { value: 'checklists', label: 'Checklists', icon: ClipboardList, roles: ALL, content: <AdminChecklists /> },
+            { value: 'vehicle-health', label: 'Vehicle Health', icon: ClipboardList, roles: ADVISOR, content: <AdminVehicleHealth /> },
             { value: 'invoices', label: 'Invoices', icon: Receipt, roles: ADVISOR, content: <AdminInvoices /> },
             { value: 'catalog', label: 'Catalog', icon: Package, roles: PARTS, content: <AdminCatalog /> },
             { value: 'time', label: 'RO Time', icon: Clock, roles: ADMIN_ONLY, content: <AdminTimeTracking /> },

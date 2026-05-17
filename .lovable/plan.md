@@ -1,67 +1,69 @@
-## Goal
-Auto-attach a focused inspection checklist to each appointment based on its `service_type`, so techs inspect adjacent components while in that area and can convert findings into estimate lines in one tap.
+## Master Vehicle Health Checklist
 
-## Job → focus-area templates (seeded)
-Each becomes a `checklist_templates` row with `category = 'inspection'` and a `service_type_match` array.
+A single, persistent **Vehicle Health Checklist** per vehicle that aggregates items from every inspection template, auto-updates after each tech inspection, and is editable by both the admin and the customer.
 
-- **Oil change** → under-hood + undercarriage: belts, hoses, coolant level, brake fluid, air filter, leaks, CV boots, exhaust, motor mounts.
-- **Brake job** → suspension + wheel area: rotors, calipers, pads remaining (mm), struts/shocks, tie rods, ball joints, control-arm bushings, wheel bearing, tire tread/wear pattern.
-- **Tires / alignment** → steering + front end: ball joints, tie rod ends, control arms, wheel bearings, sway bar links, alignment indicators.
-- **Battery / electrical** → charging system: alternator output, starter draw, battery terminals/clamps, ground straps, belt tension.
-- **Coolant / radiator** → cooling system: hoses, water pump, thermostat housing, cap, fan operation, overflow tank.
-- **Transmission service** → drivetrain: mounts, axles/CV joints, transfer case, diff seals, driveshaft U-joints.
-- **AC service** → HVAC + belts: compressor clutch, condenser fins, cabin filter, blower, refrigerant pressures, drive belt.
+### Concept
 
-## Schema additions
+Today: each appointment spawns one or more disposable `service_checklists` from templates. The customer only sees flagged items from the most recent job.
 
-Extend the existing `service_checklists` + `service_checklist_items` tables (already in use) with severity + upsell fields.
+New: every vehicle has **one master checklist** — a living record of every inspection point (brakes, fluids, suspension, tires, etc.) with current status, last-checked date, who checked it, and notes. Per-job tech checklists keep working as they do now, but on save they **push results into the master**.
 
-```text
-checklist_templates
-  + service_type_match  text[]    -- e.g. {oil_change, oil}
-  + auto_attach         boolean   -- default true on inspection templates
+### Data model
 
-service_checklist_items
-  + severity            text      -- good | monitor | needs_service | urgent | null
-  + recommended         boolean   -- tech marked as upsell
-  + recommended_at      timestamptz
-  + recommended_by      uuid
-  + estimate_line_id    uuid      -- back-ref once added to an estimate
-```
+New table `vehicle_master_checklist_items`:
+- `vehicle_id`, `customer_id`
+- `category` (Brakes, Fluids, Tires, Suspension, etc.)
+- `label` (e.g. "Front brake pads")
+- `status` (`good` | `monitor` | `due_soon` | `urgent` | `unknown`)
+- `severity_note`, `measurement` (e.g. "4mm")
+- `last_checked_at`, `last_checked_by` (tech id), `last_source` (`tech_inspection` | `customer_edit` | `admin_edit` | `seed`)
+- `price_low`, `price_high` (carried from template item)
+- `customer_note` (free-text the customer can add: "replaced at Jiffy Lube 3/2026")
+- `source_template_id`, `source_template_item_id` (for dedupe)
+- `is_hidden` (soft-delete so edits don't get clobbered by re-seed)
 
-(Photos and measured-value fields skipped per your selection.)
+### Seeding & sync
 
-## Auto-attach trigger
+1. **Seed on demand**: a `seed_vehicle_master_checklist(vehicle_id)` function pulls every active template's items into the master (deduped by template_item_id). Runs first time the master is viewed, or when a new template is added.
+2. **Tech sync trigger**: when a `service_checklist_items` row is updated (status set, recommended, measurement entered), an `AFTER UPDATE` trigger upserts the matching master item by `source_template_item_id` — copies status, measurement, note, sets `last_checked_at = now()`, `last_source = 'tech_inspection'`. Customer edits flagged `last_source = 'customer_edit'` within the last 30 days are NOT overwritten unless the tech's status is worse (e.g. customer said "good", tech finds "urgent" → tech wins).
+3. **Customer/admin edit**: writes directly to `vehicle_master_checklist_items` with `last_source = 'customer_edit'` or `'admin_edit'`.
 
-DB trigger `tr_appointment_attach_inspection` on `appointments` AFTER INSERT/UPDATE OF `service_type`:
-1. Find active `checklist_templates` where `service_type_match` contains the appointment's service_type.
-2. For each, call existing `create_checklist_from_template(template_id, appointment_id, customer_id, vehicle_id)` if one isn't already attached.
-3. Idempotent: skip if a checklist with that `(appointment_id, template_id)` already exists.
+### RLS
 
-## Tech UX (`TechChecklists.tsx`)
+- Customer: SELECT + UPDATE rows where `customer_id = auth.uid()` (only `status`, `customer_note`, `measurement` columns — enforced via trigger).
+- Admin/tech: full access.
+- Insert/delete restricted to admin + the seed function.
 
-Per item, add:
-- 4-color severity selector: green (good) / yellow (monitor) / orange (needs service) / red (urgent).
-- **"Recommend"** button (visible when severity ≥ monitor). Tapping it:
-  - Marks `recommended = true`.
-  - Opens a small sheet pre-filled with item label, suggested labor hours, and optional catalog part search.
-  - On confirm → inserts a line into the active estimate for that RO/appointment (creates a draft estimate if none exists) and stamps `estimate_line_id` back on the item.
+### UI
 
-## Admin UX
+**Customer portal** — new page `/portal/vehicle-health` (and a card on the existing dashboard):
+- Grouped by category, color-coded by status
+- Each row: label, status badge, last-checked date, measurement, price range, customer note
+- Inline edit: change status, add note ("I replaced this myself"), mark as serviced elsewhere
+- "Request service" button on urgent/due_soon items → opens existing quote dialog
 
-- `AdminChecklists.tsx` template editor gains a multi-select **"Auto-attach for service types"** field and per-item severity defaults.
-- RO/appointment detail shows a "Recommendations" panel listing all `recommended = true` items across the job's checklists with a one-click "Add to estimate" for any not yet linked.
+**Admin** — new tab in customer detail (`AdminCustomerDetail`) → "Vehicle Health":
+- Same grid, full edit (any field), re-seed button, hide/unhide
+- Audit trail shown (last_source + who)
 
-## Customer portal
+**Tech** — existing per-job checklist unchanged. After they save, a small "Synced to vehicle health" toast confirms.
 
-Read-only badge per item showing severity color + any tech-added recommendation note (no pricing pressure — they see findings, admin sends the estimate separately via the existing estimate flow).
+### Files
 
-## Out of scope (v1)
-- Photos per item, measured numeric fields, auto-sent recommendation summaries to customer, AI suggestions.
+New:
+- migration: `vehicle_master_checklist_items` table, RLS, `seed_vehicle_master_checklist` RPC, `sync_master_from_tech_checklist` trigger
+- `src/lib/vehicleMasterChecklist.ts` — typed helpers (load, upsert, seed, update)
+- `src/pages/portal/PortalVehicleHealth.tsx` — customer view
+- `src/components/admin/AdminVehicleHealth.tsx` — admin tab
 
-## Files touched
-- New migration: schema additions + auto-attach trigger + seed of 7 templates with items.
-- `src/pages/tech/TechChecklists.tsx` — severity selector, Recommend sheet, estimate-line creation.
-- `src/components/admin/AdminChecklists.tsx` — service_type_match editor.
-- `src/pages/portal/PortalChecklists.tsx` — severity color display.
-- New `src/components/admin/RecommendationsPanel.tsx` mounted on RO/appointment detail.
+Edited:
+- `src/App.tsx` — route for `/portal/vehicle-health`
+- `src/components/portal/PortalNav.tsx` (or equivalent) — nav link
+- `src/pages/admin/AdminCustomerDetail.tsx` — new tab
+- `src/pages/portal/PortalDashboard.tsx` — health summary card
+
+### Out of scope (intentionally)
+
+- Per-vehicle override of price ranges (still uses template prices)
+- Photo uploads on customer edits (admin/tech only)
+- Reminder push notifications (can add later)
