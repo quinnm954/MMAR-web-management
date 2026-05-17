@@ -5,12 +5,6 @@ import { portalStrings } from "@/lib/portalStrings";
 import { useNativePushRegistration } from "@/hooks/useNativePushRegistration";
 import { Button } from "@/components/ui/button";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
   LayoutDashboard,
   Car,
   CreditCard,
@@ -20,7 +14,6 @@ import {
   LogOut,
   Wrench,
   FileText,
-  ChevronDown,
   AlertTriangle,
 } from "lucide-react";
 import MobileBottomNav from "@/components/shell/MobileBottomNav";
