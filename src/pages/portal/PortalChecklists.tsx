@@ -156,7 +156,10 @@ const Detail = ({ id }: { id: string }) => {
                   {statusIcon(it.status)}
                 </button>
                 <div className="flex-1 space-y-2">
-                  <div className="text-sm font-medium">{it.label}</div>
+                  <div className="flex items-center justify-between gap-2 flex-wrap">
+                    <div className="text-sm font-medium">{it.label}</div>
+                    <div className="flex items-center gap-1">{severityBadge(it.severity)}{it.recommended && <Badge variant="outline" className="text-[10px]">Recommended by tech</Badge>}</div>
+                  </div>
                   {it.description && <p className="text-xs text-muted-foreground">{it.description}</p>}
                   <Textarea
                     defaultValue={it.notes ?? ""}
