@@ -286,7 +286,7 @@ const ChecklistsPanel = () => {
     const { data } = await supabase.from("service_checklists").select("*").order("created_at", { ascending: false }).limit(500);
     const list = (data as any) ?? [];
     setRows(list);
-    const ids = Array.from(new Set(list.map((r: Checklist) => r.customer_id)));
+    const ids = Array.from(new Set(list.map((r: Checklist) => r.customer_id))) as string[];
     if (ids.length) {
       const { data: profs } = await supabase.from("profiles").select("id, full_name, email").in("id", ids);
       const map: any = {};
