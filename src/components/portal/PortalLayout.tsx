@@ -63,59 +63,31 @@ const PortalLayout = ({ children }: { children: ReactNode }) => {
   const bottomNavItems = [
     { to: "/portal/dashboard", label: "Home", icon: LayoutDashboard, end: true },
     { to: "/portal/vehicles", label: "Vehicles", icon: Car },
-    { to: "/portal/estimates", label: "Estimates", icon: FileText },
-    { to: "/portal/repair-orders", label: "Repairs", icon: Wrench },
-    { to: "/portal/invoices", label: "Invoices", icon: Receipt },
+    { to: "/portal/appointments", label: "Book", icon: Calendar },
+    { to: "/portal/vehicle-health", label: "Health", icon: ClipboardList },
   ];
+
+  const moreNavItems = navItems.filter(
+    (n) => !bottomNavItems.some((b) => b.to === n.to),
+  );
 
   return (
     <div className="min-h-screen bg-background flex flex-col lg:flex-row">
-      {/* Mobile top bar with dropdown menu */}
-      <div className="lg:hidden border-b border-border bg-card/50 backdrop-blur safe-pt">
-        <div className="px-4 py-3 flex items-center justify-between gap-3">
+      {/* Mobile top bar - logo + sign out only; primary nav lives in the bottom bar */}
+      <div className="lg:hidden sticky top-0 z-30 border-b border-border bg-card/80 backdrop-blur safe-pt">
+        <div className="px-4 py-2.5 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
             <img src={mmarLogo} alt="MMAR" className="h-9 w-auto rounded shrink-0" />
             <div className="min-w-0">
               <div className="font-bold text-sm flex items-center gap-1.5">
                 <Wrench className="h-3.5 w-3.5 text-primary" /> {portalStrings.platform.name}
               </div>
-              <div className="text-xs text-muted-foreground truncate">{user?.email ?? portalStrings.platform.headerTagline}</div>
+              <div className="text-[11px] text-muted-foreground truncate">{currentItem.label}</div>
             </div>
           </div>
           <Button variant="ghost" size="sm" className="shrink-0 tap-44" onClick={handleSignOut} aria-label="Sign out">
-            <LogOut className="h-4 w-4" />
+            <LogOut className="h-5 w-5" />
           </Button>
-        </div>
-        <div className="px-4 pb-3">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="w-full justify-between tap-44">
-                <span className="flex items-center gap-2">
-                  <currentItem.icon className="h-4 w-4 text-primary" />
-                  {currentItem.label}
-                </span>
-                <ChevronDown className="h-4 w-4 opacity-60" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-[calc(100vw-2rem)] max-w-sm bg-popover z-50">
-              {navItems.map(({ to, label, icon: Icon }) => (
-                <DropdownMenuItem key={to} asChild>
-                  <NavLink
-                    to={to}
-                    end={to === "/portal/dashboard"}
-                    className={({ isActive }) =>
-                      `flex items-center gap-3 cursor-pointer ${
-                        isActive ? "bg-primary/10 text-primary" : ""
-                      }`
-                    }
-                  >
-                    <Icon className="h-4 w-4" />
-                    {label}
-                  </NavLink>
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
         </div>
       </div>
 
@@ -162,7 +134,18 @@ const PortalLayout = ({ children }: { children: ReactNode }) => {
         {children}
       </main>
 
-      <MobileBottomNav items={bottomNavItems} />
+      <MobileBottomNav
+        items={bottomNavItems}
+        moreItems={moreNavItems}
+        moreFooter={
+          <div className="space-y-2">
+            <div className="text-xs text-muted-foreground truncate px-1">{user?.email}</div>
+            <Button variant="outline" className="w-full tap-44" onClick={handleSignOut}>
+              <LogOut className="h-4 w-4 mr-2" /> Sign Out
+            </Button>
+          </div>
+        }
+      />
     </div>
   );
 };
