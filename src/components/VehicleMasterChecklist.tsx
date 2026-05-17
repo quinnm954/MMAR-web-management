@@ -144,16 +144,16 @@ const VehicleMasterChecklist = ({ vehicleId, mode, customerId }: Props) => {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <div className="text-sm text-muted-foreground">
-          {visible.length} item{visible.length === 1 ? "" : "s"} • updated whenever your tech completes an inspection
+        <div className="text-xs sm:text-sm text-muted-foreground flex-1 min-w-0">
+          {visible.length} item{visible.length === 1 ? "" : "s"} • auto-updates after each inspection
         </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={() => setShowHidden(s => !s)}>
+        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+          <Button variant="outline" size="sm" className="flex-1 sm:flex-none" onClick={() => setShowHidden(s => !s)}>
             {showHidden ? <><EyeOff className="h-4 w-4 mr-1" /> Hide hidden</> : <><Eye className="h-4 w-4 mr-1" /> Show hidden</>}
           </Button>
           {isAdmin && (
-            <Button variant="outline" size="sm" onClick={reseed} disabled={busy}>
-              <RefreshCw className={`h-4 w-4 mr-1 ${busy ? "animate-spin" : ""}`} /> Sync templates
+            <Button variant="outline" size="sm" className="flex-1 sm:flex-none" onClick={reseed} disabled={busy}>
+              <RefreshCw className={`h-4 w-4 mr-1 ${busy ? "animate-spin" : ""}`} /> Sync
             </Button>
           )}
         </div>
@@ -178,7 +178,7 @@ const VehicleMasterChecklist = ({ vehicleId, mode, customerId }: Props) => {
                 <div key={item.id} className={`rounded-lg border p-3 ${item.is_hidden ? "opacity-50" : ""}`}>
                   <div className="flex flex-wrap items-start justify-between gap-2">
                     <div className="min-w-0 flex-1">
-                      <div className="font-medium">{item.label}</div>
+                      <div className="font-medium break-words">{item.label}</div>
                       {item.description && <div className="text-xs text-muted-foreground">{item.description}</div>}
                       <div className="text-[11px] text-muted-foreground mt-1">
                         Last: {fmtDate(item.last_checked_at)} • Source: {item.last_source.replace("_", " ")}
@@ -187,7 +187,7 @@ const VehicleMasterChecklist = ({ vehicleId, mode, customerId }: Props) => {
                         )}
                       </div>
                     </div>
-                    <Badge variant="outline" className={meta.tone}>{meta.label}</Badge>
+                    <Badge variant="outline" className={`${meta.tone} shrink-0`}>{meta.label}</Badge>
                   </div>
 
                   <div className="grid sm:grid-cols-3 gap-2 mt-3">
@@ -246,7 +246,7 @@ const VehicleMasterChecklist = ({ vehicleId, mode, customerId }: Props) => {
             <div className="grid sm:grid-cols-[1fr_1fr_auto] gap-2">
               <Input placeholder="Label" value={newLabel} onChange={(e) => setNewLabel(e.target.value)} />
               <Input placeholder="Category" value={newCategory} onChange={(e) => setNewCategory(e.target.value)} />
-              <Button onClick={addRow} disabled={!newLabel.trim() || busy}>
+              <Button onClick={addRow} disabled={!newLabel.trim() || busy} className="w-full sm:w-auto">
                 <Plus className="h-4 w-4 mr-1" /> Add
               </Button>
             </div>
