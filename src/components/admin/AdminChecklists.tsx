@@ -173,6 +173,8 @@ const TemplateEditor = ({ template, plans, onClose }: { template: Template; plan
     const { error } = await supabase.from("checklist_templates").update({
       name: form.name, description: form.description, category: form.category,
       plan_id: form.plan_id, customer_visible: form.customer_visible, is_active: form.is_active,
+      auto_attach: form.auto_attach, focus_area: form.focus_area,
+      service_type_match: form.service_type_match ?? [],
     }).eq("id", form.id);
     if (error) return toast.error(error.message);
     toast.success("Saved");
