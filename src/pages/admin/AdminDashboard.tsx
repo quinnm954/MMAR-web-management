@@ -45,6 +45,7 @@ import AdminCalendar from '@/components/admin/AdminCalendar';
 import AdminTechProductivity from '@/components/admin/AdminTechProductivity';
 import AdminShifts from '@/components/admin/AdminShifts';
 import AdminTechLaborPay from '@/components/admin/AdminTechLaborPay';
+import AdminChecklists from '@/components/admin/AdminChecklists';
 import { supabase } from '@/integrations/supabase/client';
 import mmarLogo from '@/assets/mmar-logo.jpeg';
 import type { AppRole } from '@/hooks/useAuth';
