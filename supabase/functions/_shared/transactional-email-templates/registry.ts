@@ -21,8 +21,10 @@ import { template as invoicePaidReceipt } from './invoice-paid-receipt.tsx'
 import { template as bookingRequestReceived } from './booking-request-received.tsx'
 import { template as adminNewBookingRequest } from './admin-new-booking-request.tsx'
 import { template as maintenanceChecklistReminder } from './maintenance-checklist-reminder.tsx'
+import { template as adminMessage } from './admin-message.tsx'
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
+  'admin-message': adminMessage,
   'appointment-confirmed': appointmentConfirmed,
   'service-completed': serviceCompleted,
   'invoice-issued': invoiceIssued,
