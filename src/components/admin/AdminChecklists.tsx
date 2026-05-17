@@ -24,6 +24,9 @@ type Template = {
   customer_visible: boolean;
   is_active: boolean;
   created_at: string;
+  service_type_match: string[] | null;
+  auto_attach: boolean;
+  focus_area: string | null;
 };
 
 type TemplateItem = {
@@ -170,6 +173,8 @@ const TemplateEditor = ({ template, plans, onClose }: { template: Template; plan
     const { error } = await supabase.from("checklist_templates").update({
       name: form.name, description: form.description, category: form.category,
       plan_id: form.plan_id, customer_visible: form.customer_visible, is_active: form.is_active,
+      auto_attach: form.auto_attach, focus_area: form.focus_area,
+      service_type_match: form.service_type_match ?? [],
     }).eq("id", form.id);
     if (error) return toast.error(error.message);
     toast.success("Saved");
@@ -239,6 +244,23 @@ const TemplateEditor = ({ template, plans, onClose }: { template: Template; plan
           <div className="flex items-center justify-between rounded border p-2">
             <div><Label>Active</Label><p className="text-xs text-muted-foreground">Available to spawn new checklists from</p></div>
             <Switch checked={form.is_active} onCheckedChange={(v) => setForm({ ...form, is_active: v })} />
+          </div>
+          <div className="flex items-center justify-between rounded border p-2">
+            <div><Label>Auto-attach to matching jobs</Label><p className="text-xs text-muted-foreground">Spawn this checklist when an appointment's service type matches a keyword below</p></div>
+            <Switch checked={form.auto_attach} onCheckedChange={(v) => setForm({ ...form, auto_attach: v })} />
+          </div>
+          <div>
+            <Label>Service type keywords</Label>
+            <Input
+              value={(form.service_type_match ?? []).join(", ")}
+              onChange={(e) => setForm({ ...form, service_type_match: e.target.value.split(",").map(s => s.trim().toLowerCase()).filter(Boolean) })}
+              placeholder="e.g. brake, brakes, pad, rotor"
+            />
+            <p className="text-xs text-muted-foreground mt-1">Comma-separated. Matches if any keyword appears in the appointment's service type (case-insensitive).</p>
+          </div>
+          <div>
+            <Label>Focus area (optional)</Label>
+            <Input value={form.focus_area ?? ""} onChange={(e) => setForm({ ...form, focus_area: e.target.value })} placeholder="e.g. Suspension + wheel area" />
           </div>
           <Button onClick={saveTemplate} className="w-full">Save details</Button>
 

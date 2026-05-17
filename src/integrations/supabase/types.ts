@@ -568,36 +568,45 @@ export type Database = {
       }
       checklist_templates: {
         Row: {
+          auto_attach: boolean
           category: string
           created_at: string
           customer_visible: boolean
           description: string | null
+          focus_area: string | null
           id: string
           is_active: boolean
           name: string
           plan_id: string | null
+          service_type_match: string[]
           updated_at: string
         }
         Insert: {
+          auto_attach?: boolean
           category?: string
           created_at?: string
           customer_visible?: boolean
           description?: string | null
+          focus_area?: string | null
           id?: string
           is_active?: boolean
           name: string
           plan_id?: string | null
+          service_type_match?: string[]
           updated_at?: string
         }
         Update: {
+          auto_attach?: boolean
           category?: string
           created_at?: string
           customer_visible?: boolean
           description?: string | null
+          focus_area?: string | null
           id?: string
           is_active?: boolean
           name?: string
           plan_id?: string | null
+          service_type_match?: string[]
           updated_at?: string
         }
         Relationships: [
@@ -1908,10 +1917,15 @@ export type Database = {
           completed_by: string | null
           created_at: string
           description: string | null
+          estimate_id: string | null
           id: string
           label: string
           notes: string | null
+          recommended: boolean
+          recommended_at: string | null
+          recommended_by: string | null
           required: boolean
+          severity: string | null
           sort_order: number
           status: string
           updated_at: string
@@ -1922,10 +1936,15 @@ export type Database = {
           completed_by?: string | null
           created_at?: string
           description?: string | null
+          estimate_id?: string | null
           id?: string
           label: string
           notes?: string | null
+          recommended?: boolean
+          recommended_at?: string | null
+          recommended_by?: string | null
           required?: boolean
+          severity?: string | null
           sort_order?: number
           status?: string
           updated_at?: string
@@ -1936,10 +1955,15 @@ export type Database = {
           completed_by?: string | null
           created_at?: string
           description?: string | null
+          estimate_id?: string | null
           id?: string
           label?: string
           notes?: string | null
+          recommended?: boolean
+          recommended_at?: string | null
+          recommended_by?: string | null
           required?: boolean
+          severity?: string | null
           sort_order?: number
           status?: string
           updated_at?: string
@@ -2887,6 +2911,15 @@ export type Database = {
           msg_id: number
           read_ct: number
         }[]
+      }
+      recommend_checklist_item: {
+        Args: {
+          _item_id: string
+          _labor_hours?: number
+          _note?: string
+          _unit_price?: number
+        }
+        Returns: Json
       }
       redeem_mileage_token: {
         Args: { _miles: number; _token: string }
