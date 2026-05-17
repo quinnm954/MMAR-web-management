@@ -13,6 +13,8 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { SERVICE_TYPES } from "@/lib/serviceTypes";
 import { toast } from "sonner";
 import { CalendarCheck, CheckCircle2, XCircle, Phone, Loader2, RefreshCw, ExternalLink, Pencil, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -362,7 +364,12 @@ const AdminBookingRequests = () => {
             </div>
             <div>
               <Label htmlFor="eservice">Service type *</Label>
-              <Input id="eservice" value={editForm.service_type} onChange={(e) => setEditForm({ ...editForm, service_type: e.target.value })} />
+              <Select value={editForm.service_type} onValueChange={(v) => setEditForm({ ...editForm, service_type: v })}>
+                <SelectTrigger id="eservice"><SelectValue placeholder="Choose a service" /></SelectTrigger>
+                <SelectContent>
+                  {SERVICE_TYPES.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                </SelectContent>
+              </Select>
             </div>
             <div>
               <Label htmlFor="edesc">Description</Label>
