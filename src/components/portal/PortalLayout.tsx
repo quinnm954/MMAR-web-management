@@ -3,6 +3,7 @@ import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { portalStrings } from "@/lib/portalStrings";
 import { useNativePushRegistration } from "@/hooks/useNativePushRegistration";
+import { useSwipeTabNav } from "@/hooks/useSwipeTabNav";
 import { Button } from "@/components/ui/button";
 import {
   LayoutDashboard,
