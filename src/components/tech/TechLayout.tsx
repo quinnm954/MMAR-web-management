@@ -16,6 +16,7 @@ const items = [
 const TechLayout = ({ children }: { children: ReactNode }) => {
   const { signOut } = useAuth();
   const navigate = useNavigate();
+  useSwipeTabNav(items);
   return (
     <main className="min-h-screen bg-background">
       <header className="border-b border-border bg-card safe-pt">
