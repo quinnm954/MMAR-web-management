@@ -65,6 +65,8 @@ const PortalLayout = ({ children }: { children: ReactNode }) => {
     (n) => !bottomNavItems.some((b) => b.to === n.to),
   );
 
+  useSwipeTabNav(bottomNavItems);
+
   return (
     <div className="min-h-screen bg-background flex flex-col lg:flex-row">
       {/* Mobile top bar - logo + sign out only; primary nav lives in the bottom bar */}
