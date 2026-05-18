@@ -6,7 +6,7 @@ import LocalServicesDropdown from "@/components/footer/LocalServicesDropdown";
 
 const Footer = () => {
   return (
-    <footer className="pt-12 pb-6 border-t border-border bg-secondary/20">
+    <footer className="pt-12 pb-6 md:pb-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] border-t border-border bg-secondary/20">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-10">
           <div>

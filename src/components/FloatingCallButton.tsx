@@ -38,34 +38,37 @@ const FloatingCallButton = () => {
     window.open(getDirectionsUrl(), "_blank", "noopener,noreferrer");
   };
 
+  // Compact icon-only stack on phones so the FAB doesn't overlap centered hero CTAs / trust strip.
+  // Labels return on small-tablets (sm+) where there's room.
   return (
-    <div className="fixed bottom-6 right-6 z-40 flex flex-col gap-3 md:hidden animate-fade-in">
+    <div className="fixed right-3 sm:right-6 z-40 flex flex-col gap-2.5 sm:gap-3 md:hidden animate-fade-in"
+         style={{ bottom: "calc(1rem + env(safe-area-inset-bottom))" }}>
       <a
         href="sms:8135017572"
         onClick={handleText}
-        className="flex items-center gap-2 bg-primary text-primary-foreground px-5 py-3 rounded-full shadow-lg hover:bg-primary/90 active:scale-95 transition-all duration-200"
+        className="inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground h-12 w-12 sm:h-auto sm:w-auto sm:px-5 sm:py-3 rounded-full shadow-lg hover:bg-primary/90 active:scale-95 transition-all duration-200"
         aria-label="Text Mike's Mobile Auto Repair"
       >
         <MessageCircle className="w-5 h-5" />
-        <span className="font-semibold text-sm">Text Us</span>
+        <span className="hidden sm:inline font-semibold text-sm">Text Us</span>
       </a>
       <a
         href={GMB_URL}
         onClick={handleDirections}
-        className="flex items-center gap-2 bg-secondary text-secondary-foreground px-5 py-3 rounded-full shadow-lg hover:bg-secondary/90 active:scale-95 transition-all duration-200"
+        className="inline-flex items-center justify-center gap-2 bg-secondary text-secondary-foreground h-12 w-12 sm:h-auto sm:w-auto sm:px-5 sm:py-3 rounded-full shadow-lg hover:bg-secondary/90 active:scale-95 transition-all duration-200"
         aria-label="Get directions to Mike's Mobile Auto Repair"
       >
         <MapPin className="w-5 h-5" />
-        <span className="font-semibold text-sm">Directions</span>
+        <span className="hidden sm:inline font-semibold text-sm">Directions</span>
       </a>
       <a
         href="tel:8135017572"
         onClick={handleCall}
-        className="flex items-center gap-2 bg-accent text-accent-foreground px-5 py-3 rounded-full shadow-lg hover:bg-accent/90 active:scale-95 transition-all duration-200"
+        className="inline-flex items-center justify-center gap-2 bg-accent text-accent-foreground h-12 w-12 sm:h-auto sm:w-auto sm:px-5 sm:py-3 rounded-full shadow-lg hover:bg-accent/90 active:scale-95 transition-all duration-200"
         aria-label="Call Mike's Mobile Auto Repair"
       >
         <Phone className="w-5 h-5" />
-        <span className="font-semibold text-sm">Call Now</span>
+        <span className="hidden sm:inline font-semibold text-sm">Call Now</span>
       </a>
     </div>
   );
