@@ -4,6 +4,7 @@ import { Wrench, Clock, ClipboardCheck, ClipboardList, LogOut, LayoutDashboard }
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import MobileBottomNav from "@/components/shell/MobileBottomNav";
+import { useSwipeTabNav } from "@/hooks/useSwipeTabNav";
 
 const items = [
   { to: "/tech", label: "Jobs", icon: LayoutDashboard, end: true },
@@ -15,6 +16,7 @@ const items = [
 const TechLayout = ({ children }: { children: ReactNode }) => {
   const { signOut } = useAuth();
   const navigate = useNavigate();
+  useSwipeTabNav(items);
   return (
     <main className="min-h-screen bg-background">
       <header className="border-b border-border bg-card safe-pt">

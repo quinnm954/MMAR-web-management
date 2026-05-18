@@ -3,6 +3,7 @@ import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { portalStrings } from "@/lib/portalStrings";
 import { useNativePushRegistration } from "@/hooks/useNativePushRegistration";
+import { useSwipeTabNav } from "@/hooks/useSwipeTabNav";
 import { Button } from "@/components/ui/button";
 import {
   LayoutDashboard,
@@ -63,6 +64,8 @@ const PortalLayout = ({ children }: { children: ReactNode }) => {
   const moreNavItems = navItems.filter(
     (n) => !bottomNavItems.some((b) => b.to === n.to),
   );
+
+  useSwipeTabNav(bottomNavItems);
 
   return (
     <div className="min-h-screen bg-background flex flex-col lg:flex-row">
