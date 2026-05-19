@@ -79,7 +79,7 @@ export default function AdminReports() {
       const [inv, completed, members, ests, settings, employeesRes] = await Promise.all([
         supabase
           .from('invoices')
-          .select('id, invoice_number, total, subtotal, status, created_at, customer_id, service_record_id, line_items, stripe_session_id, stripe_payment_intent_id, stripe_fee, stripe_fee_synced_at')
+          .select('id, invoice_number, total, subtotal, status, created_at, customer_id, service_record_id, technician_id, line_items, stripe_session_id, stripe_payment_intent_id, stripe_fee, stripe_fee_synced_at')
           .gte('created_at', since)
           .order('created_at', { ascending: false }),
         supabase.from('appointments').select('id', { count: 'exact', head: true }).eq('status', 'completed').gte('created_at', since),
@@ -106,20 +106,20 @@ export default function AdminReports() {
         if (e.id) empByUser.set(e.id, e);
       });
 
-      // Parts revenue/cost
+      // Parts revenue/cost. Missing `kind` defaults to 'part' (matches invoice trigger),
+      // and we count revenue even if unit_cost is 0 so margin reflects reality.
       let partsRevenue = 0;
       let partsCost = 0;
       for (const i of paid) {
         const items = Array.isArray(i.line_items) ? i.line_items : [];
         for (const li of items) {
-          if (li.kind !== 'part') continue;
+          const kind = li.kind ?? 'part';
+          if (kind !== 'part') continue;
           const qty = Number(li.quantity ?? 1);
-          const price = Number(li.unit_price ?? 0);
+          const price = Number(li.unit_price ?? li.amount ?? 0);
           const cost = Number(li.unit_cost ?? 0);
-          if (cost > 0) {
-            partsRevenue += qty * price;
-            partsCost += qty * cost;
-          }
+          partsRevenue += qty * price;
+          partsCost += qty * cost;
         }
       }
       const partsMargin = partsRevenue - partsCost;
@@ -183,7 +183,10 @@ export default function AdminReports() {
         const paidLaborHours = info?.paidHours ?? 0;
         const clockedHours = info?.clockedHours ?? 0;
         const varianceHours = clockedHours - paidLaborHours;
-        const tech = info?.tech ? empByUser.get(info.tech) : null;
+        // Prefer the tech assigned directly to the invoice (set when RO completes,
+        // editable from Admin → Invoices), and fall back to the appointment.
+        const techId = (inv as any).technician_id ?? info?.tech ?? null;
+        const tech = techId ? empByUser.get(techId) : null;
         const techRate = tech?.hourly_rate != null ? Number(tech.hourly_rate) : rate;
         // Pay technicians on PAID labor hours (from the estimate), not clocked time
         const employeeCost = paidLaborHours * techRate;
@@ -202,7 +205,7 @@ export default function AdminReports() {
           invoice_number: inv.invoice_number,
           date: new Date(inv.created_at).toLocaleDateString(),
           customer: cust?.full_name || cust?.email || '—',
-          technician: tech?.full_name ?? (info?.tech ? 'Unassigned employee' : '—'),
+          technician: tech?.full_name ?? (techId ? 'Unassigned employee' : '—'),
           paidLaborHours,
           clockedHours,
           varianceHours,

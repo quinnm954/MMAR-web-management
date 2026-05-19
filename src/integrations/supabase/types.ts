@@ -1414,6 +1414,7 @@ export type Database = {
           stripe_session_id: string | null
           subtotal: number
           tax: number
+          technician_id: string | null
           total: number
           updated_at: string
         }
@@ -1441,6 +1442,7 @@ export type Database = {
           stripe_session_id?: string | null
           subtotal?: number
           tax?: number
+          technician_id?: string | null
           total?: number
           updated_at?: string
         }
@@ -1468,6 +1470,7 @@ export type Database = {
           stripe_session_id?: string | null
           subtotal?: number
           tax?: number
+          technician_id?: string | null
           total?: number
           updated_at?: string
         }
