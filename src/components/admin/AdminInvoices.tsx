@@ -13,6 +13,7 @@ import { shareLink } from "@/lib/share";
 import DeleteButton from "@/components/admin/DeleteButton";
 
 interface Customer { id: string; full_name: string | null; email: string | null }
+interface Employee { id: string; user_id: string | null; full_name: string | null }
 interface Invoice {
   id: string;
   invoice_number: string | null;
@@ -30,6 +31,7 @@ interface Invoice {
   created_at: string;
   customer_id: string;
   service_record_id: string | null;
+  technician_id?: string | null;
   customer?: Customer | null;
   technician_name?: string | null;
 }
