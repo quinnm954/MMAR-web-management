@@ -106,20 +106,20 @@ export default function AdminReports() {
         if (e.id) empByUser.set(e.id, e);
       });
 
-      // Parts revenue/cost
+      // Parts revenue/cost. Missing `kind` defaults to 'part' (matches invoice trigger),
+      // and we count revenue even if unit_cost is 0 so margin reflects reality.
       let partsRevenue = 0;
       let partsCost = 0;
       for (const i of paid) {
         const items = Array.isArray(i.line_items) ? i.line_items : [];
         for (const li of items) {
-          if (li.kind !== 'part') continue;
+          const kind = li.kind ?? 'part';
+          if (kind !== 'part') continue;
           const qty = Number(li.quantity ?? 1);
-          const price = Number(li.unit_price ?? 0);
+          const price = Number(li.unit_price ?? li.amount ?? 0);
           const cost = Number(li.unit_cost ?? 0);
-          if (cost > 0) {
-            partsRevenue += qty * price;
-            partsCost += qty * cost;
-          }
+          partsRevenue += qty * price;
+          partsCost += qty * cost;
         }
       }
       const partsMargin = partsRevenue - partsCost;
