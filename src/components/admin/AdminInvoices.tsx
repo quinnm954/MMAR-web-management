@@ -68,56 +68,60 @@ const AdminInvoices = () => {
 
   const load = async () => {
     setLoading(true);
-    const [i, c] = await Promise.all([
+    const [i, c, e] = await Promise.all([
       supabase.from("invoices").select("*").order("created_at", { ascending: false }),
       supabase.from("profiles").select("id, full_name, email").order("full_name"),
+      supabase.from("employees" as any).select("id, user_id, full_name").eq("is_active", true).order("full_name"),
     ]);
     const list = (i.data as Invoice[]) ?? [];
     const profs = (c.data as Customer[]) ?? [];
+    const emps = ((e.data as any[]) ?? []) as Employee[];
     const byId: Record<string, Customer> = {};
     profs.forEach((p) => { byId[p.id] = p; });
     list.forEach((r) => { r.customer = byId[r.customer_id] ?? null; });
 
-    // Resolve technician via service_record → appointment.assigned_technician_id
-    const srIds = list.map((l) => l.service_record_id).filter(Boolean) as string[];
+    // Build technician name lookup keyed by both auth user_id and employees.id
+    const techNameById = new Map<string, string>();
+    emps.forEach((emp) => {
+      const name = emp.full_name || "";
+      if (emp.user_id) techNameById.set(emp.user_id, name);
+      if (emp.id) techNameById.set(emp.id, name);
+    });
+
+    // Walk service_record → appointment for invoices that don't already have a tech assigned
+    const srIds = list.filter((l) => !l.technician_id && l.service_record_id).map((l) => l.service_record_id) as string[];
+    const techByAppt = new Map<string, string | null>();
+    const apptByService = new Map<string, string>();
     if (srIds.length) {
-      const { data: srs } = await supabase
-        .from("service_records")
-        .select("id, appointment_id")
-        .in("id", srIds);
-      const apptByService = new Map<string, string>((srs ?? []).map((s: any) => [s.id, s.appointment_id]));
-      const apptIds = Array.from(new Set(Array.from(apptByService.values()).filter(Boolean))) as string[];
+      const { data: srs } = await supabase.from("service_records").select("id, appointment_id").in("id", srIds);
+      (srs ?? []).forEach((s: any) => { if (s.appointment_id) apptByService.set(s.id, s.appointment_id); });
+      const apptIds = Array.from(new Set(Array.from(apptByService.values()))) as string[];
       if (apptIds.length) {
         const { data: appts } = await supabase
           .from("appointments")
           .select("id, assigned_technician_id")
           .in("id", apptIds);
-        const techByAppt = new Map<string, string | null>((appts ?? []).map((a: any) => [a.id, a.assigned_technician_id]));
-        const techIds = Array.from(new Set(Array.from(techByAppt.values()).filter(Boolean))) as string[];
-        const techNameById = new Map<string, string>();
-        if (techIds.length) {
-          const { data: emps } = await supabase
-            .from("employees" as any)
-            .select("user_id, full_name")
-            .in("user_id", techIds);
-          (emps ?? []).forEach((e: any) => { if (e.user_id) techNameById.set(e.user_id, e.full_name); });
-          const missing = techIds.filter((t) => !techNameById.has(t));
-          if (missing.length) {
-            const { data: profs2 } = await supabase.from("profiles").select("id, full_name, email").in("id", missing);
-            (profs2 ?? []).forEach((p: any) => techNameById.set(p.id, p.full_name || p.email || ""));
-          }
-        }
-        list.forEach((r) => {
-          if (!r.service_record_id) return;
-          const apptId = apptByService.get(r.service_record_id);
-          const techId = apptId ? techByAppt.get(apptId) : null;
-          r.technician_name = techId ? (techNameById.get(techId) || null) : null;
-        });
+        (appts ?? []).forEach((a: any) => techByAppt.set(a.id, a.assigned_technician_id));
       }
     }
+    // Resolve any missing names from profiles (auth users not yet linked to an employee row)
+    const unknownIds = new Set<string>();
+    list.forEach((r) => {
+      const tid = r.technician_id ?? (r.service_record_id ? techByAppt.get(apptByService.get(r.service_record_id) ?? "") : null);
+      if (tid && !techNameById.has(tid)) unknownIds.add(tid);
+    });
+    if (unknownIds.size) {
+      const { data: profs2 } = await supabase.from("profiles").select("id, full_name, email").in("id", Array.from(unknownIds));
+      (profs2 ?? []).forEach((p: any) => techNameById.set(p.id, p.full_name || p.email || ""));
+    }
+    list.forEach((r) => {
+      const tid = r.technician_id ?? (r.service_record_id ? techByAppt.get(apptByService.get(r.service_record_id) ?? "") : null) ?? null;
+      r.technician_name = tid ? (techNameById.get(tid) || null) : null;
+    });
 
     setInvoices(list);
     setCustomers(profs);
+    setEmployees(emps);
 
     // Load inbound SMS replies linked to these invoices
     const ids = list.map((l) => l.id);
