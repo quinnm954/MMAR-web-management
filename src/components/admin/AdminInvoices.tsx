@@ -240,6 +240,16 @@ const AdminInvoices = () => {
     load();
   };
 
+  const updateTech = async (id: string, techId: string) => {
+    const value = techId === "__none__" ? null : techId;
+    const { error } = await supabase.from("invoices").update({ technician_id: value }).eq("id", id);
+    if (error) return toast.error(error.message);
+    toast.success(value ? "Technician assigned" : "Technician cleared");
+    load();
+  };
+
+
+
   const totalDue = invoices.filter((i) => i.status !== "paid" && i.status !== "void").reduce((s, i) => s + (i.total - i.amount_paid), 0);
 
   const [textingId, setTextingId] = useState<string | null>(null);
