@@ -362,7 +362,35 @@ const AdminInvoices = () => {
                       <div className="text-xs text-muted-foreground">{i.customer?.full_name || i.customer?.email}</div>
                       <div className="text-[10px] text-muted-foreground">
                         {new Date(i.created_at).toLocaleDateString()}{i.due_date && ` • Due ${i.due_date}`}
-                        {i.technician_name && <> • Tech: <span className="text-foreground/80 font-medium">{i.technician_name}</span></>}
+                      </div>
+                      <div className="mt-1 flex items-center gap-1.5">
+                        <span className="text-[10px] text-muted-foreground">Tech:</span>
+                        <Select
+                          value={i.technician_id ?? "__none__"}
+                          onValueChange={(v) => updateTech(i.id, v)}
+                        >
+                          <SelectTrigger className="h-7 w-44 text-xs">
+                            <SelectValue placeholder="Unassigned" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="__none__">Unassigned</SelectItem>
+                            {employees.map((emp) => {
+                              const val = emp.user_id || emp.id;
+                              return (
+                                <SelectItem key={emp.id} value={val}>
+                                  {emp.full_name || "Unnamed"}
+                                </SelectItem>
+                              );
+                            })}
+                            {/* Show the current assignment even if it's not in the active employee list */}
+                            {i.technician_id &&
+                              !employees.some((emp) => (emp.user_id || emp.id) === i.technician_id) && (
+                                <SelectItem value={i.technician_id}>
+                                  {i.technician_name || "Linked user"}
+                                </SelectItem>
+                              )}
+                          </SelectContent>
+                        </Select>
                       </div>
                     </div>
                   </div>
