@@ -183,7 +183,10 @@ export default function AdminReports() {
         const paidLaborHours = info?.paidHours ?? 0;
         const clockedHours = info?.clockedHours ?? 0;
         const varianceHours = clockedHours - paidLaborHours;
-        const tech = info?.tech ? empByUser.get(info.tech) : null;
+        // Prefer the tech assigned directly to the invoice (set when RO completes,
+        // editable from Admin → Invoices), and fall back to the appointment.
+        const techId = (inv as any).technician_id ?? info?.tech ?? null;
+        const tech = techId ? empByUser.get(techId) : null;
         const techRate = tech?.hourly_rate != null ? Number(tech.hourly_rate) : rate;
         // Pay technicians on PAID labor hours (from the estimate), not clocked time
         const employeeCost = paidLaborHours * techRate;
