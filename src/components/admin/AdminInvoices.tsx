@@ -242,7 +242,7 @@ const AdminInvoices = () => {
 
   const updateTech = async (id: string, techId: string) => {
     const value = techId === "__none__" ? null : techId;
-    const { error } = await supabase.from("invoices").update({ technician_id: value }).eq("id", id);
+    const { error } = await supabase.from("invoices").update({ technician_id: value } as any).eq("id", id);
     if (error) return toast.error(error.message);
     toast.success(value ? "Technician assigned" : "Technician cleared");
     load();
