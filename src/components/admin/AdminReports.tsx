@@ -205,7 +205,7 @@ export default function AdminReports() {
           invoice_number: inv.invoice_number,
           date: new Date(inv.created_at).toLocaleDateString(),
           customer: cust?.full_name || cust?.email || '—',
-          technician: tech?.full_name ?? (info?.tech ? 'Unassigned employee' : '—'),
+          technician: tech?.full_name ?? (techId ? 'Unassigned employee' : '—'),
           paidLaborHours,
           clockedHours,
           varianceHours,
