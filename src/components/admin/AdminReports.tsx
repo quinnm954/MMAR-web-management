@@ -20,6 +20,7 @@ type InvoiceRow = {
   created_at: string;
   customer_id: string;
   service_record_id: string | null;
+  technician_id: string | null;
   line_items: LineItem[];
   stripe_session_id: string | null;
   stripe_payment_intent_id: string | null;
@@ -49,6 +50,32 @@ type ProfitRow = {
 const estimatedStripeFee = (amount: number, paid: boolean, hasStripe: boolean) => {
   if (!paid || !hasStripe || amount <= 0) return 0;
   return amount * 0.029 + 0.3;
+};
+
+const itemAmount = (li: LineItem) => {
+  const qty = Number(li.quantity ?? 1);
+  const price = Number(li.unit_price ?? 0);
+  return Number(li.amount ?? qty * price) || 0;
+};
+
+const partCost = (li: LineItem) => {
+  const qty = Number(li.quantity ?? 1);
+  return (Number(li.unit_cost ?? 0) || 0) * qty;
+};
+
+const laborHoursFromInvoice = (items: LineItem[], fallbackRate: number, fallbackSubtotal: number) => {
+  const hours = items.reduce((sum, li) => {
+    const kind = String(li.kind ?? 'part').toLowerCase();
+    if (kind !== 'labor' && !(kind !== 'part' && Number(li.labor_hours) > 0)) return sum;
+    const explicit = Number(li.labor_hours ?? 0);
+    if (explicit > 0) return sum + explicit;
+    const qty = Number(li.quantity ?? 0);
+    if (qty > 0 && kind === 'labor') return sum + qty;
+    const unit = Number(li.unit_price ?? 0);
+    const amount = itemAmount(li);
+    return sum + (unit > 0 ? amount / unit : 0);
+  }, 0);
+  return hours > 0 ? hours : (fallbackRate > 0 && fallbackSubtotal > 0 ? fallbackSubtotal / fallbackRate : 0);
 };
 
 export default function AdminReports() {
