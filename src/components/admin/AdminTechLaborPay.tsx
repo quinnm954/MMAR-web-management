@@ -25,7 +25,7 @@ const lineAmount = (li: any) => {
 
 const paidLaborHours = (items: any[], fallbackRate: number, fallbackSubtotal: number) => {
   const hours = items.reduce((sum, li) => {
-    const kind = String(li?.kind ?? "part").toLowerCase();
+    const kind = String(li?.kind ?? (Number(li?.labor_hours ?? 0) > 0 ? "labor" : "part")).toLowerCase();
     if (kind !== "labor" && !(kind !== "part" && Number(li?.labor_hours) > 0)) return sum;
     const explicit = Number(li?.labor_hours ?? 0);
     if (explicit > 0) return sum + explicit;
@@ -35,7 +35,7 @@ const paidLaborHours = (items: any[], fallbackRate: number, fallbackSubtotal: nu
     const amount = lineAmount(li);
     return sum + (unit > 0 ? amount / unit : 0);
   }, 0);
-  return hours > 0 ? hours : (fallbackRate > 0 && fallbackSubtotal > 0 ? fallbackSubtotal / fallbackRate : 0);
+  return hours > 0 ? hours : (items.length === 0 && fallbackRate > 0 && fallbackSubtotal > 0 ? fallbackSubtotal / fallbackRate : 0);
 };
 
 export default function AdminTechLaborPay() {
