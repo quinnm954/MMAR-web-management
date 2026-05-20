@@ -140,13 +140,10 @@ export default function AdminReports() {
       for (const i of paid) {
         const items = Array.isArray(i.line_items) ? i.line_items : [];
         for (const li of items) {
-          const kind = li.kind ?? 'part';
+          const kind = String(li.kind ?? 'part').toLowerCase();
           if (kind !== 'part') continue;
-          const qty = Number(li.quantity ?? 1);
-          const price = Number(li.unit_price ?? li.amount ?? 0);
-          const cost = Number(li.unit_cost ?? 0);
-          partsRevenue += qty * price;
-          partsCost += qty * cost;
+          partsRevenue += itemAmount(li);
+          partsCost += partCost(li);
         }
       }
       const partsMargin = partsRevenue - partsCost;
@@ -169,28 +166,19 @@ export default function AdminReports() {
       );
       const apptIds = Array.from(new Set(Array.from(apptByService.values()).filter(Boolean))) as string[];
 
-      // Appointments → tech assignment, paid (estimate) labor hours, clocked hours
-      const apptInfo = new Map<string, { tech: string | null; paidHours: number; clockedHours: number }>();
+      // Appointments → tech assignment and clocked hours. Paid labor comes from invoice line items.
+      const apptInfo = new Map<string, { tech: string | null; clockedHours: number }>();
       if (apptIds.length) {
-        const [apRes, estRes, teRes] = await Promise.all([
+        const [apRes, teRes] = await Promise.all([
           supabase.from('appointments').select('id, assigned_technician_id').in('id', apptIds),
-          supabase.from('estimates').select('appointment_id, line_items').in('appointment_id', apptIds),
           supabase.from('time_entries').select('appointment_id, duration_minutes, technician_id').in('appointment_id', apptIds),
         ]);
         (apRes.data ?? []).forEach((a: any) => {
-          apptInfo.set(a.id, { tech: a.assigned_technician_id, paidHours: 0, clockedHours: 0 });
-        });
-        // Sum labor_hours from estimates per appointment (what the customer paid for)
-        (estRes.data ?? []).forEach((e: any) => {
-          const items = Array.isArray(e.line_items) ? e.line_items : [];
-          const hrs = items.reduce((s: number, li: any) => s + (Number(li.labor_hours) || 0), 0);
-          const cur = apptInfo.get(e.appointment_id) ?? { tech: null, paidHours: 0, clockedHours: 0 };
-          cur.paidHours += hrs;
-          apptInfo.set(e.appointment_id, cur);
+          apptInfo.set(a.id, { tech: a.assigned_technician_id, clockedHours: 0 });
         });
         // Sum clocked time per appointment (performance only)
         (teRes.data ?? []).forEach((t: any) => {
-          const cur = apptInfo.get(t.appointment_id) ?? { tech: null, paidHours: 0, clockedHours: 0 };
+          const cur = apptInfo.get(t.appointment_id) ?? { tech: null, clockedHours: 0 };
           cur.clockedHours += Number(t.duration_minutes || 0) / 60;
           // Fall back to clocked tech only if no assigned tech on the RO
           if (!cur.tech) cur.tech = t.technician_id;
