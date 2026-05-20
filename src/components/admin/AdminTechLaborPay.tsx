@@ -176,7 +176,7 @@ export default function AdminTechLaborPay() {
               ))}
             </div>
             <p className="text-xs text-muted-foreground mt-4">
-              Hours = paid invoice subtotal ÷ shop labor rate (${laborRate}/hr). Pay = hours × employee hourly rate. Set hourly rate per tech in Employees.
+              Hours come from paid invoice labor line items. If an invoice has no labor lines, subtotal ÷ shop labor rate (${laborRate}/hr) is used as a fallback. Pay = hours × employee hourly rate.
             </p>
           </>
         )}
