@@ -17,6 +17,27 @@ interface TechRow {
   pay: number;
 }
 
+const lineAmount = (li: any) => {
+  const qty = Number(li?.quantity ?? 1);
+  const price = Number(li?.unit_price ?? 0);
+  return Number(li?.amount ?? qty * price) || 0;
+};
+
+const paidLaborHours = (items: any[], fallbackRate: number, fallbackSubtotal: number) => {
+  const hours = items.reduce((sum, li) => {
+    const kind = String(li?.kind ?? (Number(li?.labor_hours ?? 0) > 0 ? "labor" : "part")).toLowerCase();
+    if (kind !== "labor" && !(kind !== "part" && Number(li?.labor_hours) > 0)) return sum;
+    const explicit = Number(li?.labor_hours ?? 0);
+    if (explicit > 0) return sum + explicit;
+    const qty = Number(li?.quantity ?? 0);
+    if (qty > 0 && kind === "labor") return sum + qty;
+    const unit = Number(li?.unit_price ?? 0);
+    const amount = lineAmount(li);
+    return sum + (unit > 0 ? amount / unit : 0);
+  }, 0);
+  return hours > 0 ? hours : (items.length === 0 && fallbackRate > 0 && fallbackSubtotal > 0 ? fallbackSubtotal / fallbackRate : 0);
+};
+
 export default function AdminTechLaborPay() {
   const [days, setDays] = useState<keyof typeof ranges>("30");
   const [loading, setLoading] = useState(true);
@@ -28,66 +49,77 @@ export default function AdminTechLaborPay() {
       setLoading(true);
       const since = startOfDay(subDays(new Date(), parseInt(days))).toISOString();
 
-      const [{ data: settings }, { data: techRoles }] = await Promise.all([
+      const [{ data: settings }, { data: techRoles }, { data: employees }] = await Promise.all([
         supabase.from("shop_settings").select("labor_cost_per_hour").eq("id", 1).maybeSingle(),
         supabase.from("user_roles").select("user_id").eq("role", "technician"),
+        supabase.from("employees" as any).select("id, user_id, full_name, hourly_rate").eq("is_active", true),
       ]);
       const rate = Number(settings?.labor_cost_per_hour ?? 35);
       setLaborRate(rate);
 
-      const techIds = (techRoles ?? []).map((r: any) => r.user_id);
-      if (!techIds.length) { setRows([]); setLoading(false); return; }
+      const { data: paidInvoices } = await supabase.from("invoices")
+        .select("id, subtotal, status, paid_at, service_record_id, technician_id, line_items")
+        .eq("status", "paid")
+        .gte("paid_at", since);
 
-      const [{ data: profs }, { data: emps }, { data: appts }] = await Promise.all([
-        supabase.from("profiles").select("id, full_name, email").in("id", techIds),
-        supabase.from("employees").select("user_id, hourly_rate").in("user_id", techIds),
-        supabase.from("appointments").select("id, assigned_technician_id").in("assigned_technician_id", techIds),
-      ]);
-      const empByUser: Record<string, number> = {};
-      (emps ?? []).forEach((e: any) => { if (e.user_id) empByUser[e.user_id] = Number(e.hourly_rate || 0); });
-
-      const apptToTech: Record<string, string> = {};
-      const apptIds = (appts ?? []).map((a: any) => { apptToTech[a.id] = a.assigned_technician_id; return a.id; });
-
-      let srs: any[] = [];
-      if (apptIds.length) {
-        const { data } = await supabase.from("service_records").select("id, appointment_id").in("appointment_id", apptIds);
-        srs = data ?? [];
-      }
-      const srToTech: Record<string, string> = {};
-      const srIds = srs.map((s) => { srToTech[s.id] = apptToTech[s.appointment_id]; return s.id; });
-
-      let invs: any[] = [];
-      if (srIds.length) {
-        const { data } = await supabase.from("invoices")
-          .select("id, subtotal, status, paid_at, service_record_id")
-          .in("service_record_id", srIds)
-          .eq("status", "paid")
-          .gte("paid_at", since);
-        invs = data ?? [];
+      const serviceIds = ((paidInvoices ?? []) as any[]).filter((i) => !i.technician_id && i.service_record_id).map((i) => i.service_record_id);
+      const techByService = new Map<string, string | null>();
+      if (serviceIds.length) {
+        const { data: srs } = await supabase.from("service_records").select("id, appointment_id").in("id", serviceIds);
+        const apptByService = new Map<string, string>();
+        (srs ?? []).forEach((s: any) => { if (s.appointment_id) apptByService.set(s.id, s.appointment_id); });
+        const apptIds = Array.from(new Set(Array.from(apptByService.values())));
+        if (apptIds.length) {
+          const { data: appts } = await supabase.from("appointments").select("id, assigned_technician_id").in("id", apptIds);
+          const techByAppt = new Map<string, string | null>((appts ?? []).map((a: any) => [a.id, a.assigned_technician_id]));
+          apptByService.forEach((apptId, serviceId) => techByService.set(serviceId, techByAppt.get(apptId) ?? null));
+        }
       }
 
-      const agg: Record<string, { invoices: number; subtotal: number }> = {};
-      invs.forEach((inv: any) => {
-        const techId = srToTech[inv.service_record_id];
-        if (!techId) return;
-        if (!agg[techId]) agg[techId] = { invoices: 0, subtotal: 0 };
-        agg[techId].invoices += 1;
-        agg[techId].subtotal += Number(inv.subtotal || 0);
+      const employeeRows = ((employees ?? []) as any[]);
+      const techIds = new Set<string>();
+      (techRoles ?? []).forEach((r: any) => { if (r.user_id) techIds.add(r.user_id); });
+      employeeRows.forEach((e: any) => techIds.add(e.user_id || e.id));
+      ((paidInvoices ?? []) as any[]).forEach((inv: any) => {
+        const tid = inv.technician_id ?? (inv.service_record_id ? techByService.get(inv.service_record_id) : null);
+        if (tid) techIds.add(tid);
+      });
+      if (!techIds.size) { setRows([]); setLoading(false); return; }
+
+      const profileIds = Array.from(techIds).filter((id) => employeeRows.some((e: any) => e.user_id === id) || (techRoles ?? []).some((r: any) => r.user_id === id));
+      const { data: profs } = profileIds.length
+        ? await supabase.from("profiles").select("id, full_name, email").in("id", profileIds)
+        : { data: [] as any[] };
+      const profileById = new Map<string, any>((profs ?? []).map((p: any) => [p.id, p]));
+      const empById = new Map<string, any>();
+      employeeRows.forEach((e: any) => {
+        if (e.user_id) empById.set(e.user_id, e);
+        empById.set(e.id, e);
       });
 
-      const list: TechRow[] = (profs ?? []).map((p: any) => {
-        const a = agg[p.id] || { invoices: 0, subtotal: 0 };
-        const hours = rate > 0 ? a.subtotal / rate : 0;
-        const hourlyRate = empByUser[p.id] || 0;
+      const agg: Record<string, { invoices: number; subtotal: number; hours: number }> = {};
+      ((paidInvoices ?? []) as any[]).forEach((inv: any) => {
+        const techId = inv.technician_id ?? (inv.service_record_id ? techByService.get(inv.service_record_id) : null);
+        if (!techId) return;
+        if (!agg[techId]) agg[techId] = { invoices: 0, subtotal: 0, hours: 0 };
+        agg[techId].invoices += 1;
+        agg[techId].subtotal += Number(inv.subtotal || 0);
+        agg[techId].hours += paidLaborHours(Array.isArray(inv.line_items) ? inv.line_items : [], rate, Number(inv.subtotal || 0));
+      });
+
+      const list: TechRow[] = Array.from(techIds).map((id) => {
+        const a = agg[id] || { invoices: 0, subtotal: 0, hours: 0 };
+        const employee = empById.get(id);
+        const profile = profileById.get(id);
+        const hourlyRate = Number(employee?.hourly_rate ?? 0) || rate;
         return {
-          id: p.id,
-          name: p.full_name || p.email || p.id.slice(0, 8),
+          id,
+          name: employee?.full_name || profile?.full_name || profile?.email || id.slice(0, 8),
           hourlyRate,
           invoices: a.invoices,
           subtotal: a.subtotal,
-          hours,
-          pay: hours * hourlyRate,
+          hours: a.hours,
+          pay: a.hours * hourlyRate,
         };
       }).sort((a, b) => b.pay - a.pay);
 
@@ -144,7 +176,7 @@ export default function AdminTechLaborPay() {
               ))}
             </div>
             <p className="text-xs text-muted-foreground mt-4">
-              Hours = paid invoice subtotal ÷ shop labor rate (${laborRate}/hr). Pay = hours × employee hourly rate. Set hourly rate per tech in Employees.
+              Hours come from paid invoice labor line items. If an invoice has no labor lines, subtotal ÷ shop labor rate (${laborRate}/hr) is used as a fallback. Pay = hours × employee hourly rate.
             </p>
           </>
         )}

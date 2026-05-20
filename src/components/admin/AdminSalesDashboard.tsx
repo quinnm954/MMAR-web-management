@@ -172,7 +172,7 @@ export default function AdminSalesDashboard() {
         const qty = Number(li.quantity ?? 1);
         const price = Number(li.unit_price ?? 0);
         const amt = Number(li.amount ?? qty * price);
-        const k = String(li.kind || '').toLowerCase();
+        const k = String(li.kind || 'part').toLowerCase();
         const desc = `${li.name ?? ''} ${li.description ?? ''}`.toLowerCase();
         const isDiagnosis =
           k === 'diagnosis' ||
@@ -181,8 +181,6 @@ export default function AdminSalesDashboard() {
         if (isDiagnosis) acc.diagnosis += amt;
         else if (k === 'labor') acc.labor += amt;
         else if (k === 'part') acc.parts += amt;
-        // Unknown/other line kinds are excluded so the mix stays focused on
-        // diagnosis / labor / parts only.
       });
     });
     return [

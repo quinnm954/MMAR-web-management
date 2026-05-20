@@ -20,6 +20,7 @@ type InvoiceRow = {
   created_at: string;
   customer_id: string;
   service_record_id: string | null;
+  technician_id: string | null;
   line_items: LineItem[];
   stripe_session_id: string | null;
   stripe_payment_intent_id: string | null;
@@ -49,6 +50,34 @@ type ProfitRow = {
 const estimatedStripeFee = (amount: number, paid: boolean, hasStripe: boolean) => {
   if (!paid || !hasStripe || amount <= 0) return 0;
   return amount * 0.029 + 0.3;
+};
+
+const itemAmount = (li: LineItem) => {
+  const qty = Number(li.quantity ?? 1);
+  const price = Number(li.unit_price ?? 0);
+  return Number(li.amount ?? qty * price) || 0;
+};
+
+const partCost = (li: LineItem) => {
+  const qty = Number(li.quantity ?? 1);
+  return (Number(li.unit_cost ?? 0) || 0) * qty;
+};
+
+const itemKind = (li: LineItem) => String(li.kind ?? (Number(li.labor_hours ?? 0) > 0 ? 'labor' : 'part')).toLowerCase();
+
+const laborHoursFromInvoice = (items: LineItem[], fallbackRate: number, fallbackSubtotal: number) => {
+  const hours = items.reduce((sum, li) => {
+    const kind = itemKind(li);
+    if (kind !== 'labor' && !(kind !== 'part' && Number(li.labor_hours) > 0)) return sum;
+    const explicit = Number(li.labor_hours ?? 0);
+    if (explicit > 0) return sum + explicit;
+    const qty = Number(li.quantity ?? 0);
+    if (qty > 0 && kind === 'labor') return sum + qty;
+    const unit = Number(li.unit_price ?? 0);
+    const amount = itemAmount(li);
+    return sum + (unit > 0 ? amount / unit : 0);
+  }, 0);
+  return hours > 0 ? hours : (items.length === 0 && fallbackRate > 0 && fallbackSubtotal > 0 ? fallbackSubtotal / fallbackRate : 0);
 };
 
 export default function AdminReports() {
@@ -113,13 +142,10 @@ export default function AdminReports() {
       for (const i of paid) {
         const items = Array.isArray(i.line_items) ? i.line_items : [];
         for (const li of items) {
-          const kind = li.kind ?? 'part';
+          const kind = itemKind(li);
           if (kind !== 'part') continue;
-          const qty = Number(li.quantity ?? 1);
-          const price = Number(li.unit_price ?? li.amount ?? 0);
-          const cost = Number(li.unit_cost ?? 0);
-          partsRevenue += qty * price;
-          partsCost += qty * cost;
+          partsRevenue += itemAmount(li);
+          partsCost += partCost(li);
         }
       }
       const partsMargin = partsRevenue - partsCost;
@@ -142,28 +168,19 @@ export default function AdminReports() {
       );
       const apptIds = Array.from(new Set(Array.from(apptByService.values()).filter(Boolean))) as string[];
 
-      // Appointments → tech assignment, paid (estimate) labor hours, clocked hours
-      const apptInfo = new Map<string, { tech: string | null; paidHours: number; clockedHours: number }>();
+      // Appointments → tech assignment and clocked hours. Paid labor comes from invoice line items.
+      const apptInfo = new Map<string, { tech: string | null; clockedHours: number }>();
       if (apptIds.length) {
-        const [apRes, estRes, teRes] = await Promise.all([
+        const [apRes, teRes] = await Promise.all([
           supabase.from('appointments').select('id, assigned_technician_id').in('id', apptIds),
-          supabase.from('estimates').select('appointment_id, line_items').in('appointment_id', apptIds),
           supabase.from('time_entries').select('appointment_id, duration_minutes, technician_id').in('appointment_id', apptIds),
         ]);
         (apRes.data ?? []).forEach((a: any) => {
-          apptInfo.set(a.id, { tech: a.assigned_technician_id, paidHours: 0, clockedHours: 0 });
-        });
-        // Sum labor_hours from estimates per appointment (what the customer paid for)
-        (estRes.data ?? []).forEach((e: any) => {
-          const items = Array.isArray(e.line_items) ? e.line_items : [];
-          const hrs = items.reduce((s: number, li: any) => s + (Number(li.labor_hours) || 0), 0);
-          const cur = apptInfo.get(e.appointment_id) ?? { tech: null, paidHours: 0, clockedHours: 0 };
-          cur.paidHours += hrs;
-          apptInfo.set(e.appointment_id, cur);
+          apptInfo.set(a.id, { tech: a.assigned_technician_id, clockedHours: 0 });
         });
         // Sum clocked time per appointment (performance only)
         (teRes.data ?? []).forEach((t: any) => {
-          const cur = apptInfo.get(t.appointment_id) ?? { tech: null, paidHours: 0, clockedHours: 0 };
+          const cur = apptInfo.get(t.appointment_id) ?? { tech: null, clockedHours: 0 };
           cur.clockedHours += Number(t.duration_minutes || 0) / 60;
           // Fall back to clocked tech only if no assigned tech on the RO
           if (!cur.tech) cur.tech = t.technician_id;
@@ -171,22 +188,34 @@ export default function AdminReports() {
         });
       }
 
+      const reportTechIds = new Set<string>();
+      paid.forEach((inv) => {
+        const apptId = inv.service_record_id ? apptByService.get(inv.service_record_id) : undefined;
+        const tid = inv.technician_id ?? (apptId ? apptInfo.get(apptId)?.tech : null);
+        if (tid) reportTechIds.add(tid);
+      });
+      const missingProfileTechIds = Array.from(reportTechIds).filter((id) => !empByUser.has(id));
+      const { data: techProfiles } = missingProfileTechIds.length
+        ? await supabase.from('profiles').select('id, full_name, email').in('id', missingProfileTechIds)
+        : { data: [] as any[] };
+      const techProfileById = new Map<string, any>((techProfiles ?? []).map((p: any) => [p.id, p]));
+
       const rows: ProfitRow[] = paid.map((inv) => {
         const items = Array.isArray(inv.line_items) ? inv.line_items : [];
         const cogs = items.reduce((s, li) => {
-          const qty = Number(li.quantity ?? 1);
-          const cost = Number(li.unit_cost ?? 0);
-          return s + qty * cost;
+          const kind = itemKind(li);
+          return kind === 'part' ? s + partCost(li) : s;
         }, 0);
         const apptId = inv.service_record_id ? apptByService.get(inv.service_record_id) : undefined;
         const info = apptId ? apptInfo.get(apptId) : undefined;
-        const paidLaborHours = info?.paidHours ?? 0;
+        const paidLaborHours = laborHoursFromInvoice(items, rate, Number(inv.subtotal || 0));
         const clockedHours = info?.clockedHours ?? 0;
         const varianceHours = clockedHours - paidLaborHours;
         // Prefer the tech assigned directly to the invoice (set when RO completes,
         // editable from Admin → Invoices), and fall back to the appointment.
         const techId = (inv as any).technician_id ?? info?.tech ?? null;
         const tech = techId ? empByUser.get(techId) : null;
+        const techProfile = techId ? techProfileById.get(techId) : null;
         const techRate = tech?.hourly_rate != null ? Number(tech.hourly_rate) : rate;
         // Pay technicians on PAID labor hours (from the estimate), not clocked time
         const employeeCost = paidLaborHours * techRate;
@@ -205,7 +234,7 @@ export default function AdminReports() {
           invoice_number: inv.invoice_number,
           date: new Date(inv.created_at).toLocaleDateString(),
           customer: cust?.full_name || cust?.email || '—',
-          technician: tech?.full_name ?? (techId ? 'Unassigned employee' : '—'),
+          technician: tech?.full_name ?? techProfile?.full_name ?? techProfile?.email ?? (techId ? 'Linked tech missing employee row' : '—'),
           paidLaborHours,
           clockedHours,
           varianceHours,
