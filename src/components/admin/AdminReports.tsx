@@ -63,9 +63,11 @@ const partCost = (li: LineItem) => {
   return (Number(li.unit_cost ?? 0) || 0) * qty;
 };
 
+const itemKind = (li: LineItem) => String(li.kind ?? (Number(li.labor_hours ?? 0) > 0 ? 'labor' : 'part')).toLowerCase();
+
 const laborHoursFromInvoice = (items: LineItem[], fallbackRate: number, fallbackSubtotal: number) => {
   const hours = items.reduce((sum, li) => {
-    const kind = String(li.kind ?? 'part').toLowerCase();
+    const kind = itemKind(li);
     if (kind !== 'labor' && !(kind !== 'part' && Number(li.labor_hours) > 0)) return sum;
     const explicit = Number(li.labor_hours ?? 0);
     if (explicit > 0) return sum + explicit;
@@ -75,7 +77,7 @@ const laborHoursFromInvoice = (items: LineItem[], fallbackRate: number, fallback
     const amount = itemAmount(li);
     return sum + (unit > 0 ? amount / unit : 0);
   }, 0);
-  return hours > 0 ? hours : (fallbackRate > 0 && fallbackSubtotal > 0 ? fallbackSubtotal / fallbackRate : 0);
+  return hours > 0 ? hours : (items.length === 0 && fallbackRate > 0 && fallbackSubtotal > 0 ? fallbackSubtotal / fallbackRate : 0);
 };
 
 export default function AdminReports() {
