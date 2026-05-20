@@ -186,6 +186,18 @@ export default function AdminReports() {
         });
       }
 
+      const reportTechIds = new Set<string>();
+      paid.forEach((inv) => {
+        const apptId = inv.service_record_id ? apptByService.get(inv.service_record_id) : undefined;
+        const tid = inv.technician_id ?? (apptId ? apptInfo.get(apptId)?.tech : null);
+        if (tid) reportTechIds.add(tid);
+      });
+      const missingProfileTechIds = Array.from(reportTechIds).filter((id) => !empByUser.has(id));
+      const { data: techProfiles } = missingProfileTechIds.length
+        ? await supabase.from('profiles').select('id, full_name, email').in('id', missingProfileTechIds)
+        : { data: [] as any[] };
+      const techProfileById = new Map<string, any>((techProfiles ?? []).map((p: any) => [p.id, p]));
+
       const rows: ProfitRow[] = paid.map((inv) => {
         const items = Array.isArray(inv.line_items) ? inv.line_items : [];
         const cogs = items.reduce((s, li) => {
@@ -201,6 +213,7 @@ export default function AdminReports() {
         // editable from Admin → Invoices), and fall back to the appointment.
         const techId = (inv as any).technician_id ?? info?.tech ?? null;
         const tech = techId ? empByUser.get(techId) : null;
+        const techProfile = techId ? techProfileById.get(techId) : null;
         const techRate = tech?.hourly_rate != null ? Number(tech.hourly_rate) : rate;
         // Pay technicians on PAID labor hours (from the estimate), not clocked time
         const employeeCost = paidLaborHours * techRate;
@@ -219,7 +232,7 @@ export default function AdminReports() {
           invoice_number: inv.invoice_number,
           date: new Date(inv.created_at).toLocaleDateString(),
           customer: cust?.full_name || cust?.email || '—',
-          technician: tech?.full_name ?? (techId ? 'Unassigned employee' : '—'),
+          technician: tech?.full_name ?? techProfile?.full_name ?? techProfile?.email ?? (techId ? 'Linked tech missing employee row' : '—'),
           paidLaborHours,
           clockedHours,
           varianceHours,
