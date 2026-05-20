@@ -142,7 +142,7 @@ export default function AdminReports() {
       for (const i of paid) {
         const items = Array.isArray(i.line_items) ? i.line_items : [];
         for (const li of items) {
-          const kind = String(li.kind ?? 'part').toLowerCase();
+          const kind = itemKind(li);
           if (kind !== 'part') continue;
           partsRevenue += itemAmount(li);
           partsCost += partCost(li);
@@ -203,7 +203,7 @@ export default function AdminReports() {
       const rows: ProfitRow[] = paid.map((inv) => {
         const items = Array.isArray(inv.line_items) ? inv.line_items : [];
         const cogs = items.reduce((s, li) => {
-          const kind = String(li.kind ?? 'part').toLowerCase();
+          const kind = itemKind(li);
           return kind === 'part' ? s + partCost(li) : s;
         }, 0);
         const apptId = inv.service_record_id ? apptByService.get(inv.service_record_id) : undefined;
