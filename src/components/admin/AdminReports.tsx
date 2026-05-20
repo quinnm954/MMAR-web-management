@@ -189,13 +189,12 @@ export default function AdminReports() {
       const rows: ProfitRow[] = paid.map((inv) => {
         const items = Array.isArray(inv.line_items) ? inv.line_items : [];
         const cogs = items.reduce((s, li) => {
-          const qty = Number(li.quantity ?? 1);
-          const cost = Number(li.unit_cost ?? 0);
-          return s + qty * cost;
+          const kind = String(li.kind ?? 'part').toLowerCase();
+          return kind === 'part' ? s + partCost(li) : s;
         }, 0);
         const apptId = inv.service_record_id ? apptByService.get(inv.service_record_id) : undefined;
         const info = apptId ? apptInfo.get(apptId) : undefined;
-        const paidLaborHours = info?.paidHours ?? 0;
+        const paidLaborHours = laborHoursFromInvoice(items, rate, Number(inv.subtotal || 0));
         const clockedHours = info?.clockedHours ?? 0;
         const varianceHours = clockedHours - paidLaborHours;
         // Prefer the tech assigned directly to the invoice (set when RO completes,
