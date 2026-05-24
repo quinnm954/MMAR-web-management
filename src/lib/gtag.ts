@@ -81,12 +81,8 @@ async function loadSettings(): Promise<Settings | null> {
   if (cached) return cached;
   if (pending) return pending;
   pending = (async () => {
-    const { data } = await supabase
-      .from("tracking_settings")
-      .select("google_ads_conversion_id,phone_call_label,text_click_label,quote_submit_label,lead_label,wcc_phone_number,wcc_conversion_id,dni_enabled")
-      .eq("id", 1)
-      .maybeSingle();
-    cached = (data as Settings) ?? null;
+    const { data } = await supabase.rpc("get_public_tracking_settings");
+    cached = (data as Settings | null) ?? null;
     // Configure DNI / Website Call Conversion if enabled
     if (cached?.dni_enabled && cached.wcc_conversion_id && cached.wcc_phone_number && cached.google_ads_conversion_id && typeof window !== "undefined" && window.gtag) {
       window.gtag("config", cached.google_ads_conversion_id, {
