@@ -2994,6 +2994,7 @@ export type Database = {
       }
       get_appointment_confirmation: { Args: { _token: string }; Returns: Json }
       get_estimate_by_token: { Args: { _token: string }; Returns: Json }
+      get_public_tracking_settings: { Args: never; Returns: Json }
       get_shared_customer_summary: { Args: { _token: string }; Returns: Json }
       has_role: {
         Args: {
