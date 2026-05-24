@@ -13,10 +13,11 @@ export const GtagRouteTracker = () => {
   const location = useLocation();
 
   useEffect(() => {
-    if (typeof window === "undefined" || typeof window.gtag !== "function") return;
+    const w = window as unknown as { gtag?: (...args: unknown[]) => void };
+    if (typeof w.gtag !== "function") return;
     const page_path = location.pathname + location.search;
     GA_IDS.forEach((id) => {
-      window.gtag!("config", id, { page_path });
+      w.gtag!("config", id, { page_path });
     });
   }, [location.pathname, location.search]);
 
