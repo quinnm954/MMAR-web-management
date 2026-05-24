@@ -77,6 +77,7 @@ const App = () => (
         <AuthProvider>
           <NativeBoot />
           <PullToRefresh />
+          <GtagRouteTracker />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/financing-contract" element={<FinancingContract />} />
