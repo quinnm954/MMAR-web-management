@@ -1,13 +1,6 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 
-declare global {
-  interface Window {
-    gtag?: (...args: any[]) => void;
-    dataLayer?: any[];
-  }
-}
-
 const GA_IDS = ["AW-17463969717", "AW-18160507059"];
 
 /**
