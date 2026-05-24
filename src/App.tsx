@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
+import { GtagRouteTracker } from "@/components/GtagRouteTracker";
 import Index from "./pages/Index";
 
 import FinancingContract from "./pages/FinancingContract";
@@ -77,6 +78,7 @@ const App = () => (
         <AuthProvider>
           <NativeBoot />
           <PullToRefresh />
+          <GtagRouteTracker />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/financing-contract" element={<FinancingContract />} />
