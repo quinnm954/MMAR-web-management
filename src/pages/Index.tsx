@@ -13,7 +13,9 @@ import HomeServicesOverview from "@/components/home/HomeServicesOverview";
 import PopularLocalServices from "@/components/home/PopularLocalServices";
 import HomeFAQ from "@/components/home/HomeFAQ";
 import LocalPhotoGallery from "@/components/home/LocalPhotoGallery";
+import VoiceSearchAnswers from "@/components/home/VoiceSearchAnswers";
 import FinalCTA from "@/components/home/FinalCTA";
+
 import { useSeo } from "@/lib/useSeo";
 
 const SITE = "https://mikesmautorepair.com";
@@ -108,11 +110,24 @@ const Index = () => {
           url: `${SITE}/`,
         })),
         {
+          "@type": "WebPage",
+          "@id": `${SITE}/#webpage`,
+          url: `${SITE}/`,
+          name: "Mobile Auto Repair Near Me — Lehigh Acres & Fort Myers, FL",
+          isPartOf: { "@id": `${SITE}/#business` },
+          speakable: {
+            "@type": "SpeakableSpecification",
+            cssSelector: ["#speakable-summary", ".speakable-answer"],
+            xpath: ["/html/head/title", "//*[@id='speakable-summary']"],
+          },
+        },
+        {
           "@type": "BreadcrumbList",
           itemListElement: [
             { "@type": "ListItem", position: 1, name: "Home", item: `${SITE}/` },
           ],
         },
+
       ],
     };
     const script = document.createElement("script");
@@ -138,7 +153,9 @@ const Index = () => {
       <PopularLocalServices />
       <LocalPhotoGallery />
       <HomeFAQ />
+      <VoiceSearchAnswers />
       <FinalCTA />
+
       <Footer />
       <FloatingCallButton />
     </div>
