@@ -153,7 +153,9 @@ const Index = () => {
       <PopularLocalServices />
       <LocalPhotoGallery />
       <HomeFAQ />
+      <VoiceSearchAnswers />
       <FinalCTA />
+
       <Footer />
       <FloatingCallButton />
     </div>
