@@ -13,7 +13,9 @@ import HomeServicesOverview from "@/components/home/HomeServicesOverview";
 import PopularLocalServices from "@/components/home/PopularLocalServices";
 import HomeFAQ from "@/components/home/HomeFAQ";
 import LocalPhotoGallery from "@/components/home/LocalPhotoGallery";
+import VoiceSearchAnswers from "@/components/home/VoiceSearchAnswers";
 import FinalCTA from "@/components/home/FinalCTA";
+
 import { useSeo } from "@/lib/useSeo";
 
 const SITE = "https://mikesmautorepair.com";
