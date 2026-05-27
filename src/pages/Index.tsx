@@ -110,11 +110,24 @@ const Index = () => {
           url: `${SITE}/`,
         })),
         {
+          "@type": "WebPage",
+          "@id": `${SITE}/#webpage`,
+          url: `${SITE}/`,
+          name: "Mobile Auto Repair Near Me — Lehigh Acres & Fort Myers, FL",
+          isPartOf: { "@id": `${SITE}/#business` },
+          speakable: {
+            "@type": "SpeakableSpecification",
+            cssSelector: ["#speakable-summary", ".speakable-answer"],
+            xpath: ["/html/head/title", "//*[@id='speakable-summary']"],
+          },
+        },
+        {
           "@type": "BreadcrumbList",
           itemListElement: [
             { "@type": "ListItem", position: 1, name: "Home", item: `${SITE}/` },
           ],
         },
+
       ],
     };
     const script = document.createElement("script");
