@@ -8,6 +8,15 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { Loader2, RefreshCw } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+
+type Preset = 'd' | 'w' | 'm' | 'y' | 'custom';
+type Granularity = 'day' | 'week' | 'month' | 'year';
+
+const PRESET_DAYS: Record<Exclude<Preset, 'custom'>, number> = { d: 1, w: 7, m: 30, y: 365 };
+const PRESET_GRAIN: Record<Exclude<Preset, 'custom'>, Granularity> = { d: 'day', w: 'day', m: 'week', y: 'month' };
+const PRESET_LABEL: Record<Preset, string> = { d: 'Today', w: 'This Week', m: 'This Month', y: 'This Year', custom: 'Custom' };
 
 type LineItem = { quantity?: number; unit_price?: number; unit_cost?: number; amount?: number; kind?: string; labor_hours?: number };
 
