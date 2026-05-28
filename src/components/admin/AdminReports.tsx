@@ -288,8 +288,7 @@ export default function AdminReports() {
 
   const perfTotals = useMemo(() => {
     const paidH = filteredRows.reduce((s, r) => s + r.paidLaborHours, 0);
-    const clockedH = filteredRows.reduce((s, r) => s + r.clockedHours, 0);
-    return { paidH, clockedH, variance: clockedH - paidH };
+    return { paidH };
   }, [filteredRows]);
 
   const totals = useMemo(() => {
