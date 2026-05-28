@@ -516,6 +516,27 @@ const AdminInvoices = () => {
                     />
                   </div>
                 </div>
+                {(paymentsByInvoice[i.id]?.length ?? 0) > 0 && (
+                  <div className="rounded-md border border-border/50 bg-muted/20 p-2 space-y-1">
+                    <div className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">
+                      Payments ({paymentsByInvoice[i.id].length})
+                    </div>
+                    {paymentsByInvoice[i.id].map((p) => (
+                      <div key={p.id} className="flex items-center justify-between text-xs">
+                        <div>
+                          <span className="font-semibold">${Number(p.amount).toFixed(2)}</span>
+                          <span className="text-muted-foreground"> · {p.method}</span>
+                          {p.reference && <span className="text-muted-foreground"> · {p.reference}</span>}
+                          <span className="text-muted-foreground"> · {new Date(p.paid_at).toLocaleDateString()}</span>
+                          {p.notes && <div className="text-[10px] text-muted-foreground italic">{p.notes}</div>}
+                        </div>
+                        <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => deletePayment(p.id)} title="Remove payment">
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
                 {replies.length > 0 && (
                   <div className="rounded-md border border-border/50 bg-muted/30 p-2 space-y-1">
                     <div className="flex items-center gap-1 text-[11px] font-semibold text-primary">
@@ -530,6 +551,7 @@ const AdminInvoices = () => {
                   </div>
                 )}
               </CardContent>
+
             </Card>
             );
           })}
