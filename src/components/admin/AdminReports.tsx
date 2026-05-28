@@ -389,8 +389,6 @@ export default function AdminReports() {
                 <TableHead>Customer</TableHead>
                 <TableHead>Technician</TableHead>
                 <TableHead className="text-right">Paid Labor (hrs)</TableHead>
-                <TableHead className="text-right">Clocked (hrs)</TableHead>
-                <TableHead className="text-right">Variance</TableHead>
                 <TableHead className="text-right">Revenue</TableHead>
                 <TableHead className="text-right">COGS</TableHead>
                 <TableHead className="text-right">Gross Profit</TableHead>
@@ -402,7 +400,7 @@ export default function AdminReports() {
             <TableBody>
               {filteredRows.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={13} className="text-center text-muted-foreground py-6">
+                  <TableCell colSpan={11} className="text-center text-muted-foreground py-6">
                     {profitRows.length === 0 ? 'No paid invoices in this window.' : 'No invoices for this technician.'}
                   </TableCell>
                 </TableRow>
@@ -414,10 +412,6 @@ export default function AdminReports() {
                     <TableCell className="text-xs">{r.customer}</TableCell>
                     <TableCell className="text-xs">{r.technician}</TableCell>
                     <TableCell className="text-right">{r.paidLaborHours.toFixed(2)}</TableCell>
-                    <TableCell className="text-right text-muted-foreground">{r.clockedHours.toFixed(2)}</TableCell>
-                    <TableCell className={`text-right font-medium ${r.varianceHours > 0 ? 'text-destructive' : r.varianceHours < 0 ? 'text-primary' : 'text-muted-foreground'}`} title={r.varianceHours > 0 ? 'Tech took longer than billed (over paid time)' : r.varianceHours < 0 ? 'Tech finished faster than billed (under paid time)' : 'On target'}>
-                      {r.varianceHours > 0 ? '+' : ''}{r.varianceHours.toFixed(2)}
-                    </TableCell>
                     <TableCell className="text-right">{fmt(r.revenue)}</TableCell>
                     <TableCell className="text-right">{fmt(r.cogs)}</TableCell>
                     <TableCell className={`text-right ${r.grossProfit < 0 ? 'text-destructive' : ''}`}>
