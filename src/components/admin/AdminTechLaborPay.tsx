@@ -38,6 +38,12 @@ const paidLaborHours = (items: any[], fallbackRate: number, fallbackSubtotal: nu
   return hours > 0 ? hours : (items.length === 0 && fallbackRate > 0 && fallbackSubtotal > 0 ? fallbackSubtotal / fallbackRate : 0);
 };
 
+const resolveTechId = (techId: string | null | undefined, employeeById: Map<string, any>) => {
+  if (!techId) return null;
+  const employee = employeeById.get(techId);
+  return employee?.user_id || employee?.id || techId;
+};
+
 export default function AdminTechLaborPay() {
   const [days, setDays] = useState<keyof typeof ranges>("30");
   const [loading, setLoading] = useState(true);
@@ -54,7 +60,7 @@ export default function AdminTechLaborPay() {
         supabase.from("user_roles").select("user_id").eq("role", "technician"),
         supabase.from("employees" as any).select("id, user_id, full_name, hourly_rate").eq("is_active", true),
       ]);
-      const rate = Number(settings?.labor_cost_per_hour ?? 35);
+      const rate = Number(settings?.labor_cost_per_hour) > 0 ? Number(settings?.labor_cost_per_hour) : 35;
       setLaborRate(rate);
 
       const { data: paidInvoices } = await supabase.from("invoices")
@@ -77,11 +83,15 @@ export default function AdminTechLaborPay() {
       }
 
       const employeeRows = ((employees ?? []) as any[]);
+      const employeeById = new Map<string, any>();
+      employeeRows.forEach((e: any) => {
+        if (e.id) employeeById.set(e.id, e);
+      });
       const techIds = new Set<string>();
       (techRoles ?? []).forEach((r: any) => { if (r.user_id) techIds.add(r.user_id); });
       employeeRows.forEach((e: any) => techIds.add(e.user_id || e.id));
       ((paidInvoices ?? []) as any[]).forEach((inv: any) => {
-        const tid = inv.technician_id ?? (inv.service_record_id ? techByService.get(inv.service_record_id) : null);
+        const tid = resolveTechId(inv.technician_id ?? (inv.service_record_id ? techByService.get(inv.service_record_id) : null), employeeById);
         if (tid) techIds.add(tid);
       });
       if (!techIds.size) { setRows([]); setLoading(false); return; }
@@ -99,7 +109,7 @@ export default function AdminTechLaborPay() {
 
       const agg: Record<string, { invoices: number; subtotal: number; hours: number }> = {};
       ((paidInvoices ?? []) as any[]).forEach((inv: any) => {
-        const techId = inv.technician_id ?? (inv.service_record_id ? techByService.get(inv.service_record_id) : null);
+        const techId = resolveTechId(inv.technician_id ?? (inv.service_record_id ? techByService.get(inv.service_record_id) : null), employeeById);
         if (!techId) return;
         if (!agg[techId]) agg[techId] = { invoices: 0, subtotal: 0, hours: 0 };
         agg[techId].invoices += 1;
