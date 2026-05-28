@@ -219,7 +219,10 @@ const VehicleMasterChecklist = ({ vehicleId, mode, customerId }: Props) => {
                         </div>
 
                         <div className="grid sm:grid-cols-3 gap-2 mt-3">
-                          <Select value={cur.status} onValueChange={(v) => setDraft(item.id, { status: v as MasterStatus })}>
+                          <Select
+                            value={cur.status}
+                            onValueChange={(v) => saveItemPatch(item.id, { status: v as MasterStatus })}
+                          >
                             <SelectTrigger><SelectValue /></SelectTrigger>
                             <SelectContent>
                               {STATUS_OPTIONS.map(s => (
@@ -231,11 +234,13 @@ const VehicleMasterChecklist = ({ vehicleId, mode, customerId }: Props) => {
                             placeholder="Measurement (e.g. 4mm)"
                             value={cur.measurement ?? ""}
                             onChange={(e) => setDraft(item.id, { measurement: e.target.value })}
+                            onBlur={() => flushDraft(item.id)}
                           />
                           <Input
                             placeholder={isAdmin ? "Tech / admin note" : "Your note (e.g. replaced at other shop)"}
                             value={(isAdmin ? cur.severity_note : cur.customer_note) ?? ""}
                             onChange={(e) => setDraft(item.id, isAdmin ? { severity_note: e.target.value } : { customer_note: e.target.value })}
+                            onBlur={() => flushDraft(item.id)}
                           />
                         </div>
                         {isAdmin && (
@@ -244,23 +249,22 @@ const VehicleMasterChecklist = ({ vehicleId, mode, customerId }: Props) => {
                             placeholder="Customer note (visible to customer)"
                             value={cur.customer_note ?? ""}
                             onChange={(e) => setDraft(item.id, { customer_note: e.target.value })}
+                            onBlur={() => flushDraft(item.id)}
                           />
                         )}
                         {!isAdmin && cur.severity_note && (
                           <div className="text-xs mt-2 p-2 rounded bg-muted">Tech note: {cur.severity_note}</div>
                         )}
 
-                        <div className="flex items-center justify-end gap-2 mt-2">
-                          {isAdmin && (
+                        {isAdmin && (
+                          <div className="flex items-center justify-end gap-2 mt-2">
                             <Button variant="ghost" size="sm" onClick={() => toggleHidden(item)} disabled={busy}>
                               {item.is_hidden ? "Unhide" : "Hide"}
                             </Button>
-                          )}
-                          <Button size="sm" disabled={!dirty || busy} onClick={() => saveItem(item)}>
-                            <Save className="h-4 w-4 mr-1" /> Save
-                          </Button>
-                        </div>
+                          </div>
+                        )}
                       </div>
+
                     );
                   })}
                 </AccordionContent>
