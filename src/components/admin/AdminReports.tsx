@@ -41,6 +41,7 @@ type ProfitRow = {
   id: string;
   invoice_number: string | null;
   date: string;
+  createdAt: string;
   customer: string;
   technician: string;
   paidLaborHours: number;   // billed to customer on the estimate (also drives tech pay)
