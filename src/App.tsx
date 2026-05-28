@@ -46,7 +46,7 @@ import NotFound from "./pages/NotFound";
 import Unsubscribe from "./pages/Unsubscribe";
 import MileageUpdate from "./pages/MileageUpdate";
 import TechDashboard from "./pages/tech/TechDashboard";
-import TechClock from "./pages/tech/TechClock";
+
 import TechInspections from "./pages/tech/TechInspections";
 import TechChecklists from "./pages/tech/TechChecklists";
 import PortalChecklists from "./pages/portal/PortalChecklists";
