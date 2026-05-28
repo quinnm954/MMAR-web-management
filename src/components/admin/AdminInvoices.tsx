@@ -482,6 +482,10 @@ const AdminInvoices = () => {
                     </Button>
                     {i.status !== "paid" && i.status !== "void" && (
                       <>
+                        <Button size="sm" variant="hero" onClick={() => openPayment(i)} title="Record a payment (cash, card, check, Zelle, split, etc.)">
+                          <DollarSign className="h-3 w-3 mr-1" />
+                          Record Payment
+                        </Button>
                         <Button size="sm" variant="outline" onClick={() => sharePaymentLink(i)} disabled={textingId === i.id} title="Share payment link">
                           {textingId === i.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Share2 className="h-3 w-3 mr-1" />}
                           Share
@@ -491,6 +495,12 @@ const AdminInvoices = () => {
                           Copy Link
                         </Button>
                       </>
+                    )}
+                    {i.status === "paid" && (i.amount_paid ?? 0) < i.total && (
+                      <Button size="sm" variant="outline" onClick={() => openPayment(i)} title="Add another payment">
+                        <DollarSign className="h-3 w-3 mr-1" />
+                        Add Payment
+                      </Button>
                     )}
                     <Select value={i.status} onValueChange={(v) => updateStatus(i.id, v)}>
                       <SelectTrigger className="h-8 w-28 text-xs"><SelectValue /></SelectTrigger>
