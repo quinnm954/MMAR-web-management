@@ -29,7 +29,7 @@ export default function RepairOrderDetail({ appointmentId, open, onClose }: Prop
   const [inspections, setInspections] = useState<any[]>([]);
   const [services, setServices] = useState<any[]>([]);
   const [invoices, setInvoices] = useState<any[]>([]);
-  const [timeEntries, setTimeEntries] = useState<any[]>([]);
+  
   const [techs, setTechs] = useState<{ id: string; name: string }[]>([]);
   const [techMap, setTechMap] = useState<Record<string, string>>({});
   const [assignHistory, setAssignHistory] = useState<any[]>([]);
