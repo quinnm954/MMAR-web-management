@@ -368,9 +368,7 @@ export default function AdminReports() {
   const summaryRows: SummaryRow[] = useMemo(() => {
     const map = new Map<string, SummaryRow>();
     filteredRows.forEach((r) => {
-      const inv = profitRows.find((p) => p.id === r.id);
-      // r.date is locale string; we need original timestamp — fall back to today
-      const iso = inv ? new Date(inv.date).toISOString() : new Date().toISOString();
+      const iso = r.createdAt;
       const b = bucketKey(iso);
       const cur = map.get(b.key) ?? {
         key: b.key, label: b.label, sortKey: b.sortKey,
