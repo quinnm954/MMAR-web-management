@@ -225,8 +225,6 @@ export default function AdminReports() {
           customer: cust?.full_name || cust?.email || '—',
           technician: tech?.full_name ?? techProfile?.full_name ?? techProfile?.email ?? (techId ? 'Linked tech missing employee row' : '—'),
           paidLaborHours,
-          clockedHours,
-          varianceHours,
           revenue: revenueRow,
           cogs,
           employeeCost,
