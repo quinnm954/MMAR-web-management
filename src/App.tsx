@@ -128,7 +128,7 @@ const App = () => (
             <Route path="/unsubscribe" element={<Unsubscribe />} />
             <Route path="/m/:token" element={<MileageUpdate />} />
             <Route path="/tech" element={<TechProtectedRoute><TechDashboard /></TechProtectedRoute>} />
-            <Route path="/tech/clock" element={<TechProtectedRoute><TechClock /></TechProtectedRoute>} />
+            
             <Route path="/tech/inspections" element={<TechProtectedRoute><TechInspections /></TechProtectedRoute>} />
             <Route path="/tech/checklists" element={<TechProtectedRoute><TechChecklists /></TechProtectedRoute>} />
             <Route path="/tech/checklists/:id" element={<TechProtectedRoute><TechChecklists /></TechProtectedRoute>} />
