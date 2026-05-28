@@ -104,7 +104,12 @@ export default function AdminReports() {
 
   const [profitRows, setProfitRows] = useState<ProfitRow[]>([]);
   const [defaultRate, setDefaultRate] = useState<number>(35);
-  const [days, setDays] = useState<number>(30);
+  const [preset, setPreset] = useState<Preset>('m');
+  const [customDays, setCustomDays] = useState<number>(30);
+  const days = preset === 'custom' ? customDays : PRESET_DAYS[preset];
+  const granularity: Granularity = preset === 'custom'
+    ? (customDays <= 2 ? 'day' : customDays <= 31 ? 'week' : customDays <= 180 ? 'month' : 'year')
+    : PRESET_GRAIN[preset];
   const [techFilter, setTechFilter] = useState<string>('all');
 
   const [syncing, setSyncing] = useState(false);
