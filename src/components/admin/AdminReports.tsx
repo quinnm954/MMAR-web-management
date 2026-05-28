@@ -392,17 +392,39 @@ export default function AdminReports() {
   return (
     <div className="space-y-4">
       <div className="flex items-end justify-between flex-wrap gap-3">
-        <h2 className="font-display text-xl">Last {days} Days</h2>
-        <div className="flex items-end gap-2">
+        <div>
+          <h2 className="font-display text-xl">{PRESET_LABEL[preset]}{preset === 'custom' ? ` · Last ${days} days` : ''}</h2>
+          <p className="text-xs text-muted-foreground">
+            Grouped by {granularity} · {filteredRows.length} paid invoice{filteredRows.length === 1 ? '' : 's'}
+          </p>
+        </div>
+        <div className="flex items-end gap-2 flex-wrap">
           <div>
-            <Label className="text-xs">Window (days)</Label>
-            <Input
-              type="number"
-              value={days}
-              onChange={(e) => setDays(Math.max(1, parseInt(e.target.value) || 30))}
-              className="w-24 h-9"
-            />
+            <Label className="text-xs">Period</Label>
+            <ToggleGroup
+              type="single"
+              value={preset}
+              onValueChange={(v) => v && setPreset(v as Preset)}
+              className="h-9"
+            >
+              <ToggleGroupItem value="d" className="h-9 px-3">D</ToggleGroupItem>
+              <ToggleGroupItem value="w" className="h-9 px-3">W</ToggleGroupItem>
+              <ToggleGroupItem value="m" className="h-9 px-3">M</ToggleGroupItem>
+              <ToggleGroupItem value="y" className="h-9 px-3">Y</ToggleGroupItem>
+              <ToggleGroupItem value="custom" className="h-9 px-3">Custom</ToggleGroupItem>
+            </ToggleGroup>
           </div>
+          {preset === 'custom' && (
+            <div>
+              <Label className="text-xs">Days</Label>
+              <Input
+                type="number"
+                value={customDays}
+                onChange={(e) => setCustomDays(Math.max(1, parseInt(e.target.value) || 30))}
+                className="w-24 h-9"
+              />
+            </div>
+          )}
           <div>
             <Label className="text-xs">Technician</Label>
             <Select value={techFilter} onValueChange={setTechFilter}>
@@ -439,15 +461,6 @@ export default function AdminReports() {
         <KPI label="Billable Labor Hrs" value={String(data.techHours)} />
       </div>
 
-      <h2 className="font-display text-xl pt-2">Profit by Invoice (paid)</h2>
-      <p className="text-xs text-muted-foreground -mt-2">
-        Gross profit = gross revenue − cost of goods. Net profit = gross profit − cost of employees − Stripe fees.
-        Technician is taken from the repair order assignment and carried through to the paid invoice. Employee cost
-        uses each technician's per-employee hourly rate from the Employees tab × <strong>paid labor hours</strong>{' '}
-        (from the estimate). Default rate ${defaultRate.toFixed(2)}/hr is used when no employee record exists.
-        Stripe fees use the actual amount Stripe charged per payment when synced; otherwise an estimate of
-        2.9% + $0.30 is used as a fallback.
-      </p>
       <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
         <KPI label="Gross Revenue" value={fmt(totals.revenue)} />
         <KPI label="Cost of Goods" value={fmt(totals.cogs)} />
@@ -460,59 +473,124 @@ export default function AdminReports() {
         <KPI label={`Paid Labor Hrs${techFilter !== 'all' ? ` · ${techFilter}` : ''}`} value={perfTotals.paidH.toFixed(2)} />
       </div>
 
-      <Card>
-        <CardContent className="p-0 overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Invoice</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Customer</TableHead>
-                <TableHead>Technician</TableHead>
-                <TableHead className="text-right">Paid Labor (hrs)</TableHead>
-                <TableHead className="text-right">Revenue</TableHead>
-                <TableHead className="text-right">COGS</TableHead>
-                <TableHead className="text-right">Gross Profit</TableHead>
-                <TableHead className="text-right">Employee Cost</TableHead>
-                <TableHead className="text-right">Stripe Fees</TableHead>
-                <TableHead className="text-right">Net Profit</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredRows.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={11} className="text-center text-muted-foreground py-6">
-                    {profitRows.length === 0 ? 'No paid invoices in this window.' : 'No invoices for this technician.'}
-                  </TableCell>
-                </TableRow>
-              ) : (
-                filteredRows.map((r) => (
-                  <TableRow key={r.id}>
-                    <TableCell className="font-mono text-xs">{r.invoice_number ?? r.id.slice(0, 8)}</TableCell>
-                    <TableCell className="text-xs">{r.date}</TableCell>
-                    <TableCell className="text-xs">{r.customer}</TableCell>
-                    <TableCell className="text-xs">{r.technician}</TableCell>
-                    <TableCell className="text-right">{r.paidLaborHours.toFixed(2)}</TableCell>
-                    <TableCell className="text-right">{fmt(r.revenue)}</TableCell>
-                    <TableCell className="text-right">{fmt(r.cogs)}</TableCell>
-                    <TableCell className={`text-right ${r.grossProfit < 0 ? 'text-destructive' : ''}`}>
-                      {fmt(r.grossProfit)}
-                    </TableCell>
-                    <TableCell className="text-right">{fmt(r.employeeCost)}</TableCell>
-                    <TableCell className="text-right" title={r.stripeFeeIsActual ? 'Actual fee from Stripe' : 'Estimated (not yet synced)'}>
-                      {fmt(r.stripeFee)}
-                      {!r.stripeFeeIsActual && r.stripeFee > 0 && <span className="text-muted-foreground ml-1">~</span>}
-                    </TableCell>
-                    <TableCell className={`text-right font-semibold ${r.netProfit < 0 ? 'text-destructive' : 'text-primary'}`}>
-                      {fmt(r.netProfit)}
-                    </TableCell>
+      <Tabs defaultValue="summary" className="w-full">
+        <TabsList>
+          <TabsTrigger value="summary">Summary</TabsTrigger>
+          <TabsTrigger value="detail">Detail</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="summary" className="space-y-2">
+          <p className="text-xs text-muted-foreground">
+            Totals rolled up by {granularity}. Each row aggregates every paid invoice that landed in that bucket.
+          </p>
+          <Card>
+            <CardContent className="p-0 overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Period</TableHead>
+                    <TableHead className="text-right">Invoices</TableHead>
+                    <TableHead className="text-right">Labor (hrs)</TableHead>
+                    <TableHead className="text-right">Revenue</TableHead>
+                    <TableHead className="text-right">COGS</TableHead>
+                    <TableHead className="text-right">Gross Profit</TableHead>
+                    <TableHead className="text-right">Employee Cost</TableHead>
+                    <TableHead className="text-right">Stripe Fees</TableHead>
+                    <TableHead className="text-right">Net Profit</TableHead>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+                </TableHeader>
+                <TableBody>
+                  {summaryRows.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={9} className="text-center text-muted-foreground py-6">
+                        No paid invoices in this window.
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    summaryRows.map((s) => (
+                      <TableRow key={s.key}>
+                        <TableCell className="text-xs font-medium">{s.label}</TableCell>
+                        <TableCell className="text-right">{s.invoices}</TableCell>
+                        <TableCell className="text-right">{s.paidLaborHours.toFixed(2)}</TableCell>
+                        <TableCell className="text-right">{fmt(s.revenue)}</TableCell>
+                        <TableCell className="text-right">{fmt(s.cogs)}</TableCell>
+                        <TableCell className={`text-right ${s.grossProfit < 0 ? 'text-destructive' : ''}`}>{fmt(s.grossProfit)}</TableCell>
+                        <TableCell className="text-right">{fmt(s.employeeCost)}</TableCell>
+                        <TableCell className="text-right">{fmt(s.stripeFee)}</TableCell>
+                        <TableCell className={`text-right font-semibold ${s.netProfit < 0 ? 'text-destructive' : 'text-primary'}`}>
+                          {fmt(s.netProfit)}
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="detail" className="space-y-2">
+          <p className="text-xs text-muted-foreground">
+            One row per paid invoice. Gross profit = revenue − cost of goods. Net profit = gross − cost of employees − Stripe fees.
+            Employee cost uses the technician's hourly rate from Employees × <strong>paid labor hours</strong> from the estimate
+            (default ${defaultRate.toFixed(2)}/hr when no employee record). Stripe fees use the actual amount when synced, else
+            an estimate of 2.9% + $0.30.
+          </p>
+          <Card>
+            <CardContent className="p-0 overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Invoice</TableHead>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Customer</TableHead>
+                    <TableHead>Technician</TableHead>
+                    <TableHead className="text-right">Paid Labor (hrs)</TableHead>
+                    <TableHead className="text-right">Revenue</TableHead>
+                    <TableHead className="text-right">COGS</TableHead>
+                    <TableHead className="text-right">Gross Profit</TableHead>
+                    <TableHead className="text-right">Employee Cost</TableHead>
+                    <TableHead className="text-right">Stripe Fees</TableHead>
+                    <TableHead className="text-right">Net Profit</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredRows.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={11} className="text-center text-muted-foreground py-6">
+                        {profitRows.length === 0 ? 'No paid invoices in this window.' : 'No invoices for this technician.'}
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    filteredRows.map((r) => (
+                      <TableRow key={r.id}>
+                        <TableCell className="font-mono text-xs">{r.invoice_number ?? r.id.slice(0, 8)}</TableCell>
+                        <TableCell className="text-xs">{r.date}</TableCell>
+                        <TableCell className="text-xs">{r.customer}</TableCell>
+                        <TableCell className="text-xs">{r.technician}</TableCell>
+                        <TableCell className="text-right">{r.paidLaborHours.toFixed(2)}</TableCell>
+                        <TableCell className="text-right">{fmt(r.revenue)}</TableCell>
+                        <TableCell className="text-right">{fmt(r.cogs)}</TableCell>
+                        <TableCell className={`text-right ${r.grossProfit < 0 ? 'text-destructive' : ''}`}>
+                          {fmt(r.grossProfit)}
+                        </TableCell>
+                        <TableCell className="text-right">{fmt(r.employeeCost)}</TableCell>
+                        <TableCell className="text-right" title={r.stripeFeeIsActual ? 'Actual fee from Stripe' : 'Estimated (not yet synced)'}>
+                          {fmt(r.stripeFee)}
+                          {!r.stripeFeeIsActual && r.stripeFee > 0 && <span className="text-muted-foreground ml-1">~</span>}
+                        </TableCell>
+                        <TableCell className={`text-right font-semibold ${r.netProfit < 0 ? 'text-destructive' : 'text-primary'}`}>
+                          {fmt(r.netProfit)}
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
 
       <h2 className="font-display text-xl pt-2">Parts Profitability (paid invoices)</h2>
       <p className="text-xs text-muted-foreground -mt-2">
