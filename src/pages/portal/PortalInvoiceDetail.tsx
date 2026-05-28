@@ -51,6 +51,7 @@ const PortalInvoiceDetail = () => {
   const [inv, setInv] = useState<Invoice | null>(null);
   const [customer, setCustomer] = useState<any>(null);
   const [vehicle, setVehicle] = useState<any>(null);
+  const [payments, setPayments] = useState<Array<{ id: string; amount: number; method: string; reference: string | null; paid_at: string }>>([]);
   const [loading, setLoading] = useState(true);
   const [paying, setPaying] = useState(false);
 
@@ -69,10 +70,17 @@ const PortalInvoiceDetail = () => {
             setVehicle(v);
           }
         }
+        const { data: pays } = await supabase
+          .from("invoice_payments" as any)
+          .select("id, amount, method, reference, paid_at")
+          .eq("invoice_id", data.id)
+          .order("paid_at", { ascending: true });
+        setPayments(((pays as any[]) ?? []) as any);
       }
       setLoading(false);
     })();
   }, [user, id]);
+
 
   const pay = async () => {
     if (!inv) return;
