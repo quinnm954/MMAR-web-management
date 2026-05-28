@@ -114,7 +114,9 @@ export default function AdminEmployees() {
   };
 
   const save = async () => {
-    if (!form.full_name.trim()) {
+    const fullName = form.full_name.trim();
+    const normalizedEmail = form.email?.trim().toLowerCase() || null;
+    if (!fullName) {
       toast.error('Name required');
       return;
     }
@@ -124,7 +126,7 @@ export default function AdminEmployees() {
 
       // Optionally provision an auth login for this employee
       if (!form.id && createLogin) {
-        if (!form.email?.trim()) {
+        if (!normalizedEmail) {
           toast.error('Email is required to create a login account');
           setSaving(false);
           return;
@@ -138,8 +140,8 @@ export default function AdminEmployees() {
         }
         const { data, error } = await supabase.functions.invoke('admin-create-employee-user', {
           body: {
-            email: form.email.trim(),
-            full_name: form.full_name,
+            email: normalizedEmail,
+            full_name: fullName,
             employee_type: form.employee_type,
           },
         });
@@ -156,10 +158,42 @@ export default function AdminEmployees() {
         );
       }
 
+      if (!linkedUserId && normalizedEmail) {
+        const { data: matchingProfiles } = await supabase
+          .from('profiles')
+          .select('id')
+          .ilike('email', normalizedEmail)
+          .limit(1);
+        linkedUserId = (matchingProfiles?.[0] as any)?.id ?? null;
+      }
+
+      let saveId = form.id;
+      if (!saveId && linkedUserId) {
+        const { data: linkedEmployees } = await supabase
+          .from('employees' as any)
+          .select('id, user_id')
+          .eq('user_id', linkedUserId)
+          .limit(1);
+        saveId = (linkedEmployees?.[0] as any)?.id ?? '';
+      }
+
+      if (!saveId && normalizedEmail) {
+        const { data: matchingEmployees } = await supabase
+          .from('employees' as any)
+          .select('id, user_id')
+          .ilike('email', normalizedEmail)
+          .limit(1);
+        const existingEmployee = matchingEmployees?.[0] as any;
+        if (existingEmployee?.id) {
+          saveId = existingEmployee.id;
+          linkedUserId = existingEmployee.user_id || linkedUserId;
+        }
+      }
+
       const payload: any = {
-        full_name: form.full_name,
-        email: form.email || null,
-        phone: form.phone || null,
+        full_name: fullName,
+        email: normalizedEmail,
+        phone: form.phone?.trim() || null,
         employee_type: form.employee_type,
         pay_basis: form.pay_basis,
         hourly_rate: Number(form.hourly_rate) || 0,
@@ -168,8 +202,8 @@ export default function AdminEmployees() {
         notes: form.notes || null,
         user_id: linkedUserId,
       };
-      const q = form.id
-        ? supabase.from('employees' as any).update(payload).eq('id', form.id)
+      const q = saveId
+        ? supabase.from('employees' as any).update(payload).eq('id', saveId)
         : supabase.from('employees' as any).insert(payload);
       const { error } = await q;
       if (error) {
@@ -177,7 +211,15 @@ export default function AdminEmployees() {
         setSaving(false);
         return;
       }
-      toast.success('Saved');
+
+      if (linkedUserId) {
+        await supabase
+          .from('profiles')
+          .update({ full_name: fullName, email: normalizedEmail })
+          .eq('id', linkedUserId);
+      }
+
+      toast.success(!form.id && saveId ? 'Updated existing employee' : 'Saved');
       setOpen(false);
       load();
     } finally {

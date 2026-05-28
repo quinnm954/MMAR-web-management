@@ -122,7 +122,8 @@ export default function AdminReports() {
       const paid = allInvoices.filter((i) => i.status === 'paid');
       const revenue = paid.reduce((s, i) => s + Number(i.total || 0), 0);
 
-      const rate = Number((settings.data as any)?.labor_cost_per_hour ?? 35);
+      const configuredRate = Number((settings.data as any)?.labor_cost_per_hour);
+      const rate = configuredRate > 0 ? configuredRate : 35;
       setDefaultRate(rate);
 
       // Employee map by user_id
