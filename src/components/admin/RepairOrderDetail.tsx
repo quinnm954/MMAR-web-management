@@ -44,14 +44,13 @@ export default function RepairOrderDetail({ appointmentId, open, onClose }: Prop
       if (!active) return;
       setAppt(a);
       if (a) {
-        const [{ data: c }, { data: v }, { data: est }, { data: insp }, { data: sr }, { data: inv }, { data: te }] = await Promise.all([
+        const [{ data: c }, { data: v }, { data: est }, { data: insp }, { data: sr }, { data: inv }] = await Promise.all([
           supabase.from("profiles").select("*").eq("id", a.customer_id).maybeSingle(),
           a.vehicle_id ? supabase.from("vehicles").select("*").eq("id", a.vehicle_id).maybeSingle() : Promise.resolve({ data: null }),
           supabase.from("estimates").select("*").eq("appointment_id", a.id).order("created_at", { ascending: false }),
           supabase.from("inspections").select("*").eq("appointment_id", a.id).order("created_at", { ascending: false }),
           supabase.from("service_records").select("*").eq("appointment_id", a.id).order("created_at", { ascending: false }),
           supabase.from("invoices").select("*").in("service_record_id", []).order("created_at", { ascending: false }), // placeholder
-          supabase.from("time_entries").select("*").eq("appointment_id", a.id).order("clock_in", { ascending: false }),
         ]);
         if (!active) return;
         setCustomer(c);
@@ -59,7 +58,6 @@ export default function RepairOrderDetail({ appointmentId, open, onClose }: Prop
         setEstimates(est || []);
         setInspections(insp || []);
         setServices(sr || []);
-        setTimeEntries(te || []);
         // load invoices linked to this appt's service records
         const srIds = (sr || []).map((r: any) => r.id);
         if (srIds.length) {
