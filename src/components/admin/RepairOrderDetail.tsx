@@ -530,30 +530,8 @@ export default function RepairOrderDetail({ appointmentId, open, onClose }: Prop
               ))}
             </Section>
 
-            {/* Time entries */}
-            <Section
-              icon={Clock}
-              title={`Labor Time (${(totalLaborMinutes / 60).toFixed(2)} hrs)`}
-              action={
-                targetEstimate && totalLaborMinutes > 0 ? (
-                  <Button size="sm" variant="outline" onClick={applyLaborToEstimate} disabled={applyingHours}>
-                    {applyingHours ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : <FileSpreadsheet className="h-3 w-3 mr-1" />}
-                    Apply to estimate
-                  </Button>
-                ) : null
-              }
-            >
-              {timeEntries.length === 0 && <Empty>No time clocked.</Empty>}
-              {timeEntries.map((t) => (
-                <Row key={t.id}>
-                  <div className="text-sm">
-                    {format(new Date(t.clock_in), "MMM d, p")}
-                    {t.clock_out && ` → ${format(new Date(t.clock_out), "p")}`}
-                  </div>
-                  <div className="text-sm">{t.duration_minutes ? `${t.duration_minutes} min` : "active"}</div>
-                </Row>
-              ))}
-            </Section>
+
+
 
             {/* Invoices */}
             <Section
