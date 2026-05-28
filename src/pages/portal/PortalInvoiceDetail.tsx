@@ -191,6 +191,19 @@ const PortalInvoiceDetail = () => {
           )}
         </div>
 
+        {payments.length > 0 && (
+          <div className="mt-4 ml-auto sm:w-72 text-xs space-y-1">
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Payment History</div>
+            {payments.map((p) => (
+              <div key={p.id} className="flex justify-between border-t border-border/60 pt-1">
+                <span>{new Date(p.paid_at).toLocaleDateString()} · {p.method}{p.reference ? ` · ${p.reference}` : ""}</span>
+                <span className="font-medium">${Number(p.amount).toFixed(2)}</span>
+              </div>
+            ))}
+          </div>
+        )}
+
+
         {/* Pay / Paid */}
         <div className="mt-6">
           {isPaid ? (
