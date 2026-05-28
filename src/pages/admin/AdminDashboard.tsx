@@ -33,7 +33,6 @@ import AdminInspections from '@/components/admin/AdminInspections';
 import AdminCatalog from '@/components/admin/AdminCatalog';
 import AdminShopSettings from '@/components/admin/AdminShopSettings';
 import AdminKanban from '@/components/admin/AdminKanban';
-import AdminTimeTracking from '@/components/admin/AdminTimeTracking';
 import AdminReports from '@/components/admin/AdminReports';
 import AdminSalesDashboard from '@/components/admin/AdminSalesDashboard';
 import AdminCustomerShare from '@/components/admin/AdminCustomerShare';
@@ -42,8 +41,6 @@ import AdminDeclinedWork from '@/components/admin/AdminDeclinedWork';
 import AdminQuickBooksExport from '@/components/admin/AdminQuickBooksExport';
 import AdminRepairOrders from '@/components/admin/AdminRepairOrders';
 import AdminCalendar from '@/components/admin/AdminCalendar';
-import AdminTechProductivity from '@/components/admin/AdminTechProductivity';
-import AdminShifts from '@/components/admin/AdminShifts';
 import AdminTechLaborPay from '@/components/admin/AdminTechLaborPay';
 import AdminChecklists from '@/components/admin/AdminChecklists';
 import AdminVehicleHealth from '@/components/admin/AdminVehicleHealth';
@@ -152,10 +149,7 @@ const AdminDashboard = () => {
             { value: 'vehicle-health', label: 'Vehicle Health', icon: ClipboardList, roles: ADVISOR, content: <AdminVehicleHealth /> },
             { value: 'invoices', label: 'Invoices', icon: Receipt, roles: ADVISOR, content: <AdminInvoices /> },
             { value: 'catalog', label: 'Catalog', icon: Package, roles: PARTS, content: <AdminCatalog /> },
-            { value: 'time', label: 'RO Time', icon: Clock, roles: ADMIN_ONLY, content: <AdminTimeTracking /> },
-            { value: 'shifts', label: 'Shifts', icon: Clock, roles: ADMIN_ONLY, content: <AdminShifts /> },
             { value: 'laborpay', label: 'Labor Pay', icon: DollarSign, roles: ADMIN_ONLY, content: <AdminTechLaborPay /> },
-            { value: 'productivity', label: 'Productivity', icon: Activity, roles: ADMIN_ONLY, content: <AdminTechProductivity /> },
             { value: 'share', label: 'Share', icon: Share2, roles: ADVISOR, content: <AdminCustomerShare /> },
             { value: 'declined', label: 'Declined', icon: AlertTriangle, roles: ADVISOR, content: <AdminDeclinedWork /> },
             { value: 'quickbooks', label: 'QuickBooks', icon: FileDown, roles: ADMIN_ONLY, content: <AdminQuickBooksExport /> },

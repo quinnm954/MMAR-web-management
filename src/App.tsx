@@ -46,7 +46,7 @@ import NotFound from "./pages/NotFound";
 import Unsubscribe from "./pages/Unsubscribe";
 import MileageUpdate from "./pages/MileageUpdate";
 import TechDashboard from "./pages/tech/TechDashboard";
-import TechClock from "./pages/tech/TechClock";
+
 import TechInspections from "./pages/tech/TechInspections";
 import TechChecklists from "./pages/tech/TechChecklists";
 import PortalChecklists from "./pages/portal/PortalChecklists";
@@ -128,7 +128,7 @@ const App = () => (
             <Route path="/unsubscribe" element={<Unsubscribe />} />
             <Route path="/m/:token" element={<MileageUpdate />} />
             <Route path="/tech" element={<TechProtectedRoute><TechDashboard /></TechProtectedRoute>} />
-            <Route path="/tech/clock" element={<TechProtectedRoute><TechClock /></TechProtectedRoute>} />
+            
             <Route path="/tech/inspections" element={<TechProtectedRoute><TechInspections /></TechProtectedRoute>} />
             <Route path="/tech/checklists" element={<TechProtectedRoute><TechChecklists /></TechProtectedRoute>} />
             <Route path="/tech/checklists/:id" element={<TechProtectedRoute><TechChecklists /></TechProtectedRoute>} />

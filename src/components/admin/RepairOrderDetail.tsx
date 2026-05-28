@@ -29,7 +29,7 @@ export default function RepairOrderDetail({ appointmentId, open, onClose }: Prop
   const [inspections, setInspections] = useState<any[]>([]);
   const [services, setServices] = useState<any[]>([]);
   const [invoices, setInvoices] = useState<any[]>([]);
-  const [timeEntries, setTimeEntries] = useState<any[]>([]);
+  
   const [techs, setTechs] = useState<{ id: string; name: string }[]>([]);
   const [techMap, setTechMap] = useState<Record<string, string>>({});
   const [assignHistory, setAssignHistory] = useState<any[]>([]);
@@ -44,14 +44,13 @@ export default function RepairOrderDetail({ appointmentId, open, onClose }: Prop
       if (!active) return;
       setAppt(a);
       if (a) {
-        const [{ data: c }, { data: v }, { data: est }, { data: insp }, { data: sr }, { data: inv }, { data: te }] = await Promise.all([
+        const [{ data: c }, { data: v }, { data: est }, { data: insp }, { data: sr }, { data: inv }] = await Promise.all([
           supabase.from("profiles").select("*").eq("id", a.customer_id).maybeSingle(),
           a.vehicle_id ? supabase.from("vehicles").select("*").eq("id", a.vehicle_id).maybeSingle() : Promise.resolve({ data: null }),
           supabase.from("estimates").select("*").eq("appointment_id", a.id).order("created_at", { ascending: false }),
           supabase.from("inspections").select("*").eq("appointment_id", a.id).order("created_at", { ascending: false }),
           supabase.from("service_records").select("*").eq("appointment_id", a.id).order("created_at", { ascending: false }),
           supabase.from("invoices").select("*").in("service_record_id", []).order("created_at", { ascending: false }), // placeholder
-          supabase.from("time_entries").select("*").eq("appointment_id", a.id).order("clock_in", { ascending: false }),
         ]);
         if (!active) return;
         setCustomer(c);
@@ -59,7 +58,6 @@ export default function RepairOrderDetail({ appointmentId, open, onClose }: Prop
         setEstimates(est || []);
         setInspections(insp || []);
         setServices(sr || []);
-        setTimeEntries(te || []);
         // load invoices linked to this appt's service records
         const srIds = (sr || []).map((r: any) => r.id);
         if (srIds.length) {
@@ -109,7 +107,7 @@ export default function RepairOrderDetail({ appointmentId, open, onClose }: Prop
     };
   }, [appointmentId, open]);
 
-  const totalLaborMinutes = timeEntries.reduce((s, t) => s + (t.duration_minutes || 0), 0);
+  const totalLaborMinutes = 0;
   const totalInvoiced = invoices.reduce((s, i) => s + Number(i.total || 0), 0);
   const totalPaid = invoices.reduce((s, i) => s + Number(i.amount_paid || 0), 0);
   const approvedEstimate = estimates.find((e: any) => e.status === 'approved' || e.status === 'partially_approved' || e.status === 'converted');
@@ -532,30 +530,8 @@ export default function RepairOrderDetail({ appointmentId, open, onClose }: Prop
               ))}
             </Section>
 
-            {/* Time entries */}
-            <Section
-              icon={Clock}
-              title={`Labor Time (${(totalLaborMinutes / 60).toFixed(2)} hrs)`}
-              action={
-                targetEstimate && totalLaborMinutes > 0 ? (
-                  <Button size="sm" variant="outline" onClick={applyLaborToEstimate} disabled={applyingHours}>
-                    {applyingHours ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : <FileSpreadsheet className="h-3 w-3 mr-1" />}
-                    Apply to estimate
-                  </Button>
-                ) : null
-              }
-            >
-              {timeEntries.length === 0 && <Empty>No time clocked.</Empty>}
-              {timeEntries.map((t) => (
-                <Row key={t.id}>
-                  <div className="text-sm">
-                    {format(new Date(t.clock_in), "MMM d, p")}
-                    {t.clock_out && ` → ${format(new Date(t.clock_out), "p")}`}
-                  </div>
-                  <div className="text-sm">{t.duration_minutes ? `${t.duration_minutes} min` : "active"}</div>
-                </Row>
-              ))}
-            </Section>
+
+
 
             {/* Invoices */}
             <Section
