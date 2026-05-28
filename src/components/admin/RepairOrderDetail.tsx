@@ -107,7 +107,7 @@ export default function RepairOrderDetail({ appointmentId, open, onClose }: Prop
     };
   }, [appointmentId, open]);
 
-  const totalLaborMinutes = timeEntries.reduce((s, t) => s + (t.duration_minutes || 0), 0);
+  const totalLaborMinutes = 0;
   const totalInvoiced = invoices.reduce((s, i) => s + Number(i.total || 0), 0);
   const totalPaid = invoices.reduce((s, i) => s + Number(i.amount_paid || 0), 0);
   const approvedEstimate = estimates.find((e: any) => e.status === 'approved' || e.status === 'partially_approved' || e.status === 'converted');
