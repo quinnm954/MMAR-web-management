@@ -237,6 +237,7 @@ export default function AdminReports() {
           id: inv.id,
           invoice_number: inv.invoice_number,
           date: new Date(inv.created_at).toLocaleDateString(),
+          createdAt: inv.created_at,
           customer: cust?.full_name || cust?.email || '—',
           technician: tech?.full_name ?? techProfile?.full_name ?? techProfile?.email ?? (techId ? 'Linked tech missing employee row' : '—'),
           paidLaborHours,
