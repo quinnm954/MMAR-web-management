@@ -200,8 +200,6 @@ export default function AdminReports() {
         const apptId = inv.service_record_id ? apptByService.get(inv.service_record_id) : undefined;
         const info = apptId ? apptInfo.get(apptId) : undefined;
         const paidLaborHours = laborHoursFromInvoice(items, rate, Number(inv.subtotal || 0));
-        const clockedHours = info?.clockedHours ?? 0;
-        const varianceHours = clockedHours - paidLaborHours;
         // Prefer the tech assigned directly to the invoice (set when RO completes,
         // editable from Admin → Invoices), and fall back to the appointment.
         const techId = (inv as any).technician_id ?? info?.tech ?? null;
