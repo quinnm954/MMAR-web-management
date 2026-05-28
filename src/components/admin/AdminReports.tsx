@@ -320,6 +320,75 @@ export default function AdminReports() {
     );
   }, [filteredRows]);
 
+  // Group rows into time buckets for the summary view
+  const bucketKey = (iso: string): { key: string; label: string; sortKey: string } => {
+    const d = new Date(iso);
+    if (granularity === 'day') {
+      const k = d.toISOString().slice(0, 10);
+      return { key: k, label: d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }), sortKey: k };
+    }
+    if (granularity === 'week') {
+      const day = d.getDay();
+      const monday = new Date(d);
+      monday.setDate(d.getDate() - ((day + 6) % 7));
+      monday.setHours(0, 0, 0, 0);
+      const sunday = new Date(monday);
+      sunday.setDate(monday.getDate() + 6);
+      const k = monday.toISOString().slice(0, 10);
+      return {
+        key: k,
+        label: `${monday.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} – ${sunday.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`,
+        sortKey: k,
+      };
+    }
+    if (granularity === 'month') {
+      const k = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      return { key: k, label: d.toLocaleDateString(undefined, { month: 'long', year: 'numeric' }), sortKey: k };
+    }
+    const k = String(d.getFullYear());
+    return { key: k, label: k, sortKey: k };
+  };
+
+  type SummaryRow = {
+    key: string;
+    label: string;
+    sortKey: string;
+    invoices: number;
+    paidLaborHours: number;
+    revenue: number;
+    cogs: number;
+    grossProfit: number;
+    employeeCost: number;
+    stripeFee: number;
+    netProfit: number;
+  };
+
+  const summaryRows: SummaryRow[] = useMemo(() => {
+    const map = new Map<string, SummaryRow>();
+    filteredRows.forEach((r) => {
+      const inv = profitRows.find((p) => p.id === r.id);
+      // r.date is locale string; we need original timestamp — fall back to today
+      const iso = inv ? new Date(inv.date).toISOString() : new Date().toISOString();
+      const b = bucketKey(iso);
+      const cur = map.get(b.key) ?? {
+        key: b.key, label: b.label, sortKey: b.sortKey,
+        invoices: 0, paidLaborHours: 0, revenue: 0, cogs: 0,
+        grossProfit: 0, employeeCost: 0, stripeFee: 0, netProfit: 0,
+      };
+      cur.invoices += 1;
+      cur.paidLaborHours += r.paidLaborHours;
+      cur.revenue += r.revenue;
+      cur.cogs += r.cogs;
+      cur.grossProfit += r.grossProfit;
+      cur.employeeCost += r.employeeCost;
+      cur.stripeFee += r.stripeFee;
+      cur.netProfit += r.netProfit;
+      map.set(b.key, cur);
+    });
+    return Array.from(map.values()).sort((a, b) => b.sortKey.localeCompare(a.sortKey));
+  }, [filteredRows, profitRows, granularity]);
+
+
   return (
     <div className="space-y-4">
       <div className="flex items-end justify-between flex-wrap gap-3">
