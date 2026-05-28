@@ -167,23 +167,15 @@ export default function AdminReports() {
       );
       const apptIds = Array.from(new Set(Array.from(apptByService.values()).filter(Boolean))) as string[];
 
-      // Appointments → tech assignment and clocked hours. Paid labor comes from invoice line items.
-      const apptInfo = new Map<string, { tech: string | null; clockedHours: number }>();
+      // Appointments → tech assignment. Paid labor (and tech pay) comes from invoice line items.
+      const apptInfo = new Map<string, { tech: string | null }>();
       if (apptIds.length) {
-        const [apRes, teRes] = await Promise.all([
-          supabase.from('appointments').select('id, assigned_technician_id').in('id', apptIds),
-          supabase.from('time_entries').select('appointment_id, duration_minutes, technician_id').in('appointment_id', apptIds),
-        ]);
-        (apRes.data ?? []).forEach((a: any) => {
-          apptInfo.set(a.id, { tech: a.assigned_technician_id, clockedHours: 0 });
-        });
-        // Sum clocked time per appointment (performance only)
-        (teRes.data ?? []).forEach((t: any) => {
-          const cur = apptInfo.get(t.appointment_id) ?? { tech: null, clockedHours: 0 };
-          cur.clockedHours += Number(t.duration_minutes || 0) / 60;
-          // Fall back to clocked tech only if no assigned tech on the RO
-          if (!cur.tech) cur.tech = t.technician_id;
-          apptInfo.set(t.appointment_id, cur);
+        const { data: apData } = await supabase
+          .from('appointments')
+          .select('id, assigned_technician_id')
+          .in('id', apptIds);
+        (apData ?? []).forEach((a: any) => {
+          apptInfo.set(a.id, { tech: a.assigned_technician_id });
         });
       }
 
