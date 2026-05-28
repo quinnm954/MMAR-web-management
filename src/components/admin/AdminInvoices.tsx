@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
-import { Loader2, Plus, Receipt, MessageSquare, Link2, Share2, ExternalLink, Tag } from "lucide-react";
+import { Loader2, Plus, Receipt, MessageSquare, Link2, Share2, ExternalLink, Tag, DollarSign, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { shareLink } from "@/lib/share";
 import DeleteButton from "@/components/admin/DeleteButton";
@@ -65,6 +65,14 @@ const AdminInvoices = () => {
   const [discountEditing, setDiscountEditing] = useState<string | null>(null);
   const [discountForm, setDiscountForm] = useState({ type: "amount" as "amount" | "percent", value: "", reason: "" });
   const [savingDiscount, setSavingDiscount] = useState(false);
+
+  // Split payments
+  type Payment = { id: string; invoice_id: string; amount: number; method: string; reference: string | null; notes: string | null; paid_at: string };
+  const [paymentsByInvoice, setPaymentsByInvoice] = useState<Record<string, Payment[]>>({});
+  const [payingInvoice, setPayingInvoice] = useState<Invoice | null>(null);
+  const [paymentForm, setPaymentForm] = useState({ amount: "", method: "cash", reference: "", notes: "", paid_at: "" });
+  const [savingPayment, setSavingPayment] = useState(false);
+
 
   const load = async () => {
     setLoading(true);
@@ -143,8 +151,25 @@ const AdminInvoices = () => {
     } else {
       setRepliesByInvoice({});
     }
+
+    // Load split payments per invoice
+    if (ids.length) {
+      const { data: pays } = await supabase
+        .from("invoice_payments" as any)
+        .select("id, invoice_id, amount, method, reference, notes, paid_at")
+        .in("invoice_id", ids)
+        .order("paid_at", { ascending: true });
+      const pmap: Record<string, Payment[]> = {};
+      ((pays as any[]) ?? []).forEach((p) => {
+        (pmap[p.invoice_id] = pmap[p.invoice_id] || []).push(p as Payment);
+      });
+      setPaymentsByInvoice(pmap);
+    } else {
+      setPaymentsByInvoice({});
+    }
     setLoading(false);
   };
+
 
   useEffect(() => {
     load();
@@ -247,6 +272,48 @@ const AdminInvoices = () => {
     toast.success(value ? "Technician assigned" : "Technician cleared");
     load();
   };
+
+  const openPayment = (inv: Invoice) => {
+    const due = Math.max(Number(inv.total || 0) - Number(inv.amount_paid || 0), 0);
+    setPayingInvoice(inv);
+    setPaymentForm({
+      amount: due > 0 ? due.toFixed(2) : "",
+      method: "cash",
+      reference: "",
+      notes: "",
+      paid_at: new Date().toISOString().slice(0, 10),
+    });
+  };
+
+  const savePayment = async () => {
+    if (!payingInvoice) return;
+    const amt = parseFloat(paymentForm.amount);
+    if (!amt || amt <= 0) return toast.error("Enter a payment amount");
+    setSavingPayment(true);
+    const { error } = await supabase.from("invoice_payments" as any).insert({
+      invoice_id: payingInvoice.id,
+      amount: amt,
+      method: paymentForm.method,
+      reference: paymentForm.reference || null,
+      notes: paymentForm.notes || null,
+      paid_at: paymentForm.paid_at ? new Date(paymentForm.paid_at).toISOString() : new Date().toISOString(),
+    });
+    setSavingPayment(false);
+    if (error) return toast.error(error.message);
+    toast.success(`Recorded $${amt.toFixed(2)} payment`);
+    setPayingInvoice(null);
+    load();
+  };
+
+  const deletePayment = async (pid: string) => {
+    if (!confirm("Remove this payment?")) return;
+    const { error } = await supabase.from("invoice_payments" as any).delete().eq("id", pid);
+    if (error) return toast.error(error.message);
+    toast.success("Payment removed");
+    load();
+  };
+
+
 
 
 
@@ -415,6 +482,10 @@ const AdminInvoices = () => {
                     </Button>
                     {i.status !== "paid" && i.status !== "void" && (
                       <>
+                        <Button size="sm" variant="hero" onClick={() => openPayment(i)} title="Record a payment (cash, card, check, Zelle, split, etc.)">
+                          <DollarSign className="h-3 w-3 mr-1" />
+                          Record Payment
+                        </Button>
                         <Button size="sm" variant="outline" onClick={() => sharePaymentLink(i)} disabled={textingId === i.id} title="Share payment link">
                           {textingId === i.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Share2 className="h-3 w-3 mr-1" />}
                           Share
@@ -424,6 +495,12 @@ const AdminInvoices = () => {
                           Copy Link
                         </Button>
                       </>
+                    )}
+                    {i.status === "paid" && (i.amount_paid ?? 0) < i.total && (
+                      <Button size="sm" variant="outline" onClick={() => openPayment(i)} title="Add another payment">
+                        <DollarSign className="h-3 w-3 mr-1" />
+                        Add Payment
+                      </Button>
                     )}
                     <Select value={i.status} onValueChange={(v) => updateStatus(i.id, v)}>
                       <SelectTrigger className="h-8 w-28 text-xs"><SelectValue /></SelectTrigger>
@@ -439,6 +516,27 @@ const AdminInvoices = () => {
                     />
                   </div>
                 </div>
+                {(paymentsByInvoice[i.id]?.length ?? 0) > 0 && (
+                  <div className="rounded-md border border-border/50 bg-muted/20 p-2 space-y-1">
+                    <div className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">
+                      Payments ({paymentsByInvoice[i.id].length})
+                    </div>
+                    {paymentsByInvoice[i.id].map((p) => (
+                      <div key={p.id} className="flex items-center justify-between text-xs">
+                        <div>
+                          <span className="font-semibold">${Number(p.amount).toFixed(2)}</span>
+                          <span className="text-muted-foreground"> · {p.method}</span>
+                          {p.reference && <span className="text-muted-foreground"> · {p.reference}</span>}
+                          <span className="text-muted-foreground"> · {new Date(p.paid_at).toLocaleDateString()}</span>
+                          {p.notes && <div className="text-[10px] text-muted-foreground italic">{p.notes}</div>}
+                        </div>
+                        <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => deletePayment(p.id)} title="Remove payment">
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
                 {replies.length > 0 && (
                   <div className="rounded-md border border-border/50 bg-muted/30 p-2 space-y-1">
                     <div className="flex items-center gap-1 text-[11px] font-semibold text-primary">
@@ -453,6 +551,7 @@ const AdminInvoices = () => {
                   </div>
                 )}
               </CardContent>
+
             </Card>
             );
           })}
@@ -503,7 +602,71 @@ const AdminInvoices = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <Dialog open={!!payingInvoice} onOpenChange={(o) => !o && setPayingInvoice(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Record Payment{payingInvoice ? ` · ${payingInvoice.invoice_number ?? ""}` : ""}</DialogTitle>
+          </DialogHeader>
+          {payingInvoice && (
+            <div className="space-y-3">
+              <div className="rounded-md bg-muted/30 p-2 text-xs flex justify-between">
+                <span>Total ${Number(payingInvoice.total).toFixed(2)}</span>
+                <span>Paid ${Number(payingInvoice.amount_paid || 0).toFixed(2)}</span>
+                <span className="font-semibold">Remaining ${Math.max(Number(payingInvoice.total) - Number(payingInvoice.amount_paid || 0), 0).toFixed(2)}</span>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label>Amount *</Label>
+                  <Input type="number" step="0.01" value={paymentForm.amount} onChange={(e) => setPaymentForm({ ...paymentForm, amount: e.target.value })} />
+                </div>
+                <div>
+                  <Label>Method *</Label>
+                  <Select value={paymentForm.method} onValueChange={(v) => setPaymentForm({ ...paymentForm, method: v })}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="cash">Cash</SelectItem>
+                      <SelectItem value="card">Card (in person)</SelectItem>
+                      <SelectItem value="stripe">Stripe (online)</SelectItem>
+                      <SelectItem value="check">Check</SelectItem>
+                      <SelectItem value="zelle">Zelle</SelectItem>
+                      <SelectItem value="venmo">Venmo</SelectItem>
+                      <SelectItem value="cashapp">Cash App</SelectItem>
+                      <SelectItem value="financing">Financing</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label>Date</Label>
+                  <Input type="date" value={paymentForm.paid_at} onChange={(e) => setPaymentForm({ ...paymentForm, paid_at: e.target.value })} />
+                </div>
+                <div>
+                  <Label>Reference (check #, last 4, etc.)</Label>
+                  <Input value={paymentForm.reference} onChange={(e) => setPaymentForm({ ...paymentForm, reference: e.target.value })} />
+                </div>
+              </div>
+              <div>
+                <Label>Notes</Label>
+                <Input value={paymentForm.notes} onChange={(e) => setPaymentForm({ ...paymentForm, notes: e.target.value })} placeholder="e.g. split payment 1 of 2" />
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Add multiple payments to record split-pay across methods. The invoice status updates automatically (unpaid → partial → paid).
+              </p>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setPayingInvoice(null)}>Cancel</Button>
+            <Button variant="hero" onClick={savePayment} disabled={savingPayment}>
+              {savingPayment ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save Payment"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
+
   );
 };
 

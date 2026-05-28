@@ -116,24 +116,51 @@ Deno.serve(async (req) => {
       // One-off invoice payment
       if (invoiceId && session.payment_status === "paid") {
         const amount = (session.amount_total || 0) / 100;
+        const paymentIntentId = session.payment_intent as string | null;
+
+        // Record the payment (trigger updates invoices.amount_paid/status/paid_at)
+        if (amount > 0 && paymentIntentId) {
+          // Avoid double-recording if Stripe retries the webhook
+          const { data: existing } = await admin
+            .from("invoice_payments")
+            .select("id")
+            .eq("invoice_id", invoiceId)
+            .eq("stripe_payment_intent_id", paymentIntentId)
+            .maybeSingle();
+          if (!existing) {
+            await admin.from("invoice_payments").insert({
+              invoice_id: invoiceId,
+              amount,
+              method: "stripe",
+              reference: paymentIntentId,
+              stripe_payment_intent_id: paymentIntentId,
+              paid_at: new Date().toISOString(),
+            });
+          }
+        }
+
+        // Keep pointer to the latest intent on the invoice for refund webhook lookups
         await admin
           .from("invoices")
-          .update({
-            status: "paid",
-            amount_paid: amount,
-            paid_at: new Date().toISOString(),
-            stripe_payment_intent_id: session.payment_intent as string,
-          })
+          .update({ stripe_payment_intent_id: paymentIntentId })
           .eq("id", invoiceId);
-        console.log("Invoice paid", invoiceId);
+        console.log("Invoice payment recorded", invoiceId, amount);
 
-        // Email paid receipt to customer
+        // Email paid receipt to customer (only if fully paid now)
         try {
-          await sendInvoicePaidReceipt(admin, invoiceId, session.payment_intent as string | null);
+          const { data: inv } = await admin
+            .from("invoices")
+            .select("status")
+            .eq("id", invoiceId)
+            .maybeSingle();
+          if (inv?.status === "paid") {
+            await sendInvoicePaidReceipt(admin, invoiceId, paymentIntentId);
+          }
         } catch (e) {
           console.warn("paid receipt email failed", e);
         }
       }
+
 
       // Membership subscription checkout completed
       if (membershipId && session.mode === "subscription") {

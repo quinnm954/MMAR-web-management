@@ -51,6 +51,7 @@ const PortalInvoiceDetail = () => {
   const [inv, setInv] = useState<Invoice | null>(null);
   const [customer, setCustomer] = useState<any>(null);
   const [vehicle, setVehicle] = useState<any>(null);
+  const [payments, setPayments] = useState<Array<{ id: string; amount: number; method: string; reference: string | null; paid_at: string }>>([]);
   const [loading, setLoading] = useState(true);
   const [paying, setPaying] = useState(false);
 
@@ -69,10 +70,17 @@ const PortalInvoiceDetail = () => {
             setVehicle(v);
           }
         }
+        const { data: pays } = await supabase
+          .from("invoice_payments" as any)
+          .select("id, amount, method, reference, paid_at")
+          .eq("invoice_id", data.id)
+          .order("paid_at", { ascending: true });
+        setPayments(((pays as any[]) ?? []) as any);
       }
       setLoading(false);
     })();
   }, [user, id]);
+
 
   const pay = async () => {
     if (!inv) return;
@@ -182,6 +190,19 @@ const PortalInvoiceDetail = () => {
             </div>
           )}
         </div>
+
+        {payments.length > 0 && (
+          <div className="mt-4 ml-auto sm:w-72 text-xs space-y-1">
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Payment History</div>
+            {payments.map((p) => (
+              <div key={p.id} className="flex justify-between border-t border-border/60 pt-1">
+                <span>{new Date(p.paid_at).toLocaleDateString()} · {p.method}{p.reference ? ` · ${p.reference}` : ""}</span>
+                <span className="font-medium">${Number(p.amount).toFixed(2)}</span>
+              </div>
+            ))}
+          </div>
+        )}
+
 
         {/* Pay / Paid */}
         <div className="mt-6">
