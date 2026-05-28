@@ -602,7 +602,71 @@ const AdminInvoices = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <Dialog open={!!payingInvoice} onOpenChange={(o) => !o && setPayingInvoice(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Record Payment{payingInvoice ? ` · ${payingInvoice.invoice_number ?? ""}` : ""}</DialogTitle>
+          </DialogHeader>
+          {payingInvoice && (
+            <div className="space-y-3">
+              <div className="rounded-md bg-muted/30 p-2 text-xs flex justify-between">
+                <span>Total ${Number(payingInvoice.total).toFixed(2)}</span>
+                <span>Paid ${Number(payingInvoice.amount_paid || 0).toFixed(2)}</span>
+                <span className="font-semibold">Remaining ${Math.max(Number(payingInvoice.total) - Number(payingInvoice.amount_paid || 0), 0).toFixed(2)}</span>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label>Amount *</Label>
+                  <Input type="number" step="0.01" value={paymentForm.amount} onChange={(e) => setPaymentForm({ ...paymentForm, amount: e.target.value })} />
+                </div>
+                <div>
+                  <Label>Method *</Label>
+                  <Select value={paymentForm.method} onValueChange={(v) => setPaymentForm({ ...paymentForm, method: v })}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="cash">Cash</SelectItem>
+                      <SelectItem value="card">Card (in person)</SelectItem>
+                      <SelectItem value="stripe">Stripe (online)</SelectItem>
+                      <SelectItem value="check">Check</SelectItem>
+                      <SelectItem value="zelle">Zelle</SelectItem>
+                      <SelectItem value="venmo">Venmo</SelectItem>
+                      <SelectItem value="cashapp">Cash App</SelectItem>
+                      <SelectItem value="financing">Financing</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label>Date</Label>
+                  <Input type="date" value={paymentForm.paid_at} onChange={(e) => setPaymentForm({ ...paymentForm, paid_at: e.target.value })} />
+                </div>
+                <div>
+                  <Label>Reference (check #, last 4, etc.)</Label>
+                  <Input value={paymentForm.reference} onChange={(e) => setPaymentForm({ ...paymentForm, reference: e.target.value })} />
+                </div>
+              </div>
+              <div>
+                <Label>Notes</Label>
+                <Input value={paymentForm.notes} onChange={(e) => setPaymentForm({ ...paymentForm, notes: e.target.value })} placeholder="e.g. split payment 1 of 2" />
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Add multiple payments to record split-pay across methods. The invoice status updates automatically (unpaid → partial → paid).
+              </p>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setPayingInvoice(null)}>Cancel</Button>
+            <Button variant="hero" onClick={savePayment} disabled={savingPayment}>
+              {savingPayment ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save Payment"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
+
   );
 };
 
