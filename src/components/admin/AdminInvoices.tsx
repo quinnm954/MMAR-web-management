@@ -151,8 +151,25 @@ const AdminInvoices = () => {
     } else {
       setRepliesByInvoice({});
     }
+
+    // Load split payments per invoice
+    if (ids.length) {
+      const { data: pays } = await supabase
+        .from("invoice_payments" as any)
+        .select("id, invoice_id, amount, method, reference, notes, paid_at")
+        .in("invoice_id", ids)
+        .order("paid_at", { ascending: true });
+      const pmap: Record<string, Payment[]> = {};
+      ((pays as any[]) ?? []).forEach((p) => {
+        (pmap[p.invoice_id] = pmap[p.invoice_id] || []).push(p as Payment);
+      });
+      setPaymentsByInvoice(pmap);
+    } else {
+      setPaymentsByInvoice({});
+    }
     setLoading(false);
   };
+
 
   useEffect(() => {
     load();
