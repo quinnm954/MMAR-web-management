@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
-import { Loader2, Plus, Receipt, MessageSquare, Link2, Share2, ExternalLink, Tag } from "lucide-react";
+import { Loader2, Plus, Receipt, MessageSquare, Link2, Share2, ExternalLink, Tag, DollarSign, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { shareLink } from "@/lib/share";
 import DeleteButton from "@/components/admin/DeleteButton";
