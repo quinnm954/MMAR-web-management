@@ -361,9 +361,7 @@ export default function AdminReports() {
         Gross profit = gross revenue − cost of goods. Net profit = gross profit − cost of employees − Stripe fees.
         Technician is taken from the repair order assignment and carried through to the paid invoice. Employee cost
         uses each technician's per-employee hourly rate from the Employees tab × <strong>paid labor hours</strong>{' '}
-        (from the estimate) — not clocked time. Default rate ${defaultRate.toFixed(2)}/hr is used when no employee
-        record exists. Clocked hours and the variance column are for performance tracking only: positive variance
-        means the tech ran <strong>over paid labor time</strong>; negative means <strong>under paid labor time</strong>.
+        (from the estimate). Default rate ${defaultRate.toFixed(2)}/hr is used when no employee record exists.
         Stripe fees use the actual amount Stripe charged per payment when synced; otherwise an estimate of
         2.9% + $0.30 is used as a fallback.
       </p>
