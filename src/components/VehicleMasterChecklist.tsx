@@ -18,6 +18,9 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
+import {
+  Accordion, AccordionContent, AccordionItem, AccordionTrigger,
+} from "@/components/ui/accordion";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, RefreshCw, Plus, EyeOff, Eye, Save } from "lucide-react";
 
@@ -165,79 +168,100 @@ const VehicleMasterChecklist = ({ vehicleId, mode, customerId }: Props) => {
         </CardContent></Card>
       )}
 
-      {grouped.map(([cat, rows]) => (
-        <Card key={cat}>
-          <CardHeader className="pb-3"><CardTitle className="text-base">{cat}</CardTitle></CardHeader>
-          <CardContent className="space-y-3">
-            {rows.map(item => {
-              const d = drafts[item.id] ?? {};
-              const cur = { ...item, ...d };
-              const meta = STATUS_META[cur.status];
-              const dirty = Object.keys(d).length > 0;
-              return (
-                <div key={item.id} className={`rounded-lg border p-3 ${item.is_hidden ? "opacity-50" : ""}`}>
-                  <div className="flex flex-wrap items-start justify-between gap-2">
-                    <div className="min-w-0 flex-1">
-                      <div className="font-medium break-words">{item.label}</div>
-                      {item.description && <div className="text-xs text-muted-foreground">{item.description}</div>}
-                      <div className="text-[11px] text-muted-foreground mt-1">
-                        Last: {fmtDate(item.last_checked_at)} • Source: {item.last_source.replace("_", " ")}
-                        {item.price_low != null && item.price_high != null && (
-                          <> • Est. ${item.price_low}–${item.price_high}</>
-                        )}
-                      </div>
+      {grouped.length > 0 && (
+        <Accordion type="multiple" className="space-y-2">
+          {grouped.map(([cat, rows]) => {
+            const urgentCount = rows.filter(r => r.status === "urgent").length;
+            const dueCount = rows.filter(r => r.status === "due_soon").length;
+            return (
+              <AccordionItem key={cat} value={cat} className="border rounded-lg bg-card px-3">
+                <AccordionTrigger className="hover:no-underline py-3">
+                  <div className="flex items-center justify-between w-full pr-2 gap-2">
+                    <span className="text-base font-medium text-left">{cat}</span>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      {urgentCount > 0 && (
+                        <Badge variant="outline" className={STATUS_META.urgent.tone}>{urgentCount} urgent</Badge>
+                      )}
+                      {dueCount > 0 && (
+                        <Badge variant="outline" className={STATUS_META.due_soon.tone}>{dueCount} due</Badge>
+                      )}
+                      <Badge variant="outline" className="text-muted-foreground">{rows.length}</Badge>
                     </div>
-                    <Badge variant="outline" className={`${meta.tone} shrink-0`}>{meta.label}</Badge>
                   </div>
+                </AccordionTrigger>
+                <AccordionContent className="space-y-3 pt-1 pb-3">
+                  {rows.map(item => {
+                    const d = drafts[item.id] ?? {};
+                    const cur = { ...item, ...d };
+                    const meta = STATUS_META[cur.status];
+                    const dirty = Object.keys(d).length > 0;
+                    return (
+                      <div key={item.id} className={`rounded-lg border p-3 ${item.is_hidden ? "opacity-50" : ""}`}>
+                        <div className="flex flex-wrap items-start justify-between gap-2">
+                          <div className="min-w-0 flex-1">
+                            <div className="font-medium break-words">{item.label}</div>
+                            {item.description && <div className="text-xs text-muted-foreground">{item.description}</div>}
+                            <div className="text-[11px] text-muted-foreground mt-1">
+                              Last: {fmtDate(item.last_checked_at)} • Source: {item.last_source.replace("_", " ")}
+                              {item.price_low != null && item.price_high != null && (
+                                <> • Est. ${item.price_low}–${item.price_high}</>
+                              )}
+                            </div>
+                          </div>
+                          <Badge variant="outline" className={`${meta.tone} shrink-0`}>{meta.label}</Badge>
+                        </div>
 
-                  <div className="grid sm:grid-cols-3 gap-2 mt-3">
-                    <Select value={cur.status} onValueChange={(v) => setDraft(item.id, { status: v as MasterStatus })}>
-                      <SelectTrigger><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        {STATUS_OPTIONS.map(s => (
-                          <SelectItem key={s} value={s}>{STATUS_META[s].label}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <Input
-                      placeholder="Measurement (e.g. 4mm)"
-                      value={cur.measurement ?? ""}
-                      onChange={(e) => setDraft(item.id, { measurement: e.target.value })}
-                    />
-                    <Input
-                      placeholder={isAdmin ? "Tech / admin note" : "Your note (e.g. replaced at other shop)"}
-                      value={(isAdmin ? cur.severity_note : cur.customer_note) ?? ""}
-                      onChange={(e) => setDraft(item.id, isAdmin ? { severity_note: e.target.value } : { customer_note: e.target.value })}
-                    />
-                  </div>
-                  {isAdmin && (
-                    <Textarea
-                      className="mt-2"
-                      placeholder="Customer note (visible to customer)"
-                      value={cur.customer_note ?? ""}
-                      onChange={(e) => setDraft(item.id, { customer_note: e.target.value })}
-                    />
-                  )}
-                  {!isAdmin && cur.severity_note && (
-                    <div className="text-xs mt-2 p-2 rounded bg-muted">Tech note: {cur.severity_note}</div>
-                  )}
+                        <div className="grid sm:grid-cols-3 gap-2 mt-3">
+                          <Select value={cur.status} onValueChange={(v) => setDraft(item.id, { status: v as MasterStatus })}>
+                            <SelectTrigger><SelectValue /></SelectTrigger>
+                            <SelectContent>
+                              {STATUS_OPTIONS.map(s => (
+                                <SelectItem key={s} value={s}>{STATUS_META[s].label}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <Input
+                            placeholder="Measurement (e.g. 4mm)"
+                            value={cur.measurement ?? ""}
+                            onChange={(e) => setDraft(item.id, { measurement: e.target.value })}
+                          />
+                          <Input
+                            placeholder={isAdmin ? "Tech / admin note" : "Your note (e.g. replaced at other shop)"}
+                            value={(isAdmin ? cur.severity_note : cur.customer_note) ?? ""}
+                            onChange={(e) => setDraft(item.id, isAdmin ? { severity_note: e.target.value } : { customer_note: e.target.value })}
+                          />
+                        </div>
+                        {isAdmin && (
+                          <Textarea
+                            className="mt-2"
+                            placeholder="Customer note (visible to customer)"
+                            value={cur.customer_note ?? ""}
+                            onChange={(e) => setDraft(item.id, { customer_note: e.target.value })}
+                          />
+                        )}
+                        {!isAdmin && cur.severity_note && (
+                          <div className="text-xs mt-2 p-2 rounded bg-muted">Tech note: {cur.severity_note}</div>
+                        )}
 
-                  <div className="flex items-center justify-end gap-2 mt-2">
-                    {isAdmin && (
-                      <Button variant="ghost" size="sm" onClick={() => toggleHidden(item)} disabled={busy}>
-                        {item.is_hidden ? "Unhide" : "Hide"}
-                      </Button>
-                    )}
-                    <Button size="sm" disabled={!dirty || busy} onClick={() => saveItem(item)}>
-                      <Save className="h-4 w-4 mr-1" /> Save
-                    </Button>
-                  </div>
-                </div>
-              );
-            })}
-          </CardContent>
-        </Card>
-      ))}
+                        <div className="flex items-center justify-end gap-2 mt-2">
+                          {isAdmin && (
+                            <Button variant="ghost" size="sm" onClick={() => toggleHidden(item)} disabled={busy}>
+                              {item.is_hidden ? "Unhide" : "Hide"}
+                            </Button>
+                          )}
+                          <Button size="sm" disabled={!dirty || busy} onClick={() => saveItem(item)}>
+                            <Save className="h-4 w-4 mr-1" /> Save
+                          </Button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </AccordionContent>
+              </AccordionItem>
+            );
+          })}
+        </Accordion>
+      )}
 
       {isAdmin && customerId && (
         <Card>
