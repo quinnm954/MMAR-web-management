@@ -58,7 +58,7 @@ export default function AdminTechLaborPay() {
       const [{ data: settings }, { data: techRoles }, { data: employees }] = await Promise.all([
         supabase.from("shop_settings").select("labor_cost_per_hour").eq("id", 1).maybeSingle(),
         supabase.from("user_roles").select("user_id").eq("role", "technician"),
-        supabase.from("employees" as any).select("id, user_id, full_name, hourly_rate").eq("is_active", true),
+        supabase.from("employees" as any).select("id, user_id, full_name, hourly_rate").eq("is_active", true).eq("employee_type", "technician"),
       ]);
       const rate = Number(settings?.labor_cost_per_hour) > 0 ? Number(settings?.labor_cost_per_hour) : 35;
       setLaborRate(rate);
