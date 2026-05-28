@@ -79,20 +79,27 @@ const VehicleMasterChecklist = ({ vehicleId, mode, customerId }: Props) => {
   const setDraft = (id: string, patch: Partial<MasterChecklistItem>) =>
     setDrafts(d => ({ ...d, [id]: { ...d[id], ...patch } }));
 
-  const saveItem = async (item: MasterChecklistItem) => {
-    const patch = drafts[item.id];
-    if (!patch) return;
-    setBusy(true);
+  const saveItemPatch = async (id: string, patch: Partial<MasterChecklistItem>) => {
+    if (!patch || Object.keys(patch).length === 0) return;
+    // optimistic local update
+    setItems(prev => prev.map(it => it.id === id ? { ...it, ...patch } as MasterChecklistItem : it));
+    setDrafts(d => {
+      const { [id]: _omit, ...rest } = d;
+      return rest;
+    });
     try {
-      await updateMasterItem(item.id, patch);
-      toast({ title: "Saved" });
-      await reload();
+      await updateMasterItem(id, patch);
     } catch (e: any) {
       toast({ title: "Save failed", description: e.message, variant: "destructive" });
-    } finally {
-      setBusy(false);
+      await reload();
     }
   };
+
+  const flushDraft = (id: string) => {
+    const patch = drafts[id];
+    if (patch && Object.keys(patch).length > 0) saveItemPatch(id, patch);
+  };
+
 
   const reseed = async () => {
     setBusy(true);
