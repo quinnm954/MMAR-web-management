@@ -273,6 +273,48 @@ const AdminInvoices = () => {
     load();
   };
 
+  const openPayment = (inv: Invoice) => {
+    const due = Math.max(Number(inv.total || 0) - Number(inv.amount_paid || 0), 0);
+    setPayingInvoice(inv);
+    setPaymentForm({
+      amount: due > 0 ? due.toFixed(2) : "",
+      method: "cash",
+      reference: "",
+      notes: "",
+      paid_at: new Date().toISOString().slice(0, 10),
+    });
+  };
+
+  const savePayment = async () => {
+    if (!payingInvoice) return;
+    const amt = parseFloat(paymentForm.amount);
+    if (!amt || amt <= 0) return toast.error("Enter a payment amount");
+    setSavingPayment(true);
+    const { error } = await supabase.from("invoice_payments" as any).insert({
+      invoice_id: payingInvoice.id,
+      amount: amt,
+      method: paymentForm.method,
+      reference: paymentForm.reference || null,
+      notes: paymentForm.notes || null,
+      paid_at: paymentForm.paid_at ? new Date(paymentForm.paid_at).toISOString() : new Date().toISOString(),
+    });
+    setSavingPayment(false);
+    if (error) return toast.error(error.message);
+    toast.success(`Recorded $${amt.toFixed(2)} payment`);
+    setPayingInvoice(null);
+    load();
+  };
+
+  const deletePayment = async (pid: string) => {
+    if (!confirm("Remove this payment?")) return;
+    const { error } = await supabase.from("invoice_payments" as any).delete().eq("id", pid);
+    if (error) return toast.error(error.message);
+    toast.success("Payment removed");
+    load();
+  };
+
+
+
 
 
   const totalDue = invoices.filter((i) => i.status !== "paid" && i.status !== "void").reduce((s, i) => s + (i.total - i.amount_paid), 0);
