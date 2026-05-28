@@ -66,6 +66,14 @@ const AdminInvoices = () => {
   const [discountForm, setDiscountForm] = useState({ type: "amount" as "amount" | "percent", value: "", reason: "" });
   const [savingDiscount, setSavingDiscount] = useState(false);
 
+  // Split payments
+  type Payment = { id: string; invoice_id: string; amount: number; method: string; reference: string | null; notes: string | null; paid_at: string };
+  const [paymentsByInvoice, setPaymentsByInvoice] = useState<Record<string, Payment[]>>({});
+  const [payingInvoice, setPayingInvoice] = useState<Invoice | null>(null);
+  const [paymentForm, setPaymentForm] = useState({ amount: "", method: "cash", reference: "", notes: "", paid_at: "" });
+  const [savingPayment, setSavingPayment] = useState(false);
+
+
   const load = async () => {
     setLoading(true);
     const [i, c, e] = await Promise.all([
