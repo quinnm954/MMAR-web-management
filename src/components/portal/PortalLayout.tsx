@@ -16,6 +16,7 @@ import {
   Wrench,
   FileText,
   AlertTriangle,
+  ClipboardCheck,
 } from "lucide-react";
 import MobileBottomNav from "@/components/shell/MobileBottomNav";
 import InstallAppBanner from "@/components/shell/InstallAppBanner";
