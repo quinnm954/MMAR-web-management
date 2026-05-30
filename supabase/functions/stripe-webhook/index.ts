@@ -227,13 +227,94 @@ Deno.serve(async (req) => {
     if (event.type === "invoice.payment_succeeded") {
       const inv = event.data.object as Stripe.Invoice;
       if (inv.subscription) {
+        // Look up membership by stripe_subscription_id
+        const { data: m } = await admin
+          .from("memberships")
+          .select("id, customer_id, plan:membership_plans(stripe_price_id)")
+          .eq("stripe_subscription_id", inv.subscription as string)
+          .maybeSingle();
+
+        if (m) {
+          // Get Stripe fee from the charge's balance transaction
+          let stripeFee: number | null = null;
+          let chargeId: string | null = (inv.charge as string) || null;
+          let piId: string | null = (inv.payment_intent as string) || null;
+          try {
+            if (chargeId) {
+              const ch = await stripe.charges.retrieve(chargeId, {
+                expand: ["balance_transaction"],
+              });
+              const bt = ch.balance_transaction as Stripe.BalanceTransaction | null;
+              if (bt && typeof bt.fee === "number") stripeFee = bt.fee / 100;
+              if (!piId && ch.payment_intent) piId = ch.payment_intent as string;
+            }
+          } catch (e) {
+            console.warn("fee lookup failed", e);
+          }
+
+          const planPriceId = (m as any).plan?.stripe_price_id as string | undefined;
+          const lines = inv.lines?.data ?? [];
+
+          // Allocate the single charge's fee proportionally across lines
+          const totalAmount = lines.reduce((s, l) => s + (l.amount || 0), 0) || 1;
+
+          for (const line of lines) {
+            const linePriceId = (line.price?.id ?? null) as string | null;
+            const isRecurring = !!line.price?.recurring || linePriceId === planPriceId;
+            const kind = isRecurring ? "subscription" : "deposit";
+            const amount = (line.amount || 0) / 100;
+            const lineFee = stripeFee != null
+              ? Math.round((stripeFee * (line.amount || 0) / totalAmount) * 100) / 100
+              : null;
+
+            // Make stripe_invoice_id unique per line (deposit + subscription on same invoice)
+            const stripeInvoiceId = `${inv.id}:${line.id}`;
+            await admin
+              .from("membership_payments")
+              .upsert({
+                membership_id: m.id,
+                customer_id: m.customer_id,
+                kind,
+                amount,
+                currency: inv.currency || "usd",
+                status: "paid",
+                stripe_invoice_id: stripeInvoiceId,
+                stripe_payment_intent_id: piId,
+                stripe_charge_id: chargeId,
+                stripe_fee: lineFee,
+                stripe_fee_synced_at: lineFee != null ? new Date().toISOString() : null,
+                period_start: line.period?.start
+                  ? new Date(line.period.start * 1000).toISOString()
+                  : null,
+                period_end: line.period?.end
+                  ? new Date(line.period.end * 1000).toISOString()
+                  : null,
+                paid_at: new Date((inv.status_transitions?.paid_at ?? inv.created) * 1000).toISOString(),
+                description: line.description ?? null,
+              }, { onConflict: "stripe_invoice_id" });
+          }
+
+          await admin
+            .from("memberships")
+            .update({
+              next_billing_date: lines[0]?.period?.end
+                ? new Date(lines[0].period.end * 1000).toISOString().slice(0, 10)
+                : null,
+              current_period_end: lines[0]?.period?.end
+                ? new Date(lines[0].period.end * 1000).toISOString()
+                : null,
+            })
+            .eq("id", m.id);
+        }
+      }
+    }
+
+    if (event.type === "invoice.payment_failed") {
+      const inv = event.data.object as Stripe.Invoice;
+      if (inv.subscription) {
         await admin
           .from("memberships")
-          .update({
-            next_billing_date: inv.lines.data[0]?.period?.end
-              ? new Date(inv.lines.data[0].period.end * 1000).toISOString().slice(0, 10)
-              : null,
-          })
+          .update({ status: "past_due" })
           .eq("stripe_subscription_id", inv.subscription as string);
       }
     }
@@ -247,6 +328,12 @@ Deno.serve(async (req) => {
           .from("invoices")
           .update({ status: newStatus })
           .eq("stripe_payment_intent_id", pi);
+        if (event.type === "charge.refunded") {
+          await admin
+            .from("membership_payments")
+            .update({ status: "refunded" })
+            .eq("stripe_payment_intent_id", pi);
+        }
       }
     }
 

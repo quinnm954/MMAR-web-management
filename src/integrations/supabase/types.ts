@@ -1582,6 +1582,77 @@ export type Database = {
         }
         Relationships: []
       }
+      membership_payments: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string
+          customer_id: string | null
+          description: string | null
+          id: string
+          kind: string
+          membership_id: string
+          paid_at: string
+          period_end: string | null
+          period_start: string | null
+          status: string
+          stripe_charge_id: string | null
+          stripe_fee: number | null
+          stripe_fee_synced_at: string | null
+          stripe_invoice_id: string | null
+          stripe_payment_intent_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          customer_id?: string | null
+          description?: string | null
+          id?: string
+          kind: string
+          membership_id: string
+          paid_at?: string
+          period_end?: string | null
+          period_start?: string | null
+          status?: string
+          stripe_charge_id?: string | null
+          stripe_fee?: number | null
+          stripe_fee_synced_at?: string | null
+          stripe_invoice_id?: string | null
+          stripe_payment_intent_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          customer_id?: string | null
+          description?: string | null
+          id?: string
+          kind?: string
+          membership_id?: string
+          paid_at?: string
+          period_end?: string | null
+          period_start?: string | null
+          status?: string
+          stripe_charge_id?: string | null
+          stripe_fee?: number | null
+          stripe_fee_synced_at?: string | null
+          stripe_invoice_id?: string | null
+          stripe_payment_intent_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "membership_payments_membership_id_fkey"
+            columns: ["membership_id"]
+            isOneToOne: false
+            referencedRelation: "memberships"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       membership_plans: {
         Row: {
           badge: string | null

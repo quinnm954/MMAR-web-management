@@ -104,6 +104,10 @@ export default function AdminReports() {
   });
 
   const [profitRows, setProfitRows] = useState<ProfitRow[]>([]);
+  const [memberRows, setMemberRows] = useState<{
+    id: string; paid_at: string; kind: string; amount: number; stripeFee: number;
+    stripeFeeIsActual: boolean; member: string; plan: string;
+  }[]>([]);
   const [defaultRate, setDefaultRate] = useState<number>(35);
   const [preset, setPreset] = useState<Preset>('m');
   const [customDays, setCustomDays] = useState<number>(30);
@@ -118,7 +122,7 @@ export default function AdminReports() {
   const load = useCallback(async () => {
       const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
 
-      const [inv, completed, members, ests, settings, employeesRes] = await Promise.all([
+      const [inv, completed, members, ests, settings, employeesRes, mpRes] = await Promise.all([
         supabase
           .from('invoices')
           .select('id, invoice_number, total, subtotal, status, created_at, customer_id, service_record_id, technician_id, line_items, stripe_session_id, stripe_payment_intent_id, stripe_fee, stripe_fee_synced_at')
@@ -129,6 +133,12 @@ export default function AdminReports() {
         supabase.from('estimates').select('id', { count: 'exact', head: true }).eq('status', 'sent'),
         supabase.from('shop_settings').select('labor_cost_per_hour').eq('id', 1).single(),
         supabase.from('employees' as any).select('id, user_id, full_name, hourly_rate, pay_basis').eq('is_active', true),
+        supabase
+          .from('membership_payments' as any)
+          .select('id, paid_at, kind, amount, stripe_fee, stripe_fee_synced_at, customer_id, membership:memberships(plan:membership_plans(name))')
+          .eq('status', 'paid')
+          .gte('paid_at', since)
+          .order('paid_at', { ascending: false }),
       ]);
 
       const allInvoices = ((inv.data ?? []) as any[]) as InvoiceRow[];
@@ -252,6 +262,32 @@ export default function AdminReports() {
       });
       setProfitRows(rows);
 
+      // Membership payments
+      const mpData = (mpRes.data ?? []) as any[];
+      const memberCustIds = Array.from(new Set(mpData.map((r) => r.customer_id).filter(Boolean)));
+      const newCustIds = memberCustIds.filter((id) => !customerMap.has(id));
+      if (newCustIds.length) {
+        const { data: extra } = await supabase.from('profiles').select('id, full_name, email').in('id', newCustIds);
+        (extra ?? []).forEach((p: any) => customerMap.set(p.id, p));
+      }
+      const mRows = mpData.map((r) => {
+        const cust = customerMap.get(r.customer_id);
+        const amount = Number(r.amount || 0);
+        const actualFee = r.stripe_fee != null ? Number(r.stripe_fee) : null;
+        const fee = actualFee != null ? actualFee : estimatedStripeFee(amount, true, true);
+        return {
+          id: r.id,
+          paid_at: r.paid_at,
+          kind: r.kind,
+          amount,
+          stripeFee: fee,
+          stripeFeeIsActual: actualFee != null,
+          member: cust?.full_name || cust?.email || '—',
+          plan: r.membership?.plan?.name || '—',
+        };
+      });
+      setMemberRows(mRows);
+
       const totalLaborHrs = rows.reduce((s, r) => s + r.paidLaborHours, 0);
 
       setData({
@@ -307,8 +343,21 @@ export default function AdminReports() {
     return { paidH };
   }, [filteredRows]);
 
+  const membershipTotals = useMemo(() => {
+    return memberRows.reduce(
+      (acc, r) => {
+        acc.revenue += r.amount;
+        acc.stripeFee += r.stripeFee;
+        if (r.kind === 'deposit') acc.deposits += r.amount;
+        else acc.recurring += r.amount;
+        return acc;
+      },
+      { revenue: 0, stripeFee: 0, deposits: 0, recurring: 0 },
+    );
+  }, [memberRows]);
+
   const totals = useMemo(() => {
-    return filteredRows.reduce(
+    const base = filteredRows.reduce(
       (acc, r) => {
         acc.revenue += r.revenue;
         acc.cogs += r.cogs;
@@ -320,7 +369,15 @@ export default function AdminReports() {
       },
       { revenue: 0, cogs: 0, employeeCost: 0, stripeFee: 0, grossProfit: 0, netProfit: 0 },
     );
-  }, [filteredRows]);
+    // Membership revenue (no COGS / employee cost) only included when no tech filter is set
+    if (techFilter === 'all') {
+      base.revenue += membershipTotals.revenue;
+      base.stripeFee += membershipTotals.stripeFee;
+      base.grossProfit += membershipTotals.revenue;
+      base.netProfit += membershipTotals.revenue - membershipTotals.stripeFee;
+    }
+    return base;
+  }, [filteredRows, membershipTotals, techFilter]);
 
   // Group rows into time buckets for the summary view
   const bucketKey = (iso: string): { key: string; label: string; sortKey: string } => {
@@ -385,8 +442,23 @@ export default function AdminReports() {
       cur.netProfit += r.netProfit;
       map.set(b.key, cur);
     });
+    if (techFilter === 'all') {
+      memberRows.forEach((r) => {
+        const b = bucketKey(r.paid_at);
+        const cur = map.get(b.key) ?? {
+          key: b.key, label: b.label, sortKey: b.sortKey,
+          invoices: 0, paidLaborHours: 0, revenue: 0, cogs: 0,
+          grossProfit: 0, employeeCost: 0, stripeFee: 0, netProfit: 0,
+        };
+        cur.revenue += r.amount;
+        cur.grossProfit += r.amount;
+        cur.stripeFee += r.stripeFee;
+        cur.netProfit += r.amount - r.stripeFee;
+        map.set(b.key, cur);
+      });
+    }
     return Array.from(map.values()).sort((a, b) => b.sortKey.localeCompare(a.sortKey));
-  }, [filteredRows, profitRows, granularity]);
+  }, [filteredRows, profitRows, memberRows, techFilter, granularity]);
 
 
   return (
@@ -469,8 +541,11 @@ export default function AdminReports() {
         <KPI label="Stripe Fees" value={fmt(totals.stripeFee)} />
         <KPI label="Net Profit" value={fmt(totals.netProfit)} />
       </div>
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <KPI label={`Paid Labor Hrs${techFilter !== 'all' ? ` · ${techFilter}` : ''}`} value={perfTotals.paidH.toFixed(2)} />
+        <KPI label="Membership Revenue" value={fmt(membershipTotals.revenue)} />
+        <KPI label="Membership Deposits" value={fmt(membershipTotals.deposits)} />
+        <KPI label="Membership Recurring" value={fmt(membershipTotals.recurring)} />
       </div>
 
       <Tabs defaultValue="summary" className="w-full">
@@ -581,6 +656,54 @@ export default function AdminReports() {
                         </TableCell>
                         <TableCell className={`text-right font-semibold ${r.netProfit < 0 ? 'text-destructive' : 'text-primary'}`}>
                           {fmt(r.netProfit)}
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+
+          <h3 className="font-display text-lg pt-4">Membership Payments</h3>
+          <p className="text-xs text-muted-foreground -mt-1">
+            One row per Stripe charge tied to a membership (deposits + monthly recurring).
+          </p>
+          <Card>
+            <CardContent className="p-0 overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Member</TableHead>
+                    <TableHead>Plan</TableHead>
+                    <TableHead>Type</TableHead>
+                    <TableHead className="text-right">Amount</TableHead>
+                    <TableHead className="text-right">Stripe Fee</TableHead>
+                    <TableHead className="text-right">Net</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {memberRows.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={7} className="text-center text-muted-foreground py-6">
+                        No membership payments in this window.
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    memberRows.map((r) => (
+                      <TableRow key={r.id}>
+                        <TableCell className="text-xs">{new Date(r.paid_at).toLocaleDateString()}</TableCell>
+                        <TableCell className="text-xs">{r.member}</TableCell>
+                        <TableCell className="text-xs">{r.plan}</TableCell>
+                        <TableCell className="text-xs capitalize">{r.kind}</TableCell>
+                        <TableCell className="text-right">{fmt(r.amount)}</TableCell>
+                        <TableCell className="text-right" title={r.stripeFeeIsActual ? 'Actual fee from Stripe' : 'Estimated (not yet synced)'}>
+                          {fmt(r.stripeFee)}
+                          {!r.stripeFeeIsActual && r.stripeFee > 0 && <span className="text-muted-foreground ml-1">~</span>}
+                        </TableCell>
+                        <TableCell className="text-right font-semibold text-primary">
+                          {fmt(r.amount - r.stripeFee)}
                         </TableCell>
                       </TableRow>
                     ))
