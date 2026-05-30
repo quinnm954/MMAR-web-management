@@ -33,6 +33,7 @@ const navItems = [
   { to: "/portal/service-history", label: "Service History", icon: ClipboardList },
   { to: "/portal/checklists", label: "Recommendations", icon: AlertTriangle },
   { to: "/portal/vehicle-health", label: "Vehicle Health", icon: ClipboardList },
+  { to: "/portal/inspections", label: "Inspections", icon: ClipboardCheck },
   { to: "/portal/invoices", label: "Invoices", icon: Receipt },
   { to: "/portal/financing", label: "Financing", icon: CreditCard },
 ];
