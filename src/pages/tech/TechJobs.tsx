@@ -1,14 +1,13 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Loader2, Calendar, MapPin, Wrench, RefreshCw } from "lucide-react";
+import { Loader2, Calendar, MapPin, ClipboardCheck, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import TechLayout from "@/components/tech/TechLayout";
@@ -26,6 +25,7 @@ interface Appt {
   technician_notes: string | null;
   vehicle: { id: string; year: number | null; make: string | null; model: string | null } | null;
   customer?: { full_name: string | null; email: string | null } | null;
+  inspection_id?: string | null;
 }
 
 const STATUSES = ["scheduled", "in_progress", "completed", "cancelled"];
@@ -39,17 +39,10 @@ const statusColor = (s: string) => {
 
 const TechJobs = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [rows, setRows] = useState<Appt[]>([]);
   const [loading, setLoading] = useState(true);
-  const [logOpen, setLogOpen] = useState<Appt | null>(null);
-  const [saving, setSaving] = useState(false);
-  const [form, setForm] = useState({
-    service_type: "",
-    mileage_at_service: "",
-    labor_performed: "",
-    technician_notes: "",
-    invoice_total: "",
-  });
+  const [opening, setOpening] = useState<string | null>(null);
 
   const load = async () => {
     if (!user) return;
@@ -66,6 +59,17 @@ const TechJobs = () => {
       const byId: Record<string, { full_name: string | null; email: string | null }> = {};
       (profs ?? []).forEach((p) => { byId[p.id] = { full_name: p.full_name, email: p.email }; });
       list.forEach((r) => { r.customer = byId[r.customer_id] ?? null; });
+    }
+    // Attach existing inspection ids
+    const apptIds = list.map((r) => r.id);
+    if (apptIds.length) {
+      const { data: insps } = await supabase
+        .from("inspections")
+        .select("id, appointment_id")
+        .in("appointment_id", apptIds);
+      const map: Record<string, string> = {};
+      (insps ?? []).forEach((i: any) => { if (i.appointment_id) map[i.appointment_id] = i.id; });
+      list.forEach((r) => { r.inspection_id = map[r.id] ?? null; });
     }
     setRows(list);
     setLoading(false);
@@ -98,40 +102,69 @@ const TechJobs = () => {
     toast.success("Notes saved");
   };
 
-  const openLog = (a: Appt) => {
-    setForm({
-      service_type: a.service_type,
-      mileage_at_service: "",
-      labor_performed: "",
-      technician_notes: a.technician_notes ?? "",
-      invoice_total: "",
-    });
-    setLogOpen(a);
-  };
-
-  const saveLog = async () => {
-    if (!logOpen) return;
-    if (!logOpen.vehicle_id) return toast.error("This appointment has no vehicle attached");
-    setSaving(true);
-    const { error } = await supabase.from("service_records").insert({
-      appointment_id: logOpen.id,
-      customer_id: logOpen.customer_id,
-      vehicle_id: logOpen.vehicle_id,
-      service_date: new Date().toISOString().slice(0, 10),
-      service_type: form.service_type,
-      mileage_at_service: form.mileage_at_service ? parseInt(form.mileage_at_service) : null,
-      labor_performed: form.labor_performed || null,
-      technician_notes: form.technician_notes || null,
-      invoice_total: form.invoice_total ? parseFloat(form.invoice_total) : null,
-    });
-    if (!error) {
-      await supabase.from("appointments").update({ status: "completed" }).eq("id", logOpen.id);
+  const openInspection = async (a: Appt) => {
+    if (!user) return;
+    if (a.inspection_id) {
+      navigate(`/tech/inspections?inspection=${a.inspection_id}`);
+      return;
     }
-    setSaving(false);
-    if (error) return toast.error(error.message);
-    toast.success("Service logged");
-    setLogOpen(null);
-    load();
+    if (!a.vehicle_id) return toast.error("This job has no vehicle attached");
+    setOpening(a.id);
+
+    // Build item list from all active checklist templates
+    const { data: templates } = await supabase
+      .from("checklist_templates")
+      .select("id, name")
+      .eq("is_active", true);
+    const tplIds = (templates ?? []).map((t: any) => t.id);
+    let mergedItems: { category: string; item_name: string; sort_order: number }[] = [];
+    if (tplIds.length) {
+      const { data: tItems } = await supabase
+        .from("checklist_template_items")
+        .select("template_id, label, sort_order")
+        .in("template_id", tplIds)
+        .order("sort_order", { ascending: true });
+      const tplById: Record<string, string> = {};
+      (templates ?? []).forEach((t: any) => { tplById[t.id] = t.name; });
+      const seen = new Set<string>();
+      let order = 0;
+      (tItems ?? []).forEach((it: any) => {
+        const cat = tplById[it.template_id] ?? "General";
+        const key = `${cat}::${it.label}`;
+        if (seen.has(key)) return;
+        seen.add(key);
+        mergedItems.push({ category: cat, item_name: it.label, sort_order: order++ });
+      });
+    }
+    if (!mergedItems.length) {
+      mergedItems = [
+        { category: "General", item_name: "Walk-around inspection", sort_order: 0 },
+      ];
+    }
+
+    const { data: insp, error } = await supabase.from("inspections").insert({
+      technician_id: user.id,
+      customer_id: a.customer_id,
+      vehicle_id: a.vehicle_id,
+      appointment_id: a.id,
+      status: "in_progress",
+    }).select().single();
+
+    if (error || !insp) {
+      setOpening(null);
+      return toast.error(error?.message ?? "Failed to start inspection");
+    }
+    await supabase.from("inspection_items").insert(
+      mergedItems.map((m) => ({
+        inspection_id: insp.id,
+        category: m.category,
+        item_name: m.item_name,
+        status: "na",
+        sort_order: m.sort_order,
+      })),
+    );
+    setOpening(null);
+    navigate(`/tech/inspections?inspection=${insp.id}`);
   };
 
   return (
@@ -189,32 +222,26 @@ const TechJobs = () => {
                 </div>
               </div>
 
-              <Button variant="hero" size="sm" onClick={() => openLog(r)} className="w-full">
-                <Wrench className="h-4 w-4 mr-1" /> Log Service & Complete
+              <Button
+                variant="hero"
+                size="sm"
+                onClick={() => openInspection(r)}
+                disabled={opening === r.id}
+                className="w-full min-h-11"
+              >
+                {opening === r.id ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <>
+                    <ClipboardCheck className="h-4 w-4 mr-1" />
+                    {r.inspection_id ? "Open Inspection" : "Start Inspection"}
+                  </>
+                )}
               </Button>
             </CardContent>
           </Card>
         ))}
       </div>
-
-      <Dialog open={!!logOpen} onOpenChange={(v) => !v && setLogOpen(null)}>
-        <DialogContent className="max-w-lg">
-          <DialogHeader><DialogTitle>Log Service Record</DialogTitle></DialogHeader>
-          <div className="space-y-3">
-            <div><Label>Service Type *</Label><Input value={form.service_type} onChange={(e) => setForm({ ...form, service_type: e.target.value })} /></div>
-            <div><Label>Mileage</Label><Input type="number" value={form.mileage_at_service} onChange={(e) => setForm({ ...form, mileage_at_service: e.target.value })} /></div>
-            <div><Label>Labor Performed</Label><Textarea rows={2} value={form.labor_performed} onChange={(e) => setForm({ ...form, labor_performed: e.target.value })} /></div>
-            <div><Label>Technician Notes</Label><Textarea rows={2} value={form.technician_notes} onChange={(e) => setForm({ ...form, technician_notes: e.target.value })} /></div>
-            <div><Label>Invoice Total ($)</Label><Input type="number" step="0.01" value={form.invoice_total} onChange={(e) => setForm({ ...form, invoice_total: e.target.value })} /></div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setLogOpen(null)}>Cancel</Button>
-            <Button variant="hero" onClick={saveLog} disabled={saving || !form.service_type}>
-              {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save & Complete"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </TechLayout>
   );
 };

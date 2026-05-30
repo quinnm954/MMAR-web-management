@@ -1,68 +1,44 @@
-# Tech Dashboard Overview Hub
+# Inspection = the job completion
 
-Turn `/tech` from a bare jobs list into a proper overview hub, and consolidate checklists + inspections into one section.
+Make the inspection the only thing a tech fills out per job. Merge all 9 admin-defined checklist templates into one mobile-friendly form. Completing the inspection auto-completes the job and auto-creates the service record.
 
-## New routes
+## Behavior changes
 
-- `/tech` → **New** `TechHome` overview hub (replaces current dashboard view)
-- `/tech/jobs` → existing assigned-jobs list (current `TechDashboard` content, renamed)
-- `/tech/inspections` (existing checklists + inspections merged here)
-- `/tech/checklists` → redirect to `/tech/inspections` (keep links alive)
-- `/tech/customers` → **New** read-only customer + vehicle lookup
-- `/tech/history` → **New** service records the tech has logged
-- `/tech/time` → **New** labor hours tracker (uses existing `time_entries` table)
+**TechJobs (`/tech/jobs`)**
+- Remove the "Log Service & Complete" button and the entire log-service dialog.
+- Replace with a single primary action per card: **"Open Inspection"** → if an inspection already exists for that appointment, open it; otherwise create one and open it.
+- Keep status dropdown and notes field (handy for quick updates), but no manual service-record entry.
 
-## Overview hub layout (`/tech`)
+**TechInspections — single merged form**
+- When creating an inspection for an appointment, pull items from **all active** `checklist_templates` (`is_active = true`), via `checklist_template_items`, and insert them as `inspection_items` grouped by template name as the category.
+- De-dupe rule: collapse identical `(category, item_name)` pairs so the same item from two templates appears once.
+- Sort by template `sort_order` then item `sort_order`, so the form reads top-down in the order the admin set up.
+- Mobile-first tweaks: sticky category headers, large pass/warn/fail/N/A buttons (min 44px tap), one-tap photo capture, a sticky "Complete inspection" bar at the bottom, collapsible categories so the form stays scannable on a phone.
 
-Top: greeting + today's date.
+**On "Complete Inspection"**
+1. Mark `inspections.status = completed`, set `completed_at`.
+2. If the inspection has an `appointment_id`:
+   - Set `appointments.status = completed`.
+   - Insert a `service_records` row using: the appointment's `service_type`, today's date, `mileage` from inspection → `mileage_at_service`, `summary_notes` → `labor_performed`, and a summary like "Inspection #abcd1234" in `technician_notes`. Skip if a service_record already exists for that `appointment_id`.
+3. Toast and return to job list.
 
-**Stats row (4 cards):**
-- Jobs today (scheduled appointments assigned to me, today)
-- In progress (status = in_progress)
-- Completed this week
-- Hours this week (sum from `time_entries` where technician_id = me)
-
-**Quick-access cards (grid, mobile-first):**
-- My Jobs → `/tech/jobs`
-- Checklists & Inspections → `/tech/inspections`
-- Customers & Vehicles → `/tech/customers`
-- Service History → `/tech/history`
-- Labor Hours → `/tech/time`
-
-**Next up section:** next 3 upcoming appointments with quick "Start" / "Open" buttons.
-
-## Merge checklists + inspections
-
-The existing `/tech/inspections` page becomes the single home for both. Add tabs at the top: **Inspections** | **Checklists**. Move `TechChecklists` content into a tab inside `TechInspections`. Delete the separate route and update `TechLayout` nav: replace "Checklists" + "Inspections" entries with one **Inspections** entry.
-
-Mobile bottom nav becomes: Home · Jobs · Inspections · More (sheet with Customers, History, Time).
-
-## New pages
-
-**`TechCustomers`** — search bar + paginated list of customers (read-only). Click a row → expand to show vehicles + recent service history for that customer. Uses existing `profiles`, `vehicles`, `service_records` tables. Reuses tech role check; RLS already lets tech roles read these.
-
-**`TechHistory`** — list of `service_records` where `technician_id = auth.uid()` (need to confirm column exists; if not, filter via joined appointment.assigned_technician_id). Shows date, customer, vehicle, service type, labor performed.
-
-**`TechTime`** — clock in/out widget + list of today's/this-week's `time_entries` for the current tech, with totals. Optional link to an appointment when clocking in. Uses existing RLS policy "Technicians manage own time entries".
+## What gets removed
+- TechJobs: `openLog`, `saveLog`, `form` state, the entire `<Dialog>` for service logging, the "Log Service & Complete" button, related imports (Textarea, Select if unused, etc.).
+- The 12-item hardcoded `DEFAULT_TEMPLATE` in `TechInspections.tsx` — replaced by a loader that fetches `checklist_templates` + `checklist_template_items` and builds the merged item list.
 
 ## Files
 
-New:
-- `src/pages/tech/TechHome.tsx`
-- `src/pages/tech/TechJobs.tsx` (moved from current `TechDashboard.tsx`)
-- `src/pages/tech/TechCustomers.tsx`
-- `src/pages/tech/TechHistory.tsx`
-- `src/pages/tech/TechTime.tsx`
-
 Edited:
-- `src/App.tsx` — add new routes, redirect `/tech/checklists` → `/tech/inspections`
-- `src/components/tech/TechLayout.tsx` — new nav items (Home, Jobs, Inspections, Customers, History, Time)
-- `src/pages/tech/TechInspections.tsx` — add tabs to host checklists content
-- `src/pages/tech/TechDashboard.tsx` — becomes thin re-export of `TechJobs` or deleted (replaced by `TechHome`)
+- `src/pages/tech/TechJobs.tsx` — remove log flow; add "Open Inspection" action that creates-or-opens the appointment's inspection (navigates to `/tech/inspections?inspection=<id>` or sets internal state via shared route).
+- `src/pages/tech/TechInspections.tsx` — replace hardcoded template with merged-template loader, add auto service-record creation on completion, sticky bottom CTA, collapsible categories.
 
-No database changes — all required tables (`time_entries`, `service_records`, `appointments`, `vehicles`, `profiles`, `vehicle_inspections`, `vehicle_checklists`) and RLS policies already exist.
+No database schema changes. Uses existing tables: `checklist_templates`, `checklist_template_items`, `inspections`, `inspection_items`, `service_records`, `appointments`.
+
+## Open-deep-link detail
+
+To make "Open Inspection" from TechJobs land directly on the inspection editor, `TechInspections` will read an `?inspection=<id>` query param on mount and open that one. If the appointment has no inspection yet, TechJobs creates a draft inspection (same logic as the existing `createInspection`) then navigates with the new id.
 
 ## Out of scope
-- Editing customer data from tech view (read-only only)
-- New labor-pay calculations (admin already has `AdminTechLaborPay`)
-- Push notifications for new jobs
+- Editing checklist templates themselves (admin already has `AdminChecklists`).
+- Invoice creation — admin still does that from the new `service_records` row.
+- Photo annotations / signatures.

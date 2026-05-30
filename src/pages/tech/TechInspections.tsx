@@ -12,7 +12,9 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Loader2, Plus, ClipboardCheck, ClipboardList, Camera } from "lucide-react";
+import {
+  Loader2, Plus, ClipboardCheck, ClipboardList, Camera, ChevronDown, ChevronRight, ArrowLeft,
+} from "lucide-react";
 import { toast } from "sonner";
 
 interface Inspection {
@@ -48,22 +50,8 @@ type Checklist = {
   completed_at: string | null; created_at: string;
 };
 
-const DEFAULT_TEMPLATE = [
-  { category: "Engine", item_name: "Oil level & condition" },
-  { category: "Engine", item_name: "Coolant level" },
-  { category: "Engine", item_name: "Belts & hoses" },
-  { category: "Brakes", item_name: "Front brake pads" },
-  { category: "Brakes", item_name: "Rear brake pads" },
-  { category: "Brakes", item_name: "Brake fluid" },
-  { category: "Tires", item_name: "Tread depth" },
-  { category: "Tires", item_name: "Tire pressure" },
-  { category: "Lights", item_name: "Headlights" },
-  { category: "Lights", item_name: "Brake lights" },
-  { category: "Suspension", item_name: "Shocks/struts" },
-  { category: "Battery", item_name: "Battery & terminals" },
-];
-
-const ITEM_STATUSES = ["na", "pass", "warning", "fail"];
+const ITEM_STATUSES = ["na", "pass", "warning", "fail"] as const;
+const STATUS_LABEL: Record<string, string> = { na: "N/A", pass: "Pass", warning: "Warn", fail: "Fail" };
 const statusBadge = (s: string) => {
   if (s === "pass") return "bg-green-500/15 text-green-500";
   if (s === "warning") return "bg-yellow-500/15 text-yellow-500";
@@ -71,22 +59,52 @@ const statusBadge = (s: string) => {
   return "bg-muted text-muted-foreground";
 };
 
+const buildMergedTemplateItems = async (): Promise<{ category: string; item_name: string; sort_order: number }[]> => {
+  const { data: templates } = await supabase
+    .from("checklist_templates")
+    .select("id, name")
+    .eq("is_active", true);
+  const tplIds = (templates ?? []).map((t: any) => t.id);
+  const merged: { category: string; item_name: string; sort_order: number }[] = [];
+  if (!tplIds.length) return merged;
+  const { data: tItems } = await supabase
+    .from("checklist_template_items")
+    .select("template_id, label, sort_order")
+    .in("template_id", tplIds)
+    .order("sort_order", { ascending: true });
+  const tplName: Record<string, string> = {};
+  (templates ?? []).forEach((t: any) => { tplName[t.id] = t.name; });
+  const seen = new Set<string>();
+  let order = 0;
+  (tItems ?? []).forEach((it: any) => {
+    const cat = tplName[it.template_id] ?? "General";
+    const key = `${cat}::${it.label}`;
+    if (seen.has(key)) return;
+    seen.add(key);
+    merged.push({ category: cat, item_name: it.label, sort_order: order++ });
+  });
+  return merged;
+};
+
 const TechInspections = () => {
   const { user } = useAuth();
   const [params, setParams] = useSearchParams();
   const tab = params.get("tab") === "checklists" ? "checklists" : "inspections";
+  const inspectionParam = params.get("inspection");
 
-  // Inspections state
+  // Inspections
   const [inspections, setInspections] = useState<Inspection[]>([]);
   const [appts, setAppts] = useState<Appt[]>([]);
   const [loadingInsp, setLoadingInsp] = useState(true);
   const [openId, setOpenId] = useState<string | null>(null);
   const [items, setItems] = useState<InspItem[]>([]);
+  const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
   const [createOpen, setCreateOpen] = useState(false);
   const [newApptId, setNewApptId] = useState("");
   const [creating, setCreating] = useState(false);
+  const [completing, setCompleting] = useState(false);
 
-  // Checklists state
+  // Checklists
   const [checklists, setChecklists] = useState<Checklist[]>([]);
   const [loadingCl, setLoadingCl] = useState(true);
 
@@ -138,8 +156,29 @@ const TechInspections = () => {
 
   const openInspection = async (id: string) => {
     setOpenId(id);
-    const { data } = await supabase.from("inspection_items").select("*").eq("inspection_id", id).order("sort_order");
+    const { data } = await supabase
+      .from("inspection_items")
+      .select("*")
+      .eq("inspection_id", id)
+      .order("sort_order");
     setItems((data ?? []) as InspItem[]);
+  };
+
+  // Deep link: /tech/inspections?inspection=<id>
+  useEffect(() => {
+    if (inspectionParam && inspectionParam !== openId) {
+      openInspection(inspectionParam);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inspectionParam]);
+
+  const closeDetail = () => {
+    setOpenId(null);
+    if (params.get("inspection")) {
+      const next = new URLSearchParams(params);
+      next.delete("inspection");
+      setParams(next, { replace: true });
+    }
   };
 
   const createInspection = async () => {
@@ -156,13 +195,15 @@ const TechInspections = () => {
     }).select().single();
     if (error || !insp) { setCreating(false); return toast.error(error?.message ?? "Failed"); }
 
-    const rows = DEFAULT_TEMPLATE.map((t, idx) => ({
-      inspection_id: insp.id,
-      category: t.category,
-      item_name: t.item_name,
-      status: "na",
-      sort_order: idx,
-    }));
+    const merged = await buildMergedTemplateItems();
+    const rows = (merged.length ? merged : [{ category: "General", item_name: "Walk-around inspection", sort_order: 0 }])
+      .map((t) => ({
+        inspection_id: insp.id,
+        category: t.category,
+        item_name: t.item_name,
+        status: "na",
+        sort_order: t.sort_order,
+      }));
     await supabase.from("inspection_items").insert(rows);
     setCreating(false);
     setCreateOpen(false);
@@ -191,96 +232,201 @@ const TechInspections = () => {
 
   const completeInspection = async () => {
     if (!openId) return;
-    await supabase.from("inspections").update({
-      status: "completed",
-      completed_at: new Date().toISOString(),
-    }).eq("id", openId);
+    const current = inspections.find((i) => i.id === openId);
+    setCompleting(true);
+    const completedAt = new Date().toISOString();
+
+    // 1. mark inspection complete
+    const { error: e1 } = await supabase
+      .from("inspections")
+      .update({ status: "completed", completed_at: completedAt })
+      .eq("id", openId);
+    if (e1) { setCompleting(false); return toast.error(e1.message); }
+
+    // 2. if linked to an appointment, complete it + ensure a service_record exists
+    if (current?.appointment_id) {
+      const { data: appt } = await supabase
+        .from("appointments")
+        .select("id, service_type, customer_id, vehicle_id")
+        .eq("id", current.appointment_id)
+        .maybeSingle();
+
+      await supabase
+        .from("appointments")
+        .update({ status: "completed" })
+        .eq("id", current.appointment_id);
+
+      if (appt?.vehicle_id) {
+        const { data: existing } = await supabase
+          .from("service_records")
+          .select("id")
+          .eq("appointment_id", current.appointment_id)
+          .maybeSingle();
+        if (!existing) {
+          await supabase.from("service_records").insert({
+            appointment_id: appt.id,
+            customer_id: appt.customer_id,
+            vehicle_id: appt.vehicle_id,
+            service_date: new Date().toISOString().slice(0, 10),
+            service_type: appt.service_type,
+            mileage_at_service: current.mileage ?? null,
+            labor_performed: current.summary_notes ?? null,
+            technician_notes: `Inspection #${openId.slice(0, 8)}`,
+          });
+        }
+      }
+    }
+
+    setCompleting(false);
     toast.success("Inspection completed");
-    setOpenId(null);
+    closeDetail();
     loadInsp();
   };
 
   const updateMileageNotes = async (mileage: string, summary: string) => {
     if (!openId) return;
-    await supabase.from("inspections").update({
+    const patch: any = {
       mileage: mileage ? parseInt(mileage) : null,
       summary_notes: summary || null,
-    }).eq("id", openId);
+    };
+    await supabase.from("inspections").update(patch).eq("id", openId);
+    setInspections((prev) => prev.map((i) => i.id === openId ? { ...i, ...patch } : i));
   };
 
   const current = inspections.find((i) => i.id === openId) ?? null;
+  const grouped = items.reduce<Record<string, InspItem[]>>((acc, it) => {
+    (acc[it.category] ||= []).push(it);
+    return acc;
+  }, {});
+  const totalItems = items.length;
+  const answered = items.filter((i) => i.status !== "na").length;
 
-  // When viewing a single inspection, hide the tabs and show only that view
+  // Single inspection view (mobile-first)
   if (openId && current) {
     return (
       <TechLayout>
-        <div className="space-y-4 max-w-3xl">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-bold">Inspection</h2>
-              <p className="text-sm text-muted-foreground">
-                {current.vehicle ? `${current.vehicle.year} ${current.vehicle.make} ${current.vehicle.model}` : "Vehicle"}
-                {" — "}{current.customer?.full_name || current.customer?.email}
-              </p>
+        <div className="space-y-4 max-w-3xl pb-24">
+          <div className="flex items-center justify-between gap-2">
+            <Button variant="ghost" size="sm" onClick={closeDetail} className="-ml-2">
+              <ArrowLeft className="h-4 w-4 mr-1" /> Back
+            </Button>
+            <div className="text-xs text-muted-foreground">
+              {answered} / {totalItems} answered
             </div>
-            <Button variant="ghost" onClick={() => setOpenId(null)}>Back</Button>
+          </div>
+
+          <div>
+            <h2 className="text-xl font-bold">Inspection</h2>
+            <p className="text-sm text-muted-foreground">
+              {current.vehicle ? `${current.vehicle.year} ${current.vehicle.make} ${current.vehicle.model}` : "Vehicle"}
+              {" — "}{current.customer?.full_name || current.customer?.email}
+            </p>
           </div>
 
           <Card>
             <CardContent className="p-4 grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
                 <Label>Mileage</Label>
-                <Input type="number" defaultValue={current.mileage ?? ""} onBlur={(e) => updateMileageNotes(e.target.value, current.summary_notes ?? "")} />
+                <Input
+                  type="number"
+                  inputMode="numeric"
+                  defaultValue={current.mileage ?? ""}
+                  onBlur={(e) => updateMileageNotes(e.target.value, current.summary_notes ?? "")}
+                />
               </div>
               <div>
-                <Label>Summary</Label>
-                <Input defaultValue={current.summary_notes ?? ""} onBlur={(e) => updateMileageNotes(String(current.mileage ?? ""), e.target.value)} />
+                <Label>Summary / labor performed</Label>
+                <Input
+                  defaultValue={current.summary_notes ?? ""}
+                  onBlur={(e) => updateMileageNotes(String(current.mileage ?? ""), e.target.value)}
+                />
               </div>
             </CardContent>
           </Card>
 
-          {Object.entries(items.reduce<Record<string, InspItem[]>>((acc, it) => {
-            (acc[it.category] ||= []).push(it);
-            return acc;
-          }, {})).map(([cat, list]) => (
-            <Card key={cat}>
-              <CardHeader className="pb-2"><CardTitle className="text-base">{cat}</CardTitle></CardHeader>
-              <CardContent className="space-y-3">
-                {list.map((it) => (
-                  <div key={it.id} className="border-b border-border/50 pb-3 last:border-0 space-y-2">
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="text-sm font-medium">{it.item_name}</div>
-                      <div className="flex gap-1">
-                        {ITEM_STATUSES.map((s) => (
-                          <button
-                            key={s}
-                            onClick={() => updateItem(it.id, { status: s })}
-                            className={`text-xs px-2 py-1 rounded ${it.status === s ? statusBadge(s) : "bg-muted text-muted-foreground"}`}
-                          >
-                            {s}
-                          </button>
-                        ))}
+          {Object.entries(grouped).map(([cat, list]) => {
+            const isCollapsed = collapsed[cat];
+            const catAnswered = list.filter((i) => i.status !== "na").length;
+            return (
+              <Card key={cat}>
+                <CardHeader className="pb-2 cursor-pointer select-none" onClick={() => setCollapsed((c) => ({ ...c, [cat]: !c[cat] }))}>
+                  <CardTitle className="text-base flex items-center justify-between gap-2">
+                    <span className="flex items-center gap-1.5">
+                      {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                      {cat}
+                    </span>
+                    <Badge variant="outline" className="text-[10px]">{catAnswered}/{list.length}</Badge>
+                  </CardTitle>
+                </CardHeader>
+                {!isCollapsed && (
+                  <CardContent className="space-y-3">
+                    {list.map((it) => (
+                      <div key={it.id} className="border-b border-border/50 pb-3 last:border-0 space-y-2">
+                        <div className="text-sm font-medium">{it.item_name}</div>
+                        <div className="grid grid-cols-4 gap-1.5">
+                          {ITEM_STATUSES.map((s) => (
+                            <button
+                              key={s}
+                              onClick={() => updateItem(it.id, { status: s })}
+                              className={`min-h-11 text-xs font-medium rounded px-2 ${
+                                it.status === s ? statusBadge(s) : "bg-muted text-muted-foreground hover:bg-muted/70"
+                              }`}
+                            >
+                              {STATUS_LABEL[s]}
+                            </button>
+                          ))}
+                        </div>
+                        <Textarea
+                          rows={1}
+                          placeholder="Notes (optional)"
+                          defaultValue={it.notes ?? ""}
+                          onBlur={(e) => updateItem(it.id, { notes: e.target.value })}
+                        />
+                        <div className="flex flex-wrap gap-2 items-center">
+                          {(it.photo_urls ?? []).map((u, idx) => (
+                            <img key={idx} src={u} alt="" className="h-14 w-14 rounded object-cover border border-border" />
+                          ))}
+                          <label className="cursor-pointer text-xs flex items-center gap-1 min-h-11 px-3 rounded border border-dashed border-border text-muted-foreground hover:text-foreground">
+                            <Camera className="h-4 w-4" /> Photo
+                            <input
+                              type="file"
+                              accept="image/*"
+                              capture="environment"
+                              hidden
+                              onChange={(e) => e.target.files?.[0] && uploadPhoto(it, e.target.files[0])}
+                            />
+                          </label>
+                        </div>
                       </div>
-                    </div>
-                    <Textarea rows={1} placeholder="Notes" defaultValue={it.notes ?? ""} onBlur={(e) => updateItem(it.id, { notes: e.target.value })} />
-                    <div className="flex flex-wrap gap-2 items-center">
-                      {(it.photo_urls ?? []).map((u, idx) => (
-                        <img key={idx} src={u} className="h-14 w-14 rounded object-cover border border-border" />
-                      ))}
-                      <label className="cursor-pointer text-xs flex items-center gap-1 px-2 py-1 rounded border border-dashed border-border text-muted-foreground hover:text-foreground">
-                        <Camera className="h-3 w-3" /> Photo
-                        <input type="file" accept="image/*" capture="environment" hidden onChange={(e) => e.target.files?.[0] && uploadPhoto(it, e.target.files[0])} />
-                      </label>
-                    </div>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-          ))}
+                    ))}
+                  </CardContent>
+                )}
+              </Card>
+            );
+          })}
+        </div>
 
-          <Button variant="hero" className="w-full" onClick={completeInspection}>
-            <ClipboardCheck className="h-4 w-4 mr-1" /> Complete Inspection
-          </Button>
+        {/* Sticky bottom complete bar */}
+        <div className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-card/95 backdrop-blur safe-pb lg:left-auto lg:right-0 lg:w-[calc(100%-0px)]">
+          <div className="container mx-auto px-4 py-3">
+            <Button
+              variant="hero"
+              className="w-full min-h-12"
+              onClick={completeInspection}
+              disabled={completing || current.status === "completed"}
+            >
+              {completing ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : current.status === "completed" ? (
+                <>Inspection already completed</>
+              ) : (
+                <>
+                  <ClipboardCheck className="h-4 w-4 mr-1" />
+                  Complete Inspection & Job
+                </>
+              )}
+            </Button>
+          </div>
         </div>
       </TechLayout>
     );
