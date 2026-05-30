@@ -51,6 +51,7 @@ import TechInspections from "./pages/tech/TechInspections";
 import TechChecklists from "./pages/tech/TechChecklists";
 import PortalChecklists from "./pages/portal/PortalChecklists";
 import PortalVehicleHealth from "./pages/portal/PortalVehicleHealth";
+import PortalInspections from "./pages/portal/PortalInspections";
 import TechProtectedRoute from "./components/tech/TechProtectedRoute";
 import EstimateApproval from "./pages/EstimateApproval";
 import InspectionReport from "./pages/InspectionReport";
