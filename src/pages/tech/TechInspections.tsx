@@ -111,16 +111,34 @@ const TechInspections = () => {
   const loadInsp = async () => {
     if (!user) return;
     setLoadingInsp(true);
-    const [i, a] = await Promise.all([
-      supabase.from("inspections")
-        .select("*")
-        .eq("technician_id", user.id)
-        .order("created_at", { ascending: false }),
-      supabase.from("appointments")
-        .select("id, service_type, customer_id, vehicle_id")
-        .eq("assigned_technician_id", user.id)
-        .in("status", ["scheduled", "in_progress"]),
-    ]);
+    // Get all appointments assigned to this tech (any status) so we can
+    // surface inspections linked to those appointments — even when the
+    // inspection itself has no technician_id set yet.
+    const { data: allAssigned } = await supabase
+      .from("appointments")
+      .select("id, service_type, customer_id, vehicle_id, status")
+      .eq("assigned_technician_id", user.id);
+    const assignedApptIds = (allAssigned ?? []).map((x: any) => x.id);
+    const assignedCustomerIds = Array.from(
+      new Set((allAssigned ?? []).map((x: any) => x.customer_id).filter(Boolean))
+    );
+
+    // Build an OR filter: own inspections, linked appointment, or
+    // unclaimed inspection for a customer this tech is assigned to.
+    const orParts: string[] = [`technician_id.eq.${user.id}`];
+    if (assignedApptIds.length) orParts.push(`appointment_id.in.(${assignedApptIds.join(",")})`);
+    if (assignedCustomerIds.length) orParts.push(`customer_id.in.(${assignedCustomerIds.join(",")})`);
+
+    const i = await supabase
+      .from("inspections")
+      .select("*")
+      .or(orParts.join(","))
+      .order("created_at", { ascending: false });
+
+    const activeAppts = (allAssigned ?? []).filter((x: any) =>
+      ["scheduled", "in_progress"].includes(x.status)
+    );
+
     const list = ((i.data ?? []) as unknown) as Inspection[];
     const custIds = Array.from(new Set(list.map((x) => x.customer_id)));
     const vehIds = Array.from(new Set(list.map((x) => x.vehicle_id).filter(Boolean)));
@@ -137,7 +155,7 @@ const TechInspections = () => {
       x.vehicle = vehMap[x.vehicle_id] ?? null;
     });
     setInspections(list);
-    setAppts((a.data ?? []) as Appt[]);
+    setAppts(activeAppts as Appt[]);
     setLoadingInsp(false);
   };
 
