@@ -113,7 +113,7 @@ const MembershipSignup = () => {
 
           {step > 0 && (
             <div className="text-center mt-4">
-              <Button variant="ghost" size="sm" onClick={() => navigate("/memberships")}>
+              <Button variant="ghost" size="sm" onClick={() => navigate("/mmar-care")}>
                 Cancel and view plans
               </Button>
             </div>

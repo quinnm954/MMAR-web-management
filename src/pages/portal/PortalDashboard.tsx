@@ -98,7 +98,7 @@ const PortalDashboard = () => {
             Lock in predictable mobile maintenance with priority scheduling and member discounts.
           </p>
           <Button variant="hero" asChild>
-            <Link to="/memberships">View Plans <ArrowRight className="h-4 w-4 ml-1" /></Link>
+            <Link to="/mmar-care">View Plans <ArrowRight className="h-4 w-4 ml-1" /></Link>
           </Button>
         </CardContent>
       </Card>

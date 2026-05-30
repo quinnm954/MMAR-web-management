@@ -87,7 +87,7 @@ const PortalMembership = () => {
           <CardContent className="p-12 text-center">
             <CreditCard className="h-12 w-12 text-muted-foreground/40 mx-auto mb-3" />
             <p className="text-muted-foreground mb-4">No memberships yet.</p>
-            <Button variant="hero" asChild><Link to="/memberships">View Plans</Link></Button>
+            <Button variant="hero" asChild><Link to="/mmar-care">View Plans</Link></Button>
           </CardContent>
         </Card>
       ) : (
