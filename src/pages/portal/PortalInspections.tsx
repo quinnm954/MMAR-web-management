@@ -13,6 +13,16 @@ import {
 } from "@/components/ui/accordion";
 import { ClipboardCheck, Loader2, FileText } from "lucide-react";
 
+interface InspItem {
+  id: string;
+  category: string;
+  item_name: string;
+  status: "green" | "yellow" | "red" | "na";
+  notes: string | null;
+  photo_urls: string[];
+  sort_order: number;
+}
+
 interface Inspection {
   id: string;
   status: string;
@@ -22,6 +32,7 @@ interface Inspection {
   completed_at: string | null;
   created_at: string;
   vehicle: { year: number | null; make: string | null; model: string | null } | null;
+  inspection_items: InspItem[];
 }
 
 interface Template {
@@ -37,6 +48,14 @@ const statusVariant: Record<string, "default" | "secondary" | "outline"> = {
   sent: "default",
   in_progress: "secondary",
 };
+
+const dotColor: Record<string, string> = {
+  green: "bg-green-500",
+  yellow: "bg-yellow-500",
+  red: "bg-red-500",
+  na: "bg-muted",
+};
+
 
 const PortalInspections = () => {
   const { user } = useAuth();
