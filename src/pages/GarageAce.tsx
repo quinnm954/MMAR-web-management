@@ -1,11 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Wrench,
   CalendarCheck,
@@ -19,15 +17,12 @@ import {
   Smartphone,
   BarChart3,
   Phone,
-  Loader2,
   LogIn,
 } from "lucide-react";
-import { toast } from "sonner";
 import { useSeo } from "@/lib/useSeo";
 import { PLATFORM_BRAND } from "@/lib/brand";
 import { useAuth } from "@/hooks/useAuth";
-import { lovable } from "@/integrations/lovable";
-import { supabase } from "@/integrations/supabase/client";
+
 
 const FEATURES = [
   { icon: ClipboardList, title: "Repair orders & estimates", text: "Build estimates, get digital approvals, convert to ROs and invoices in one flow." },
@@ -70,12 +65,9 @@ const FAQ = [
 const GarageAce = () => {
   const canonical = "https://shop-flow-home.lovable.app/garage-ace";
   const navigate = useNavigate();
-  const { signIn, user, isAdmin, isStaff, isLoading } = useAuth();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [busy, setBusy] = useState(false);
+  const { user, isAdmin, isStaff, isLoading } = useAuth();
 
-  // Auto-route signed-in users to their portal
+  // Auto-route signed-in users to their portal based on role
   useEffect(() => {
     if (isLoading || !user) return;
     if (isAdmin) navigate("/admin/dashboard", { replace: true });
@@ -83,36 +75,6 @@ const GarageAce = () => {
     else navigate("/portal/dashboard", { replace: true });
   }, [user, isAdmin, isStaff, isLoading, navigate]);
 
-  const handleSignIn = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setBusy(true);
-    const { error } = await signIn(email, password);
-    setBusy(false);
-    if (error) toast.error(error.message || "Sign in failed");
-    else toast.success("Welcome back");
-  };
-
-  const handleGoogle = async () => {
-    setBusy(true);
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
-    });
-    if (result.error) {
-      toast.error("Google sign-in failed");
-      setBusy(false);
-    }
-  };
-
-  const handleForgotPassword = async () => {
-    if (!email) return toast.error("Enter your email above first");
-    setBusy(true);
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: window.location.origin + "/set-password",
-    });
-    setBusy(false);
-    if (error) toast.error(error.message);
-    else toast.success("Password reset email sent. Check your inbox.");
-  };
 
   useSeo({
     title: "Garage Ace — Shop Management Software & Admin/Staff Login",
