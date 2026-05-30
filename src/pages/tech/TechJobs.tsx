@@ -51,6 +51,7 @@ const TechJobs = () => {
       .from("appointments")
       .select("id, service_type, description, service_address, scheduled_at, requested_date, status, customer_id, vehicle_id, technician_notes, vehicle:vehicles(id, year, make, model)")
       .eq("assigned_technician_id", user.id)
+      .in("status", ["scheduled", "in_progress"])
       .order("scheduled_at", { ascending: true, nullsFirst: false });
     const list = (data as unknown as Appt[]) ?? [];
     const ids = Array.from(new Set(list.map((r) => r.customer_id)));
