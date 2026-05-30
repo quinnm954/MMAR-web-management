@@ -121,17 +121,27 @@ const AboutPage = () => {
           </p>
 
           <h2 className="font-display text-2xl md:text-3xl text-sky mt-10 mb-4">
-            Why we built MMAR Care
+            Why we built Garage Ace (the app)
           </h2>
           <p className="text-muted-foreground leading-relaxed">
             After a few years of running paper invoices and chasing customers down to schedule
-            follow-ups, we built our own customer portal —{" "}
-            <Link to="/mmar-care" className="text-primary hover:underline">MMAR Care</Link>. It's
-            free for every customer. You can manage every vehicle in your household, request
+            follow-ups, we built our own customer app —{" "}
+            <Link to="/why-garage-ace" className="text-primary hover:underline">Garage Ace</Link>.
+            It's free for every customer. You can manage every vehicle in your household, request
             appointments, approve estimates, see digital inspection photos, pay invoices, and pull
-            up service history any time you need it. Optional memberships add discounted labor,
-            included oil changes, and priority scheduling — they pay for themselves with one or two
-            services a year.
+            up service history any time you need it.
+          </p>
+
+          <h2 className="font-display text-2xl md:text-3xl text-sky mt-10 mb-4">
+            Why we built MMAR Care (the plan)
+          </h2>
+          <p className="text-muted-foreground leading-relaxed">
+            Inside the app, customers can subscribe to{" "}
+            <Link to="/mmar-care" className="text-primary hover:underline">MMAR Care</Link> — our
+            monthly maintenance plan. It bundles in oil changes, priority scheduling, discounted
+            labor, and a transferable warranty, so the predictable parts of car ownership become a
+            small monthly bill instead of a surprise $400 invoice every few months. Most members
+            cover the plan cost with one or two services a year.
           </p>
           <p className="text-muted-foreground leading-relaxed">
             For households or small businesses with{" "}
@@ -180,10 +190,10 @@ const AboutPage = () => {
                 <Phone className="w-4 h-4" /> Call (813) 501-7572
               </a>
               <Link
-                to="/mmar-care"
+                to="/why-garage-ace"
                 className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg border border-primary/50 text-primary font-semibold hover:bg-primary/10 transition-colors"
               >
-                Learn About MMAR Care <ArrowRight className="w-4 h-4" />
+                Why You Need The App <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
           </div>

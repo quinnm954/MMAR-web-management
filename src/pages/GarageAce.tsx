@@ -198,9 +198,15 @@ const GarageAce = () => {
                 <li className="flex items-start gap-2"><Wrench className="h-4 w-4 text-accent mt-0.5 shrink-0" /> Techs & advisors → Tech app</li>
               </ul>
               <p className="text-sm text-muted-foreground mt-4">
-                MMAR Care customer?{" "}
-                <Link to="/mmar-care" className="text-primary hover:underline font-medium">
-                  Sign in on the MMAR Care page →
+                Customer?{" "}
+                <Link to="/login" className="text-primary hover:underline font-medium">
+                  Sign in to your Garage Ace account →
+                </Link>
+              </p>
+              <p className="text-xs text-muted-foreground mt-2">
+                New here?{" "}
+                <Link to="/why-garage-ace" className="text-primary hover:underline">
+                  Why do I need this app?
                 </Link>
               </p>
             </div>
@@ -269,9 +275,13 @@ const GarageAce = () => {
                       </Button>
                     </form>
                     <div className="text-xs text-center text-muted-foreground">
-                      Customer looking for the portal?{" "}
-                      <Link to="/mmar-care" className="text-primary hover:underline">
-                        Go to MMAR Care
+                      Customer?{" "}
+                      <Link to="/login" className="text-primary hover:underline">
+                        Sign in here
+                      </Link>
+                      {" · "}
+                      <Link to="/why-garage-ace" className="text-primary hover:underline">
+                        What's this app?
                       </Link>
                     </div>
                   </>
