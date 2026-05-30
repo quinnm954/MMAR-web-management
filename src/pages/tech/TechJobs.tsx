@@ -28,7 +28,7 @@ interface Appt {
   inspection_id?: string | null;
 }
 
-interface Record {
+interface ServiceRecord {
   id: string;
   service_date: string;
   service_type: string;
