@@ -154,7 +154,6 @@ const TechDashboard = () => {
     { to: "/tech/inspections", label: "Inspections & Checklists", icon: ClipboardCheck, desc: "Multi-point inspections" },
     { to: "/tech/customers", label: "Customers & Vehicles", icon: Users, desc: "Look up history" },
     { to: "/tech/history", label: "Service History", icon: History, desc: "Records I logged" },
-    { to: "/tech/time", label: "Labor Hours", icon: Clock, desc: "Clock in & track time" },
   ];
 
   return (
