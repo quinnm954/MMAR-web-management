@@ -262,6 +262,32 @@ export default function AdminReports() {
       });
       setProfitRows(rows);
 
+      // Membership payments
+      const mpData = (mpRes.data ?? []) as any[];
+      const memberCustIds = Array.from(new Set(mpData.map((r) => r.customer_id).filter(Boolean)));
+      const newCustIds = memberCustIds.filter((id) => !customerMap.has(id));
+      if (newCustIds.length) {
+        const { data: extra } = await supabase.from('profiles').select('id, full_name, email').in('id', newCustIds);
+        (extra ?? []).forEach((p: any) => customerMap.set(p.id, p));
+      }
+      const mRows = mpData.map((r) => {
+        const cust = customerMap.get(r.customer_id);
+        const amount = Number(r.amount || 0);
+        const actualFee = r.stripe_fee != null ? Number(r.stripe_fee) : null;
+        const fee = actualFee != null ? actualFee : estimatedStripeFee(amount, true, true);
+        return {
+          id: r.id,
+          paid_at: r.paid_at,
+          kind: r.kind,
+          amount,
+          stripeFee: fee,
+          stripeFeeIsActual: actualFee != null,
+          member: cust?.full_name || cust?.email || '—',
+          plan: r.membership?.plan?.name || '—',
+        };
+      });
+      setMemberRows(mRows);
+
       const totalLaborHrs = rows.reduce((s, r) => s + r.paidLaborHours, 0);
 
       setData({
