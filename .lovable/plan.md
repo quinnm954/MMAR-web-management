@@ -1,70 +1,72 @@
-## Goal
+## Plan: Add a "Why Garage Ace?" customer bio + fix MMAR Care wording across the site
 
-Make membership signups actually complete the Stripe charge (deposit + monthly subscription), then record every membership payment locally so admin reports show correct revenue, Stripe fees, and totals.
+### Corrected brand model
 
-## Problems found
+- **Garage Ace** = the customer app / portal / native app — the thing customers log into to manage vehicles, approve estimates, see inspections, pay invoices.
+- **MMAR Care** = the maintenance plan / membership program customers subscribe to inside Garage Ace. It is a product offering, not an app or portal.
 
-1. **Checkout fails immediately.** `create-membership-checkout` passes `subscription_data.add_invoice_items`, which is not a valid Stripe parameter. Edge function logs show every signup returning `parameter_unknown`. The one membership in the DB (`status='pending'`, `deposit_paid=false`, no `stripe_subscription_id`) confirms no customer has ever actually paid.
-2. **Membership revenue is invisible to reporting.** `AdminReports` pulls from the `invoices` table only. Subscription deposits and monthly recurring charges are never written there, so revenue, Stripe fees, and totals are understated.
-3. **No record of individual membership payments.** There's no `membership_payments` table, so we can't audit what each member has been charged or reconcile against Stripe.
+Today the site conflates these — `MmarCare.tsx` is built as a customer-portal sign-in page, Navigation labels it "MMAR Care Portal", Login.tsx says "For MMAR Care customers", etc. We need to fix that and add a bio page that answers "why do I need this app?"
 
-## Fix plan
+### 1. New page: `src/pages/WhyGarageAce.tsx` (route `/why-garage-ace`)
 
-### 1. Fix Stripe Checkout session creation
-In `supabase/functions/create-membership-checkout/index.ts`, charge the deposit as a second `line_items` entry (Checkout in subscription mode accepts mixed one-time + recurring line items) instead of using `subscription_data.add_invoice_items`:
+Public, customer-facing bio that the shop can send to anyone asking "why do I need this app?". Conversational tone, no jargon.
 
-```
-line_items: [
-  { price: plan.stripe_price_id, quantity: 1 },               // recurring monthly
-  ...(depositCents > 0 ? [{                                   // one-time deposit
-    quantity: 1,
-    price_data: {
-      currency: "usd",
-      unit_amount: depositCents,
-      product_data: { name: `${plan.name} — Membership Deposit (non-refundable)` },
-    },
-  }] : []),
-],
-```
+Sections:
+- **Hero** — "Your car, your phone, your peace of mind." One line on what Garage Ace is for customers (the free app from Mike's Mobile Auto Repair).
+- **The problem** — receipts in glove boxes, forgotten oil-change dates, phone tag for quotes, paper inspection sheets.
+- **What Garage Ace does for you** — vehicle history, request appointments, approve estimates from your phone, see inspection photos, pay invoices, manage household vehicles.
+- **Where MMAR Care fits in** — short callout: MMAR Care is the optional monthly maintenance plan you can subscribe to inside the app. The app is free either way.
+- **Common questions** — Do I have to pay? (No.) Do I need to download anything? (No, works in any browser; native app optional.) Is my info safe? Can I share access with my spouse?
+- **Get started** — sign-up CTA + text/call CTA.
 
-Drop the broken `subscription_data.add_invoice_items` block. Keep the metadata.
+Uses `Navigation`, `Footer`, `FloatingCallButton`, `useSeo`, existing Tailwind tokens (sky/gold), Lucide icons. Mobile-first.
 
-### 2. New `membership_payments` table
-Migration to create a normalized record of every charge tied to a membership:
+### 2. Fix MMAR Care discrepancies across the site
 
-- `membership_id`, `kind` ('deposit' | 'subscription'), `amount`, `stripe_invoice_id`, `stripe_payment_intent_id`, `stripe_charge_id`, `stripe_fee`, `period_start`, `period_end`, `paid_at`, `status`.
-- Unique on `stripe_invoice_id` so retried webhooks don't double-insert.
-- RLS: members read their own rows; admins read all; service role writes.
-- GRANTs for `authenticated` and `service_role`.
+**`src/pages/MmarCare.tsx`** — rebuild as the marketing page for the MMAR Care **maintenance plan program** (not a portal/login page).
+- Remove the sign-in card entirely (login lives in Garage Ace).
+- Reframe copy: MMAR Care = subscription maintenance plans (oil changes included, priority scheduling, discounted labor, per-VIN coverage).
+- CTAs: "View plans" → `/memberships`, "Sign up" → `/login?tab=signup`, "Already a member? Open the app" → `/login`.
+- Update SEO title/description to "MMAR Care Maintenance Plans" (no "Portal").
+- Replace "What's inside MMAR Care" feature grid with plan benefits (included services, priority, savings, transferable warranty) instead of app features.
 
-### 3. Webhook: record every Stripe invoice for membership subs
-Extend `supabase/functions/stripe-webhook/index.ts`:
+**`src/components/Navigation.tsx`**
+- Line 61: change `"MMAR Care Portal"` → `"Garage Ace"` (or `PLATFORM_BRAND.name`).
+- Lines 132 & 245: the menu item labeled "MMAR Care" that links to the portal — split or relabel: keep a "MMAR Care" link pointing to `/mmar-care` (plan info), and add/rename the portal/sign-in link to "Garage Ace" pointing to `/login` or `/portal/dashboard`.
 
-- On `invoice.payment_succeeded` where `invoice.subscription` is set, look up the membership by `stripe_subscription_id`. For each line item, classify deposit vs recurring (by price_id vs the plan's `stripe_price_id`), then upsert a `membership_payments` row including the Stripe fee from the charge's balance transaction.
-- Continue updating `memberships.next_billing_date` and (newly) `current_period_end`.
-- On `invoice.payment_failed`, set `memberships.status = 'past_due'`.
-- On `charge.refunded` for a membership invoice, mark the matching `membership_payments` row as `refunded`.
+**`src/pages/Login.tsx`** (line 157)
+- Change `"For MMAR Care customers and staff"` → `"For Garage Ace customers and staff"`.
 
-### 4. Surface membership revenue in admin reports
-In `src/components/admin/AdminReports.tsx`:
+**`src/pages/GarageAce.tsx`**
+- Lines 201–205 & 271–275: "MMAR Care customer? Sign in on the MMAR Care page" — wrong. Customers sign in on Garage Ace itself. Replace with a single combined "Customer sign-in" affordance (or keep the staff card and add a customer link to `/login`).
+- Lines 54, 176, 334, 341: keep "Powering MMAR Care" references — these are correct (Garage Ace powers the MMAR Care plan program at this shop).
 
-- Fetch `membership_payments` for the same date window alongside `invoices`.
-- Add membership revenue and Stripe fees into the existing Summary buckets (day/week/month/year) and KPI totals.
-- Add a Memberships section to the Detail tab showing each charge (member name, plan, kind, amount, fee, paid_at) with the same D/W/M/Y filtering.
+**`src/components/Hero.tsx`** (line 66) — `"Join MMAR Care — Member Plans"` — keep, this is correct (joining the plan).
 
-### 5. Extend Stripe fee sync to memberships
-Update `supabase/functions/sync-stripe-fees/index.ts` to also iterate `membership_payments` rows missing `stripe_fee` and backfill them from the balance transaction, same pattern as invoices.
+**`src/pages/AboutPage.tsx`** — adjust the "Why we built MMAR Care" section copy: split into "Why we built Garage Ace (the app)" and "Why we built MMAR Care (the plan)". Update the existing paragraph that calls MMAR Care a portal.
 
-### 6. Verification checklist
-- Submit a test signup → Checkout opens with two line items (monthly + deposit), payment succeeds.
-- Webhook activates membership, sets `stripe_subscription_id`, `deposit_paid=true`, and writes a `deposit` + `subscription` row in `membership_payments`.
-- Admin → Reports shows the new revenue under the selected period, with the Stripe fee populated after sync.
-- Member portal still shows their active membership.
+**`src/lib/brand.ts`** — update the JSDoc comment block to reflect: PRODUCT_BRAND is the maintenance plan product, not "the customer-facing service product / public marketing site". Keep `name: "MMAR Care"` and `tagline: "Mobile mechanic care plans"` (already correct).
 
-## Files touched
+### 3. Route + cross-links
 
-- `supabase/functions/create-membership-checkout/index.ts` (fix line items)
-- `supabase/migrations/<new>.sql` (create `membership_payments` + RLS + grants)
-- `supabase/functions/stripe-webhook/index.ts` (record payments, handle failed/refunded)
-- `supabase/functions/sync-stripe-fees/index.ts` (cover membership payments)
-- `src/components/admin/AdminReports.tsx` (include membership revenue/fees in summary + detail)
+- Register `/why-garage-ace` route in `src/App.tsx`.
+- Add a small "Why do I need this app?" link to:
+  - The new revamped `/mmar-care` page (so members understand the app too).
+  - `/login` page (subtle link under the sign-in form).
+
+### 4. Memory update
+
+Update `mem://branding/platform-name` so future work doesn't reintroduce the same confusion: explicitly state MMAR Care is a **maintenance plan / membership product**, not a portal or app. Garage Ace is the only app/portal brand.
+
+### Files touched
+- `src/pages/WhyGarageAce.tsx` (new)
+- `src/App.tsx` (route)
+- `src/pages/MmarCare.tsx` (rebuild as plan marketing page)
+- `src/components/Navigation.tsx` (labels)
+- `src/pages/Login.tsx` (copy)
+- `src/pages/GarageAce.tsx` (customer sign-in references)
+- `src/pages/AboutPage.tsx` (split brand explanation)
+- `src/lib/brand.ts` (JSDoc only)
+- `mem://branding/platform-name` (clarify)
+
+No database changes.
