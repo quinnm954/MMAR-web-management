@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { Wrench, ClipboardCheck, LogOut, LayoutDashboard, Users, History, Clock } from "lucide-react";
+import { Wrench, ClipboardCheck, LogOut, LayoutDashboard, Users, History } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import MobileBottomNav from "@/components/shell/MobileBottomNav";
@@ -15,7 +15,6 @@ const primary = [
 const more = [
   { to: "/tech/customers", label: "Customers", icon: Users },
   { to: "/tech/history", label: "Service History", icon: History },
-  { to: "/tech/time", label: "Labor Hours", icon: Clock },
 ];
 
 const allDesktop = [...primary, ...more];
