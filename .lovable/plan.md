@@ -1,69 +1,70 @@
-## Master Vehicle Health Checklist
+## Goal
 
-A single, persistent **Vehicle Health Checklist** per vehicle that aggregates items from every inspection template, auto-updates after each tech inspection, and is editable by both the admin and the customer.
+Make membership signups actually complete the Stripe charge (deposit + monthly subscription), then record every membership payment locally so admin reports show correct revenue, Stripe fees, and totals.
 
-### Concept
+## Problems found
 
-Today: each appointment spawns one or more disposable `service_checklists` from templates. The customer only sees flagged items from the most recent job.
+1. **Checkout fails immediately.** `create-membership-checkout` passes `subscription_data.add_invoice_items`, which is not a valid Stripe parameter. Edge function logs show every signup returning `parameter_unknown`. The one membership in the DB (`status='pending'`, `deposit_paid=false`, no `stripe_subscription_id`) confirms no customer has ever actually paid.
+2. **Membership revenue is invisible to reporting.** `AdminReports` pulls from the `invoices` table only. Subscription deposits and monthly recurring charges are never written there, so revenue, Stripe fees, and totals are understated.
+3. **No record of individual membership payments.** There's no `membership_payments` table, so we can't audit what each member has been charged or reconcile against Stripe.
 
-New: every vehicle has **one master checklist** — a living record of every inspection point (brakes, fluids, suspension, tires, etc.) with current status, last-checked date, who checked it, and notes. Per-job tech checklists keep working as they do now, but on save they **push results into the master**.
+## Fix plan
 
-### Data model
+### 1. Fix Stripe Checkout session creation
+In `supabase/functions/create-membership-checkout/index.ts`, charge the deposit as a second `line_items` entry (Checkout in subscription mode accepts mixed one-time + recurring line items) instead of using `subscription_data.add_invoice_items`:
 
-New table `vehicle_master_checklist_items`:
-- `vehicle_id`, `customer_id`
-- `category` (Brakes, Fluids, Tires, Suspension, etc.)
-- `label` (e.g. "Front brake pads")
-- `status` (`good` | `monitor` | `due_soon` | `urgent` | `unknown`)
-- `severity_note`, `measurement` (e.g. "4mm")
-- `last_checked_at`, `last_checked_by` (tech id), `last_source` (`tech_inspection` | `customer_edit` | `admin_edit` | `seed`)
-- `price_low`, `price_high` (carried from template item)
-- `customer_note` (free-text the customer can add: "replaced at Jiffy Lube 3/2026")
-- `source_template_id`, `source_template_item_id` (for dedupe)
-- `is_hidden` (soft-delete so edits don't get clobbered by re-seed)
+```
+line_items: [
+  { price: plan.stripe_price_id, quantity: 1 },               // recurring monthly
+  ...(depositCents > 0 ? [{                                   // one-time deposit
+    quantity: 1,
+    price_data: {
+      currency: "usd",
+      unit_amount: depositCents,
+      product_data: { name: `${plan.name} — Membership Deposit (non-refundable)` },
+    },
+  }] : []),
+],
+```
 
-### Seeding & sync
+Drop the broken `subscription_data.add_invoice_items` block. Keep the metadata.
 
-1. **Seed on demand**: a `seed_vehicle_master_checklist(vehicle_id)` function pulls every active template's items into the master (deduped by template_item_id). Runs first time the master is viewed, or when a new template is added.
-2. **Tech sync trigger**: when a `service_checklist_items` row is updated (status set, recommended, measurement entered), an `AFTER UPDATE` trigger upserts the matching master item by `source_template_item_id` — copies status, measurement, note, sets `last_checked_at = now()`, `last_source = 'tech_inspection'`. Customer edits flagged `last_source = 'customer_edit'` within the last 30 days are NOT overwritten unless the tech's status is worse (e.g. customer said "good", tech finds "urgent" → tech wins).
-3. **Customer/admin edit**: writes directly to `vehicle_master_checklist_items` with `last_source = 'customer_edit'` or `'admin_edit'`.
+### 2. New `membership_payments` table
+Migration to create a normalized record of every charge tied to a membership:
 
-### RLS
+- `membership_id`, `kind` ('deposit' | 'subscription'), `amount`, `stripe_invoice_id`, `stripe_payment_intent_id`, `stripe_charge_id`, `stripe_fee`, `period_start`, `period_end`, `paid_at`, `status`.
+- Unique on `stripe_invoice_id` so retried webhooks don't double-insert.
+- RLS: members read their own rows; admins read all; service role writes.
+- GRANTs for `authenticated` and `service_role`.
 
-- Customer: SELECT + UPDATE rows where `customer_id = auth.uid()` (only `status`, `customer_note`, `measurement` columns — enforced via trigger).
-- Admin/tech: full access.
-- Insert/delete restricted to admin + the seed function.
+### 3. Webhook: record every Stripe invoice for membership subs
+Extend `supabase/functions/stripe-webhook/index.ts`:
 
-### UI
+- On `invoice.payment_succeeded` where `invoice.subscription` is set, look up the membership by `stripe_subscription_id`. For each line item, classify deposit vs recurring (by price_id vs the plan's `stripe_price_id`), then upsert a `membership_payments` row including the Stripe fee from the charge's balance transaction.
+- Continue updating `memberships.next_billing_date` and (newly) `current_period_end`.
+- On `invoice.payment_failed`, set `memberships.status = 'past_due'`.
+- On `charge.refunded` for a membership invoice, mark the matching `membership_payments` row as `refunded`.
 
-**Customer portal** — new page `/portal/vehicle-health` (and a card on the existing dashboard):
-- Grouped by category, color-coded by status
-- Each row: label, status badge, last-checked date, measurement, price range, customer note
-- Inline edit: change status, add note ("I replaced this myself"), mark as serviced elsewhere
-- "Request service" button on urgent/due_soon items → opens existing quote dialog
+### 4. Surface membership revenue in admin reports
+In `src/components/admin/AdminReports.tsx`:
 
-**Admin** — new tab in customer detail (`AdminCustomerDetail`) → "Vehicle Health":
-- Same grid, full edit (any field), re-seed button, hide/unhide
-- Audit trail shown (last_source + who)
+- Fetch `membership_payments` for the same date window alongside `invoices`.
+- Add membership revenue and Stripe fees into the existing Summary buckets (day/week/month/year) and KPI totals.
+- Add a Memberships section to the Detail tab showing each charge (member name, plan, kind, amount, fee, paid_at) with the same D/W/M/Y filtering.
 
-**Tech** — existing per-job checklist unchanged. After they save, a small "Synced to vehicle health" toast confirms.
+### 5. Extend Stripe fee sync to memberships
+Update `supabase/functions/sync-stripe-fees/index.ts` to also iterate `membership_payments` rows missing `stripe_fee` and backfill them from the balance transaction, same pattern as invoices.
 
-### Files
+### 6. Verification checklist
+- Submit a test signup → Checkout opens with two line items (monthly + deposit), payment succeeds.
+- Webhook activates membership, sets `stripe_subscription_id`, `deposit_paid=true`, and writes a `deposit` + `subscription` row in `membership_payments`.
+- Admin → Reports shows the new revenue under the selected period, with the Stripe fee populated after sync.
+- Member portal still shows their active membership.
 
-New:
-- migration: `vehicle_master_checklist_items` table, RLS, `seed_vehicle_master_checklist` RPC, `sync_master_from_tech_checklist` trigger
-- `src/lib/vehicleMasterChecklist.ts` — typed helpers (load, upsert, seed, update)
-- `src/pages/portal/PortalVehicleHealth.tsx` — customer view
-- `src/components/admin/AdminVehicleHealth.tsx` — admin tab
+## Files touched
 
-Edited:
-- `src/App.tsx` — route for `/portal/vehicle-health`
-- `src/components/portal/PortalNav.tsx` (or equivalent) — nav link
-- `src/pages/admin/AdminCustomerDetail.tsx` — new tab
-- `src/pages/portal/PortalDashboard.tsx` — health summary card
-
-### Out of scope (intentionally)
-
-- Per-vehicle override of price ranges (still uses template prices)
-- Photo uploads on customer edits (admin/tech only)
-- Reminder push notifications (can add later)
+- `supabase/functions/create-membership-checkout/index.ts` (fix line items)
+- `supabase/migrations/<new>.sql` (create `membership_payments` + RLS + grants)
+- `supabase/functions/stripe-webhook/index.ts` (record payments, handle failed/refunded)
+- `supabase/functions/sync-stripe-fees/index.ts` (cover membership payments)
+- `src/components/admin/AdminReports.tsx` (include membership revenue/fees in summary + detail)
