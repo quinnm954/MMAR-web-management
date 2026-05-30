@@ -239,7 +239,7 @@ const WhyGarageAce = () => {
                     </Link>
                   </Button>
                   <Button variant="outline" asChild>
-                    <Link to="/memberships">See plans & pricing</Link>
+                    <Link to="/mmar-care">See plans & pricing</Link>
                   </Button>
                 </div>
               </CardContent>

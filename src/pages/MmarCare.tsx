@@ -281,7 +281,7 @@ const MmarCare = () => {
               Additional charges may apply for oil above included quantity, specialty oils,
               specialty filters, oversized vehicles, and diesel vehicles. Fleet pricing (5+
               vehicles) available — see{" "}
-              <Link to="/memberships#fleet" className="text-primary hover:underline">
+              <Link to="/mmar-care#fleet" className="text-primary hover:underline">
                 fleet plans
               </Link>
               .
