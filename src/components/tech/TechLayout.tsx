@@ -1,21 +1,29 @@
 import { ReactNode } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { Wrench, ClipboardCheck, ClipboardList, LogOut, LayoutDashboard } from "lucide-react";
+import { Wrench, ClipboardCheck, LogOut, LayoutDashboard, Users, History, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import MobileBottomNav from "@/components/shell/MobileBottomNav";
 import { useSwipeTabNav } from "@/hooks/useSwipeTabNav";
 
-const items = [
-  { to: "/tech", label: "Jobs", icon: LayoutDashboard, end: true },
-  { to: "/tech/checklists", label: "Checklists", icon: ClipboardList },
-  { to: "/tech/inspections", label: "Inspections", icon: ClipboardCheck },
+const primary = [
+  { to: "/tech", label: "Home", icon: LayoutDashboard, end: true },
+  { to: "/tech/jobs", label: "Jobs", icon: Wrench },
+  { to: "/tech/inspections", label: "Inspect", icon: ClipboardCheck },
 ];
+
+const more = [
+  { to: "/tech/customers", label: "Customers", icon: Users },
+  { to: "/tech/history", label: "Service History", icon: History },
+  { to: "/tech/time", label: "Labor Hours", icon: Clock },
+];
+
+const allDesktop = [...primary, ...more];
 
 const TechLayout = ({ children }: { children: ReactNode }) => {
   const { signOut } = useAuth();
   const navigate = useNavigate();
-  useSwipeTabNav(items);
+  useSwipeTabNav(primary);
   return (
     <main className="min-h-screen bg-background">
       <header className="border-b border-border bg-card safe-pt">
@@ -33,11 +41,11 @@ const TechLayout = ({ children }: { children: ReactNode }) => {
         </div>
         {/* Desktop top tabs */}
         <nav className="hidden lg:flex container mx-auto px-2 pb-2 gap-1 overflow-x-auto">
-          {items.map((l) => (
+          {allDesktop.map((l) => (
             <NavLink
               key={l.to}
               to={l.to}
-              end={l.end}
+              end={(l as any).end}
               className={({ isActive }) =>
                 `flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm whitespace-nowrap ${
                   isActive ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted"
@@ -51,7 +59,7 @@ const TechLayout = ({ children }: { children: ReactNode }) => {
         </nav>
       </header>
       <div className="container mx-auto px-4 py-6 pb-mobile-nav lg:pb-6">{children}</div>
-      <MobileBottomNav items={items} />
+      <MobileBottomNav items={primary} moreItems={more} />
     </main>
   );
 };
