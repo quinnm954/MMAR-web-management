@@ -303,7 +303,6 @@ Deno.serve(async (req) => {
               current_period_end: lines[0]?.period?.end
                 ? new Date(lines[0].period.end * 1000).toISOString()
                 : null,
-              ...(kind => kind)(undefined),
             })
             .eq("id", m.id);
         }
