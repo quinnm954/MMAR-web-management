@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Loader2, Search, Users, Car, Wrench, Phone } from "lucide-react";
 
 type Customer = { id: string; full_name: string | null; email: string | null; phone: string | null };
-type Vehicle = { id: string; customer_id: string; year: number | null; make: string | null; model: string | null; license_plate: string | null; vin: string | null };
+type Vehicle = { id: string; owner_id: string; year: number | null; make: string | null; model: string | null; license_plate: string | null; vin: string | null };
 type ServiceRec = { id: string; vehicle_id: string; service_date: string; service_type: string; labor_performed: string | null };
 
 const TechCustomers = () => {
@@ -23,7 +23,7 @@ const TechCustomers = () => {
       setLoading(true);
       const [cRes, vRes] = await Promise.all([
         supabase.from("profiles").select("id, full_name, email, phone").order("full_name", { ascending: true }).limit(500),
-        supabase.from("vehicles").select("id, customer_id, year, make, model, license_plate, vin").limit(2000),
+        supabase.from("vehicles").select("id, owner_id, year, make, model, license_plate, vin").limit(2000),
       ]);
       setCustomers((cRes.data as Customer[]) ?? []);
       setVehicles((vRes.data as Vehicle[]) ?? []);
@@ -38,7 +38,7 @@ const TechCustomers = () => {
       if ((c.full_name ?? "").toLowerCase().includes(needle)) return true;
       if ((c.email ?? "").toLowerCase().includes(needle)) return true;
       if ((c.phone ?? "").toLowerCase().includes(needle)) return true;
-      const cars = vehicles.filter((v) => v.customer_id === c.id);
+      const cars = vehicles.filter((v) => v.owner_id === c.id);
       return cars.some(
         (v) =>
           `${v.year ?? ""} ${v.make ?? ""} ${v.model ?? ""}`.toLowerCase().includes(needle) ||
@@ -52,7 +52,7 @@ const TechCustomers = () => {
     const next = openId === id ? null : id;
     setOpenId(next);
     if (next && !records[next]) {
-      const cars = vehicles.filter((v) => v.customer_id === next).map((v) => v.id);
+      const cars = vehicles.filter((v) => v.owner_id === next).map((v) => v.id);
       if (!cars.length) {
         setRecords((r) => ({ ...r, [next]: [] }));
         return;
@@ -87,7 +87,7 @@ const TechCustomers = () => {
         ) : (
           <div className="space-y-2">
             {filtered.slice(0, 100).map((c) => {
-              const cars = vehicles.filter((v) => v.customer_id === c.id);
+              const cars = vehicles.filter((v) => v.owner_id === c.id);
               const open = openId === c.id;
               return (
                 <Card key={c.id}>
