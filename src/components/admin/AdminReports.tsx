@@ -104,6 +104,10 @@ export default function AdminReports() {
   });
 
   const [profitRows, setProfitRows] = useState<ProfitRow[]>([]);
+  const [memberRows, setMemberRows] = useState<{
+    id: string; paid_at: string; kind: string; amount: number; stripeFee: number;
+    stripeFeeIsActual: boolean; member: string; plan: string;
+  }[]>([]);
   const [defaultRate, setDefaultRate] = useState<number>(35);
   const [preset, setPreset] = useState<Preset>('m');
   const [customDays, setCustomDays] = useState<number>(30);
