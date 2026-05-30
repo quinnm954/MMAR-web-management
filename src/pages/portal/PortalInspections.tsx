@@ -115,8 +115,13 @@ const PortalInspections = () => {
               const v = insp.vehicle;
               const vehicleLabel = v ? `${v.year ?? ""} ${v.make ?? ""} ${v.model ?? ""}`.trim() : "Vehicle";
               const date = new Date(insp.completed_at ?? insp.created_at).toLocaleDateString();
-              const body = (
-                <Card className="hover:bg-muted/40 transition-colors">
+              const inspItems = [...(insp.inspection_items ?? [])].sort(
+                (a, b) => a.sort_order - b.sort_order,
+              );
+              const grouped: Record<string, InspItem[]> = {};
+              for (const it of inspItems) (grouped[it.category] ||= []).push(it);
+              return (
+                <Card key={insp.id}>
                   <CardHeader className="pb-2">
                     <div className="flex items-center justify-between gap-2">
                       <CardTitle className="text-base">{vehicleLabel}</CardTitle>
@@ -125,23 +130,115 @@ const PortalInspections = () => {
                       </Badge>
                     </div>
                   </CardHeader>
-                  <CardContent className="text-sm text-muted-foreground space-y-1">
-                    <div>
+                  <CardContent className="space-y-3 text-sm">
+                    <div className="text-muted-foreground">
                       {date}
                       {insp.mileage ? ` · ${insp.mileage.toLocaleString()} mi` : ""}
                     </div>
                     {insp.summary_notes && (
-                      <div className="line-clamp-2 text-foreground/80">{insp.summary_notes}</div>
+                      <div className="rounded-md border border-border bg-muted/40 p-3">
+                        <div className="text-xs font-semibold text-muted-foreground mb-1">
+                          Technician summary
+                        </div>
+                        <div className="whitespace-pre-wrap">{insp.summary_notes}</div>
+                      </div>
+                    )}
+
+                    {inspItems.length > 0 ? (
+                      <Accordion type="multiple" className="space-y-2">
+                        {Object.entries(grouped).map(([cat, list]) => {
+                          const reds = list.filter((i) => i.status === "red").length;
+                          const yellows = list.filter((i) => i.status === "yellow").length;
+                          return (
+                            <AccordionItem
+                              key={cat}
+                              value={cat}
+                              className="border border-border rounded-lg bg-card px-3"
+                            >
+                              <AccordionTrigger className="hover:no-underline py-3">
+                                <div className="flex items-center gap-2 text-left w-full">
+                                  <span className="font-semibold">{cat}</span>
+                                  <span className="ml-auto flex items-center gap-1.5 text-xs text-muted-foreground">
+                                    {reds > 0 && (
+                                      <span className="inline-flex items-center gap-1">
+                                        <span className="h-2 w-2 rounded-full bg-red-500" />
+                                        {reds}
+                                      </span>
+                                    )}
+                                    {yellows > 0 && (
+                                      <span className="inline-flex items-center gap-1">
+                                        <span className="h-2 w-2 rounded-full bg-yellow-500" />
+                                        {yellows}
+                                      </span>
+                                    )}
+                                    <span>{list.length} items</span>
+                                  </span>
+                                </div>
+                              </AccordionTrigger>
+                              <AccordionContent>
+                                <ul className="space-y-3 pt-1">
+                                  {list.map((it) => (
+                                    <li
+                                      key={it.id}
+                                      className="border-b border-border/50 last:border-0 pb-3 last:pb-0"
+                                    >
+                                      <div className="flex items-start gap-2">
+                                        <span
+                                          className={`mt-1.5 h-3 w-3 rounded-full shrink-0 ${dotColor[it.status]}`}
+                                        />
+                                        <div className="flex-1">
+                                          <div className="font-medium">{it.item_name}</div>
+                                          {it.notes && (
+                                            <div className="text-muted-foreground mt-1 whitespace-pre-wrap">
+                                              {it.notes}
+                                            </div>
+                                          )}
+                                          {it.photo_urls?.length > 0 && (
+                                            <div className="flex gap-2 mt-2 flex-wrap">
+                                              {it.photo_urls.map((url, i) => (
+                                                <a
+                                                  key={i}
+                                                  href={url}
+                                                  target="_blank"
+                                                  rel="noreferrer"
+                                                >
+                                                  <img
+                                                    src={url}
+                                                    className="w-20 h-20 object-cover rounded border border-border"
+                                                  />
+                                                </a>
+                                              ))}
+                                            </div>
+                                          )}
+                                        </div>
+                                        <Badge variant="outline" className="text-[10px] uppercase">
+                                          {it.status}
+                                        </Badge>
+                                      </div>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </AccordionContent>
+                            </AccordionItem>
+                          );
+                        })}
+                      </Accordion>
+                    ) : (
+                      <div className="text-muted-foreground italic">
+                        No inspection items recorded.
+                      </div>
+                    )}
+
+                    {insp.share_token && (
+                      <Link
+                        to={`/inspection/${insp.share_token}`}
+                        className="inline-block text-xs text-primary underline"
+                      >
+                        Open shareable report
+                      </Link>
                     )}
                   </CardContent>
                 </Card>
-              );
-              return insp.share_token ? (
-                <Link key={insp.id} to={`/inspection/${insp.share_token}`}>
-                  {body}
-                </Link>
-              ) : (
-                <div key={insp.id}>{body}</div>
               );
             })
           )}
