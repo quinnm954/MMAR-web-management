@@ -16,10 +16,14 @@ interface AuthContextType {
   hasRole: (role: AppRole) => boolean;
   hasAnyRole: (roles: AppRole[]) => boolean;
   isLoading: boolean;
+  isPasswordRecovery: boolean;
+  clearPasswordRecovery: () => void;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signUp: (email: string, password: string, fullName: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
 }
+
+const RECOVERY_KEY = 'sb-password-recovery';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -28,6 +32,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [roles, setRoles] = useState<AppRole[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isPasswordRecovery, setIsPasswordRecovery] = useState<boolean>(() => {
+    try {
+      return sessionStorage.getItem(RECOVERY_KEY) === '1';
+    } catch {
+      return false;
+    }
+  });
+
+  const clearPasswordRecovery = () => {
+    setIsPasswordRecovery(false);
+    try { sessionStorage.removeItem(RECOVERY_KEY); } catch {}
+  };
 
   const loadRoles = async (userId: string): Promise<AppRole[]> => {
     try {
@@ -49,6 +65,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        if (event === 'PASSWORD_RECOVERY') {
+          setIsPasswordRecovery(true);
+          try { sessionStorage.setItem(RECOVERY_KEY, '1'); } catch {}
+        }
         setSession(session);
         setUser(session?.user ?? null);
 
@@ -104,7 +124,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUser(null);
     setSession(null);
     setRoles([]);
+    setIsPasswordRecovery(false);
     try {
+      sessionStorage.removeItem(RECOVERY_KEY);
       // Best-effort: purge any stale Supabase auth keys
       Object.keys(localStorage)
         .filter((k) => k.startsWith('sb-') && k.endsWith('-auth-token'))
@@ -130,6 +152,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         hasRole,
         hasAnyRole,
         isLoading,
+        isPasswordRecovery,
+        clearPasswordRecovery,
         signIn,
         signUp,
         signOut,
