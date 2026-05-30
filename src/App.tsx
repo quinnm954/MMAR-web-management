@@ -27,7 +27,7 @@ import Reviews from "./pages/Reviews";
 import ReviewLanding from "./pages/ReviewLanding";
 import ContactPage from "./pages/ContactPage";
 import InstallApp from "./pages/InstallApp";
-import Memberships from "./pages/Memberships";
+
 import PortalDashboard from "./pages/portal/PortalDashboard";
 import PortalOnboarding from "./pages/portal/PortalOnboarding";
 import PortalMaintenance from "./pages/portal/PortalMaintenance";
@@ -99,7 +99,8 @@ const App = () => (
             <Route path="/blog/tag/:tag" element={<BlogTag />} />
             <Route path="/blog/:slug" element={<BlogPost />} />
             <Route path="/admin/login" element={<Navigate to="/login" replace />} />
-            <Route path="/memberships" element={<Memberships />} />
+            <Route path="/memberships" element={<Navigate to="/mmar-care" replace />} />
+            <Route path="/memberships/*" element={<Navigate to="/mmar-care" replace />} />
             <Route path="/mmar-care" element={<MmarCare />} />
             <Route path="/fleet" element={<Fleet />} />
             <Route path="/garage-ace" element={<GarageAce />} />

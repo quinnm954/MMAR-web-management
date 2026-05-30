@@ -80,7 +80,7 @@ const DocReferences = ({ financingHref, hideFinancing, estimateId, estimateToken
               scheduling, and exclusive perks — all on a low monthly plan. Stack savings on top of your current invoice.
             </p>
             <Button asChild size="sm" variant="outline">
-              <Link to="/memberships">
+              <Link to="/mmar-care">
                 Explore MMAR Care plans <ExternalLink className="h-3 w-3 ml-1" />
               </Link>
             </Button>

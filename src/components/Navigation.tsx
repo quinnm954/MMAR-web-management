@@ -132,9 +132,6 @@ const Navigation = () => {
               MMAR Care Plans
             </NavLink>
 
-            <NavLink to="/memberships" className={({ isActive }) => `px-3 py-2 font-medium transition-colors ${isActive ? "text-accent" : "text-accent/80 hover:text-accent"}`}>
-              Memberships
-            </NavLink>
 
             <NavLink to="/book" className={({ isActive }) => `px-3 py-2 font-semibold transition-colors ${isActive ? "text-accent" : "text-accent/90 hover:text-accent"}`}>
               Book
@@ -247,7 +244,7 @@ const Navigation = () => {
               <Link to="/why-garage-ace" onClick={close} className="text-foreground hover:text-primary font-medium py-2 px-2 rounded-lg flex items-center gap-2">
                 <User className="w-4 h-4" /> Why the App?
               </Link>
-              <Link to="/memberships" onClick={close} className="text-accent hover:text-accent/80 font-semibold py-2 px-2 rounded-lg">Memberships</Link>
+              
               <Link to="/garage-ace" onClick={close} className="text-foreground hover:text-primary font-medium py-2 px-2 rounded-lg flex items-center gap-2">
                 <Wrench className="w-4 h-4" /> Garage Ace
               </Link>

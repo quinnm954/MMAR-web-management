@@ -145,7 +145,7 @@ const AboutPage = () => {
           </p>
           <p className="text-muted-foreground leading-relaxed">
             For households or small businesses with{" "}
-            <Link to="/memberships#fleet" className="text-primary hover:underline">5+ vehicles</Link>,
+            <Link to="/mmar-care#fleet" className="text-primary hover:underline">5+ vehicles</Link>,
             our fleet program adds volume pricing and on-site service so trucks and vans never have
             to leave the yard for routine maintenance.
           </p>
