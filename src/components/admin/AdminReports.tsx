@@ -442,8 +442,23 @@ export default function AdminReports() {
       cur.netProfit += r.netProfit;
       map.set(b.key, cur);
     });
+    if (techFilter === 'all') {
+      memberRows.forEach((r) => {
+        const b = bucketKey(r.paid_at);
+        const cur = map.get(b.key) ?? {
+          key: b.key, label: b.label, sortKey: b.sortKey,
+          invoices: 0, paidLaborHours: 0, revenue: 0, cogs: 0,
+          grossProfit: 0, employeeCost: 0, stripeFee: 0, netProfit: 0,
+        };
+        cur.revenue += r.amount;
+        cur.grossProfit += r.amount;
+        cur.stripeFee += r.stripeFee;
+        cur.netProfit += r.amount - r.stripeFee;
+        map.set(b.key, cur);
+      });
+    }
     return Array.from(map.values()).sort((a, b) => b.sortKey.localeCompare(a.sortKey));
-  }, [filteredRows, profitRows, granularity]);
+  }, [filteredRows, profitRows, memberRows, techFilter, granularity]);
 
 
   return (
