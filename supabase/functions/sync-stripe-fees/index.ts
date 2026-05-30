@@ -93,8 +93,50 @@ Deno.serve(async (req) => {
       }
     }
 
+    // Membership payments — backfill stripe_fee from charge balance transactions
+    const { data: mpRows } = await admin
+      .from("membership_payments")
+      .select("id, stripe_charge_id, stripe_payment_intent_id, stripe_invoice_id, stripe_fee, amount")
+      .eq("status", "paid")
+      .gte("paid_at", sinceISO);
+
+    let mpSynced = 0;
+    let mpSkipped = 0;
+    // Group by charge_id so we only call Stripe once per charge and split proportionally
+    const byCharge = new Map<string, typeof mpRows>();
+    for (const r of mpRows ?? []) {
+      if (!force && r.stripe_fee != null) { mpSkipped++; continue; }
+      if (!r.stripe_charge_id) { mpSkipped++; continue; }
+      const arr = byCharge.get(r.stripe_charge_id) ?? [];
+      arr.push(r);
+      byCharge.set(r.stripe_charge_id, arr);
+    }
+    for (const [chargeId, rows] of byCharge) {
+      try {
+        const ch = await stripe.charges.retrieve(chargeId, { expand: ["balance_transaction"] });
+        const bt = ch.balance_transaction as Stripe.BalanceTransaction | null;
+        if (!bt || typeof bt.fee !== "number") { mpSkipped += rows!.length; continue; }
+        const totalFee = bt.fee / 100;
+        const totalAmount = rows!.reduce((s, r) => s + Number(r.amount || 0), 0) || 1;
+        for (const r of rows!) {
+          const lineFee = Math.round((totalFee * Number(r.amount || 0) / totalAmount) * 100) / 100;
+          await admin
+            .from("membership_payments")
+            .update({ stripe_fee: lineFee, stripe_fee_synced_at: new Date().toISOString() })
+            .eq("id", r.id);
+          mpSynced++;
+        }
+      } catch (e) {
+        errors.push({ id: chargeId, error: (e as Error).message });
+      }
+    }
+
     return new Response(
-      JSON.stringify({ synced, skipped, scanned: invoices?.length ?? 0, errors }),
+      JSON.stringify({
+        synced, skipped, scanned: invoices?.length ?? 0,
+        membership_synced: mpSynced, membership_skipped: mpSkipped, membership_scanned: mpRows?.length ?? 0,
+        errors,
+      }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (e) {
