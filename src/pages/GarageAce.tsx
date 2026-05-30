@@ -179,118 +179,46 @@ const GarageAce = () => {
         </div>
       </section>
 
-      {/* Sign-in (admin / staff / customer) */}
+      {/* Sign in (single entry, role auto-detected) */}
       <section id="signin" className="py-12 md:py-16 border-y border-border bg-card/30">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center max-w-5xl mx-auto">
-            <div>
-              <div className="inline-flex items-center gap-2 text-xs font-semibold text-primary mb-3 bg-primary/10 px-3 py-1 rounded-full">
-                <LogIn className="h-3.5 w-3.5" /> Staff sign in
-              </div>
-              <h2 className="text-3xl md:text-4xl font-bold mb-3">
-                Admin & staff sign in.
-              </h2>
-              <p className="text-muted-foreground mb-4">
-                Garage Ace operator access for shop admins, technicians, and service advisors.
-              </p>
-              <ul className="space-y-2 text-sm">
-                <li className="flex items-start gap-2"><ShieldCheck className="h-4 w-4 text-accent mt-0.5 shrink-0" /> Admins → Admin dashboard</li>
-                <li className="flex items-start gap-2"><Wrench className="h-4 w-4 text-accent mt-0.5 shrink-0" /> Techs & advisors → Tech app</li>
-              </ul>
-              <p className="text-sm text-muted-foreground mt-4">
-                Customer?{" "}
-                <Link to="/login" className="text-primary hover:underline font-medium">
-                  Sign in to your Garage Ace account →
-                </Link>
-              </p>
-              <p className="text-xs text-muted-foreground mt-2">
-                New here?{" "}
-                <Link to="/why-garage-ace" className="text-primary hover:underline">
-                  Why do I need this app?
-                </Link>
-              </p>
-            </div>
-
-            <Card className="border-border/60">
-              <CardHeader>
-                <CardTitle className="text-xl flex items-center gap-2">
-                  <Wrench className="h-5 w-5 text-primary" /> Staff sign in
-                </CardTitle>
-                <CardDescription>Admin, technicians & service advisors</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {isLoading ? (
-                  <div className="flex justify-center py-6">
-                    <Loader2 className="h-6 w-6 animate-spin text-primary" />
-                  </div>
-                ) : (
-                  <>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="w-full"
-                      onClick={handleGoogle}
-                      disabled={busy}
-                    >
-                      Continue with Google
-                    </Button>
-                    <div className="relative text-center">
-                      <span className="bg-card px-2 text-xs text-muted-foreground relative z-10">or</span>
-                      <div className="absolute inset-x-0 top-1/2 h-px bg-border -z-0" />
-                    </div>
-                    <form onSubmit={handleSignIn} className="space-y-3">
-                      <div className="space-y-1.5">
-                        <Label htmlFor="ga-email">Email</Label>
-                        <Input
-                          id="ga-email"
-                          type="email"
-                          autoComplete="email"
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                          required
-                        />
-                      </div>
-                      <div className="space-y-1.5">
-                        <div className="flex items-center justify-between">
-                          <Label htmlFor="ga-password">Password</Label>
-                          <button
-                            type="button"
-                            onClick={handleForgotPassword}
-                            className="text-xs text-muted-foreground hover:text-primary"
-                          >
-                            Forgot?
-                          </button>
-                        </div>
-                        <Input
-                          id="ga-password"
-                          type="password"
-                          autoComplete="current-password"
-                          value={password}
-                          onChange={(e) => setPassword(e.target.value)}
-                          required
-                        />
-                      </div>
-                      <Button type="submit" variant="hero" className="w-full" disabled={busy}>
-                        {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : "Sign in"}
-                      </Button>
-                    </form>
-                    <div className="text-xs text-center text-muted-foreground">
-                      Customer?{" "}
-                      <Link to="/login" className="text-primary hover:underline">
-                        Sign in here
-                      </Link>
-                      {" · "}
-                      <Link to="/why-garage-ace" className="text-primary hover:underline">
-                        What's this app?
-                      </Link>
-                    </div>
-                  </>
-                )}
-              </CardContent>
-            </Card>
+        <div className="container mx-auto px-4 max-w-3xl text-center">
+          <div className="inline-flex items-center gap-2 text-xs font-semibold text-primary mb-3 bg-primary/10 px-3 py-1 rounded-full">
+            <LogIn className="h-3.5 w-3.5" /> One sign-in for everyone
+          </div>
+          <h2 className="text-3xl md:text-4xl font-bold mb-3">
+            Sign in to Garage Ace
+          </h2>
+          <p className="text-muted-foreground mb-6">
+            Use the same sign-in whether you're a customer, technician, advisor, or admin —
+            we'll automatically send you to the right place based on your account.
+          </p>
+          <ul className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm text-left max-w-2xl mx-auto mb-8">
+            <li className="flex items-start gap-2 p-3 rounded-lg border border-border/60 bg-card/50">
+              <Users className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+              <span><strong>Customers</strong> → your vehicle portal</span>
+            </li>
+            <li className="flex items-start gap-2 p-3 rounded-lg border border-border/60 bg-card/50">
+              <Wrench className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+              <span><strong>Techs & advisors</strong> → tech app</span>
+            </li>
+            <li className="flex items-start gap-2 p-3 rounded-lg border border-border/60 bg-card/50">
+              <ShieldCheck className="h-4 w-4 text-accent mt-0.5 shrink-0" />
+              <span><strong>Admins</strong> → admin dashboard</span>
+            </li>
+          </ul>
+          <div className="flex flex-wrap gap-3 justify-center">
+            <Button variant="hero" size="lg" asChild>
+              <Link to="/login">
+                <LogIn className="h-5 w-5 mr-2" /> Sign in
+              </Link>
+            </Button>
+            <Button variant="heroOutline" size="lg" asChild>
+              <Link to="/why-garage-ace">New here? Why the app?</Link>
+            </Button>
           </div>
         </div>
       </section>
+
 
       {/* Features */}
       <section className="py-16 md:py-20">
