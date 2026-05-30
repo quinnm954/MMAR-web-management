@@ -541,8 +541,11 @@ export default function AdminReports() {
         <KPI label="Stripe Fees" value={fmt(totals.stripeFee)} />
         <KPI label="Net Profit" value={fmt(totals.netProfit)} />
       </div>
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <KPI label={`Paid Labor Hrs${techFilter !== 'all' ? ` · ${techFilter}` : ''}`} value={perfTotals.paidH.toFixed(2)} />
+        <KPI label="Membership Revenue" value={fmt(membershipTotals.revenue)} />
+        <KPI label="Membership Deposits" value={fmt(membershipTotals.deposits)} />
+        <KPI label="Membership Recurring" value={fmt(membershipTotals.recurring)} />
       </div>
 
       <Tabs defaultValue="summary" className="w-full">
