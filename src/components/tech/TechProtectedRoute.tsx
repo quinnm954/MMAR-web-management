@@ -5,7 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Loader2 } from "lucide-react";
 
 const TechProtectedRoute = ({ children }: { children: ReactNode }) => {
-  const { user, isLoading } = useAuth();
+  const { user, isLoading, isPasswordRecovery } = useAuth();
   const location = useLocation();
   const [checking, setChecking] = useState(true);
   const [isTech, setIsTech] = useState(false);
@@ -31,6 +31,9 @@ const TechProtectedRoute = ({ children }: { children: ReactNode }) => {
     );
   }
   if (!user) return <Navigate to={`/login?redirect=${encodeURIComponent(location.pathname)}`} replace />;
+  if (isPasswordRecovery && location.pathname !== "/set-password") {
+    return <Navigate to="/set-password" replace />;
+  }
   if ((user.user_metadata as any)?.must_set_password && location.pathname !== "/set-password") {
     return <Navigate to="/set-password" replace />;
   }

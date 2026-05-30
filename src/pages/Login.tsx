@@ -22,7 +22,7 @@ const signupSchema = z.object({
 const Login = () => {
   const navigate = useNavigate();
   const [params] = useSearchParams();
-  const { signIn, signUp, user, roles, isAdmin, isStaff, isLoading } = useAuth();
+  const { signIn, signUp, user, roles, isAdmin, isStaff, isLoading, isPasswordRecovery } = useAuth();
 
   const [tab, setTab] = useState<"signin" | "signup">(
     params.get("tab") === "signup" ? "signup" : "signin"
@@ -36,6 +36,10 @@ const Login = () => {
   // Route based on role once authenticated
   useEffect(() => {
     if (isLoading || !user) return;
+    if (isPasswordRecovery) {
+      navigate("/set-password", { replace: true });
+      return;
+    }
     const explicit = params.get("redirect");
     const isExplicitPortalRedirect = explicit?.startsWith("/portal") ?? false;
     let target: string;
@@ -61,7 +65,7 @@ const Login = () => {
       }
     } catch {}
     navigate(target, { replace: true });
-  }, [user, roles, isAdmin, isStaff, isLoading, navigate, params]);
+  }, [user, roles, isAdmin, isStaff, isLoading, isPasswordRecovery, navigate, params]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();

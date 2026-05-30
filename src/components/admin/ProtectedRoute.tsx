@@ -10,7 +10,7 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute = ({ children, requireAdmin = true, allowedRoles }: ProtectedRouteProps) => {
-  const { user, isAdmin, isManager, hasAnyRole, isLoading } = useAuth();
+  const { user, isAdmin, isManager, hasAnyRole, isLoading, isPasswordRecovery } = useAuth();
   const location = useLocation();
 
   if (isLoading) {
@@ -23,6 +23,10 @@ const ProtectedRoute = ({ children, requireAdmin = true, allowedRoles }: Protect
 
   if (!user) {
     return <Navigate to="/login" replace />;
+  }
+
+  if (isPasswordRecovery && location.pathname !== "/set-password") {
+    return <Navigate to="/set-password" replace />;
   }
 
   if ((user.user_metadata as any)?.must_set_password && location.pathname !== "/set-password") {
