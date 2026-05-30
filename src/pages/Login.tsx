@@ -154,7 +154,7 @@ const Login = () => {
             <Wrench className="h-6 w-6 text-primary" />
           </div>
           <CardTitle className="text-2xl">Garage Ace</CardTitle>
-          <CardDescription>For MMAR Care customers and staff — sign in or create an account</CardDescription>
+          <CardDescription>Sign in or create your free account</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <Tabs value={tab} onValueChange={(v) => setTab(v as any)}>
@@ -232,6 +232,12 @@ const Login = () => {
               </p>
             </TabsContent>
           </Tabs>
+          <p className="text-xs text-center text-muted-foreground pt-2">
+            New here?{" "}
+            <Link to="/why-garage-ace" className="text-primary hover:underline">
+              Why do I need this app?
+            </Link>
+          </p>
         </CardContent>
       </Card>
     </div>

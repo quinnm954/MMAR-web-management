@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Menu, X, ChevronDown, Phone, User, LogOut, LayoutDashboard, CalendarCheck, Wrench } from "lucide-react";
+import { Menu, X, ChevronDown, Phone, User, LogOut, LayoutDashboard, CalendarCheck, Wrench, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -58,7 +58,7 @@ const Navigation = () => {
     ? "Admin"
     : roles.some((r) => ["technician", "service_advisor", "manager", "parts"].includes(r))
       ? "Staff Portal"
-      : "MMAR Care Portal";
+      : "Garage Ace";
 
   const handleSignOut = async () => {
     close();
@@ -129,7 +129,7 @@ const Navigation = () => {
             </DropdownMenu>
 
             <NavLink to="/mmar-care" className={({ isActive }) => `px-3 py-2 font-medium transition-colors ${isActive ? "text-primary" : "text-muted-foreground hover:text-primary"}`}>
-              MMAR Care
+              MMAR Care Plans
             </NavLink>
 
             <NavLink to="/memberships" className={({ isActive }) => `px-3 py-2 font-medium transition-colors ${isActive ? "text-accent" : "text-accent/80 hover:text-accent"}`}>
@@ -242,7 +242,10 @@ const Navigation = () => {
               </Accordion>
 
               <Link to="/mmar-care" onClick={close} className="text-foreground hover:text-primary font-semibold py-2 px-2 rounded-lg flex items-center gap-2">
-                <User className="w-4 h-4" /> MMAR Care
+                <Sparkles className="w-4 h-4" /> MMAR Care Plans
+              </Link>
+              <Link to="/why-garage-ace" onClick={close} className="text-foreground hover:text-primary font-medium py-2 px-2 rounded-lg flex items-center gap-2">
+                <User className="w-4 h-4" /> Why the App?
               </Link>
               <Link to="/memberships" onClick={close} className="text-accent hover:text-accent/80 font-semibold py-2 px-2 rounded-lg">Memberships</Link>
               <Link to="/garage-ace" onClick={close} className="text-foreground hover:text-primary font-medium py-2 px-2 rounded-lg flex items-center gap-2">

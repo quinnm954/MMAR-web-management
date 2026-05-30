@@ -1,263 +1,209 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
+import FloatingCallButton from "@/components/FloatingCallButton";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable";
-import { toast } from "sonner";
 import {
-  Wrench,
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { supabase } from "@/integrations/supabase/client";
+import {
+  Check,
   ShieldCheck,
+  Clock,
+  Wrench,
+  Sparkles,
   CalendarCheck,
-  CarFront,
-  ClipboardList,
   CreditCard,
-  Loader2,
   ArrowRight,
   Phone,
-  Sparkles,
+  MessageSquare,
+  Smartphone,
 } from "lucide-react";
 import mmarLogo from "@/assets/mmar-logo.jpeg";
 
-const FEATURES = [
+interface Plan {
+  id: string;
+  slug: string;
+  name: string;
+  tagline: string | null;
+  monthly_price: number;
+  deposit_amount: number;
+  total_at_signup: number;
+  badge: string | null;
+  features: string[];
+}
+
+const BENEFITS = [
   {
-    icon: CarFront,
-    title: "Your Vehicles, Always Up to Date",
-    text: "Track every vehicle in your household — service history, mileage, recommended maintenance, and warranty details all in one place.",
+    icon: Wrench,
+    title: "Included maintenance",
+    text: "Oil changes and routine services are baked into your plan — no per-visit invoice surprise.",
   },
   {
-    icon: CalendarCheck,
-    title: "Effortless Scheduling",
-    text: "Request appointments and pick a time window that fits your day. Members get priority booking.",
-  },
-  {
-    icon: ClipboardList,
-    title: "Estimates, Inspections & Repair Orders",
-    text: "Review and approve estimates, see digital inspection photos, and follow your repair order from drop-off to paid invoice.",
-  },
-  {
-    icon: CreditCard,
-    title: "Invoices & Financing in One Place",
-    text: "Pay invoices online, view receipts, and manage in-house financing or your monthly membership — no paper, no phone tag.",
-  },
-  {
-    icon: ShieldCheck,
-    title: "Warranty & Records on Demand",
-    text: "Magnuson-Moss warranty coverage and service records you can pull up any time — perfect for resale or trade-in.",
+    icon: Clock,
+    title: "Priority scheduling",
+    text: "Members jump the line. Get on the schedule before walk-in calls and standard service requests.",
   },
   {
     icon: Sparkles,
-    title: "Member Perks",
-    text: "Discounted labor, included oil changes on select plans, and special pricing on tires, brakes, and seasonal services.",
+    title: "Discounted labor & parts",
+    text: "Member-only pricing on brakes, batteries, tires, and seasonal work — usually pays for the plan after one or two visits.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Transferable warranty",
+    text: "Magnuson-Moss compliant coverage on parts and labor, transferable on resale — a real selling point at trade-in.",
+  },
+  {
+    icon: CalendarCheck,
+    title: "Proactive reminders",
+    text: "We track your mileage and service intervals so you never miss a fluid change, brake check, or seasonal AC service.",
+  },
+  {
+    icon: CreditCard,
+    title: "Predictable monthly billing",
+    text: "One small monthly charge instead of an unexpected $400 invoice every few months.",
   },
 ];
 
-const STEPS = [
-  { n: "1", title: "Create Your Account", text: "Sign up in under a minute — just an email and password." },
-  { n: "2", title: "Add Your Vehicle(s)", text: "Tell us about each vehicle. We'll start your service file." },
-  { n: "3", title: "Book or Join a Plan", text: "Request a one-off service or activate an MMAR Care membership." },
-  { n: "4", title: "Stay in the Loop", text: "Track repairs, approve estimates, and pay invoices from any device." },
+const RULES = [
+  { q: "Vehicle Eligibility", a: "Membership applies to one VIN and is non-transferable between vehicles." },
+  { q: "Immediate Activation", a: "Benefits activate immediately after payment and signed agreement completion." },
+  { q: "Additional Oil Charges", a: "Oil exceeding included quantities is billed separately at member-discounted rates." },
+  { q: "Scheduling Policy", a: "Services are by appointment and subject to availability — members get priority windows." },
+  { q: "Membership Deposit", a: "A non-refundable 3-month deposit is collected at signup to allow immediate activation and protect against abuse." },
+  { q: "Cancellation Policy", a: "Membership may be canceled after the first 3 months. Remaining balances may apply if services rendered exceed payments received." },
 ];
 
 const MmarCare = () => {
-  const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [checking, setChecking] = useState(true);
+  const [plans, setPlans] = useState<Plan[]>([]);
 
   useEffect(() => {
-    document.title = "MMAR Care Portal — Mobile Mechanic Customer Hub | Mike's Mobile Auto Repair";
+    document.title = "MMAR Care Maintenance Plans | Mike's Mobile Auto Repair";
     const metaDesc = document.querySelector('meta[name="description"]');
     if (metaDesc) {
       metaDesc.setAttribute(
         "content",
-        "MMAR Care is the customer portal for Mike's Mobile Auto Repair. Sign in to manage vehicles, approve estimates, pay invoices, and run your membership in Fort Myers & Lehigh Acres."
+        "MMAR Care is the monthly maintenance plan from Mike's Mobile Auto Repair. Included oil changes, priority scheduling, discounted labor, and a transferable warranty for drivers in Fort Myers & Lehigh Acres."
       );
     }
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) {
-        navigate("/portal/dashboard", { replace: true });
-        return;
-      }
-      setChecking(false);
-    });
-  }, [navigate]);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error || !data.user) {
-      toast.error(error?.message || "Sign in failed");
-      setLoading(false);
-      return;
-    }
-    toast.success("Welcome back to Garage Ace");
-    navigate("/portal/dashboard", { replace: true });
-  };
-
-  const handleGoogle = async () => {
-    setLoading(true);
-    try { sessionStorage.setItem("postLoginRedirect", "/portal/dashboard"); } catch {}
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
-    });
-    if (result.error) {
-      toast.error("Google sign-in failed");
-      setLoading(false);
-    }
-  };
-
-  const handleResend = async () => {
-    if (!email) { toast.error("Enter your email first"); return; }
-    setLoading(true);
-    const { error } = await supabase.auth.resend({
-      type: "signup",
-      email,
-      options: { emailRedirectTo: window.location.origin + "/portal/dashboard" },
-    });
-    setLoading(false);
-    if (error) toast.error(error.message);
-    else toast.success("Confirmation email sent. Check your inbox.");
-  };
+    supabase
+      .from("membership_plans")
+      .select("*")
+      .eq("is_active", true)
+      .order("sort_order")
+      .then(({ data }) => setPlans((data as Plan[]) ?? []));
+  }, []);
 
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
 
       <main className="pt-20 lg:pt-24">
-        {/* Hero + Login */}
+        {/* Hero */}
         <section className="relative px-4 py-12 lg:py-20 overflow-hidden">
           <div
             className="absolute inset-0 bg-gradient-to-br from-primary/15 via-background to-accent/10"
             aria-hidden
           />
-          <div className="container mx-auto max-w-6xl relative grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
-            {/* Left: Pitch */}
-            <div>
-              <div className="flex items-center gap-3 mb-4">
-                <img src={mmarLogo} alt="MMAR" className="h-12 w-auto rounded shadow-md" />
-                <Badge variant="outline" className="border-primary/30 text-primary">
-                  MMAR Care Portal
-                </Badge>
-              </div>
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-5">
-                Your Vehicles.{" "}
-                <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                  One Smart Hub.
-                </span>
-              </h1>
-              <p className="text-lg text-muted-foreground mb-6 max-w-xl">
-                MMAR Care is the customer portal for Mike's Mobile Auto Repair. Manage your
-                vehicles, approve estimates, pay invoices, and run your membership — all from
-                your phone.
-              </p>
-              <div className="flex flex-wrap gap-3 mb-6">
-                <Button variant="hero" size="lg" asChild>
-                  <Link to="/login?tab=signup">
-                    Create Free Account <ArrowRight className="w-4 h-4 ml-1" />
-                  </Link>
-                </Button>
-                <Button variant="outline" size="lg" asChild>
-                  <Link to="/memberships">Explore Memberships</Link>
-                </Button>
-              </div>
-              <p className="text-sm text-muted-foreground flex items-center gap-2">
-                <Phone className="w-4 h-4 text-primary" />
-                Prefer to talk?{" "}
-                <a href="tel:8135017572" className="text-primary font-medium hover:underline">
-                  (813) 501-7572
-                </a>
-              </p>
+          <div className="container mx-auto max-w-4xl relative text-center">
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <img src={mmarLogo} alt="MMAR" className="h-12 w-auto rounded shadow-md" />
+              <Badge variant="outline" className="border-accent/40 text-accent">
+                MMAR Care Maintenance Plans
+              </Badge>
             </div>
+            <h1 className="font-display text-3xl sm:text-5xl lg:text-6xl tracking-wide mb-5">
+              <span className="text-sky">Maintenance you</span>{" "}
+              <span className="text-gold">never have to think about.</span>
+            </h1>
+            <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto mb-7">
+              MMAR Care is our monthly maintenance subscription. Included oil changes, priority
+              scheduling, member-only discounts, and a transferable warranty — designed for busy
+              drivers across Fort Myers, Lehigh Acres, and Cape Coral.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Button variant="hero" size="lg" asChild>
+                <a href="#plans">
+                  View plans <ArrowRight className="w-4 h-4 ml-1" />
+                </a>
+              </Button>
+              <Button variant="outline" size="lg" asChild>
+                <Link to="/login?tab=signup">Create account & subscribe</Link>
+              </Button>
+            </div>
+            <p className="text-sm text-muted-foreground mt-5">
+              Already a member?{" "}
+              <Link to="/login" className="text-primary hover:underline font-medium">
+                Open the Garage Ace app
+              </Link>
+            </p>
+          </div>
+        </section>
 
-            {/* Right: Login card */}
-            <Card className="border-border/60 shadow-xl">
-              <CardHeader className="text-center">
-                <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-2">
-                  <Wrench className="h-6 w-6 text-primary" />
-                </div>
-                <CardTitle className="text-2xl">Sign in to MMAR Care</CardTitle>
-                <CardDescription>Customer portal access</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {checking ? (
-                  <div className="flex justify-center py-6">
-                    <Loader2 className="h-6 w-6 animate-spin text-primary" />
-                  </div>
-                ) : (
-                  <>
-                    <Button onClick={handleGoogle} disabled={loading} variant="outline" className="w-full">
-                      Continue with Google
-                    </Button>
-                    <div className="relative">
-                      <div className="absolute inset-0 flex items-center"><span className="w-full border-t" /></div>
-                      <div className="relative flex justify-center text-xs uppercase">
-                        <span className="bg-card px-2 text-muted-foreground">or email</span>
-                      </div>
-                    </div>
-                    <form onSubmit={handleSubmit} className="space-y-3">
-                      <div>
-                        <Label htmlFor="mc-email">Email</Label>
-                        <Input id="mc-email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" />
-                      </div>
-                      <div>
-                        <Label htmlFor="mc-password">Password</Label>
-                        <Input id="mc-password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="current-password" />
-                      </div>
-                      <Button type="submit" variant="hero" className="w-full" disabled={loading}>
-                        {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Sign In"}
-                      </Button>
-                    </form>
-                    <button
-                      type="button"
-                      onClick={handleResend}
-                      disabled={loading}
-                      className="text-xs text-muted-foreground hover:text-primary underline w-full text-center"
-                    >
-                      Didn't get a confirmation email? Resend it
-                    </button>
-                    <p className="text-sm text-center text-muted-foreground">
-                      New here?{" "}
-                      <Link to="/login?tab=signup" className="text-primary font-medium hover:underline">
-                        Create an account
-                      </Link>
-                    </p>
-                  </>
-                )}
+        {/* What is MMAR Care */}
+        <section className="px-4 py-14">
+          <div className="container mx-auto max-w-3xl">
+            <Card className="border-primary/30 bg-card/40">
+              <CardContent className="p-6 md:p-10">
+                <Badge variant="outline" className="mb-3 border-primary/30 text-primary">
+                  What is MMAR Care?
+                </Badge>
+                <h2 className="font-display text-2xl md:text-3xl mb-3">
+                  <span className="text-foreground">A</span>{" "}
+                  <span className="text-gold">subscription</span>{" "}
+                  <span className="text-foreground">for vehicle maintenance.</span>
+                </h2>
+                <p className="text-muted-foreground mb-3">
+                  MMAR Care is a monthly plan that covers your routine maintenance and gives you
+                  member-only benefits at Mike's Mobile Auto Repair. You pay a small monthly fee,
+                  we cover the predictable stuff, and you get priority access whenever something
+                  unexpected comes up.
+                </p>
+                <p className="text-muted-foreground">
+                  Your plan lives inside the free{" "}
+                  <Link to="/why-garage-ace" className="text-primary hover:underline font-medium">
+                    Garage Ace app
+                  </Link>{" "}
+                  — that's where you manage vehicles, see service history, approve estimates, and
+                  schedule your included services.
+                </p>
               </CardContent>
             </Card>
           </div>
         </section>
 
-        {/* What you get */}
-        <section className="px-4 py-16 lg:py-20">
+        {/* Benefits */}
+        <section className="px-4 py-14 bg-card/30 border-y border-border/50">
           <div className="container mx-auto max-w-6xl">
-            <div className="text-center mb-12">
-              <Badge variant="outline" className="mb-3 border-accent/40 text-accent">
-                What's inside MMAR Care
-              </Badge>
-              <h2 className="text-3xl lg:text-4xl font-bold mb-3">Everything your car needs, in one app</h2>
+            <div className="text-center mb-10">
+              <h2 className="font-display text-2xl md:text-4xl mb-3">
+                <span className="text-sky">Why MMAR Care members</span>{" "}
+                <span className="text-gold">stay with us.</span>
+              </h2>
               <p className="text-muted-foreground max-w-2xl mx-auto">
-                MMAR Care is included free with every service. Membership unlocks priority scheduling and discounts.
+                Predictable cost. Real priority. Coverage that actually applies to the work your car
+                needs.
               </p>
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-              {FEATURES.map(({ icon: Icon, title, text }) => (
-                <Card key={title} className="border-border/60 hover:border-primary/40 transition-colors">
-                  <CardHeader>
-                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mb-2">
-                      <Icon className="w-5 h-5 text-primary" />
+              {BENEFITS.map(({ icon: Icon, title, text }) => (
+                <Card
+                  key={title}
+                  className="border-border/60 hover:border-accent/40 transition-colors"
+                >
+                  <CardContent className="p-5">
+                    <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center mb-3">
+                      <Icon className="w-5 h-5 text-accent" />
                     </div>
-                    <CardTitle className="text-lg">{title}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
+                    <h3 className="font-semibold mb-1">{title}</h3>
                     <p className="text-sm text-muted-foreground">{text}</p>
                   </CardContent>
                 </Card>
@@ -266,43 +212,159 @@ const MmarCare = () => {
           </div>
         </section>
 
-        {/* How it works */}
-        <section className="px-4 py-16 lg:py-20 bg-muted/30">
-          <div className="container mx-auto max-w-5xl">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl lg:text-4xl font-bold mb-3">How MMAR Care works</h2>
-              <p className="text-muted-foreground">Up and running in minutes — no app store needed.</p>
+        {/* Plans */}
+        <section id="plans" className="px-4 py-14">
+          <div className="container mx-auto max-w-6xl">
+            <div className="text-center mb-10">
+              <h2 className="font-display text-2xl md:text-4xl mb-3">
+                <span className="text-foreground">Pick the plan that fits</span>{" "}
+                <span className="text-sky">your driving life.</span>
+              </h2>
+              <p className="text-muted-foreground">
+                One VIN per plan. Cancel after the first 3 months.
+              </p>
             </div>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-              {STEPS.map((s) => (
-                <div key={s.n} className="relative bg-card border border-border rounded-xl p-5">
-                  <div className="absolute -top-3 -left-3 w-9 h-9 rounded-full bg-gradient-to-br from-primary to-accent text-primary-foreground font-bold flex items-center justify-center shadow-lg">
-                    {s.n}
-                  </div>
-                  <h3 className="font-semibold mb-1 mt-1">{s.title}</h3>
-                  <p className="text-sm text-muted-foreground">{s.text}</p>
-                </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {plans.map((plan) => (
+                <Card
+                  key={plan.id}
+                  className={`relative flex flex-col ${
+                    plan.badge ? "border-accent shadow-lg shadow-accent/20 md:scale-105" : "border-border/50"
+                  }`}
+                >
+                  {plan.badge && (
+                    <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-accent text-accent-foreground">
+                      {plan.badge}
+                    </Badge>
+                  )}
+                  <CardHeader>
+                    <CardTitle className="text-xl">{plan.name}</CardTitle>
+                    {plan.tagline && (
+                      <p className="text-sm text-muted-foreground">{plan.tagline}</p>
+                    )}
+                    <div className="pt-3">
+                      <div className="flex items-baseline gap-1">
+                        <span className="text-4xl font-bold">${plan.monthly_price}</span>
+                        <span className="text-muted-foreground">/mo</span>
+                      </div>
+                      <div className="text-xs text-muted-foreground mt-2 space-y-0.5">
+                        <div>Deposit: ${plan.deposit_amount.toFixed(2)} (non-refundable)</div>
+                        <div className="font-semibold text-foreground">
+                          Due at signup: ${plan.total_at_signup.toFixed(2)}
+                        </div>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="flex-1 flex flex-col">
+                    <ul className="space-y-2 mb-6 flex-1">
+                      {plan.features.map((f, i) => (
+                        <li key={i} className="flex gap-2 text-sm">
+                          <Check className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                          <span>{f}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <Button
+                      variant={plan.badge ? "hero" : "outline"}
+                      className="w-full"
+                      asChild
+                    >
+                      <Link to={`/portal/membership-signup?plan=${plan.slug}`}>
+                        Choose {plan.name}
+                      </Link>
+                    </Button>
+                  </CardContent>
+                </Card>
               ))}
             </div>
+            <p className="text-xs text-center text-muted-foreground mt-8 max-w-2xl mx-auto">
+              Additional charges may apply for oil above included quantity, specialty oils,
+              specialty filters, oversized vehicles, and diesel vehicles. Fleet pricing (5+
+              vehicles) available — see{" "}
+              <Link to="/memberships#fleet" className="text-primary hover:underline">
+                fleet plans
+              </Link>
+              .
+            </p>
           </div>
         </section>
 
-        {/* Final CTA */}
-        <section className="px-4 py-16 lg:py-20">
-          <div className="container mx-auto max-w-4xl">
-            <div className="bg-gradient-to-br from-primary/15 via-card to-accent/10 border border-border rounded-2xl p-8 lg:p-12 text-center">
-              <h2 className="text-3xl lg:text-4xl font-bold mb-3">Ready to take control of your car care?</h2>
-              <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
-                Create a free MMAR Care account in under a minute. No credit card required to sign up.
+        {/* Where to manage it */}
+        <section className="px-4 py-14 bg-card/30 border-y border-border/50">
+          <div className="container mx-auto max-w-3xl">
+            <Card className="border-primary/40 bg-gradient-to-br from-primary/10 via-card to-accent/10">
+              <CardContent className="p-6 md:p-10 text-center">
+                <Smartphone className="w-10 h-10 text-primary mx-auto mb-4" />
+                <h2 className="font-display text-2xl md:text-3xl mb-3">
+                  <span className="text-foreground">You manage MMAR Care</span>{" "}
+                  <span className="text-sky">inside the free Garage Ace app.</span>
+                </h2>
+                <p className="text-muted-foreground mb-6 max-w-xl mx-auto">
+                  Schedule included services, see what's used and what's remaining, view inspection
+                  photos, and update billing — all from your phone.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  <Button variant="hero" asChild>
+                    <Link to="/why-garage-ace">
+                      What's the app? <ArrowRight className="w-4 h-4 ml-1" />
+                    </Link>
+                  </Button>
+                  <Button variant="outline" asChild>
+                    <Link to="/login">Sign in to the app</Link>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
+        {/* Membership rules */}
+        <section className="px-4 py-14">
+          <div className="container mx-auto max-w-3xl">
+            <h2 className="font-display text-2xl md:text-3xl text-center mb-8">
+              <span className="text-sky">Membership details</span>
+            </h2>
+            <Accordion type="single" collapsible className="space-y-2">
+              {RULES.map((r, i) => (
+                <AccordionItem
+                  key={i}
+                  value={`r${i}`}
+                  className="border border-border rounded-lg px-4"
+                >
+                  <AccordionTrigger className="hover:no-underline font-medium">
+                    {r.q}
+                  </AccordionTrigger>
+                  <AccordionContent className="text-muted-foreground">{r.a}</AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </div>
+        </section>
+
+        {/* CTA */}
+        <section className="px-4 py-14 md:py-20">
+          <div className="container mx-auto max-w-3xl">
+            <div className="rounded-2xl border border-accent/40 bg-gradient-to-br from-accent/10 via-background to-primary/10 p-8 md:p-12 text-center">
+              <h2 className="font-display text-2xl md:text-4xl mb-3">
+                <span className="text-gold">Ready to lock in</span>{" "}
+                <span className="text-foreground">predictable car care?</span>
+              </h2>
+              <p className="text-muted-foreground mb-6">
+                Create your free account, pick a plan, and we'll handle the rest.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                <Button variant="hero" size="lg" asChild>
-                  <Link to="/login?tab=signup">
-                    Create Free Account <ArrowRight className="w-4 h-4 ml-1" />
-                  </Link>
+                <Button size="lg" variant="hero" asChild>
+                  <a href="#plans">View plans</a>
                 </Button>
-                <Button variant="outline" size="lg" asChild>
-                  <Link to="/memberships">View Membership Plans</Link>
+                <Button size="lg" variant="outline" asChild>
+                  <a href="tel:8135017572">
+                    <Phone className="w-4 h-4 mr-1" /> Call (813) 501-7572
+                  </a>
+                </Button>
+                <Button size="lg" variant="outline" asChild>
+                  <a href="sms:8135017572">
+                    <MessageSquare className="w-4 h-4 mr-1" /> Text us
+                  </a>
                 </Button>
               </div>
             </div>
@@ -311,6 +373,7 @@ const MmarCare = () => {
       </main>
 
       <Footer />
+      <FloatingCallButton />
     </div>
   );
 };
