@@ -69,7 +69,7 @@ const PortalInspections = () => {
       supabase
         .from("inspections")
         .select(
-          "id, status, mileage, share_token, summary_notes, completed_at, created_at, vehicle:vehicles(year, make, model)",
+          "id, status, mileage, share_token, summary_notes, completed_at, created_at, vehicle:vehicles(year, make, model), inspection_items(id, category, item_name, status, notes, photo_urls, sort_order)",
         )
         .eq("customer_id", user.id)
         .order("created_at", { ascending: false }),
