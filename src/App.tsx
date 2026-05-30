@@ -118,6 +118,7 @@ const App = () => (
             <Route path="/portal/repair-orders" element={<CustomerProtectedRoute><PortalRepairOrders /></CustomerProtectedRoute>} />
             <Route path="/portal/financing" element={<CustomerProtectedRoute><PortalFinancing /></CustomerProtectedRoute>} />
             <Route path="/portal/vehicle-health" element={<CustomerProtectedRoute><PortalVehicleHealth /></CustomerProtectedRoute>} />
+            <Route path="/portal/inspections" element={<CustomerProtectedRoute><PortalInspections /></CustomerProtectedRoute>} />
             <Route
               path="/admin/dashboard"
               element={
