@@ -122,7 +122,7 @@ export default function AdminReports() {
   const load = useCallback(async () => {
       const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
 
-      const [inv, completed, members, ests, settings, employeesRes] = await Promise.all([
+      const [inv, completed, members, ests, settings, employeesRes, mpRes] = await Promise.all([
         supabase
           .from('invoices')
           .select('id, invoice_number, total, subtotal, status, created_at, customer_id, service_record_id, technician_id, line_items, stripe_session_id, stripe_payment_intent_id, stripe_fee, stripe_fee_synced_at')
@@ -133,6 +133,12 @@ export default function AdminReports() {
         supabase.from('estimates').select('id', { count: 'exact', head: true }).eq('status', 'sent'),
         supabase.from('shop_settings').select('labor_cost_per_hour').eq('id', 1).single(),
         supabase.from('employees' as any).select('id, user_id, full_name, hourly_rate, pay_basis').eq('is_active', true),
+        supabase
+          .from('membership_payments' as any)
+          .select('id, paid_at, kind, amount, stripe_fee, stripe_fee_synced_at, customer_id, membership:memberships(plan:membership_plans(name))')
+          .eq('status', 'paid')
+          .gte('paid_at', since)
+          .order('paid_at', { ascending: false }),
       ]);
 
       const allInvoices = ((inv.data ?? []) as any[]) as InvoiceRow[];
