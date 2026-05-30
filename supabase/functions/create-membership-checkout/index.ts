@@ -50,27 +50,37 @@ Deno.serve(async (req) => {
     const origin = req.headers.get("origin") || "https://shop-flow-home.lovable.app";
     const depositCents = Math.round(Number(plan.deposit_amount || 0) * 100);
 
+    const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = [
+      { price: plan.stripe_price_id, quantity: 1 },
+    ];
+    if (depositCents > 0) {
+      lineItems.push({
+        quantity: 1,
+        price_data: {
+          currency: "usd",
+          unit_amount: depositCents,
+          product_data: {
+            name: `${plan.name} — Membership Deposit (non-refundable)`,
+          },
+        },
+      });
+    }
+
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
       customer: customerId,
       customer_email: customerId ? undefined : user.email,
-      line_items: [{ price: plan.stripe_price_id, quantity: 1 }],
+      line_items: lineItems,
       subscription_data: {
         metadata: { membership_id, customer_id: user.id },
-        ...(depositCents > 0 && {
-          add_invoice_items: [
-            {
-              quantity: 1,
-              price_data: {
-                currency: "usd",
-                unit_amount: depositCents,
-                product_data: { name: `${plan.name} — Membership Deposit (non-refundable)` },
-              },
-            },
-          ],
-        }),
       },
-      metadata: { membership_id, customer_id: user.id, plan_name: plan.name },
+      metadata: {
+        membership_id,
+        customer_id: user.id,
+        plan_name: plan.name,
+        deposit_cents: String(depositCents),
+        plan_price_id: plan.stripe_price_id,
+      },
       success_url: `${origin}/portal/dashboard?membership=success`,
       cancel_url: `${origin}/portal/membership-signup?canceled=1`,
     });
