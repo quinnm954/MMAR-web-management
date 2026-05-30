@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import TechLayout from "@/components/tech/TechLayout";
@@ -8,9 +9,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Loader2, Plus, ClipboardCheck, Camera } from "lucide-react";
+import { Loader2, Plus, ClipboardCheck, ClipboardList, Camera } from "lucide-react";
 import { toast } from "sonner";
 
 interface Inspection {
@@ -41,6 +43,10 @@ interface Appt {
   customer_id: string;
   vehicle_id: string | null;
 }
+type Checklist = {
+  id: string; title: string; status: string; notes: string | null;
+  completed_at: string | null; created_at: string;
+};
 
 const DEFAULT_TEMPLATE = [
   { category: "Engine", item_name: "Oil level & condition" },
@@ -67,18 +73,26 @@ const statusBadge = (s: string) => {
 
 const TechInspections = () => {
   const { user } = useAuth();
+  const [params, setParams] = useSearchParams();
+  const tab = params.get("tab") === "checklists" ? "checklists" : "inspections";
+
+  // Inspections state
   const [inspections, setInspections] = useState<Inspection[]>([]);
   const [appts, setAppts] = useState<Appt[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loadingInsp, setLoadingInsp] = useState(true);
   const [openId, setOpenId] = useState<string | null>(null);
   const [items, setItems] = useState<InspItem[]>([]);
   const [createOpen, setCreateOpen] = useState(false);
   const [newApptId, setNewApptId] = useState("");
   const [creating, setCreating] = useState(false);
 
-  const load = async () => {
+  // Checklists state
+  const [checklists, setChecklists] = useState<Checklist[]>([]);
+  const [loadingCl, setLoadingCl] = useState(true);
+
+  const loadInsp = async () => {
     if (!user) return;
-    setLoading(true);
+    setLoadingInsp(true);
     const [i, a] = await Promise.all([
       supabase.from("inspections")
         .select("*")
@@ -106,10 +120,21 @@ const TechInspections = () => {
     });
     setInspections(list);
     setAppts((a.data ?? []) as Appt[]);
-    setLoading(false);
+    setLoadingInsp(false);
   };
 
-  useEffect(() => { load(); }, [user]);
+  const loadCl = async () => {
+    if (!user) return;
+    setLoadingCl(true);
+    const { data } = await supabase.from("service_checklists")
+      .select("id, title, status, notes, completed_at, created_at")
+      .eq("assigned_technician_id", user.id)
+      .order("created_at", { ascending: false });
+    setChecklists((data as any) ?? []);
+    setLoadingCl(false);
+  };
+
+  useEffect(() => { loadInsp(); loadCl(); /* eslint-disable-next-line */ }, [user]);
 
   const openInspection = async (id: string) => {
     setOpenId(id);
@@ -143,7 +168,7 @@ const TechInspections = () => {
     setCreateOpen(false);
     setNewApptId("");
     toast.success("Inspection created");
-    await load();
+    await loadInsp();
     openInspection(insp.id);
   };
 
@@ -172,7 +197,7 @@ const TechInspections = () => {
     }).eq("id", openId);
     toast.success("Inspection completed");
     setOpenId(null);
-    load();
+    loadInsp();
   };
 
   const updateMileageNotes = async (mileage: string, summary: string) => {
@@ -185,11 +210,10 @@ const TechInspections = () => {
 
   const current = inspections.find((i) => i.id === openId) ?? null;
 
-  return (
-    <TechLayout>
-      {loading ? (
-        <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
-      ) : openId && current ? (
+  // When viewing a single inspection, hide the tabs and show only that view
+  if (openId && current) {
+    return (
+      <TechLayout>
         <div className="space-y-4 max-w-3xl">
           <div className="flex items-center justify-between">
             <div>
@@ -258,13 +282,26 @@ const TechInspections = () => {
             <ClipboardCheck className="h-4 w-4 mr-1" /> Complete Inspection
           </Button>
         </div>
-      ) : (
-        <div className="space-y-3">
+      </TechLayout>
+    );
+  }
+
+  return (
+    <TechLayout>
+      <Tabs value={tab} onValueChange={(v) => setParams(v === "inspections" ? {} : { tab: v }, { replace: true })}>
+        <TabsList className="grid w-full grid-cols-2 max-w-md">
+          <TabsTrigger value="inspections"><ClipboardCheck className="h-4 w-4 mr-1" />Inspections</TabsTrigger>
+          <TabsTrigger value="checklists"><ClipboardList className="h-4 w-4 mr-1" />Checklists</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="inspections" className="mt-4 space-y-3">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-bold">My Inspections</h2>
             <Button variant="hero" size="sm" onClick={() => setCreateOpen(true)}><Plus className="h-4 w-4 mr-1" /> New</Button>
           </div>
-          {inspections.length === 0 ? (
+          {loadingInsp ? (
+            <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
+          ) : inspections.length === 0 ? (
             <Card><CardContent className="p-8 text-center text-muted-foreground">No inspections yet.</CardContent></Card>
           ) : inspections.map((i) => (
             <Card key={i.id} className="cursor-pointer hover:border-primary/50" onClick={() => openInspection(i.id)}>
@@ -281,8 +318,33 @@ const TechInspections = () => {
               </CardContent>
             </Card>
           ))}
-        </div>
-      )}
+        </TabsContent>
+
+        <TabsContent value="checklists" className="mt-4 space-y-3">
+          <h2 className="text-lg font-bold">My Checklists</h2>
+          {loadingCl ? (
+            <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
+          ) : checklists.length === 0 ? (
+            <Card><CardContent className="p-8 text-center text-muted-foreground">No checklists assigned yet.</CardContent></Card>
+          ) : (
+            <div className="space-y-2">
+              {checklists.map((r) => (
+                <Link to={`/tech/checklists/${r.id}`} key={r.id}>
+                  <Card className="hover:bg-muted/40 transition">
+                    <CardContent className="p-4 flex items-center justify-between">
+                      <div>
+                        <div className="font-medium">{r.title}</div>
+                        <div className="text-xs text-muted-foreground">{new Date(r.created_at).toLocaleDateString()}</div>
+                      </div>
+                      <Badge variant={r.status === "completed" ? "secondary" : "default"}>{r.status}</Badge>
+                    </CardContent>
+                  </Card>
+                </Link>
+              ))}
+            </div>
+          )}
+        </TabsContent>
+      </Tabs>
 
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>
         <DialogContent>

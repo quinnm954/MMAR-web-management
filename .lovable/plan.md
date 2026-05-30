@@ -1,39 +1,68 @@
-## Problem
+# Tech Dashboard Overview Hub
 
-When a user clicks the password-reset link in their email, Supabase signs them in with a recovery session and then our existing `Login` and protected-route redirects send them straight to their dashboard. They never see the "set new password" screen.
+Turn `/tech` from a bare jobs list into a proper overview hub, and consolidate checklists + inspections into one section.
 
-## Fix
+## New routes
 
-Detect the Supabase `PASSWORD_RECOVERY` auth event and pin the user on `/set-password` until they actually save a new password.
+- `/tech` → **New** `TechHome` overview hub (replaces current dashboard view)
+- `/tech/jobs` → existing assigned-jobs list (current `TechDashboard` content, renamed)
+- `/tech/inspections` (existing checklists + inspections merged here)
+- `/tech/checklists` → redirect to `/tech/inspections` (keep links alive)
+- `/tech/customers` → **New** read-only customer + vehicle lookup
+- `/tech/history` → **New** service records the tech has logged
+- `/tech/time` → **New** labor hours tracker (uses existing `time_entries` table)
 
-### 1. `src/hooks/useAuth.tsx`
+## Overview hub layout (`/tech`)
 
-- Add `isPasswordRecovery: boolean` to the context.
-- In `onAuthStateChange`, when `event === "PASSWORD_RECOVERY"`, set `isPasswordRecovery = true` and persist a marker in `sessionStorage` (so a hard refresh on `/set-password` keeps the state).
-- Expose a `clearPasswordRecovery()` helper that flips the flag off and removes the sessionStorage marker.
-- On initial mount, hydrate `isPasswordRecovery` from sessionStorage.
-- In `signOut`, clear the flag.
+Top: greeting + today's date.
 
-### 2. `src/pages/SetPassword.tsx`
+**Stats row (4 cards):**
+- Jobs today (scheduled appointments assigned to me, today)
+- In progress (status = in_progress)
+- Completed this week
+- Hours this week (sum from `time_entries` where technician_id = me)
 
-- After `supabase.auth.updateUser({ password })` succeeds, call `clearPasswordRecovery()` before navigating to the role-based destination.
+**Quick-access cards (grid, mobile-first):**
+- My Jobs → `/tech/jobs`
+- Checklists & Inspections → `/tech/inspections`
+- Customers & Vehicles → `/tech/customers`
+- Service History → `/tech/history`
+- Labor Hours → `/tech/time`
 
-### 3. Redirect guards — short-circuit to `/set-password` while recovering
+**Next up section:** next 3 upcoming appointments with quick "Start" / "Open" buttons.
 
-In each of these, if `isPasswordRecovery` is true and the current path isn't `/set-password`, redirect to `/set-password`:
+## Merge checklists + inspections
 
-- `src/pages/Login.tsx` — at the top of the post-auth `useEffect`, before the role-based routing.
-- `src/components/portal/CustomerProtectedRoute.tsx`
-- `src/components/tech/TechProtectedRoute.tsx`
-- `src/components/admin/ProtectedRoute.tsx`
+The existing `/tech/inspections` page becomes the single home for both. Add tabs at the top: **Inspections** | **Checklists**. Move `TechChecklists` content into a tab inside `TechInspections`. Delete the separate route and update `TechLayout` nav: replace "Checklists" + "Inspections" entries with one **Inspections** entry.
 
-These already check `must_set_password`; we add the recovery check next to it.
+Mobile bottom nav becomes: Home · Jobs · Inspections · More (sheet with Customers, History, Time).
 
-### 4. `src/pages/Login.tsx` — reset-password CTA copy
+## New pages
 
-The existing "Forgot?" handler already uses `redirectTo: origin + "/set-password"`, which stays correct. No change needed there.
+**`TechCustomers`** — search bar + paginated list of customers (read-only). Click a row → expand to show vehicles + recent service history for that customer. Uses existing `profiles`, `vehicles`, `service_records` tables. Reuses tech role check; RLS already lets tech roles read these.
+
+**`TechHistory`** — list of `service_records` where `technician_id = auth.uid()` (need to confirm column exists; if not, filter via joined appointment.assigned_technician_id). Shows date, customer, vehicle, service type, labor performed.
+
+**`TechTime`** — clock in/out widget + list of today's/this-week's `time_entries` for the current tech, with totals. Optional link to an appointment when clocking in. Uses existing RLS policy "Technicians manage own time entries".
+
+## Files
+
+New:
+- `src/pages/tech/TechHome.tsx`
+- `src/pages/tech/TechJobs.tsx` (moved from current `TechDashboard.tsx`)
+- `src/pages/tech/TechCustomers.tsx`
+- `src/pages/tech/TechHistory.tsx`
+- `src/pages/tech/TechTime.tsx`
+
+Edited:
+- `src/App.tsx` — add new routes, redirect `/tech/checklists` → `/tech/inspections`
+- `src/components/tech/TechLayout.tsx` — new nav items (Home, Jobs, Inspections, Customers, History, Time)
+- `src/pages/tech/TechInspections.tsx` — add tabs to host checklists content
+- `src/pages/tech/TechDashboard.tsx` — becomes thin re-export of `TechJobs` or deleted (replaced by `TechHome`)
+
+No database changes — all required tables (`time_entries`, `service_records`, `appointments`, `vehicles`, `profiles`, `vehicle_inspections`, `vehicle_checklists`) and RLS policies already exist.
 
 ## Out of scope
-
-- The auth-email-hook recovery template (no custom templates are scaffolded in this project — Supabase's default recovery email already lands on the `redirectTo` URL we set).
-- First-time `must_set_password` flow — unchanged and still works alongside this.
+- Editing customer data from tech view (read-only only)
+- New labor-pay calculations (admin already has `AdminTechLaborPay`)
+- Push notifications for new jobs
