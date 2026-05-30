@@ -155,7 +155,7 @@ const TechInspections = () => {
       x.vehicle = vehMap[x.vehicle_id] ?? null;
     });
     setInspections(list);
-    setAppts((a.data ?? []) as Appt[]);
+    setAppts(activeAppts as Appt[]);
     setLoadingInsp(false);
   };
 
