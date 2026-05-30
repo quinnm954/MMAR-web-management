@@ -343,8 +343,21 @@ export default function AdminReports() {
     return { paidH };
   }, [filteredRows]);
 
+  const membershipTotals = useMemo(() => {
+    return memberRows.reduce(
+      (acc, r) => {
+        acc.revenue += r.amount;
+        acc.stripeFee += r.stripeFee;
+        if (r.kind === 'deposit') acc.deposits += r.amount;
+        else acc.recurring += r.amount;
+        return acc;
+      },
+      { revenue: 0, stripeFee: 0, deposits: 0, recurring: 0 },
+    );
+  }, [memberRows]);
+
   const totals = useMemo(() => {
-    return filteredRows.reduce(
+    const base = filteredRows.reduce(
       (acc, r) => {
         acc.revenue += r.revenue;
         acc.cogs += r.cogs;
@@ -356,7 +369,15 @@ export default function AdminReports() {
       },
       { revenue: 0, cogs: 0, employeeCost: 0, stripeFee: 0, grossProfit: 0, netProfit: 0 },
     );
-  }, [filteredRows]);
+    // Membership revenue (no COGS / employee cost) only included when no tech filter is set
+    if (techFilter === 'all') {
+      base.revenue += membershipTotals.revenue;
+      base.stripeFee += membershipTotals.stripeFee;
+      base.grossProfit += membershipTotals.revenue;
+      base.netProfit += membershipTotals.revenue - membershipTotals.stripeFee;
+    }
+    return base;
+  }, [filteredRows, membershipTotals, techFilter]);
 
   // Group rows into time buckets for the summary view
   const bucketKey = (iso: string): { key: string; label: string; sortKey: string } => {
