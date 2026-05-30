@@ -664,6 +664,54 @@ export default function AdminReports() {
               </Table>
             </CardContent>
           </Card>
+
+          <h3 className="font-display text-lg pt-4">Membership Payments</h3>
+          <p className="text-xs text-muted-foreground -mt-1">
+            One row per Stripe charge tied to a membership (deposits + monthly recurring).
+          </p>
+          <Card>
+            <CardContent className="p-0 overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Member</TableHead>
+                    <TableHead>Plan</TableHead>
+                    <TableHead>Type</TableHead>
+                    <TableHead className="text-right">Amount</TableHead>
+                    <TableHead className="text-right">Stripe Fee</TableHead>
+                    <TableHead className="text-right">Net</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {memberRows.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={7} className="text-center text-muted-foreground py-6">
+                        No membership payments in this window.
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    memberRows.map((r) => (
+                      <TableRow key={r.id}>
+                        <TableCell className="text-xs">{new Date(r.paid_at).toLocaleDateString()}</TableCell>
+                        <TableCell className="text-xs">{r.member}</TableCell>
+                        <TableCell className="text-xs">{r.plan}</TableCell>
+                        <TableCell className="text-xs capitalize">{r.kind}</TableCell>
+                        <TableCell className="text-right">{fmt(r.amount)}</TableCell>
+                        <TableCell className="text-right" title={r.stripeFeeIsActual ? 'Actual fee from Stripe' : 'Estimated (not yet synced)'}>
+                          {fmt(r.stripeFee)}
+                          {!r.stripeFeeIsActual && r.stripeFee > 0 && <span className="text-muted-foreground ml-1">~</span>}
+                        </TableCell>
+                        <TableCell className="text-right font-semibold text-primary">
+                          {fmt(r.amount - r.stripeFee)}
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
 
