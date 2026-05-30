@@ -17,7 +17,7 @@ import { Loader2, KeyRound } from "lucide-react";
 
 const SetPassword = () => {
   const navigate = useNavigate();
-  const { user, isAdmin, hasAnyRole } = useAuth();
+  const { user, isAdmin, hasAnyRole, clearPasswordRecovery } = useAuth();
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [busy, setBusy] = useState(false);
@@ -39,6 +39,7 @@ const SetPassword = () => {
     });
     setBusy(false);
     if (error) return toast.error(error.message);
+    clearPasswordRecovery();
     toast.success("Password saved");
     navigate(destination(), { replace: true });
   };

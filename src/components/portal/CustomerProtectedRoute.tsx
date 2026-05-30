@@ -7,7 +7,7 @@ import { Loader2 } from "lucide-react";
 type OnboardingState = "unknown" | "needed" | "complete";
 
 const CustomerProtectedRoute = ({ children }: { children: ReactNode }) => {
-  const { user, isAdmin, isStaff, isLoading } = useAuth();
+  const { user, isAdmin, isStaff, isLoading, isPasswordRecovery } = useAuth();
   const location = useLocation();
   const [onboarding, setOnboarding] = useState<OnboardingState>("unknown");
 
@@ -68,6 +68,10 @@ const CustomerProtectedRoute = ({ children }: { children: ReactNode }) => {
 
   if (!user) {
     return <Navigate to={`/login?redirect=${encodeURIComponent(location.pathname)}`} replace />;
+  }
+
+  if (isPasswordRecovery && location.pathname !== "/set-password") {
+    return <Navigate to="/set-password" replace />;
   }
 
   if ((user.user_metadata as any)?.must_set_password && location.pathname !== "/set-password") {
