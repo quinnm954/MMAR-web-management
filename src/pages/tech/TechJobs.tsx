@@ -58,7 +58,7 @@ const TechJobs = () => {
   const navigate = useNavigate();
   const [tab, setTab] = useState<Tab>("active");
   const [rows, setRows] = useState<Appt[]>([]);
-  const [historyRows, setHistoryRows] = useState<Record[]>([]);
+  const [historyRows, setHistoryRows] = useState<ServiceRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [opening, setOpening] = useState<string | null>(null);
 
@@ -112,7 +112,7 @@ const TechJobs = () => {
       .in("appointment_id", apptIds)
       .order("service_date", { ascending: false })
       .limit(200);
-    const list = (data as Record[]) ?? [];
+    const list = (data as ServiceRecord[]) ?? [];
     const custIds = Array.from(new Set(list.map((r) => r.customer_id)));
     const vehIds = Array.from(new Set(list.map((r) => r.vehicle_id)));
     const [profs, vehs] = await Promise.all([
