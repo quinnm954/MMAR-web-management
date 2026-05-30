@@ -114,7 +114,7 @@ const TechJobs = () => {
     // Build item list from all active checklist templates
     const { data: templates } = await supabase
       .from("checklist_templates")
-      .select("id, name, sort_order:created_at")
+      .select("id, name")
       .eq("is_active", true);
     const tplIds = (templates ?? []).map((t: any) => t.id);
     let mergedItems: { category: string; item_name: string; sort_order: number }[] = [];
