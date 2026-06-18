@@ -126,6 +126,7 @@ export type Database = {
           priority: string
           reminder_sent_24h: boolean
           reminder_sent_2h: boolean
+          repair_order_number: string | null
           requested_date: string | null
           requested_time_window: string | null
           scheduled_at: string | null
@@ -150,6 +151,7 @@ export type Database = {
           priority?: string
           reminder_sent_24h?: boolean
           reminder_sent_2h?: boolean
+          repair_order_number?: string | null
           requested_date?: string | null
           requested_time_window?: string | null
           scheduled_at?: string | null
@@ -174,6 +176,7 @@ export type Database = {
           priority?: string
           reminder_sent_24h?: boolean
           reminder_sent_2h?: boolean
+          repair_order_number?: string | null
           requested_date?: string | null
           requested_time_window?: string | null
           scheduled_at?: string | null
