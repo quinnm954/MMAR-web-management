@@ -3060,6 +3060,33 @@ export type Database = {
       }
     }
     Views: {
+      blog_comments_public: {
+        Row: {
+          author_name: string | null
+          content: string | null
+          created_at: string | null
+          id: string | null
+          is_approved: boolean | null
+          post_slug: string | null
+        }
+        Insert: {
+          author_name?: string | null
+          content?: string | null
+          created_at?: string | null
+          id?: string | null
+          is_approved?: boolean | null
+          post_slug?: string | null
+        }
+        Update: {
+          author_name?: string | null
+          content?: string | null
+          created_at?: string | null
+          id?: string | null
+          is_approved?: boolean | null
+          post_slug?: string | null
+        }
+        Relationships: []
+      }
       customer_marketing_export: {
         Row: {
           address_line1: string | null
