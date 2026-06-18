@@ -274,8 +274,11 @@ const TechJobs = () => {
                 <CardContent className="p-4 space-y-3">
                   <div className="flex flex-wrap items-start justify-between gap-2">
                     <div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-wrap">
                         <span className="font-bold">{r.service_type}</span>
+                        {r.repair_order_number && (
+                          <Badge variant="outline" className="font-mono text-[10px]">{r.repair_order_number}</Badge>
+                        )}
                         <Badge className={statusColor(r.status)}>{r.status}</Badge>
                       </div>
                       <div className="text-sm">{r.customer?.full_name || r.customer?.email}</div>
