@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { Loader2, FileText } from "lucide-react";
 import type { WizardData } from "@/pages/portal/MembershipSignup";
 import { portalStrings } from "@/lib/portalStrings";
+import { PRODUCT_BRAND } from "@/lib/brand";
 
 interface Plan {
   id: string;
@@ -112,7 +113,7 @@ const StepAgreement = ({ data, setData, onComplete, onBack }: Props) => {
       <div className="rounded-lg border border-border bg-muted/30 p-4 text-sm space-y-3 max-h-72 overflow-y-auto">
         <div>
           <div className="font-semibold mb-1">{portalStrings.product.membershipAgreementTitle}</div>
-          <div className="text-xs text-muted-foreground">Mike's Mobile Auto Repair (MMAR) — operated by Capital Services Management, INC.</div>
+          <div className="text-xs text-muted-foreground">{PRODUCT_BRAND.shopName} (MMAR) — operated by Capital Services Management, INC.</div>
         </div>
 
         <div className="grid grid-cols-2 gap-2 text-xs">

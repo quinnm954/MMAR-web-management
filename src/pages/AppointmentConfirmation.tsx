@@ -17,6 +17,7 @@ import {
   Phone,
   AlertCircle,
 } from "lucide-react";
+import { PRODUCT_BRAND } from "@/lib/brand";
 
 interface Confirmation {
   kind: "appointment" | "booking_request";
@@ -81,7 +82,7 @@ const AppointmentConfirmation = () => {
 
   useEffect(() => {
     if (!token) return;
-    document.title = "Appointment | MMAR Care";
+    document.title = `Appointment | ${PRODUCT_BRAND.name}`;
     (async () => {
       const { data: row, error } = await supabase.rpc("get_appointment_confirmation", { _token: token });
       if (error || !row) {

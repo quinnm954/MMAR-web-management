@@ -49,7 +49,7 @@ import TechDashboard from "./pages/tech/TechDashboard";
 import TechJobs from "./pages/tech/TechJobs";
 import TechCustomers from "./pages/tech/TechCustomers";
 import TechHistory from "./pages/tech/TechHistory";
-import TechTime from "./pages/tech/TechTime";
+
 
 import TechInspections from "./pages/tech/TechInspections";
 import TechChecklists from "./pages/tech/TechChecklists";
@@ -140,7 +140,7 @@ const App = () => (
             <Route path="/tech/jobs" element={<TechProtectedRoute><TechJobs /></TechProtectedRoute>} />
             <Route path="/tech/customers" element={<TechProtectedRoute><TechCustomers /></TechProtectedRoute>} />
             <Route path="/tech/history" element={<TechProtectedRoute><TechHistory /></TechProtectedRoute>} />
-            <Route path="/tech/time" element={<TechProtectedRoute><TechTime /></TechProtectedRoute>} />
+            
             <Route path="/tech/inspections" element={<TechProtectedRoute><TechInspections /></TechProtectedRoute>} />
             <Route path="/tech/checklists" element={<Navigate to="/tech/inspections?tab=checklists" replace />} />
             <Route path="/tech/checklists/:id" element={<TechProtectedRoute><TechChecklists /></TechProtectedRoute>} />

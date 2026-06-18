@@ -16,6 +16,7 @@ import { toast } from 'sonner';
 import SignaturePad from '@/components/SignaturePad';
 import BrandedDocLayout from '@/components/BrandedDocLayout';
 import DocReferences from '@/components/DocReferences';
+import { PRODUCT_BRAND } from '@/lib/brand';
 
 const TIME_WINDOWS = ['Morning (8a–12p)', 'Afternoon (12p–4p)', 'Evening (4p–7p)'];
 const GOOGLE_REVIEW_URL = 'https://share.google/bx2Gb42dslCITJdS8';
@@ -341,7 +342,7 @@ const EstimateApproval = () => {
             <p className="text-[11px] text-muted-foreground mt-1">
               {allDeclined
                 ? 'By signing, you confirm your decision to decline this estimate.'
-                : `By signing, you authorize Mike's Mobile Auto Repair to perform the approved work.`}
+                : `By signing, you authorize ${PRODUCT_BRAND.shopName} to perform the approved work.`}
             </p>
           </div>
           <Button onClick={() => submit()} disabled={working || !signature || (!allDeclined && !requestedDate)} className="w-full" variant="hero">

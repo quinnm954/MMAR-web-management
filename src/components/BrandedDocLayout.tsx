@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import logo from "@/assets/mmar-logo.jpeg";
 import { Phone, MessageSquare, Globe } from "lucide-react";
+import { PRODUCT_BRAND } from "@/lib/brand";
 
 interface Props {
   docType: "ESTIMATE" | "INVOICE" | "RECEIPT";
@@ -10,7 +11,7 @@ interface Props {
 }
 
 const PHONE = "813-501-7572";
-const SHOP = "Mike's Mobile Auto Repair";
+const SHOP = PRODUCT_BRAND.shopName;
 const SITE = "mikesmautorepair.com";
 
 const BrandedDocLayout = ({ docType, docNumber, rightMeta, children }: Props) => {
@@ -53,7 +54,7 @@ const BrandedDocLayout = ({ docType, docNumber, rightMeta, children }: Props) =>
           {/* Branded Footer */}
           <footer className="px-6 py-4 border-t border-border bg-muted/30 text-[11px] text-muted-foreground space-y-1">
             <p>
-              Powered by <span className="font-semibold text-foreground">MMAR Care</span> — the customer service platform for {SHOP}.
+              Powered by <span className="font-semibold text-foreground">{PRODUCT_BRAND.name}</span> — the customer service platform for {SHOP}.
               Manage vehicles, service history, estimates &amp; invoices anytime at <span className="text-foreground">{SITE}/portal</span>.
             </p>
             <p>
