@@ -59,12 +59,18 @@ const statusBadge = (s: string) => {
   return "bg-muted text-muted-foreground";
 };
 
-const buildMergedTemplateItems = async (): Promise<{ category: string; item_name: string; sort_order: number }[]> => {
+const buildMergedTemplateItems = async (serviceType: string | null | undefined): Promise<{ category: string; item_name: string; sort_order: number }[]> => {
   const { data: templates } = await supabase
     .from("checklist_templates")
-    .select("id, name")
+    .select("id, name, service_type_match")
     .eq("is_active", true);
-  const tplIds = (templates ?? []).map((t: any) => t.id);
+  const st = (serviceType ?? "").toLowerCase();
+  const matched = (templates ?? []).filter((t: any) => {
+    const kws: string[] = Array.isArray(t.service_type_match) ? t.service_type_match : [];
+    if (!kws.length) return false;
+    return kws.some((kw) => st.includes(String(kw).toLowerCase()));
+  });
+  const tplIds = matched.map((t: any) => t.id);
   const merged: { category: string; item_name: string; sort_order: number }[] = [];
   if (!tplIds.length) return merged;
   const { data: tItems } = await supabase
@@ -73,7 +79,7 @@ const buildMergedTemplateItems = async (): Promise<{ category: string; item_name
     .in("template_id", tplIds)
     .order("sort_order", { ascending: true });
   const tplName: Record<string, string> = {};
-  (templates ?? []).forEach((t: any) => { tplName[t.id] = t.name; });
+  matched.forEach((t: any) => { tplName[t.id] = t.name; });
   const seen = new Set<string>();
   let order = 0;
   (tItems ?? []).forEach((it: any) => {
@@ -213,7 +219,7 @@ const TechInspections = () => {
     }).select().single();
     if (error || !insp) { setCreating(false); return toast.error(error?.message ?? "Failed"); }
 
-    const merged = await buildMergedTemplateItems();
+    const merged = await buildMergedTemplateItems(appt.service_type);
     const rows = (merged.length ? merged : [{ category: "General", item_name: "Walk-around inspection", sort_order: 0 }])
       .map((t) => ({
         inspection_id: insp.id,
@@ -452,7 +458,12 @@ const TechInspections = () => {
 
   return (
     <TechLayout>
-      <Tabs value={tab} onValueChange={(v) => setParams(v === "inspections" ? {} : { tab: v }, { replace: true })}>
+      <Tabs value={tab} onValueChange={(v) => {
+        const next = new URLSearchParams(params);
+        if (v === "inspections") next.delete("tab");
+        else next.set("tab", v);
+        setParams(next, { replace: true });
+      }}>
         <TabsList className="grid w-full grid-cols-2 max-w-md">
           <TabsTrigger value="inspections"><ClipboardCheck className="h-4 w-4 mr-1" />Inspections</TabsTrigger>
           <TabsTrigger value="checklists"><ClipboardList className="h-4 w-4 mr-1" />Checklists</TabsTrigger>

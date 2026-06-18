@@ -178,9 +178,15 @@ const TechJobs = () => {
 
     const { data: templates } = await supabase
       .from("checklist_templates")
-      .select("id, name")
+      .select("id, name, service_type_match")
       .eq("is_active", true);
-    const tplIds = (templates ?? []).map((t: any) => t.id);
+    const st = (a.service_type ?? "").toLowerCase();
+    const matched = (templates ?? []).filter((t: any) => {
+      const kws: string[] = Array.isArray(t.service_type_match) ? t.service_type_match : [];
+      if (!kws.length) return false;
+      return kws.some((kw) => st.includes(String(kw).toLowerCase()));
+    });
+    const tplIds = matched.map((t: any) => t.id);
     let mergedItems: { category: string; item_name: string; sort_order: number }[] = [];
     if (tplIds.length) {
       const { data: tItems } = await supabase
@@ -189,7 +195,7 @@ const TechJobs = () => {
         .in("template_id", tplIds)
         .order("sort_order", { ascending: true });
       const tplById: Record<string, string> = {};
-      (templates ?? []).forEach((t: any) => { tplById[t.id] = t.name; });
+      matched.forEach((t: any) => { tplById[t.id] = t.name; });
       const seen = new Set<string>();
       let order = 0;
       (tItems ?? []).forEach((it: any) => {

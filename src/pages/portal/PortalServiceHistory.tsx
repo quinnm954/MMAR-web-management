@@ -105,7 +105,7 @@ const PortalServiceHistory = () => {
             <Card className="border-dashed border-border/50">
               <CardContent className="p-12 text-center">
                 <ClipboardList className="h-12 w-12 text-muted-foreground/40 mx-auto mb-3" />
-                <p className="text-muted-foreground">No service records yet. They'll appear here after your first MMAR visit.</p>
+                <p className="text-muted-foreground">No service records yet. They'll appear here after your first visit.</p>
               </CardContent>
             </Card>
           ) : (

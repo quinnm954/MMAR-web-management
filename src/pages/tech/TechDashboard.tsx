@@ -10,7 +10,6 @@ import {
   ClipboardCheck,
   Users,
   History,
-  Clock,
   Loader2,
   Calendar,
   ArrowRight,
@@ -21,7 +20,6 @@ interface Stats {
   jobsToday: number;
   inProgress: number;
   completedThisWeek: number;
-  hoursThisWeek: number;
 }
 
 interface UpcomingAppt {
@@ -59,7 +57,6 @@ const TechDashboard = () => {
     jobsToday: 0,
     inProgress: 0,
     completedThisWeek: 0,
-    hoursThisWeek: 0,
   });
   const [upcoming, setUpcoming] = useState<UpcomingAppt[]>([]);
   const [greeting, setGreeting] = useState("Hello");
@@ -76,7 +73,7 @@ const TechDashboard = () => {
       const today = new Date();
       const weekStart = startOfWeekISO();
 
-      const [todayRes, inProgRes, doneRes, hoursRes, upcomingRes] = await Promise.all([
+      const [todayRes, inProgRes, doneRes, upcomingRes] = await Promise.all([
         supabase
           .from("appointments")
           .select("id", { count: "exact", head: true })
@@ -95,11 +92,6 @@ const TechDashboard = () => {
           .eq("status", "completed")
           .gte("updated_at", weekStart),
         supabase
-          .from("time_entries")
-          .select("duration_minutes, clock_in, clock_out")
-          .eq("technician_id", user.id)
-          .gte("clock_in", weekStart),
-        supabase
           .from("appointments")
           .select("id, service_type, scheduled_at, status, customer_id, vehicle:vehicles(year, make, model)")
           .eq("assigned_technician_id", user.id)
@@ -107,14 +99,6 @@ const TechDashboard = () => {
           .order("scheduled_at", { ascending: true, nullsFirst: false })
           .limit(3),
       ]);
-
-      const totalMinutes = (hoursRes.data ?? []).reduce((acc: number, r: any) => {
-        if (r.duration_minutes) return acc + r.duration_minutes;
-        if (r.clock_in && r.clock_out) {
-          return acc + Math.round((new Date(r.clock_out).getTime() - new Date(r.clock_in).getTime()) / 60000);
-        }
-        return acc;
-      }, 0);
 
       const upRaw = (upcomingRes.data ?? []) as any[];
       const custIds = Array.from(new Set(upRaw.map((r) => r.customer_id).filter(Boolean)));
@@ -133,7 +117,6 @@ const TechDashboard = () => {
         jobsToday: todayRes.count ?? 0,
         inProgress: inProgRes.count ?? 0,
         completedThisWeek: doneRes.count ?? 0,
-        hoursThisWeek: Math.round((totalMinutes / 60) * 10) / 10,
       });
       setUpcoming(
         upRaw.map((r) => ({
@@ -167,11 +150,10 @@ const TechDashboard = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="grid grid-cols-3 gap-3">
           <StatCard label="Jobs today" value={stats.jobsToday} icon={Calendar} loading={loading} />
           <StatCard label="In progress" value={stats.inProgress} icon={Wrench} loading={loading} accent />
           <StatCard label="Done this week" value={stats.completedThisWeek} icon={TrendingUp} loading={loading} />
-          <StatCard label="Hours this week" value={stats.hoursThisWeek} icon={Clock} loading={loading} />
         </div>
 
         <section className="space-y-3">
