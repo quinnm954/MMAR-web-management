@@ -33,7 +33,7 @@ import {
 
 const PHONE = "813-501-7572";
 const SMS_BODY = encodeURIComponent(
-  "Hi MMAR — I'd like a fleet quote. Fleet size: __ vehicles. Mix (cars/SUVs/vans/trucks): __. Fuel types (gas/hybrid/EV/diesel): __. VINs available on request."
+  "Hi Mike's Mobile Auto Repair — I'd like a fleet quote. Fleet size: __ vehicles. Mix (cars/SUVs/vans/trucks): __. Fuel types (gas/hybrid/EV/diesel): __. VINs available on request."
 );
 
 // Volume discount tiers (single 5+ plan with scaling discount)
@@ -102,7 +102,7 @@ const FAQ = [
 
 const Fleet = () => {
   useEffect(() => {
-    document.title = "Fleet Maintenance Plans (5+ Vehicles) | MMAR";
+    document.title = "Fleet Maintenance Plans (5+ Vehicles) | Mike's Mobile Auto Repair";
     const setMeta = (name: string, content: string) => {
       let el = document.querySelector(`meta[name="${name}"]`);
       if (!el) {
@@ -246,7 +246,7 @@ const Fleet = () => {
       {/* Benefits */}
       <section className="container mx-auto px-4 py-14 border-t border-border/50">
         <div className="text-center mb-10">
-          <h2 className="text-3xl font-bold mb-2">Why fleets choose MMAR</h2>
+          <h2 className="text-3xl font-bold mb-2">Why fleets choose us</h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {FLEET_BENEFITS.map((b) => {

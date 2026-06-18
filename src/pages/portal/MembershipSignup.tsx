@@ -41,7 +41,7 @@ const MembershipSignup = () => {
   const [data, setData] = useState<WizardData>({ vehicle: {} });
 
   useEffect(() => {
-    document.title = "Join MMAR Care Membership | MMAR";
+    document.title = `Join ${portalStrings.product.name} Membership | ${portalStrings.platform.name}`;
   }, []);
 
   // If signed in, skip account step
@@ -71,7 +71,7 @@ const MembershipSignup = () => {
             <div className="inline-flex items-center gap-2 text-sm text-primary font-semibold mb-2">
               <Wrench className="h-4 w-4" /> {portalStrings.product.membershipBadge}
             </div>
-            <h1 className="text-3xl font-bold">Join MMAR</h1>
+            <h1 className="text-3xl font-bold">Join {portalStrings.product.name}</h1>
             <p className="text-muted-foreground">Step {step + 1} of {STEPS.length} — {STEPS[step]}</p>
           </div>
 

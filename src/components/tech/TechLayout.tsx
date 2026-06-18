@@ -31,7 +31,7 @@ const TechLayout = ({ children }: { children: ReactNode }) => {
             <Wrench className="h-5 w-5 text-primary" />
             <div>
               <h1 className="text-base font-bold leading-tight">Garage Ace · Tech</h1>
-              <p className="text-[10px] text-muted-foreground">Mike's Mobile Auto Repair</p>
+              <p className="text-[10px] text-muted-foreground">Technician workspace</p>
             </div>
           </div>
           <Button variant="ghost" size="sm" className="tap-44" onClick={async () => { await signOut(); navigate("/"); }}>
