@@ -219,7 +219,7 @@ const TechInspections = () => {
     }).select().single();
     if (error || !insp) { setCreating(false); return toast.error(error?.message ?? "Failed"); }
 
-    const merged = await buildMergedTemplateItems();
+    const merged = await buildMergedTemplateItems(appt.service_type);
     const rows = (merged.length ? merged : [{ category: "General", item_name: "Walk-around inspection", sort_order: 0 }])
       .map((t) => ({
         inspection_id: insp.id,
