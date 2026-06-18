@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { Loader2, Wrench, ArrowLeft } from "lucide-react";
+import { PLATFORM_BRAND } from "@/lib/brand";
 import { z } from "zod";
 
 const signupSchema = z.object({
@@ -157,7 +158,7 @@ const Login = () => {
           <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-2">
             <Wrench className="h-6 w-6 text-primary" />
           </div>
-          <CardTitle className="text-2xl">Garage Ace</CardTitle>
+          <CardTitle className="text-2xl">{PLATFORM_BRAND.name}</CardTitle>
           <CardDescription>Sign in or create your free account</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">

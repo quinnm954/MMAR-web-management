@@ -27,6 +27,7 @@ import {
   Smartphone,
 } from "lucide-react";
 import mmarLogo from "@/assets/mmar-logo.jpeg";
+import { PLATFORM_BRAND } from "@/lib/brand";
 
 interface Plan {
   id: string;
@@ -142,7 +143,7 @@ const MmarCare = () => {
             <p className="text-sm text-muted-foreground mt-5">
               Already a member?{" "}
               <Link to="/login" className="text-primary hover:underline font-medium">
-                Open the Garage Ace app
+                Open the {PLATFORM_BRAND.name} app
               </Link>
             </p>
           </div>
@@ -170,7 +171,7 @@ const MmarCare = () => {
                 <p className="text-muted-foreground">
                   Your plan lives inside the free{" "}
                   <Link to="/why-garage-ace" className="text-primary hover:underline font-medium">
-                    Garage Ace app
+                    {PLATFORM_BRAND.name} app
                   </Link>{" "}
                   — that's where you manage vehicles, see service history, approve estimates, and
                   schedule your included services.
@@ -297,7 +298,7 @@ const MmarCare = () => {
                 <Smartphone className="w-10 h-10 text-primary mx-auto mb-4" />
                 <h2 className="font-display text-2xl md:text-3xl mb-3">
                   <span className="text-foreground">You manage MMAR Care</span>{" "}
-                  <span className="text-sky">inside the free Garage Ace app.</span>
+                  <span className="text-sky">inside the free {PLATFORM_BRAND.name} app.</span>
                 </h2>
                 <p className="text-muted-foreground mb-6 max-w-xl mx-auto">
                   Schedule included services, see what's used and what's remaining, view inspection

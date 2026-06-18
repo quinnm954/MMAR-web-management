@@ -11,6 +11,7 @@ import SignaturePad from "@/components/financing/SignaturePad";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import EstimateSummaryCard from "@/components/EstimateSummaryCard";
+import { PRODUCT_BRAND } from "@/lib/brand";
 
 interface EditableContractData {
   clientName: string;
@@ -39,7 +40,7 @@ interface SignatureData {
 }
 
 const PROVIDER = {
-  name: "Mike's Mobile Auto Repair (MMAR)",
+  name: `${PRODUCT_BRAND.shopName} (MMAR)`,
   address: "Fort Myers, FL",
   contact: "(813) 501-7572 | mikesmarllc@gmail.com",
 } as const;
