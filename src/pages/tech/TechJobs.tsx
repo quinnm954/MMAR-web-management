@@ -15,6 +15,7 @@ import TechLayout from "@/components/tech/TechLayout";
 interface Appt {
   id: string;
   service_type: string;
+  repair_order_number: string | null;
   description: string | null;
   service_address: string | null;
   scheduled_at: string | null;
@@ -67,7 +68,7 @@ const TechJobs = () => {
     setLoading(true);
     const { data } = await supabase
       .from("appointments")
-      .select("id, service_type, description, service_address, scheduled_at, requested_date, status, customer_id, vehicle_id, technician_notes, vehicle:vehicles(id, year, make, model)")
+      .select("id, service_type, repair_order_number, description, service_address, scheduled_at, requested_date, status, customer_id, vehicle_id, technician_notes, vehicle:vehicles(id, year, make, model)")
       .eq("assigned_technician_id", user.id)
       .in("status", ["scheduled", "in_progress"])
       .order("scheduled_at", { ascending: true, nullsFirst: false });
