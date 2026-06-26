@@ -126,6 +126,9 @@ const AdminDashboard = () => {
             <Button variant="ghost" size="sm" onClick={refreshAll} disabled={refreshing} title={`Last refreshed ${lastRefreshed.toLocaleTimeString()}`}>
               <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
             </Button>
+            <Button asChild variant="ghost" size="sm" title="Notification settings">
+              <Link to="/settings/notifications"><Bell className="h-4 w-4" /></Link>
+            </Button>
             <Button variant="outline" onClick={() => signOut()}>
               <LogOut className="mr-2 h-4 w-4" /> Sign Out
             </Button>
