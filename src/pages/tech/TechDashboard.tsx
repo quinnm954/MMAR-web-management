@@ -15,6 +15,7 @@ import {
   ArrowRight,
   TrendingUp,
 } from "lucide-react";
+import PushNotificationCard from "@/components/shell/PushNotificationCard";
 
 interface Stats {
   jobsToday: number;
@@ -142,6 +143,7 @@ const TechDashboard = () => {
   return (
     <TechLayout>
       <div className="space-y-6">
+        <PushNotificationCard />
         <div>
           <p className="text-sm text-muted-foreground">{greeting}</p>
           <h1 className="text-2xl font-bold">Tech Dashboard</h1>
