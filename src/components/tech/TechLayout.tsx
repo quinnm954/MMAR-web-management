@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import MobileBottomNav from "@/components/shell/MobileBottomNav";
 import { useSwipeTabNav } from "@/hooks/useSwipeTabNav";
+import { useNativePushRegistration } from "@/hooks/useNativePushRegistration";
 
 const primary = [
   { to: "/tech", label: "Home", icon: LayoutDashboard, end: true },
@@ -23,6 +24,7 @@ const TechLayout = ({ children }: { children: ReactNode }) => {
   const { signOut } = useAuth();
   const navigate = useNavigate();
   useSwipeTabNav(primary);
+  useNativePushRegistration();
   return (
     <main className="min-h-screen bg-background">
       <header className="border-b border-border bg-card safe-pt">
