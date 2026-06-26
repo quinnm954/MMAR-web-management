@@ -59,6 +59,7 @@ const PARTS: AppRole[] = ['owner', 'admin', 'manager', 'parts'];
 
 const AdminDashboard = () => {
   const { signOut, user, hasAnyRole, roles } = useAuth();
+  useNativePushRegistration();
   const [stats, setStats] = useState({ customers: 0, activeMemberships: 0, openAppointments: 0, unpaidInvoices: 0 });
   const [contracts, setContracts] = useState<any[]>([]);
   const [warranties, setWarranties] = useState<any[]>([]);
@@ -133,6 +134,7 @@ const AdminDashboard = () => {
       </header>
 
       <main className="container mx-auto px-4 py-8 space-y-6 safe-pb">
+        <PushNotificationCard />
         {(() => {
           const tabs: TabDef[] = [
             { value: 'dashboard', label: 'Sales Dashboard', icon: LayoutDashboard, roles: ADMIN_ONLY, content: <AdminSalesDashboard /> },
