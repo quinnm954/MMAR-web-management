@@ -87,11 +87,21 @@ async function getFcmAccessToken(serviceAccountJson: string): Promise<string> {
   return j.access_token as string;
 }
 
+type NotificationCategory =
+  | "appointment_reminders"
+  | "estimate_updates"
+  | "invoice_updates"
+  | "inspection_updates"
+  | "repair_order_updates"
+  | "membership_updates"
+  | "marketing_updates";
+
 interface PushRequest {
   user_id: string;
   title: string;
   body: string;
   data?: Record<string, string>;
+  category?: NotificationCategory;
 }
 
 Deno.serve(async (req) => {
@@ -128,15 +138,21 @@ Deno.serve(async (req) => {
 
     const supabase = createClient(supabaseUrl, serviceKey);
 
-    // Respect notification preferences
+    // Respect notification preferences (channel + category)
     const { data: pref } = await supabase
       .from("notification_preferences")
-      .select("push_enabled")
+      .select("push_enabled, appointment_reminders, estimate_updates, invoice_updates, inspection_updates, repair_order_updates, membership_updates, marketing_updates")
       .eq("user_id", body.user_id)
       .maybeSingle();
     if (pref && pref.push_enabled === false) {
       return new Response(
         JSON.stringify({ skipped: "push_disabled" }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+    if (body.category && pref && (pref as Record<string, boolean>)[body.category] === false) {
+      return new Response(
+        JSON.stringify({ skipped: `category_disabled:${body.category}` }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }

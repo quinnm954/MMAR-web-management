@@ -17,6 +17,7 @@ import {
   FileText,
   AlertTriangle,
   ClipboardCheck,
+  Bell,
 } from "lucide-react";
 import MobileBottomNav from "@/components/shell/MobileBottomNav";
 import InstallAppBanner from "@/components/shell/InstallAppBanner";
@@ -36,6 +37,7 @@ const navItems = [
   { to: "/portal/inspections", label: "Inspections", icon: ClipboardCheck },
   { to: "/portal/invoices", label: "Invoices", icon: Receipt },
   { to: "/portal/financing", label: "Financing", icon: CreditCard },
+  { to: "/settings/notifications", label: "Notifications", icon: Bell },
 ];
 
 const PortalLayout = ({ children }: { children: ReactNode }) => {

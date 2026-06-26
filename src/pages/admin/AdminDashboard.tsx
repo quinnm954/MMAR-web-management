@@ -13,7 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { LogOut, FileText, ShieldCheck, Users, CreditCard, Calendar, CalendarCheck, ClipboardList, Receipt, Wrench, Mail, FileSpreadsheet, ClipboardCheck, Package, Settings, KanbanSquare, Clock, BarChart3, Share2, Car, AlertTriangle, FileDown, Activity, History, UserCog, DollarSign, RefreshCw, Phone, PhoneCall, ChevronDown, LayoutDashboard } from 'lucide-react';
+import { LogOut, FileText, ShieldCheck, Users, CreditCard, Calendar, CalendarCheck, ClipboardList, Receipt, Wrench, Mail, FileSpreadsheet, ClipboardCheck, Package, Settings, KanbanSquare, Clock, BarChart3, Share2, Car, AlertTriangle, FileDown, Activity, History, UserCog, DollarSign, RefreshCw, Phone, PhoneCall, ChevronDown, LayoutDashboard, Bell } from 'lucide-react';
 import AdminCalls from '@/components/admin/AdminCalls';
 import AdminPhoneSettings from '@/components/admin/AdminPhoneSettings';
 import AdminTrackingSettings from '@/components/admin/AdminTrackingSettings';
@@ -125,6 +125,9 @@ const AdminDashboard = () => {
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="sm" onClick={refreshAll} disabled={refreshing} title={`Last refreshed ${lastRefreshed.toLocaleTimeString()}`}>
               <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+            </Button>
+            <Button asChild variant="ghost" size="sm" title="Notification settings">
+              <Link to="/settings/notifications"><Bell className="h-4 w-4" /></Link>
             </Button>
             <Button variant="outline" onClick={() => signOut()}>
               <LogOut className="mr-2 h-4 w-4" /> Sign Out

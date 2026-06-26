@@ -1875,7 +1875,14 @@ export type Database = {
         Row: {
           appointment_reminders: boolean
           created_at: string
+          email_enabled: boolean
+          estimate_updates: boolean
+          inspection_updates: boolean
+          invoice_updates: boolean
+          marketing_updates: boolean
+          membership_updates: boolean
           push_enabled: boolean
+          repair_order_updates: boolean
           sms_enabled: boolean
           updated_at: string
           user_id: string
@@ -1883,7 +1890,14 @@ export type Database = {
         Insert: {
           appointment_reminders?: boolean
           created_at?: string
+          email_enabled?: boolean
+          estimate_updates?: boolean
+          inspection_updates?: boolean
+          invoice_updates?: boolean
+          marketing_updates?: boolean
+          membership_updates?: boolean
           push_enabled?: boolean
+          repair_order_updates?: boolean
           sms_enabled?: boolean
           updated_at?: string
           user_id: string
@@ -1891,7 +1905,14 @@ export type Database = {
         Update: {
           appointment_reminders?: boolean
           created_at?: string
+          email_enabled?: boolean
+          estimate_updates?: boolean
+          inspection_updates?: boolean
+          invoice_updates?: boolean
+          marketing_updates?: boolean
+          membership_updates?: boolean
           push_enabled?: boolean
+          repair_order_updates?: boolean
           sms_enabled?: boolean
           updated_at?: string
           user_id?: string
