@@ -142,7 +142,7 @@ Deno.serve(async (req) => {
     // Respect notification preferences (channel + category)
     const { data: pref } = await supabase
       .from("notification_preferences")
-      .select("push_enabled, appointment_reminders, estimate_updates, invoice_updates, inspection_updates, repair_order_updates, membership_updates, marketing_updates")
+      .select("push_enabled, appointment_reminders, estimate_updates, invoice_updates, inspection_updates, repair_order_updates, membership_updates, marketing_updates, message_updates")
       .eq("user_id", body.user_id)
       .maybeSingle();
     if (pref && pref.push_enabled === false) {
