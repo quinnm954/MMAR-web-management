@@ -18,7 +18,9 @@ import {
   AlertTriangle,
   ClipboardCheck,
   Bell,
+  MessageCircle,
 } from "lucide-react";
+import MessagesBellLink from "@/components/messaging/MessagesBellLink";
 import MobileBottomNav from "@/components/shell/MobileBottomNav";
 import InstallAppBanner from "@/components/shell/InstallAppBanner";
 import mmarLogo from "@/assets/mmar-logo.jpeg";
