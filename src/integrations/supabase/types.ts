@@ -1833,6 +1833,103 @@ export type Database = {
           },
         ]
       }
+      message_reads: {
+        Row: {
+          last_read_at: string
+          thread_id: string
+          user_id: string
+        }
+        Insert: {
+          last_read_at?: string
+          thread_id: string
+          user_id: string
+        }
+        Update: {
+          last_read_at?: string
+          thread_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "message_reads_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "message_threads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      message_threads: {
+        Row: {
+          created_at: string
+          created_by: string
+          customer_id: string | null
+          id: string
+          last_message_at: string
+          last_message_preview: string | null
+          subject: string | null
+          tech_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          customer_id?: string | null
+          id?: string
+          last_message_at?: string
+          last_message_preview?: string | null
+          subject?: string | null
+          tech_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          customer_id?: string | null
+          id?: string
+          last_message_at?: string
+          last_message_preview?: string | null
+          subject?: string | null
+          tech_id?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      messages: {
+        Row: {
+          attachments: Json
+          body: string
+          created_at: string
+          id: string
+          sender_id: string
+          thread_id: string
+        }
+        Insert: {
+          attachments?: Json
+          body: string
+          created_at?: string
+          id?: string
+          sender_id: string
+          thread_id: string
+        }
+        Update: {
+          attachments?: Json
+          body?: string
+          created_at?: string
+          id?: string
+          sender_id?: string
+          thread_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "message_threads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       mileage_update_tokens: {
         Row: {
           channel: string
@@ -1881,6 +1978,7 @@ export type Database = {
           invoice_updates: boolean
           marketing_updates: boolean
           membership_updates: boolean
+          message_updates: boolean
           push_enabled: boolean
           repair_order_updates: boolean
           sms_enabled: boolean
@@ -1896,6 +1994,7 @@ export type Database = {
           invoice_updates?: boolean
           marketing_updates?: boolean
           membership_updates?: boolean
+          message_updates?: boolean
           push_enabled?: boolean
           repair_order_updates?: boolean
           sms_enabled?: boolean
@@ -1911,6 +2010,7 @@ export type Database = {
           invoice_updates?: boolean
           marketing_updates?: boolean
           membership_updates?: boolean
+          message_updates?: boolean
           push_enabled?: boolean
           repair_order_updates?: boolean
           sms_enabled?: boolean
@@ -3225,6 +3325,7 @@ export type Database = {
             }
             Returns: Json
           }
+      unread_message_count: { Args: { _user_id: string }; Returns: number }
     }
     Enums: {
       app_role:
