@@ -88,9 +88,12 @@ const PortalLayout = ({ children }: { children: ReactNode }) => {
               <div className="text-[11px] text-muted-foreground truncate">{currentItem.label}</div>
             </div>
           </div>
-          <Button variant="ghost" size="sm" className="shrink-0 tap-44" onClick={handleSignOut} aria-label="Sign out">
-            <LogOut className="h-5 w-5" />
-          </Button>
+          <div className="flex items-center gap-1 shrink-0">
+            <MessagesBellLink />
+            <Button variant="ghost" size="sm" className="tap-44" onClick={handleSignOut} aria-label="Sign out">
+              <LogOut className="h-5 w-5" />
+            </Button>
+          </div>
         </div>
       </div>
 
