@@ -94,7 +94,8 @@ type NotificationCategory =
   | "inspection_updates"
   | "repair_order_updates"
   | "membership_updates"
-  | "marketing_updates";
+  | "marketing_updates"
+  | "message_updates";
 
 interface PushRequest {
   user_id: string;
