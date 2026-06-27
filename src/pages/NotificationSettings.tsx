@@ -21,6 +21,7 @@ type Prefs = {
   repair_order_updates: boolean;
   membership_updates: boolean;
   marketing_updates: boolean;
+  message_updates: boolean;
 };
 
 const DEFAULTS: Prefs = {
@@ -34,6 +35,7 @@ const DEFAULTS: Prefs = {
   repair_order_updates: true,
   membership_updates: true,
   marketing_updates: false,
+  message_updates: true,
 };
 
 const CHANNELS: { key: keyof Prefs; label: string; description: string }[] = [
@@ -49,6 +51,7 @@ const CATEGORIES: { key: keyof Prefs; label: string; description: string }[] = [
   { key: "repair_order_updates", label: "Repair order updates", description: "Status changes on active jobs." },
   { key: "invoice_updates", label: "Invoice updates", description: "New invoices, payments and receipts." },
   { key: "membership_updates", label: "Membership & billing", description: "Plan changes, renewals and payment events." },
+  { key: "message_updates", label: "Direct messages", description: "New chat messages from the shop." },
   { key: "marketing_updates", label: "News & promotions", description: "Occasional tips, offers and shop news." },
 ];
 
