@@ -23,7 +23,7 @@ export function useUnreadMessages() {
       setAppBadge(0);
       return;
     }
-    const { data, error } = await supabase.rpc("unread_message_count", { _user_id: user.id });
+    const { data, error } = await (supabase as any).rpc("unread_message_count", { _user_id: user.id });
     if (!error) {
       const n = Number(data ?? 0);
       setCount(n);

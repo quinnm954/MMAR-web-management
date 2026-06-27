@@ -96,14 +96,14 @@ const Messages = () => {
     })();
     // mark read
     if (user) {
-      supabase.from("message_reads").upsert({ thread_id: activeId, user_id: user.id, last_read_at: new Date().toISOString() }).then(() => {});
+      (supabase as any).from("message_reads").upsert({ thread_id: activeId, user_id: user.id, last_read_at: new Date().toISOString() }).then(() => {});
     }
     const ch = supabase
       .channel(`msgs-${activeId}`)
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages", filter: `thread_id=eq.${activeId}` }, (payload) => {
         setMessages((prev) => [...prev, payload.new as Message]);
         if (user && (payload.new as Message).sender_id !== user.id) {
-          supabase.from("message_reads").upsert({ thread_id: activeId, user_id: user.id, last_read_at: new Date().toISOString() }).then(() => {});
+          (supabase as any).from("message_reads").upsert({ thread_id: activeId, user_id: user.id, last_read_at: new Date().toISOString() }).then(() => {});
         }
       })
       .subscribe();
@@ -148,7 +148,7 @@ const Messages = () => {
     setSending(true);
     const text = body.trim();
     setBody("");
-    const { error } = await supabase.from("messages").insert({ thread_id: activeId, sender_id: user.id, body: text });
+    const { error } = await (supabase as any).from("messages").insert({ thread_id: activeId, sender_id: user.id, body: text });
     if (error) { toast.error(error.message); setBody(text); }
     // fire-and-forget push to the other participant(s)
     try {
@@ -171,9 +171,9 @@ const Messages = () => {
       customer_id: newKind === "customer" ? newRecipient.id : null,
       tech_id: newKind === "tech" ? newRecipient.id : null,
     };
-    const { data: th, error } = await supabase.from("message_threads").insert(insert).select("*").single();
+    const { data: th, error } = await (supabase as any).from("message_threads").insert(insert).select("*").single();
     if (error || !th) { toast.error(error?.message ?? "Failed"); return; }
-    await supabase.from("messages").insert({ thread_id: th.id, sender_id: user.id, body: newBody.trim() });
+    await (supabase as any).from("messages").insert({ thread_id: th.id, sender_id: user.id, body: newBody.trim() });
     setNewOpen(false);
     setNewBody(""); setNewSubject(""); setNewRecipient(null); setSearch("");
     setActiveId(th.id);
@@ -188,7 +188,7 @@ const Messages = () => {
       .insert({ created_by: user.id, customer_id: user.id, subject: newSubject.trim() || "New message" })
       .select("*").single();
     if (error || !th) { toast.error(error?.message ?? "Failed"); return; }
-    await supabase.from("messages").insert({ thread_id: th.id, sender_id: user.id, body: newBody.trim() });
+    await (supabase as any).from("messages").insert({ thread_id: th.id, sender_id: user.id, body: newBody.trim() });
     setNewOpen(false); setNewBody(""); setNewSubject("");
     setActiveId(th.id);
     loadThreads();
@@ -201,7 +201,7 @@ const Messages = () => {
       .insert({ created_by: user.id, tech_id: user.id, subject: newSubject.trim() || "New message" })
       .select("*").single();
     if (error || !th) { toast.error(error?.message ?? "Failed"); return; }
-    await supabase.from("messages").insert({ thread_id: th.id, sender_id: user.id, body: newBody.trim() });
+    await (supabase as any).from("messages").insert({ thread_id: th.id, sender_id: user.id, body: newBody.trim() });
     setNewOpen(false); setNewBody(""); setNewSubject("");
     setActiveId(th.id);
     loadThreads();
