@@ -39,9 +39,12 @@ const TechLayout = ({ children }: { children: ReactNode }) => {
               <p className="text-[10px] text-muted-foreground">Technician workspace</p>
             </div>
           </div>
-          <Button variant="ghost" size="sm" className="tap-44" onClick={async () => { await signOut(); navigate("/"); }}>
-            <LogOut className="h-4 w-4 mr-1" /> Sign out
-          </Button>
+          <div className="flex items-center gap-1">
+            <MessagesBellLink />
+            <Button variant="ghost" size="sm" className="tap-44" onClick={async () => { await signOut(); navigate("/"); }}>
+              <LogOut className="h-4 w-4 mr-1" /> Sign out
+            </Button>
+          </div>
         </div>
         {/* Desktop top tabs */}
         <nav className="hidden lg:flex container mx-auto px-2 pb-2 gap-1 overflow-x-auto">
