@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { Wrench, ClipboardCheck, LogOut, LayoutDashboard, Users, History, Bell } from "lucide-react";
+import { Wrench, ClipboardCheck, LogOut, LayoutDashboard, Users, History, Bell, MessageCircle } from "lucide-react";
+import MessagesBellLink from "@/components/messaging/MessagesBellLink";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import MobileBottomNav from "@/components/shell/MobileBottomNav";
@@ -16,6 +17,7 @@ const primary = [
 const more = [
   { to: "/tech/customers", label: "Customers", icon: Users },
   { to: "/tech/history", label: "Service History", icon: History },
+  { to: "/messages", label: "Messages", icon: MessageCircle },
   { to: "/settings/notifications", label: "Notifications", icon: Bell },
 ];
 
