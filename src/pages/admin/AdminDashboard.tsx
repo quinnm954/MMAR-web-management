@@ -48,6 +48,7 @@ import { supabase } from '@/integrations/supabase/client';
 import mmarLogo from '@/assets/mmar-logo.jpeg';
 import PushNotificationCard from '@/components/shell/PushNotificationCard';
 import { useNativePushRegistration } from '@/hooks/useNativePushRegistration';
+import MessagesBellLink from '@/components/messaging/MessagesBellLink';
 import type { AppRole } from '@/hooks/useAuth';
 
 type TabDef = { value: string; label: string; icon: any; roles: AppRole[]; content: JSX.Element };
@@ -126,6 +127,7 @@ const AdminDashboard = () => {
             <Button variant="ghost" size="sm" onClick={refreshAll} disabled={refreshing} title={`Last refreshed ${lastRefreshed.toLocaleTimeString()}`}>
               <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
             </Button>
+            <MessagesBellLink />
             <Button asChild variant="ghost" size="sm" title="Notification settings">
               <Link to="/settings/notifications"><Bell className="h-4 w-4" /></Link>
             </Button>

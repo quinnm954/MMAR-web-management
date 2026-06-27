@@ -18,7 +18,9 @@ import {
   AlertTriangle,
   ClipboardCheck,
   Bell,
+  MessageCircle,
 } from "lucide-react";
+import MessagesBellLink from "@/components/messaging/MessagesBellLink";
 import MobileBottomNav from "@/components/shell/MobileBottomNav";
 import InstallAppBanner from "@/components/shell/InstallAppBanner";
 import mmarLogo from "@/assets/mmar-logo.jpeg";
@@ -37,6 +39,7 @@ const navItems = [
   { to: "/portal/inspections", label: "Inspections", icon: ClipboardCheck },
   { to: "/portal/invoices", label: "Invoices", icon: Receipt },
   { to: "/portal/financing", label: "Financing", icon: CreditCard },
+  { to: "/messages", label: "Messages", icon: MessageCircle },
   { to: "/settings/notifications", label: "Notifications", icon: Bell },
 ];
 
@@ -85,9 +88,12 @@ const PortalLayout = ({ children }: { children: ReactNode }) => {
               <div className="text-[11px] text-muted-foreground truncate">{currentItem.label}</div>
             </div>
           </div>
-          <Button variant="ghost" size="sm" className="shrink-0 tap-44" onClick={handleSignOut} aria-label="Sign out">
-            <LogOut className="h-5 w-5" />
-          </Button>
+          <div className="flex items-center gap-1 shrink-0">
+            <MessagesBellLink />
+            <Button variant="ghost" size="sm" className="tap-44" onClick={handleSignOut} aria-label="Sign out">
+              <LogOut className="h-5 w-5" />
+            </Button>
+          </div>
         </div>
       </div>
 
