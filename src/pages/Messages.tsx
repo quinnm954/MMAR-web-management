@@ -150,13 +150,13 @@ const Messages = () => {
     setBody("");
     const { error } = await supabase.from("messages").insert({ thread_id: activeId, sender_id: user.id, body: text });
     if (error) { toast.error(error.message); setBody(text); }
-    // fire-and-forget push
+    // fire-and-forget push to the other participant(s)
     try {
       const thread = threads.find((t) => t.id === activeId);
-      const targets = [thread?.customer_id, thread?.tech_id].filter((id) => id && id !== user.id);
-      if (targets.length) {
+      const targets = [thread?.customer_id, thread?.tech_id].filter((id): id is string => !!id && id !== user.id);
+      for (const uid of targets) {
         supabase.functions.invoke("send-push", {
-          body: { user_ids: targets, title: "New message", body: text.slice(0, 120), url: `/messages?t=${activeId}`, category: "message_updates" },
+          body: { user_id: uid, title: "New message", body: text.slice(0, 120), category: "message_updates", data: { url: `/messages?t=${activeId}` } },
         }).then(() => {});
       }
     } catch {}
