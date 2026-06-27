@@ -224,7 +224,7 @@ const Messages = () => {
   const isTech = hasAnyRole(["technician"]);
 
   return (
-    <div className="min-h-[calc(100vh-8rem)] flex flex-col">
+    <div className="min-h-screen bg-background p-4 lg:p-6 flex flex-col max-w-6xl mx-auto safe-pt safe-pb">
       <div className="flex items-center justify-between mb-3">
         <h1 className="text-xl font-bold flex items-center gap-2"><MessageCircle className="h-5 w-5 text-primary" /> Messages</h1>
         <Dialog open={newOpen} onOpenChange={setNewOpen}>
