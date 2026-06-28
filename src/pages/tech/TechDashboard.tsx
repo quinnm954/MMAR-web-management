@@ -14,6 +14,8 @@ import {
   Calendar,
   ArrowRight,
   TrendingUp,
+  MessageCircle,
+  Bell,
 } from "lucide-react";
 import PushNotificationCard from "@/components/shell/PushNotificationCard";
 
