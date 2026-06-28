@@ -138,8 +138,10 @@ const TechDashboard = () => {
   const tiles = [
     { to: "/tech/jobs", label: "My Jobs", icon: Wrench, desc: "Assigned appointments" },
     { to: "/tech/inspections", label: "Inspections & Checklists", icon: ClipboardCheck, desc: "Multi-point inspections" },
+    { to: "/messages", label: "Messages", icon: MessageCircle, desc: "Chat with the shop" },
     { to: "/tech/customers", label: "Customers & Vehicles", icon: Users, desc: "Look up history" },
     { to: "/tech/history", label: "Service History", icon: History, desc: "Records I logged" },
+    { to: "/settings/notifications", label: "Notifications", icon: Bell, desc: "Push & alert preferences" },
   ];
 
   return (
