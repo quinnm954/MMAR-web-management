@@ -150,16 +150,7 @@ const Messages = () => {
     setBody("");
     const { error } = await (supabase as any).from("messages").insert({ thread_id: activeId, sender_id: user.id, body: text });
     if (error) { toast.error(error.message); setBody(text); }
-    // fire-and-forget push to the other participant(s)
-    try {
-      const thread = threads.find((t) => t.id === activeId);
-      const targets = [thread?.customer_id, thread?.tech_id].filter((id): id is string => !!id && id !== user.id);
-      for (const uid of targets) {
-        supabase.functions.invoke("send-push", {
-          body: { user_id: uid, title: "New message", body: text.slice(0, 120), category: "message_updates", data: { url: `/messages?t=${activeId}` } },
-        }).then(() => {});
-      }
-    } catch {}
+    // Push notifications are dispatched server-side by a DB trigger on `messages`.
     setSending(false);
   };
 

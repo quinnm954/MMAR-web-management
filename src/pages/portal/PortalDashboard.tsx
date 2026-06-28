@@ -6,7 +6,7 @@ import { useAuth } from "@/hooks/useAuth";
 import PortalLayout from "@/components/portal/PortalLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Car, CreditCard, Calendar, ArrowRight, RefreshCw } from "lucide-react";
+import { Car, CreditCard, Calendar, ArrowRight, RefreshCw, MessageCircle, Bell } from "lucide-react";
 import { portalStrings } from "@/lib/portalStrings";
 import PushNotificationCard from "@/components/shell/PushNotificationCard";
 import VehicleHealthCard from "@/components/portal/VehicleHealthCard";
@@ -85,6 +85,31 @@ const PortalDashboard = () => {
       <MileageQuickUpdate />
 
       <VehicleHealthCard />
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+        <Link to="/messages" className="group">
+          <Card className="hover:border-primary/50 transition-colors h-full">
+            <CardContent className="p-4 flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-primary/10 text-primary"><MessageCircle className="h-5 w-5" /></div>
+              <div className="flex-1">
+                <div className="font-semibold flex items-center gap-1">Messages <ArrowRight className="h-3.5 w-3.5 opacity-0 group-hover:opacity-100 transition" /></div>
+                <p className="text-xs text-muted-foreground">Chat with the Garage Ace team</p>
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
+        <Link to="/settings/notifications" className="group">
+          <Card className="hover:border-primary/50 transition-colors h-full">
+            <CardContent className="p-4 flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-primary/10 text-primary"><Bell className="h-5 w-5" /></div>
+              <div className="flex-1">
+                <div className="font-semibold flex items-center gap-1">Notifications <ArrowRight className="h-3.5 w-3.5 opacity-0 group-hover:opacity-100 transition" /></div>
+                <p className="text-xs text-muted-foreground">Push & alert preferences</p>
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
+      </div>
 
       <PushNotificationCard />
 
