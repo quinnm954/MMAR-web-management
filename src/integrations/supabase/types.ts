@@ -3204,6 +3204,25 @@ export type Database = {
       }
     }
     Functions: {
+      _send_push: {
+        Args: {
+          _body: string
+          _category: string
+          _title: string
+          _url?: string
+          _user_id: string
+        }
+        Returns: undefined
+      }
+      _send_push_to_staff: {
+        Args: {
+          _body: string
+          _category: string
+          _title: string
+          _url?: string
+        }
+        Returns: undefined
+      }
       admin_confirm_booking_request: {
         Args: {
           _id: string
