@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Plus, Send, ArrowLeft, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import RolePortalShell from "@/components/shell/RolePortalShell";
 
 type Thread = {
   id: string;
