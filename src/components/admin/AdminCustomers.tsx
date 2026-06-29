@@ -234,7 +234,7 @@ const AdminCustomers = () => {
     <div className="space-y-4">
       <div className="flex items-center gap-2 flex-wrap">
         <Search className="h-4 w-4 text-muted-foreground" />
-        <Input placeholder="Search by name or email…" value={q} onChange={(e) => setQ(e.target.value)} className="max-w-sm" />
+        <Input placeholder="Search by name, email, or phone…" value={q} onChange={(e) => setQ(e.target.value)} className="max-w-sm" />
         <Button size="sm" onClick={openAdd} className="gap-1.5">
           <Plus className="h-3.5 w-3.5" /> Add Customer
         </Button>
