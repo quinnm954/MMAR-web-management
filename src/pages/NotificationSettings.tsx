@@ -9,6 +9,7 @@ import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import PushNotificationCard from "@/components/shell/PushNotificationCard";
+import RolePortalShell from "@/components/shell/RolePortalShell";
 
 type Prefs = {
   push_enabled: boolean;
