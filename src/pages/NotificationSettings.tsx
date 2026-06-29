@@ -100,7 +100,7 @@ const NotificationSettings = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background safe-pt safe-pb">
+    <RolePortalShell>
       <div className="container mx-auto px-4 py-6 max-w-2xl space-y-4">
         <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="-ml-2">
           <ArrowLeft className="h-4 w-4 mr-1" /> Back
@@ -178,7 +178,7 @@ const NotificationSettings = () => {
           </>
         )}
       </div>
-    </div>
+    </RolePortalShell>
   );
 };
 
