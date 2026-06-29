@@ -261,6 +261,14 @@ const AdminCustomers = () => {
                     <div className="text-xs text-muted-foreground truncate flex items-center gap-1">
                       <Mail className="h-3 w-3" /> {c.email || "(no email)"}
                     </div>
+                    <div className="text-xs text-muted-foreground truncate flex items-center gap-1 mt-0.5">
+                      <Phone className="h-3 w-3" />
+                      {c.phone ? (
+                        <a href={`tel:${c.phone}`} className="text-primary hover:underline" onClick={(e) => e.stopPropagation()}>{c.phone}</a>
+                      ) : (
+                        <span>(no phone)</span>
+                      )}
+                    </div>
                   </div>
                   <div className="flex gap-1 shrink-0">
                     <Button size="icon" variant="ghost" className="h-7 w-7" onClick={(e) => openEdit(c, e)} title="Edit">
