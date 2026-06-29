@@ -42,7 +42,7 @@ export default function AdminKanban() {
   const load = async () => {
     const { data: appts } = await supabase
       .from('appointments')
-      .select('id, service_type, customer_id, vehicle_id, scheduled_at, board_column, priority, status, profiles:customer_id(full_name, email), vehicle:vehicles(year, make, model)')
+      .select('id, service_type, customer_id, vehicle_id, scheduled_at, board_column, priority, status, profiles:customer_id(full_name, email, phone), vehicle:vehicles(year, make, model)')
       .order('sort_order', { ascending: true });
     const ids = (appts ?? []).map((a: any) => a.id);
     const estByAppt: Record<string, any> = {};
@@ -140,6 +140,11 @@ export default function AdminKanban() {
                       <div className="text-xs text-muted-foreground truncate">
                         {job.profiles?.full_name || job.profiles?.email}
                       </div>
+                      {job.profiles?.phone && (
+                        <a href={`tel:${job.profiles.phone}`} className="text-[11px] text-primary truncate block" onClick={(e) => e.stopPropagation()}>
+                          {job.profiles.phone}
+                        </a>
+                      )}
                       {job.vehicle && (
                         <div className="text-[11px] text-muted-foreground truncate">
                           {job.vehicle.year} {job.vehicle.make} {job.vehicle.model}

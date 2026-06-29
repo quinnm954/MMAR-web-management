@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, MapPin, Calendar } from "lucide-react";
+import { Loader2, MapPin, Calendar, Phone } from "lucide-react";
 import { toast } from "sonner";
 import DeleteButton from "@/components/admin/DeleteButton";
 
@@ -21,7 +21,7 @@ interface Row {
   customer_id: string;
   technician_notes: string | null;
   assigned_technician_id: string | null;
-  customer: { full_name: string | null; email: string | null } | null;
+  customer: { full_name: string | null; email: string | null; phone: string | null } | null;
   vehicle: { year: number | null; make: string | null; model: string | null } | null;
 }
 
@@ -51,9 +51,9 @@ const AdminAppointments = () => {
       .order("requested_date", { ascending: false, nullsFirst: false });
     const list = (data as unknown as Row[]) ?? [];
     const ids = Array.from(new Set(list.map((r) => r.customer_id)));
-    const { data: profs } = await supabase.from("profiles").select("id, full_name, email").in("id", ids);
-    const byId: Record<string, { full_name: string | null; email: string | null }> = {};
-    (profs ?? []).forEach((p) => { byId[p.id] = { full_name: p.full_name, email: p.email }; });
+    const { data: profs } = await supabase.from("profiles").select("id, full_name, email, phone").in("id", ids);
+    const byId: Record<string, { full_name: string | null; email: string | null; phone: string | null }> = {};
+    (profs ?? []).forEach((p) => { byId[p.id] = { full_name: p.full_name, email: p.email, phone: p.phone }; });
     list.forEach((r) => { r.customer = byId[r.customer_id] ?? null; });
 
     // Load technicians
@@ -126,7 +126,14 @@ const AdminAppointments = () => {
                   <span className="font-bold">{r.service_type}</span>
                   <Badge className={statusColor(r.status)}>{r.status}</Badge>
                 </div>
-                <div className="text-xs text-muted-foreground">{r.customer?.full_name || r.customer?.email}</div>
+                <div className="text-xs text-muted-foreground flex flex-wrap items-center gap-x-2 gap-y-0.5">
+                  <span>{r.customer?.full_name || r.customer?.email}</span>
+                  {r.customer?.phone && (
+                    <a href={`tel:${r.customer.phone}`} className="text-primary inline-flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                      <Phone className="h-3 w-3" /> {r.customer.phone}
+                    </a>
+                  )}
+                </div>
                 {r.vehicle && <div className="text-xs">{r.vehicle.year} {r.vehicle.make} {r.vehicle.model}</div>}
               </div>
               <div className="text-right text-sm">

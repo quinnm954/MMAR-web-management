@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import {
-  Loader2, Search, Mail, Car, CreditCard, Calendar, FileText, Receipt, Download,
+  Loader2, Search, Mail, Phone, Car, CreditCard, Calendar, FileText, Receipt, Download,
   Plus, Pencil, Trash2,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -200,7 +200,7 @@ const AdminCustomers = () => {
   const filtered = customers.filter((c) => {
     if (!q) return true;
     const s = q.toLowerCase();
-    return (c.email ?? "").toLowerCase().includes(s) || (c.full_name ?? "").toLowerCase().includes(s);
+    return (c.email ?? "").toLowerCase().includes(s) || (c.full_name ?? "").toLowerCase().includes(s) || (c.phone ?? "").toLowerCase().includes(s);
   });
 
   const exportMarketingCsv = async () => {
@@ -234,7 +234,7 @@ const AdminCustomers = () => {
     <div className="space-y-4">
       <div className="flex items-center gap-2 flex-wrap">
         <Search className="h-4 w-4 text-muted-foreground" />
-        <Input placeholder="Search by name or email…" value={q} onChange={(e) => setQ(e.target.value)} className="max-w-sm" />
+        <Input placeholder="Search by name, email, or phone…" value={q} onChange={(e) => setQ(e.target.value)} className="max-w-sm" />
         <Button size="sm" onClick={openAdd} className="gap-1.5">
           <Plus className="h-3.5 w-3.5" /> Add Customer
         </Button>
@@ -260,6 +260,14 @@ const AdminCustomers = () => {
                     <div className="font-semibold truncate">{c.full_name || "—"}</div>
                     <div className="text-xs text-muted-foreground truncate flex items-center gap-1">
                       <Mail className="h-3 w-3" /> {c.email || "(no email)"}
+                    </div>
+                    <div className="text-xs text-muted-foreground truncate flex items-center gap-1 mt-0.5">
+                      <Phone className="h-3 w-3" />
+                      {c.phone ? (
+                        <a href={`tel:${c.phone}`} className="text-primary hover:underline" onClick={(e) => e.stopPropagation()}>{c.phone}</a>
+                      ) : (
+                        <span>(no phone)</span>
+                      )}
                     </div>
                   </div>
                   <div className="flex gap-1 shrink-0">
@@ -294,8 +302,14 @@ const AdminCustomers = () => {
         <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{selected?.full_name || "Customer"}</DialogTitle>
-            <p className="text-sm text-muted-foreground flex items-center gap-1">
-              <Mail className="h-3 w-3" /> {selected?.email}
+            <p className="text-sm text-muted-foreground flex items-center gap-3 flex-wrap">
+              <span className="inline-flex items-center gap-1"><Mail className="h-3 w-3" /> {selected?.email || "(no email)"}</span>
+              <span className="inline-flex items-center gap-1">
+                <Phone className="h-3 w-3" />
+                {selected?.phone ? (
+                  <a href={`tel:${selected.phone}`} className="text-primary hover:underline">{selected.phone}</a>
+                ) : "(no phone)"}
+              </span>
             </p>
           </DialogHeader>
 
