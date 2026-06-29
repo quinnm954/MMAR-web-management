@@ -216,7 +216,6 @@ const Messages = () => {
   const isTech = hasAnyRole(["technician"]);
 
   return (
-  return (
     <RolePortalShell>
       <div className="p-4 lg:p-6 flex flex-col max-w-6xl mx-auto h-[calc(100vh-8rem)]">
         <div className="flex items-center justify-between mb-3">
