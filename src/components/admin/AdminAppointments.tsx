@@ -126,7 +126,14 @@ const AdminAppointments = () => {
                   <span className="font-bold">{r.service_type}</span>
                   <Badge className={statusColor(r.status)}>{r.status}</Badge>
                 </div>
-                <div className="text-xs text-muted-foreground">{r.customer?.full_name || r.customer?.email}</div>
+                <div className="text-xs text-muted-foreground flex flex-wrap items-center gap-x-2 gap-y-0.5">
+                  <span>{r.customer?.full_name || r.customer?.email}</span>
+                  {r.customer?.phone && (
+                    <a href={`tel:${r.customer.phone}`} className="text-primary inline-flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                      <Phone className="h-3 w-3" /> {r.customer.phone}
+                    </a>
+                  )}
+                </div>
                 {r.vehicle && <div className="text-xs">{r.vehicle.year} {r.vehicle.make} {r.vehicle.model}</div>}
               </div>
               <div className="text-right text-sm">
