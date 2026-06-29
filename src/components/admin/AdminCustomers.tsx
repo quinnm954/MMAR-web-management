@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import {
-  Loader2, Search, Mail, Car, CreditCard, Calendar, FileText, Receipt, Download,
+  Loader2, Search, Mail, Phone, Car, CreditCard, Calendar, FileText, Receipt, Download,
   Plus, Pencil, Trash2,
 } from "lucide-react";
 import { toast } from "sonner";
