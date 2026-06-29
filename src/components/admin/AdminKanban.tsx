@@ -140,6 +140,11 @@ export default function AdminKanban() {
                       <div className="text-xs text-muted-foreground truncate">
                         {job.profiles?.full_name || job.profiles?.email}
                       </div>
+                      {job.profiles?.phone && (
+                        <a href={`tel:${job.profiles.phone}`} className="text-[11px] text-primary truncate block" onClick={(e) => e.stopPropagation()}>
+                          {job.profiles.phone}
+                        </a>
+                      )}
                       {job.vehicle && (
                         <div className="text-[11px] text-muted-foreground truncate">
                           {job.vehicle.year} {job.vehicle.make} {job.vehicle.model}
