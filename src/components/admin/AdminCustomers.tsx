@@ -302,8 +302,14 @@ const AdminCustomers = () => {
         <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{selected?.full_name || "Customer"}</DialogTitle>
-            <p className="text-sm text-muted-foreground flex items-center gap-1">
-              <Mail className="h-3 w-3" /> {selected?.email}
+            <p className="text-sm text-muted-foreground flex items-center gap-3 flex-wrap">
+              <span className="inline-flex items-center gap-1"><Mail className="h-3 w-3" /> {selected?.email || "(no email)"}</span>
+              <span className="inline-flex items-center gap-1">
+                <Phone className="h-3 w-3" />
+                {selected?.phone ? (
+                  <a href={`tel:${selected.phone}`} className="text-primary hover:underline">{selected.phone}</a>
+                ) : "(no phone)"}
+              </span>
             </p>
           </DialogHeader>
 
