@@ -318,8 +318,9 @@ const Messages = () => {
             </>
           )}
         </Card>
+        </div>
       </div>
-    </div>
+    </RolePortalShell>
   );
 };
 
