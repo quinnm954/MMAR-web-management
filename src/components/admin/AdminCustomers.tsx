@@ -200,7 +200,7 @@ const AdminCustomers = () => {
   const filtered = customers.filter((c) => {
     if (!q) return true;
     const s = q.toLowerCase();
-    return (c.email ?? "").toLowerCase().includes(s) || (c.full_name ?? "").toLowerCase().includes(s);
+    return (c.email ?? "").toLowerCase().includes(s) || (c.full_name ?? "").toLowerCase().includes(s) || (c.phone ?? "").toLowerCase().includes(s);
   });
 
   const exportMarketingCsv = async () => {
