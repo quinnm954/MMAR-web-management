@@ -51,9 +51,9 @@ const AdminAppointments = () => {
       .order("requested_date", { ascending: false, nullsFirst: false });
     const list = (data as unknown as Row[]) ?? [];
     const ids = Array.from(new Set(list.map((r) => r.customer_id)));
-    const { data: profs } = await supabase.from("profiles").select("id, full_name, email").in("id", ids);
-    const byId: Record<string, { full_name: string | null; email: string | null }> = {};
-    (profs ?? []).forEach((p) => { byId[p.id] = { full_name: p.full_name, email: p.email }; });
+    const { data: profs } = await supabase.from("profiles").select("id, full_name, email, phone").in("id", ids);
+    const byId: Record<string, { full_name: string | null; email: string | null; phone: string | null }> = {};
+    (profs ?? []).forEach((p) => { byId[p.id] = { full_name: p.full_name, email: p.email, phone: p.phone }; });
     list.forEach((r) => { r.customer = byId[r.customer_id] ?? null; });
 
     // Load technicians
