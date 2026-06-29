@@ -21,7 +21,7 @@ interface Row {
   customer_id: string;
   technician_notes: string | null;
   assigned_technician_id: string | null;
-  customer: { full_name: string | null; email: string | null } | null;
+  customer: { full_name: string | null; email: string | null; phone: string | null } | null;
   vehicle: { year: number | null; make: string | null; model: string | null } | null;
 }
 
