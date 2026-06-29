@@ -42,7 +42,7 @@ export default function AdminKanban() {
   const load = async () => {
     const { data: appts } = await supabase
       .from('appointments')
-      .select('id, service_type, customer_id, vehicle_id, scheduled_at, board_column, priority, status, profiles:customer_id(full_name, email), vehicle:vehicles(year, make, model)')
+      .select('id, service_type, customer_id, vehicle_id, scheduled_at, board_column, priority, status, profiles:customer_id(full_name, email, phone), vehicle:vehicles(year, make, model)')
       .order('sort_order', { ascending: true });
     const ids = (appts ?? []).map((a: any) => a.id);
     const estByAppt: Record<string, any> = {};
