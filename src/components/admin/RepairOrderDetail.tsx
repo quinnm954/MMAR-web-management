@@ -336,7 +336,12 @@ export default function RepairOrderDetail({ appointmentId, open, onClose }: Prop
                 </CardHeader>
                 <CardContent className="text-sm space-y-1">
                   <div className="font-medium">{customer?.full_name || "—"}</div>
-                  <div className="text-muted-foreground text-xs">{customer?.email}</div>
+                  {customer?.email && <div className="text-muted-foreground text-xs">{customer.email}</div>}
+                  {customer?.phone && (
+                    <a href={`tel:${customer.phone}`} className="text-primary text-xs inline-flex items-center gap-1">
+                      <Phone className="h-3 w-3" /> {customer.phone}
+                    </a>
+                  )}
                 </CardContent>
               </Card>
               <Card>
