@@ -51,7 +51,7 @@ export default function AdminCalendar() {
       const rangeEnd = addDays(days[days.length - 1], 1);
       const { data: a } = await supabase
         .from("appointments")
-        .select("id,service_type,status,scheduled_at,assigned_technician_id,customer_id,vehicle_id,priority,description")
+        .select("id,service_type,status,scheduled_at,assigned_technician_id,customer_id,vehicle_id,priority,description,profiles:customer_id(full_name,phone)")
         .not("scheduled_at", "is", null)
         .gte("scheduled_at", rangeStart.toISOString())
         .lt("scheduled_at", rangeEnd.toISOString());
