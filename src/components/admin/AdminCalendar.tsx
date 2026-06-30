@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ChevronLeft, ChevronRight, CalendarDays, Loader2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, CalendarDays, Loader2, Phone } from "lucide-react";
 import { addDays, format, startOfWeek, isSameDay, setHours, setMinutes, startOfDay } from "date-fns";
 import RepairOrderDetail from "./RepairOrderDetail";
 import { toast } from "sonner";
