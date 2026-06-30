@@ -170,6 +170,18 @@ export default function AdminCalendar() {
                               style={{ top: Math.max(0, top), height: SLOT_HEIGHT - 4 }}
                             >
                               <div className="font-semibold truncate">{format(dt, "p")} · {a.service_type}</div>
+                              {a.profiles?.full_name && (
+                                <div className="truncate text-[10px] text-muted-foreground">{a.profiles.full_name}</div>
+                              )}
+                              {a.profiles?.phone && (
+                                <a
+                                  href={`tel:${a.profiles.phone}`}
+                                  onClick={(e) => e.stopPropagation()}
+                                  className="truncate text-[10px] text-primary inline-flex items-center gap-1"
+                                >
+                                  <Phone className="h-2.5 w-2.5" /> {a.profiles.phone}
+                                </a>
+                              )}
                               <div className="flex items-center gap-1 mt-0.5">
                                 <Badge variant="outline" className="text-[9px] py-0 h-4">{a.status}</Badge>
                                 {a.priority !== "normal" && <Badge variant="destructive" className="text-[9px] py-0 h-4">{a.priority}</Badge>}
