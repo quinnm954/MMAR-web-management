@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, Car, User, ClipboardCheck, FileSpreadsheet, Receipt, Wrench, Clock, ExternalLink, Paperclip, FileCheck, UserCog, History } from "lucide-react";
+import { Loader2, Car, User, ClipboardCheck, FileSpreadsheet, Receipt, Wrench, Clock, ExternalLink, Paperclip, FileCheck, UserCog, History, Phone } from "lucide-react";
 import { Link } from "react-router-dom";
 import { format } from "date-fns";
 import { toast } from "sonner";
@@ -336,7 +336,12 @@ export default function RepairOrderDetail({ appointmentId, open, onClose }: Prop
                 </CardHeader>
                 <CardContent className="text-sm space-y-1">
                   <div className="font-medium">{customer?.full_name || "—"}</div>
-                  <div className="text-muted-foreground text-xs">{customer?.email}</div>
+                  {customer?.email && <div className="text-muted-foreground text-xs">{customer.email}</div>}
+                  {customer?.phone && (
+                    <a href={`tel:${customer.phone}`} className="text-primary text-xs inline-flex items-center gap-1">
+                      <Phone className="h-3 w-3" /> {customer.phone}
+                    </a>
+                  )}
                 </CardContent>
               </Card>
               <Card>

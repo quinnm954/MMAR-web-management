@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ChevronLeft, ChevronRight, CalendarDays, Loader2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, CalendarDays, Loader2, Phone } from "lucide-react";
 import { addDays, format, startOfWeek, isSameDay, setHours, setMinutes, startOfDay } from "date-fns";
 import RepairOrderDetail from "./RepairOrderDetail";
 import { toast } from "sonner";
@@ -18,6 +18,7 @@ interface Appt {
   id: string; service_type: string; status: string; scheduled_at: string | null;
   assigned_technician_id: string | null; customer_id: string; vehicle_id: string | null;
   priority: string; description: string | null;
+  profiles?: { full_name: string | null; phone: string | null } | null;
 }
 
 export default function AdminCalendar() {
@@ -50,7 +51,7 @@ export default function AdminCalendar() {
       const rangeEnd = addDays(days[days.length - 1], 1);
       const { data: a } = await supabase
         .from("appointments")
-        .select("id,service_type,status,scheduled_at,assigned_technician_id,customer_id,vehicle_id,priority,description")
+        .select("id,service_type,status,scheduled_at,assigned_technician_id,customer_id,vehicle_id,priority,description,profiles:customer_id(full_name,phone)")
         .not("scheduled_at", "is", null)
         .gte("scheduled_at", rangeStart.toISOString())
         .lt("scheduled_at", rangeEnd.toISOString());
@@ -169,6 +170,18 @@ export default function AdminCalendar() {
                               style={{ top: Math.max(0, top), height: SLOT_HEIGHT - 4 }}
                             >
                               <div className="font-semibold truncate">{format(dt, "p")} · {a.service_type}</div>
+                              {a.profiles?.full_name && (
+                                <div className="truncate text-[10px] text-muted-foreground">{a.profiles.full_name}</div>
+                              )}
+                              {a.profiles?.phone && (
+                                <a
+                                  href={`tel:${a.profiles.phone}`}
+                                  onClick={(e) => e.stopPropagation()}
+                                  className="truncate text-[10px] text-primary inline-flex items-center gap-1"
+                                >
+                                  <Phone className="h-2.5 w-2.5" /> {a.profiles.phone}
+                                </a>
+                              )}
                               <div className="flex items-center gap-1 mt-0.5">
                                 <Badge variant="outline" className="text-[9px] py-0 h-4">{a.status}</Badge>
                                 {a.priority !== "normal" && <Badge variant="destructive" className="text-[9px] py-0 h-4">{a.priority}</Badge>}
