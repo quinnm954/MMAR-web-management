@@ -18,6 +18,7 @@ interface Appt {
   id: string; service_type: string; status: string; scheduled_at: string | null;
   assigned_technician_id: string | null; customer_id: string; vehicle_id: string | null;
   priority: string; description: string | null;
+  profiles?: { full_name: string | null; phone: string | null } | null;
 }
 
 export default function AdminCalendar() {
