@@ -23,6 +23,7 @@ export const useSeo = ({
   canonical,
   noindex,
   ogImage,
+  ogType,
   breadcrumbs,
   jsonLd,
 }: SeoOptions) => {
