@@ -75,9 +75,11 @@ import Messages from "./pages/Messages";
 import PullToRefresh from "./components/PullToRefresh";
 import { captureAttribution } from "@/lib/gtag";
 import { useAppBadgeSync } from "@/hooks/useAppBadgeSync";
+import { useWebPushRegistration } from "@/hooks/useWebPushRegistration";
 
 const AppBadgeSync = () => {
   useAppBadgeSync();
+  useWebPushRegistration();
   return null;
 };
 
