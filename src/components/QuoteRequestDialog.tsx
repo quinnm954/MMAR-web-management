@@ -24,6 +24,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { trackConversion, getAttribution } from "@/lib/gtag";
 import { SERVICE_TYPES } from "@/lib/serviceTypes";
+import { useAuth } from "@/hooks/useAuth";
 
 const currentYear = new Date().getFullYear();
 const digitsOnly = (v: string) => v.replace(/\D/g, "");
