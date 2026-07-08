@@ -27,6 +27,7 @@ import Reviews from "./pages/Reviews";
 import ReviewLanding from "./pages/ReviewLanding";
 import ContactPage from "./pages/ContactPage";
 import InstallApp from "./pages/InstallApp";
+import PrePurchaseInspection from "./pages/PrePurchaseInspection";
 
 import PortalDashboard from "./pages/portal/PortalDashboard";
 import PortalOnboarding from "./pages/portal/PortalOnboarding";
