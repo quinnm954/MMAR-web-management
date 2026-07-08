@@ -1,12 +1,12 @@
 import { Link } from "react-router-dom";
-import { Check, Car, Gauge, Wrench, ClipboardCheck, ShieldCheck, MapPin, Phone } from "lucide-react";
+import { Check, Car, Gauge, Wrench, ClipboardCheck, ShieldCheck, MapPin, Phone, MessageCircle } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import FloatingCallButton from "@/components/FloatingCallButton";
-import RequestQuoteCTA from "@/components/RequestQuoteCTA";
+import QuoteRequestDialog from "@/components/QuoteRequestDialog";
 import { Button } from "@/components/ui/button";
 import { useSeo } from "@/lib/useSeo";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { trackConversion } from "@/lib/gtag";
 
 const SITE = "https://mikesmautorepair.com";
