@@ -112,7 +112,13 @@ const QuoteRequestDialog = ({
     if (!finalService) next.service = "Tell us what service you need";
     if (!name.trim() || name.trim().length < 2) next.name = "Your name is required";
     if (digitsOnly(phone).length < 10) next.phone = "Enter a valid phone number";
-    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) next.email = "Enter a valid email";
+    if (!email.trim()) {
+      next.email = isSignedIn
+        ? "Your account is missing an email — please update your profile"
+        : "Email is required so we can set up your account";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      next.email = "Enter a valid email";
+    }
     if (year) {
       const y = Number(year);
       if (!/^\d{4}$/.test(year) || y < 1900 || y > currentYear + 1) {
