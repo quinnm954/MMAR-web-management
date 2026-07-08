@@ -38,4 +38,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'booking-request-received': bookingRequestReceived,
   'admin-new-booking-request': adminNewBookingRequest,
   'maintenance-checklist-reminder': maintenanceChecklistReminder,
+  'tech-job-assigned': techJobAssigned,
 }
