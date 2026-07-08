@@ -22,6 +22,7 @@ const CHECKLIST = [
 ];
 
 const PrePurchaseInspection = () => {
+  const [quoteOpen, setQuoteOpen] = useState(false);
   useSeo({
     title: "Pre-Purchase Car Inspection in Fort Myers | Mobile Mechanic",
     description:
