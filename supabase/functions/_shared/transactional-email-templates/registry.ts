@@ -22,6 +22,7 @@ import { template as bookingRequestReceived } from './booking-request-received.t
 import { template as adminNewBookingRequest } from './admin-new-booking-request.tsx'
 import { template as maintenanceChecklistReminder } from './maintenance-checklist-reminder.tsx'
 import { template as adminMessage } from './admin-message.tsx'
+import { template as techJobAssigned } from './tech-job-assigned.tsx'
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   'admin-message': adminMessage,
