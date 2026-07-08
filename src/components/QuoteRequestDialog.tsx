@@ -24,6 +24,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { trackConversion, getAttribution } from "@/lib/gtag";
 import { SERVICE_TYPES } from "@/lib/serviceTypes";
+import { useAuth } from "@/hooks/useAuth";
 
 const currentYear = new Date().getFullYear();
 const digitsOnly = (v: string) => v.replace(/\D/g, "");
@@ -45,6 +46,7 @@ const QuoteRequestDialog = ({
   serviceName,
 }: QuoteRequestDialogProps) => {
   const navigate = useNavigate();
+  const { user, signOut } = useAuth();
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
@@ -59,31 +61,50 @@ const QuoteRequestDialog = ({
   const [serviceTypeOverride, setServiceTypeOverride] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
+  const [profileLoaded, setProfileLoaded] = useState(false);
 
   const STORAGE_KEY = "quoteRequest:contactInfo";
+  const isSignedIn = !!user;
 
   useEffect(() => {
-    if (open) {
-      setErrors({});
-      try {
-        const saved = localStorage.getItem(STORAGE_KEY);
-        if (saved) {
-          const v = JSON.parse(saved);
-          setName(v.name ?? "");
-          setPhone(v.phone ?? "");
-          setEmail(v.email ?? "");
-          setYear(v.year ?? "");
-          setMake(v.make ?? "");
-          setModel(v.model ?? "");
-          setMileage(v.mileage ?? "");
-          setLocation(v.location ?? "");
-          return;
-        }
-      } catch {
-        // ignore
-      }
+    if (!open) return;
+    setErrors({});
+
+    // Signed-in: pull contact info from the user's profile and skip localStorage.
+    if (user) {
+      setProfileLoaded(false);
+      (async () => {
+        const { data } = await supabase
+          .from("profiles")
+          .select("full_name, phone, email")
+          .eq("id", user.id)
+          .maybeSingle();
+        setName((data?.full_name ?? "").trim());
+        setPhone((data?.phone ?? "").trim());
+        setEmail((data?.email ?? user.email ?? "").trim());
+        setProfileLoaded(true);
+      })();
+      return;
     }
-  }, [open]);
+
+    // Signed-out: restore last-used contact info from localStorage.
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const v = JSON.parse(saved);
+        setName(v.name ?? "");
+        setPhone(v.phone ?? "");
+        setEmail(v.email ?? "");
+        setYear(v.year ?? "");
+        setMake(v.make ?? "");
+        setModel(v.model ?? "");
+        setMileage(v.mileage ?? "");
+        setLocation(v.location ?? "");
+      }
+    } catch {
+      // ignore
+    }
+  }, [open, user]);
 
   const handleSubmit = async () => {
     const next: Record<string, string> = {};
@@ -91,7 +112,13 @@ const QuoteRequestDialog = ({
     if (!finalService) next.service = "Tell us what service you need";
     if (!name.trim() || name.trim().length < 2) next.name = "Your name is required";
     if (digitsOnly(phone).length < 10) next.phone = "Enter a valid phone number";
-    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) next.email = "Enter a valid email";
+    if (!email.trim()) {
+      next.email = isSignedIn
+        ? "Your account is missing an email — please update your profile"
+        : "Email is required so we can set up your account";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      next.email = "Enter a valid email";
+    }
     if (year) {
       const y = Number(year);
       if (!/^\d{4}$/.test(year) || y < 1900 || y > currentYear + 1) {
@@ -154,12 +181,32 @@ const QuoteRequestDialog = ({
       const attr = { ...getAttribution(), user_agent: navigator.userAgent };
       void supabase.rpc("set_booking_attribution", { _token: token, _attribution: attr }).then(() => {}, () => {});
 
-      // Auto-create a customer account (profile + login) when an email is provided.
-      // Fire-and-forget — failures don't block the booking confirmation.
-      if (email.trim()) {
-        void supabase.functions
-          .invoke("bootstrap-customer-from-booking", { body: { token } })
-          .catch(() => {});
+      // Auto-create a customer account (profile + login). We await this so we
+      // can email the new user a set-password link. Failures are non-blocking.
+      let bootstrapCreated = false;
+      if (email.trim() && !isSignedIn) {
+        try {
+          const { data: bootstrap } = await supabase.functions.invoke(
+            "bootstrap-customer-from-booking",
+            { body: { token } },
+          );
+          bootstrapCreated = !!(bootstrap as { created?: boolean } | null)?.created;
+        } catch {
+          // ignore — booking is already submitted
+        }
+
+        // Only send a set-password email for brand-new accounts. If the email
+        // matches an existing account, we don't want strangers to trigger a
+        // password reset by typing someone else's email into a booking.
+        if (bootstrapCreated) {
+          try {
+            await supabase.auth.resetPasswordForEmail(email.trim(), {
+              redirectTo: `${window.location.origin}/set-password`,
+            });
+          } catch {
+            // Non-blocking — they can still use "Forgot password" from login.
+          }
+        }
       }
     }
 
@@ -202,7 +249,11 @@ const QuoteRequestDialog = ({
     // Fire Google Ads "quote submit" conversion
     trackConversion("quote_submit");
 
-    toast.success("Request received! We'll text you to confirm your day & time.");
+    toast.success(
+      isSignedIn
+        ? "Request received! We'll text you to confirm your day & time."
+        : "Request received! Check your email to finish setting up your account.",
+    );
     onOpenChange(false);
     if (token) navigate(`/appointments/${token}`);
   };
@@ -288,22 +339,49 @@ const QuoteRequestDialog = ({
             </div>
           </div>
 
-          <div className="space-y-1.5">
-            <Label htmlFor="email">Email (optional)</Label>
-            <Input
-              id="email"
-              type="email"
-              autoComplete="email"
-              value={email}
-              aria-invalid={!!errors.email}
-              className={errors.email ? "border-destructive focus-visible:ring-destructive" : ""}
-              onChange={(e) => {
-                setEmail(e.target.value);
-                if (errors.email) setErrors((p) => ({ ...p, email: "" }));
-              }}
-            />
-            {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
-          </div>
+          {isSignedIn ? (
+            <div className="rounded-md border border-border/60 bg-muted/30 px-3 py-2 text-sm">
+              <div className="text-muted-foreground">Booking as</div>
+              <div className="font-medium truncate">
+                {name || email || "your account"}
+                {email && name ? (
+                  <span className="text-muted-foreground font-normal"> · {email}</span>
+                ) : null}
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  void signOut();
+                }}
+                className="mt-1 text-xs text-primary hover:underline"
+              >
+                Not you? Sign out
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-1.5">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                autoComplete="email"
+                value={email}
+                aria-invalid={!!errors.email}
+                className={errors.email ? "border-destructive focus-visible:ring-destructive" : ""}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (errors.email) setErrors((p) => ({ ...p, email: "" }));
+                }}
+              />
+              {errors.email ? (
+                <p className="text-xs text-destructive">{errors.email}</p>
+              ) : (
+                <p className="text-xs text-muted-foreground">
+                  We'll email you a link to set a password so you can track this booking.
+                </p>
+              )}
+            </div>
+          )}
 
           <div className="grid grid-cols-3 gap-3">
             <div className="space-y-1.5">
