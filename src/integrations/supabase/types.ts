@@ -2019,6 +2019,42 @@ export type Database = {
         }
         Relationships: []
       }
+      notifications: {
+        Row: {
+          body: string | null
+          category: string | null
+          created_at: string
+          data: Json
+          id: string
+          link: string | null
+          read_at: string | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          category?: string | null
+          created_at?: string
+          data?: Json
+          id?: string
+          link?: string | null
+          read_at?: string | null
+          title: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          category?: string | null
+          created_at?: string
+          data?: Json
+          id?: string
+          link?: string | null
+          read_at?: string | null
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       phone_settings: {
         Row: {
           business_hours: Json
@@ -3245,6 +3281,17 @@ export type Database = {
           _template_id: string
           _title_override?: string
           _vehicle_id?: string
+        }
+        Returns: string
+      }
+      create_notification: {
+        Args: {
+          _body: string
+          _category?: string
+          _data?: Json
+          _link?: string
+          _title: string
+          _user_id: string
         }
         Returns: string
       }

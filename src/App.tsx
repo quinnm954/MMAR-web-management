@@ -69,6 +69,7 @@ import Book from "./pages/Book";
 import AppointmentConfirmation from "./pages/AppointmentConfirmation";
 import NativeBoot from "./components/NativeBoot";
 import NotificationSettings from "./pages/NotificationSettings";
+import NotificationsPage from "./pages/Notifications";
 import Messages from "./pages/Messages";
 import PullToRefresh from "./components/PullToRefresh";
 import { captureAttribution } from "@/lib/gtag";
@@ -129,6 +130,7 @@ const App = () => (
             <Route path="/portal/vehicle-health" element={<CustomerProtectedRoute><PortalVehicleHealth /></CustomerProtectedRoute>} />
             <Route path="/portal/inspections" element={<CustomerProtectedRoute><PortalInspections /></CustomerProtectedRoute>} />
             <Route path="/settings/notifications" element={<NotificationSettings />} />
+            <Route path="/notifications" element={<NotificationsPage />} />
             <Route path="/messages" element={<Messages />} />
             <Route
               path="/admin/dashboard"

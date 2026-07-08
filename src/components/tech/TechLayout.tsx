@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { Wrench, ClipboardCheck, LogOut, LayoutDashboard, Users, History, Bell, MessageCircle } from "lucide-react";
 import MessagesBellLink from "@/components/messaging/MessagesBellLink";
+import NotificationsBell from "@/components/notifications/NotificationsBell";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import MobileBottomNav from "@/components/shell/MobileBottomNav";
@@ -41,6 +42,7 @@ const TechLayout = ({ children }: { children: ReactNode }) => {
           </div>
           <div className="flex items-center gap-1">
             <MessagesBellLink />
+            <NotificationsBell />
             <Button variant="ghost" size="sm" className="tap-44" onClick={async () => { await signOut(); navigate("/"); }}>
               <LogOut className="h-4 w-4 mr-1" /> Sign out
             </Button>
