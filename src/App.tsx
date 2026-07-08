@@ -27,6 +27,7 @@ import Reviews from "./pages/Reviews";
 import ReviewLanding from "./pages/ReviewLanding";
 import ContactPage from "./pages/ContactPage";
 import InstallApp from "./pages/InstallApp";
+import PrePurchaseInspection from "./pages/PrePurchaseInspection";
 
 import PortalDashboard from "./pages/portal/PortalDashboard";
 import PortalOnboarding from "./pages/portal/PortalOnboarding";
@@ -94,6 +95,7 @@ const App = () => (
             <Route path="/warranty-policy" element={<WarrantyPolicy />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/services" element={<ServicesIndex />} />
+            <Route path="/services/pre-purchase-inspection" element={<PrePurchaseInspection />} />
             <Route path="/services/:slug" element={<ServiceCategory />} />
             <Route path="/service-areas" element={<ServiceAreas />} />
             <Route path="/lee-county-fl" element={<LeeCounty />} />
