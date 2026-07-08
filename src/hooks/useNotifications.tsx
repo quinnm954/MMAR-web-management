@@ -63,7 +63,6 @@ export function useNotifications(limit = 50) {
         (payload) => {
           const row = payload.new as unknown as AppNotification;
           setItems((prev) => [row, ...prev].slice(0, limit));
-          setAppBadge((prev => prev)(0) + 1);
           try {
             toast(row.title, { description: row.body ?? undefined });
           } catch {}
