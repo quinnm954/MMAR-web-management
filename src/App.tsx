@@ -74,6 +74,12 @@ import NotificationsPage from "./pages/Notifications";
 import Messages from "./pages/Messages";
 import PullToRefresh from "./components/PullToRefresh";
 import { captureAttribution } from "@/lib/gtag";
+import { useAppBadgeSync } from "@/hooks/useAppBadgeSync";
+
+const AppBadgeSync = () => {
+  useAppBadgeSync();
+  return null;
+};
 
 const queryClient = new QueryClient();
 
