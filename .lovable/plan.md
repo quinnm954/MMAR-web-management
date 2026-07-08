@@ -1,38 +1,32 @@
 ## Goal
-Show a numbered badge on the installed PWA's app icon reflecting the user's unread notification count.
-
-## Approach
-Use the standard **App Badging API** (`navigator.setAppBadge(n)` / `clearAppBadge()`). This is what iOS 16.4+ (installed PWAs), Chrome/Edge on desktop, and Android Chrome support for numbered dots on the home screen / dock icon.
-
-We already have a `notifications` table with realtime capability and a `useUnreadNotifications`-style pattern in the portal. We'll hook badge updates to that same unread count.
+Force every booking request from a new customer to create a portal account. Email becomes required, we auto-create the auth user, and we email them a set-password link so the booking flow doubles as onboarding. Signed-in customers skip all contact fields.
 
 ## Changes
 
-1. **New helper** `src/lib/appBadge.ts`
-   - `setBadge(count: number)` — calls `navigator.setAppBadge(count)` if available; falls back silently.
-   - `clearBadge()` — calls `navigator.clearAppBadge()`.
-   - Feature-detects and no-ops on unsupported browsers (no errors on desktop Safari, Firefox, etc.).
+### 1. `QuoteRequestDialog.tsx` — make email required + signed-in shortcut
+- Add `useAuth()`; when `user` exists, load `profiles` (full_name, phone, email) and:
+  - Hide the Name / Mobile / Email inputs entirely.
+  - Show a small "Booking as **{name}** ({email})" note with a "Not you? Sign out" link.
+  - Use the profile values when calling `submit_booking_request`.
+- When signed-out:
+  - Change label from "Email (optional)" to "Email" and add required-field validation ("We'll create your account so you can track this booking").
+  - Add a short helper line: "We'll email you a link to set a password after you submit."
+- Keep the existing `bootstrap-customer-from-booking` invoke, but read its response. If `created === true` (brand-new user), call `supabase.auth.resetPasswordForEmail(email, { redirectTo: ${window.location.origin}/set-password })` so they get a set-password email. If `reused === true` and the current session isn't theirs, skip the reset email (they already have an account).
+- Toast copy after submit: "Request received! Check your email to finish setting up your account."
 
-2. **New hook** `src/hooks/useAppBadge.ts`
-   - Accepts current user id.
-   - Fetches initial unread count from `notifications` where `user_id = auth.uid()` and `read_at is null`.
-   - Subscribes to realtime `postgres_changes` on `notifications` filtered by `user_id` to increment/decrement/refresh.
-   - Calls `setBadge` on change, `clearBadge` on zero or sign-out.
-   - Cleans up channel on unmount.
+### 2. `bootstrap-customer-from-booking/index.ts` — small tweak
+- Already returns `{ created, reused, customer_id }`. No functional change needed there; the set-password email is triggered from the client via `resetPasswordForEmail`, which routes through the existing Lovable auth email hook (recovery template) — no new email template required.
+- Await the invoke instead of fire-and-forget so we know whether to send the reset email. Show a friendly error if it fails ("Could not set up your account — please call…").
 
-3. **Wire into app shell** (`src/App.tsx` or the authenticated layout that already mounts once per session)
-   - Call `useAppBadge(user?.id)` at the top level so it runs across all routes.
-   - Also clear badge on sign-out.
+### 3. Signed-in UX polish
+- If `user` exists but their profile is missing name/phone, still show those fields prefilled/editable so the booking can be completed.
 
-4. **Manifest check** (`public/manifest.webmanifest`)
-   - No changes required — Badging API doesn't need manifest fields, but confirm `display: "standalone"` is present (it already is for the installed PWA).
+## Not changed
+- No new tables, no new edge functions, no new email templates.
+- Admin/notification flow, RPC `submit_booking_request`, and attribution tracking stay identical.
+- `/set-password` page already exists and is public.
 
-## Technical notes
-- Badging API only shows on **installed** PWAs. In a normal browser tab it silently does nothing, which is expected.
-- iOS requires 16.4+ and the app added to Home Screen; Android Chrome and desktop Chrome/Edge support it broadly.
-- No service worker changes needed for foreground badge updates. (Background push-driven badge updates would require a push subscription + service worker — out of scope unless you want push notifications too.)
-- Uses the existing `notifications` table and RLS; no schema changes.
-
-## Out of scope
-- Background/push-driven badge updates when the app is fully closed (would require Web Push setup).
-- Changing notification content or the in-app bell UI.
+## Edge cases
+- Email belongs to an existing account → `reused: true`; we do **not** trigger a password reset (avoids letting a stranger reset someone else's password by typing their email into a booking). They can still request a reset from the login page.
+- `resetPasswordForEmail` failing is non-blocking; booking still succeeds, and we surface a subtle toast telling them to use "Forgot password" on the login screen.
+- Booking source `phone_call` / admin-created bookings are untouched (this dialog is the website flow only).
