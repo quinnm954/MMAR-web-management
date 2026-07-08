@@ -130,11 +130,9 @@ const PrePurchaseInspection = () => {
                 <Phone className="mr-2" /> Call (813) 501-7572
               </a>
             </Button>
-            <RequestQuoteCTA
-              defaultService="Pre-Purchase Vehicle Inspection"
-              label="Request an inspection quote"
-              className="w-full sm:w-auto min-h-[52px]"
-            />
+            <Button variant="secondary" size="lg" className="w-full sm:w-auto min-h-[52px]" onClick={() => setQuoteOpen(true)}>
+              <MessageCircle className="mr-2" /> Request an inspection quote
+            </Button>
           </div>
           <div className="mt-6 flex items-center gap-2 text-sm text-muted-foreground">
             <MapPin className="h-4 w-4" />
