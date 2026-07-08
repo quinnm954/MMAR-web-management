@@ -119,6 +119,7 @@ export const useSeo = ({
     canonical,
     noindex,
     ogImage,
+    ogType,
     JSON.stringify(breadcrumbs),
     JSON.stringify(jsonLd),
   ]);
