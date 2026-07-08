@@ -79,6 +79,17 @@ async function subscribeUser(userId: string): Promise<void> {
     );
 }
 
+async function ensureNotificationPermission(): Promise<NotificationPermission> {
+  const NotificationApi = (window as any).Notification as typeof Notification | undefined;
+  if (!NotificationApi) return "denied";
+  if (NotificationApi.permission !== "default") return NotificationApi.permission;
+  try {
+    return await NotificationApi.requestPermission();
+  } catch {
+    return NotificationApi.permission;
+  }
+}
+
 /**
  * Register the push service worker and store the user's push subscription so
  * background pushes can deliver banner + badge updates even when the app is
@@ -93,9 +104,11 @@ export function useWebPushRegistration() {
 
     let cancelled = false;
 
-    const tryRegister = async () => {
+    const tryRegister = async (requestPermission = false) => {
       try {
-        const perm = (window as any).Notification?.permission;
+        const perm = requestPermission
+          ? await ensureNotificationPermission()
+          : (window as any).Notification?.permission;
         if (perm !== "granted") return; // handled by useAppBadgeSync gesture prompt
         if (cancelled) return;
         await subscribeUser(user.id);
@@ -107,9 +120,11 @@ export function useWebPushRegistration() {
     // First attempt now.
     void tryRegister();
 
-    // Also retry on the first user gesture (iOS grants permission then).
+    // Also retry on the first user gesture. iOS only allows the permission
+    // prompt from a real tap, so subscribe immediately after the prompt resolves
+    // instead of waiting for the next app open.
     const onGesture = () => {
-      void tryRegister();
+      void tryRegister(true);
     };
     window.addEventListener("pointerdown", onGesture, { once: true });
 
