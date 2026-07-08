@@ -18,16 +18,33 @@ const isStandalone = (): boolean => {
   }
 };
 
-/** Request notification permission — required by iOS for App Badging. */
-export async function ensureBadgePermission(): Promise<void> {
+let permissionListenerAttached = false;
+
+/**
+ * iOS App Badging requires Notifications permission, and iOS only shows the
+ * permission prompt on a real user gesture. Attach a one-shot pointer listener
+ * that requests permission the first time the user taps inside the installed PWA.
+ */
+export function ensureBadgePermission(): void {
   try {
     if (typeof window === "undefined") return;
     if (!("Notification" in window)) return;
-    if (!isStandalone()) return; // only prompt inside the installed PWA
+    if (!isStandalone()) return; // only inside the installed PWA
     const N: any = (window as any).Notification;
-    if (N.permission === "default" && typeof N.requestPermission === "function") {
-      await N.requestPermission();
-    }
+    if (N.permission !== "default") return; // already granted or denied
+    if (permissionListenerAttached) return;
+    permissionListenerAttached = true;
+    const requestOnce = () => {
+      window.removeEventListener("pointerdown", requestOnce);
+      window.removeEventListener("keydown", requestOnce);
+      try {
+        N.requestPermission?.().catch(() => {});
+      } catch {
+        // ignore
+      }
+    };
+    window.addEventListener("pointerdown", requestOnce, { once: true });
+    window.addEventListener("keydown", requestOnce, { once: true });
   } catch {
     // ignore
   }
