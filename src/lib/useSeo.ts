@@ -8,6 +8,7 @@ type SeoOptions = {
   canonical?: string;
   noindex?: boolean;
   ogImage?: string;
+  ogType?: "website" | "article";
   breadcrumbs?: Breadcrumb[];
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
 };
