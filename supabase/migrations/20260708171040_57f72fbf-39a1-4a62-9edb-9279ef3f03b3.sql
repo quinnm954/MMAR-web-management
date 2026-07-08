@@ -1,0 +1,1 @@
+ALTER TABLE public.blog_comments ALTER COLUMN is_approved SET DEFAULT false;
