@@ -95,6 +95,7 @@ const App = () => (
           <NativeBoot />
           <PullToRefresh />
           <GtagRouteTracker />
+          <AppBadgeSync />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/financing-contract" element={<FinancingContract />} />
