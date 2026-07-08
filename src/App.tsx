@@ -95,6 +95,7 @@ const App = () => (
             <Route path="/warranty-policy" element={<WarrantyPolicy />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/services" element={<ServicesIndex />} />
+            <Route path="/services/pre-purchase-inspection" element={<PrePurchaseInspection />} />
             <Route path="/services/:slug" element={<ServiceCategory />} />
             <Route path="/service-areas" element={<ServiceAreas />} />
             <Route path="/lee-county-fl" element={<LeeCounty />} />
