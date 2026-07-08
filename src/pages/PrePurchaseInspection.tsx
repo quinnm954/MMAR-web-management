@@ -197,14 +197,18 @@ const PrePurchaseInspection = () => {
                 <Phone className="mr-2" /> Call now
               </a>
             </Button>
-            <RequestQuoteCTA
-              defaultService="Pre-Purchase Vehicle Inspection"
-              label="Text us the listing"
-              className="min-h-[52px]"
-            />
+            <Button variant="secondary" size="lg" className="min-h-[52px]" onClick={() => setQuoteOpen(true)}>
+              <MessageCircle className="mr-2" /> Text us the listing
+            </Button>
           </div>
         </div>
       </section>
+
+      <QuoteRequestDialog
+        open={quoteOpen}
+        onOpenChange={setQuoteOpen}
+        serviceName="Pre-Purchase Vehicle Inspection"
+      />
 
       <Footer />
       <FloatingCallButton />
