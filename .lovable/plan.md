@@ -1,48 +1,38 @@
-# In-App Messaging + Notification Badge
+## Goal
+Show a numbered badge on the installed PWA's app icon reflecting the user's unread notification count.
 
-Add direct messaging between users and a live unread badge that surfaces in the app and on the installed PWA icon.
+## Approach
+Use the standard **App Badging API** (`navigator.setAppBadge(n)` / `clearAppBadge()`). This is what iOS 16.4+ (installed PWAs), Chrome/Edge on desktop, and Android Chrome support for numbered dots on the home screen / dock icon.
 
-## Who can message whom
-- **Customers** ↔ **Admins / Managers**
-- **Techs** ↔ **Admins / Managers**
-- Admins/Managers can start a thread with any customer or tech.
-- Customers and techs cannot message each other directly (keeps support funneled through staff).
+We already have a `notifications` table with realtime capability and a `useUnreadNotifications`-style pattern in the portal. We'll hook badge updates to that same unread count.
 
-## What gets built
+## Changes
 
-### 1. Database (one migration)
-- `message_threads` — participants (customer_id, tech_id, staff_id), `subject`, `last_message_at`, `created_by`.
-- `messages` — `thread_id`, `sender_id`, `body`, `attachments jsonb`, `read_by jsonb` (per-user read timestamps).
-- `message_reads` — per-user last-read marker for fast unread counts.
-- RLS: only thread participants (or any admin/manager) can read/write.
-- `GRANT`s for `authenticated` + `service_role`.
-- Add tables to `supabase_realtime` publication for live updates.
-- `unread_message_count(user_id)` SQL helper for badge counts.
+1. **New helper** `src/lib/appBadge.ts`
+   - `setBadge(count: number)` — calls `navigator.setAppBadge(count)` if available; falls back silently.
+   - `clearBadge()` — calls `navigator.clearAppBadge()`.
+   - Feature-detects and no-ops on unsupported browsers (no errors on desktop Safari, Firefox, etc.).
 
-### 2. UI
-- New `/messages` route in **Portal**, **Tech**, and **Admin** layouts.
-  - Two-pane: thread list (left) + conversation (right), mobile = stack.
-  - Compose box, send on Enter, optimistic append.
-- Admin/Manager view adds a "New message" picker (search customers + techs).
-- Bell icon in each layout header gets a **red badge bubble** with unread count.
-- New `MessagesNav` link added to bottom nav / sidebar.
+2. **New hook** `src/hooks/useAppBadge.ts`
+   - Accepts current user id.
+   - Fetches initial unread count from `notifications` where `user_id = auth.uid()` and `read_at is null`.
+   - Subscribes to realtime `postgres_changes` on `notifications` filtered by `user_id` to increment/decrement/refresh.
+   - Calls `setBadge` on change, `clearBadge` on zero or sign-out.
+   - Cleans up channel on unmount.
 
-### 3. Realtime + notifications
-- Subscribe to `messages` inserts for the current user's threads → update list + badge live.
-- On new message:
-  - In-app toast.
-  - Call existing `send-push` edge function so PWA/native devices get a push.
-  - Respect `notification_preferences` (add a `message_updates` flag).
+3. **Wire into app shell** (`src/App.tsx` or the authenticated layout that already mounts once per session)
+   - Call `useAppBadge(user?.id)` at the top level so it runs across all routes.
+   - Also clear badge on sign-out.
 
-### 4. PWA app-icon badge
-- Use the Web Badging API (`navigator.setAppBadge(count)` / `clearAppBadge()`).
-- Update badge whenever unread count changes; clear on thread open.
-- Gracefully no-op on unsupported browsers.
+4. **Manifest check** (`public/manifest.webmanifest`)
+   - No changes required — Badging API doesn't need manifest fields, but confirm `display: "standalone"` is present (it already is for the installed PWA).
 
-## Out of scope (ask later if needed)
-- File/image attachments beyond basic URL field
-- Group threads with multiple customers
-- Message search, reactions, typing indicators
-- SMS/email mirroring of in-app messages
+## Technical notes
+- Badging API only shows on **installed** PWAs. In a normal browser tab it silently does nothing, which is expected.
+- iOS requires 16.4+ and the app added to Home Screen; Android Chrome and desktop Chrome/Edge support it broadly.
+- No service worker changes needed for foreground badge updates. (Background push-driven badge updates would require a push subscription + service worker — out of scope unless you want push notifications too.)
+- Uses the existing `notifications` table and RLS; no schema changes.
 
-Approve and I'll build it.
+## Out of scope
+- Background/push-driven badge updates when the app is fully closed (would require Web Push setup).
+- Changing notification content or the in-app bell UI.
