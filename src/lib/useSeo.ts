@@ -62,6 +62,7 @@ export const useSeo = ({
     setProp("og:image", ogImage || DEFAULT_OG_IMAGE);
     setMeta("twitter:image", ogImage || DEFAULT_OG_IMAGE);
     setMeta("twitter:card", "summary_large_image");
+    setProp("og:type", ogType || "website");
 
     let linkEl = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
     if (canonical) {
