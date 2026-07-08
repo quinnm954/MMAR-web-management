@@ -46,6 +46,7 @@ const QuoteRequestDialog = ({
   serviceName,
 }: QuoteRequestDialogProps) => {
   const navigate = useNavigate();
+  const { user, signOut } = useAuth();
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
@@ -60,31 +61,50 @@ const QuoteRequestDialog = ({
   const [serviceTypeOverride, setServiceTypeOverride] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
+  const [profileLoaded, setProfileLoaded] = useState(false);
 
   const STORAGE_KEY = "quoteRequest:contactInfo";
+  const isSignedIn = !!user;
 
   useEffect(() => {
-    if (open) {
-      setErrors({});
-      try {
-        const saved = localStorage.getItem(STORAGE_KEY);
-        if (saved) {
-          const v = JSON.parse(saved);
-          setName(v.name ?? "");
-          setPhone(v.phone ?? "");
-          setEmail(v.email ?? "");
-          setYear(v.year ?? "");
-          setMake(v.make ?? "");
-          setModel(v.model ?? "");
-          setMileage(v.mileage ?? "");
-          setLocation(v.location ?? "");
-          return;
-        }
-      } catch {
-        // ignore
-      }
+    if (!open) return;
+    setErrors({});
+
+    // Signed-in: pull contact info from the user's profile and skip localStorage.
+    if (user) {
+      setProfileLoaded(false);
+      (async () => {
+        const { data } = await supabase
+          .from("profiles")
+          .select("full_name, phone, email")
+          .eq("id", user.id)
+          .maybeSingle();
+        setName((data?.full_name ?? "").trim());
+        setPhone((data?.phone ?? "").trim());
+        setEmail((data?.email ?? user.email ?? "").trim());
+        setProfileLoaded(true);
+      })();
+      return;
     }
-  }, [open]);
+
+    // Signed-out: restore last-used contact info from localStorage.
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const v = JSON.parse(saved);
+        setName(v.name ?? "");
+        setPhone(v.phone ?? "");
+        setEmail(v.email ?? "");
+        setYear(v.year ?? "");
+        setMake(v.make ?? "");
+        setModel(v.model ?? "");
+        setMileage(v.mileage ?? "");
+        setLocation(v.location ?? "");
+      }
+    } catch {
+      // ignore
+    }
+  }, [open, user]);
 
   const handleSubmit = async () => {
     const next: Record<string, string> = {};
