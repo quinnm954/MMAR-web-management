@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { setAppBadge, clearAppBadge, ensureBadgePermission } from "@/lib/appBadge";
+import { setAppBadge, clearAppBadge } from "@/lib/appBadge";
 
 /**
  * Global hook: keeps the installed PWA app-icon badge in sync with the
@@ -33,8 +33,6 @@ export function useAppBadgeSync() {
       setAppBadge(count ?? 0);
     };
 
-    // iOS installed PWAs require Notifications permission before badging works.
-    void ensureBadgePermission();
     refresh();
 
     const ch = supabase
