@@ -94,6 +94,7 @@ const mainEntries = [
   urlEntry({ loc: `${SITE}/lee-county-fl`, priority: "0.8" }),
   urlEntry({ loc: `${SITE}/install`, priority: "0.4" }),
   urlEntry({ loc: `${SITE}/warranty-policy`, changefreq: "yearly", priority: "0.3" }),
+  urlEntry({ loc: `${SITE}/services/pre-purchase-inspection`, priority: "0.9" }),
   ...categories.map((id) =>
     urlEntry({ loc: `${SITE}/services/${id}`, priority: "0.8" })
   ),
