@@ -116,7 +116,7 @@ const MmarCare = () => {
           />
           <div className="container mx-auto max-w-4xl relative text-center">
             <div className="flex items-center justify-center gap-3 mb-4">
-              <img src={mmarLogo} alt="MMAR" className="h-12 w-auto rounded shadow-md" />
+              <img src={mmarLogo} alt="Mike's Mobile Auto Repair — MMAR Care maintenance plans" className="h-12 w-auto rounded shadow-md" />
               <Badge variant="outline" className="border-accent/40 text-accent">
                 MMAR Care Maintenance Plans
               </Badge>
