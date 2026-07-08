@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { setAppBadge, clearAppBadge } from "@/lib/appBadge";
+import { setAppBadge, clearAppBadge, ensureBadgePermission } from "@/lib/appBadge";
 
 /**
  * Global hook: keeps the installed PWA app-icon badge in sync with the
