@@ -72,6 +72,7 @@ const BlogPost = () => {
     title: post ? `${post.title} | Mike's Mobile Auto Repair` : "Article Not Found",
     description: post?.excerpt,
     canonical: post ? `${SITE}/blog/${post.slug}` : undefined,
+    ogType: "article",
     jsonLd,
     breadcrumbs: post
       ? [
