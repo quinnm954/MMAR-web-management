@@ -128,6 +128,7 @@ const AdminDashboard = () => {
               <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
             </Button>
             <MessagesBellLink />
+            <NotificationsBell />
             <Button asChild variant="ghost" size="sm" title="Notification settings">
               <Link to="/settings/notifications"><Bell className="h-4 w-4" /></Link>
             </Button>

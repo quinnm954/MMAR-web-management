@@ -21,6 +21,7 @@ import {
   MessageCircle,
 } from "lucide-react";
 import MessagesBellLink from "@/components/messaging/MessagesBellLink";
+import NotificationsBell from "@/components/notifications/NotificationsBell";
 import MobileBottomNav from "@/components/shell/MobileBottomNav";
 import InstallAppBanner from "@/components/shell/InstallAppBanner";
 import mmarLogo from "@/assets/mmar-logo.jpeg";
