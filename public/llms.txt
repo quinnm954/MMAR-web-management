@@ -1,0 +1,35 @@
+# Mike's Mobile Auto Repair (MMAR Care)
+
+> Mobile auto repair and maintenance across Southwest Florida — Lee, Collier, and Charlotte counties. We come to you: home, work, or roadside. Servicing all makes and models with a warranty-backed guarantee.
+
+Mike's Mobile Auto Repair operates as MMAR Care, offering on-site diagnostics, brake service, oil changes, batteries, AC repair, check-engine-light diagnostics, and pre-purchase inspections. Customers can book online, request quotes, subscribe to the MMAR Care maintenance plan, and manage vehicles/appointments through a customer portal. Contact: (813) 501-7572.
+
+## Pages
+
+- [Home](/): Mobile mechanic overview, service coverage, and how to book.
+- [About](/about): The MMAR story, service philosophy, and warranty commitments.
+- [Services](/services): Full catalog of mobile services offered.
+- [Service Areas](/service-areas): Southwest Florida cities and neighborhoods we serve.
+- [Reviews](/reviews): Verified customer reviews and testimonials.
+- [Contact](/contact): Phone, text, and service-request information.
+- [Book Service](/book): Schedule a mobile service appointment.
+- [MMAR Care](/mmar-care): Monthly maintenance membership plans.
+- [Fleet Services](/fleet): Mobile maintenance and repair for business fleets.
+- [Blog](/blog): Auto-care guides and Southwest Florida car ownership tips.
+- [Warranty Policy](/warranty-policy): Repair warranty terms and Magnuson-Moss compliance.
+- [Lee County Mobile Mechanic](/lee-county-fl): Countywide coverage detail.
+- [Install App](/install): Install the MMAR Care progressive web app.
+
+## Service Areas
+
+- [Fort Myers](/areas/fort-myers)
+- [Cape Coral](/areas/cape-coral)
+- [Lehigh Acres](/areas/lehigh-acres)
+- [Bonita Springs](/areas/bonita-springs)
+- [Estero](/areas/estero)
+- [Naples](/areas/naples)
+- [North Fort Myers](/areas/north-fort-myers)
+
+## Optional
+
+- [Why Garage Ace](/why-garage-ace): About the platform powering MMAR Care.
