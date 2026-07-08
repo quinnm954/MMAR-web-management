@@ -8,6 +8,7 @@ type SeoOptions = {
   canonical?: string;
   noindex?: boolean;
   ogImage?: string;
+  ogType?: "website" | "article";
   breadcrumbs?: Breadcrumb[];
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
 };
@@ -22,6 +23,7 @@ export const useSeo = ({
   canonical,
   noindex,
   ogImage,
+  ogType,
   breadcrumbs,
   jsonLd,
 }: SeoOptions) => {
@@ -60,6 +62,7 @@ export const useSeo = ({
     setProp("og:image", ogImage || DEFAULT_OG_IMAGE);
     setMeta("twitter:image", ogImage || DEFAULT_OG_IMAGE);
     setMeta("twitter:card", "summary_large_image");
+    setProp("og:type", ogType || "website");
 
     let linkEl = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
     if (canonical) {
@@ -116,6 +119,7 @@ export const useSeo = ({
     canonical,
     noindex,
     ogImage,
+    ogType,
     JSON.stringify(breadcrumbs),
     JSON.stringify(jsonLd),
   ]);

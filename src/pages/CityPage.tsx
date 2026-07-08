@@ -18,7 +18,7 @@ const CityPage = () => {
 
   const url = `${SITE}/areas/${slug}`;
   const title = city
-    ? `Mobile Mechanic in ${city.name}, ${city.state} | Mike's Mobile Auto Repair`
+    ? `Mobile Mechanic in ${city.name}, ${city.state} | MMAR`
     : "City Not Found";
 
   const jsonLd = city

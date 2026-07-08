@@ -92,15 +92,37 @@ const MmarCare = () => {
     if (metaDesc) {
       metaDesc.setAttribute(
         "content",
-        "MMAR Care is the monthly maintenance plan from Mike's Mobile Auto Repair. Included oil changes, priority scheduling, discounted labor, and a transferable warranty for drivers in Fort Myers & Lehigh Acres."
+        "MMAR Care monthly maintenance plans: included oil changes, priority scheduling, discounted labor, and a transferable warranty in Fort Myers & Lehigh Acres."
       );
     }
+
+    const ldId = "ld-mmar-care-faq";
+    document.getElementById(ldId)?.remove();
+    const ld = {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      mainEntity: RULES.map((r) => ({
+        "@type": "Question",
+        name: r.q,
+        acceptedAnswer: { "@type": "Answer", text: r.a },
+      })),
+    };
+    const script = document.createElement("script");
+    script.type = "application/ld+json";
+    script.id = ldId;
+    script.text = JSON.stringify(ld);
+    document.head.appendChild(script);
+
     supabase
       .from("membership_plans")
       .select("*")
       .eq("is_active", true)
       .order("sort_order")
       .then(({ data }) => setPlans((data as Plan[]) ?? []));
+
+    return () => {
+      script.remove();
+    };
   }, []);
 
   return (
@@ -116,7 +138,7 @@ const MmarCare = () => {
           />
           <div className="container mx-auto max-w-4xl relative text-center">
             <div className="flex items-center justify-center gap-3 mb-4">
-              <img src={mmarLogo} alt="MMAR" className="h-12 w-auto rounded shadow-md" />
+              <img src={mmarLogo} alt="Mike's Mobile Auto Repair — MMAR Care maintenance plans" className="h-12 w-auto rounded shadow-md" />
               <Badge variant="outline" className="border-accent/40 text-accent">
                 MMAR Care Maintenance Plans
               </Badge>

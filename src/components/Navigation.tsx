@@ -71,7 +71,7 @@ const Navigation = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16 md:h-20">
           <Link to="/" className="flex items-center gap-3 active:scale-95 transition-transform" onClick={close}>
-            <img src={mmarLogo} alt="MMAR Logo" className="h-10 sm:h-12 md:h-14 w-auto rounded" />
+            <img src={mmarLogo} alt="Mike's Mobile Auto Repair home" className="h-10 sm:h-12 md:h-14 w-auto rounded" />
           </Link>
 
           {/* Desktop nav */}
