@@ -109,7 +109,7 @@ export function useWebPushRegistration() {
         const perm = requestPermission
           ? await ensureNotificationPermission()
           : (window as any).Notification?.permission;
-        if (perm !== "granted") return; // handled by useAppBadgeSync gesture prompt
+        if (perm !== "granted") return;
         if (cancelled) return;
         await subscribeUser(user.id);
       } catch (err) {
