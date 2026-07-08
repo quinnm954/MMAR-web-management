@@ -339,22 +339,49 @@ const QuoteRequestDialog = ({
             </div>
           </div>
 
-          <div className="space-y-1.5">
-            <Label htmlFor="email">Email (optional)</Label>
-            <Input
-              id="email"
-              type="email"
-              autoComplete="email"
-              value={email}
-              aria-invalid={!!errors.email}
-              className={errors.email ? "border-destructive focus-visible:ring-destructive" : ""}
-              onChange={(e) => {
-                setEmail(e.target.value);
-                if (errors.email) setErrors((p) => ({ ...p, email: "" }));
-              }}
-            />
-            {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
-          </div>
+          {isSignedIn ? (
+            <div className="rounded-md border border-border/60 bg-muted/30 px-3 py-2 text-sm">
+              <div className="text-muted-foreground">Booking as</div>
+              <div className="font-medium truncate">
+                {name || email || "your account"}
+                {email && name ? (
+                  <span className="text-muted-foreground font-normal"> · {email}</span>
+                ) : null}
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  void signOut();
+                }}
+                className="mt-1 text-xs text-primary hover:underline"
+              >
+                Not you? Sign out
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-1.5">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                autoComplete="email"
+                value={email}
+                aria-invalid={!!errors.email}
+                className={errors.email ? "border-destructive focus-visible:ring-destructive" : ""}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (errors.email) setErrors((p) => ({ ...p, email: "" }));
+                }}
+              />
+              {errors.email ? (
+                <p className="text-xs text-destructive">{errors.email}</p>
+              ) : (
+                <p className="text-xs text-muted-foreground">
+                  We'll email you a link to set a password so you can track this booking.
+                </p>
+              )}
+            </div>
+          )}
 
           <div className="grid grid-cols-3 gap-3">
             <div className="space-y-1.5">
