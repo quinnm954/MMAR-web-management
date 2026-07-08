@@ -249,7 +249,11 @@ const QuoteRequestDialog = ({
     // Fire Google Ads "quote submit" conversion
     trackConversion("quote_submit");
 
-    toast.success("Request received! We'll text you to confirm your day & time.");
+    toast.success(
+      isSignedIn
+        ? "Request received! We'll text you to confirm your day & time."
+        : "Request received! Check your email to finish setting up your account.",
+    );
     onOpenChange(false);
     if (token) navigate(`/appointments/${token}`);
   };
