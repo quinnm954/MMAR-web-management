@@ -129,6 +129,7 @@ const App = () => (
             <Route path="/portal/vehicle-health" element={<CustomerProtectedRoute><PortalVehicleHealth /></CustomerProtectedRoute>} />
             <Route path="/portal/inspections" element={<CustomerProtectedRoute><PortalInspections /></CustomerProtectedRoute>} />
             <Route path="/settings/notifications" element={<NotificationSettings />} />
+            <Route path="/notifications" element={<NotificationsPage />} />
             <Route path="/messages" element={<Messages />} />
             <Route
               path="/admin/dashboard"

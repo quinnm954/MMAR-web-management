@@ -91,6 +91,7 @@ const PortalLayout = ({ children }: { children: ReactNode }) => {
           </div>
           <div className="flex items-center gap-1 shrink-0">
             <MessagesBellLink />
+            <NotificationsBell />
             <Button variant="ghost" size="sm" className="tap-44" onClick={handleSignOut} aria-label="Sign out">
               <LogOut className="h-5 w-5" />
             </Button>
