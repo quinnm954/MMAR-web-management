@@ -181,12 +181,32 @@ const QuoteRequestDialog = ({
       const attr = { ...getAttribution(), user_agent: navigator.userAgent };
       void supabase.rpc("set_booking_attribution", { _token: token, _attribution: attr }).then(() => {}, () => {});
 
-      // Auto-create a customer account (profile + login) when an email is provided.
-      // Fire-and-forget — failures don't block the booking confirmation.
-      if (email.trim()) {
-        void supabase.functions
-          .invoke("bootstrap-customer-from-booking", { body: { token } })
-          .catch(() => {});
+      // Auto-create a customer account (profile + login). We await this so we
+      // can email the new user a set-password link. Failures are non-blocking.
+      let bootstrapCreated = false;
+      if (email.trim() && !isSignedIn) {
+        try {
+          const { data: bootstrap } = await supabase.functions.invoke(
+            "bootstrap-customer-from-booking",
+            { body: { token } },
+          );
+          bootstrapCreated = !!(bootstrap as { created?: boolean } | null)?.created;
+        } catch {
+          // ignore — booking is already submitted
+        }
+
+        // Only send a set-password email for brand-new accounts. If the email
+        // matches an existing account, we don't want strangers to trigger a
+        // password reset by typing someone else's email into a booking.
+        if (bootstrapCreated) {
+          try {
+            await supabase.auth.resetPasswordForEmail(email.trim(), {
+              redirectTo: `${window.location.origin}/set-password`,
+            });
+          } catch {
+            // Non-blocking — they can still use "Forgot password" from login.
+          }
+        }
       }
     }
 
