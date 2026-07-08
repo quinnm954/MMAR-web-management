@@ -12,7 +12,7 @@ const AboutPage = () => {
   useSeo({
     title: "About Mike's Mobile Auto Repair LLC — Our Story",
     description:
-      "The story behind Mike's Mobile Auto Repair — how a one-truck mobile mechanic in Lehigh Acres grew into Southwest Florida's most trusted on-site shop, and why we built MMAR Care.",
+      "How a one-truck mobile mechanic in Lehigh Acres grew into Southwest Florida's most trusted on-site auto shop — and why we built MMAR Care.",
     canonical: "https://mikesmautorepair.com/about",
     breadcrumbs: [
       { name: "Home", url: "https://mikesmautorepair.com/" },
