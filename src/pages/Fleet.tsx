@@ -116,6 +116,24 @@ const Fleet = () => {
       "description",
       "Mobile fleet maintenance for 5+ vehicles in SW Florida. Volume discounts, per-VIN pricing for cars, SUVs, vans, trucks across gas, hybrid, EV, and diesel."
     );
+
+    const ldId = "ld-fleet-faq";
+    document.getElementById(ldId)?.remove();
+    const ld = {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      mainEntity: FAQ.map((f) => ({
+        "@type": "Question",
+        name: f.q,
+        acceptedAnswer: { "@type": "Answer", text: f.a },
+      })),
+    };
+    const script = document.createElement("script");
+    script.type = "application/ld+json";
+    script.id = ldId;
+    script.text = JSON.stringify(ld);
+    document.head.appendChild(script);
+    return () => script.remove();
   }, []);
 
   return (
