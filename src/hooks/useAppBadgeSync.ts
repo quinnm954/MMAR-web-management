@@ -25,9 +25,16 @@ export function useAppBadgeSync() {
         .eq("user_id", user.id)
         .is("read_at", null);
       if (cancelled) return;
-      if (!error) setAppBadge(count ?? 0);
+      if (error) {
+        console.debug("[appBadge] unread count query failed", error);
+        return;
+      }
+      console.debug("[appBadge] unread count", count);
+      setAppBadge(count ?? 0);
     };
 
+    // iOS installed PWAs require Notifications permission before badging works.
+    void ensureBadgePermission();
     refresh();
 
     const ch = supabase
