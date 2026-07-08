@@ -3292,6 +3292,10 @@ export type Database = {
         }
         Returns: undefined
       }
+      _send_tech_job_assigned_email: {
+        Args: { _appointment_id: string }
+        Returns: undefined
+      }
       admin_confirm_booking_request: {
         Args: {
           _id: string
