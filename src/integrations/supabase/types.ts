@@ -2106,6 +2106,7 @@ export type Database = {
           marketing_opt_in: boolean
           phone: string | null
           postal_code: string | null
+          pwa_tutorial_seen_at: string | null
           state: string | null
           updated_at: string
         }
@@ -2120,6 +2121,7 @@ export type Database = {
           marketing_opt_in?: boolean
           phone?: string | null
           postal_code?: string | null
+          pwa_tutorial_seen_at?: string | null
           state?: string | null
           updated_at?: string
         }
@@ -2134,6 +2136,7 @@ export type Database = {
           marketing_opt_in?: boolean
           phone?: string | null
           postal_code?: string | null
+          pwa_tutorial_seen_at?: string | null
           state?: string | null
           updated_at?: string
         }
