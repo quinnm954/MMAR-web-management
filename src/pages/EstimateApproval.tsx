@@ -295,24 +295,6 @@ const EstimateApproval = () => {
             </div>
           )}
 
-          {!allDeclined && (
-            <label className="flex items-start gap-3 rounded-md border-2 border-accent/60 bg-accent/10 p-3 cursor-pointer hover:bg-accent/15 transition-colors">
-              <Checkbox
-                checked={reviewPledge}
-                onCheckedChange={(v) => setReviewPledge(v === true)}
-                className="mt-0.5"
-              />
-              <div className="flex-1 text-sm">
-                <div className="font-semibold flex items-center gap-2">
-                  <span aria-hidden>⭐</span> Get $5 off for a 5-star Google review
-                </div>
-                <div className="text-xs text-muted-foreground mt-0.5">
-                  Check this box and we'll automatically take <strong>$5 off your final invoice</strong>.
-                  After you sign, our Google review page opens in a new tab — just tap the 5-star rating to claim it.
-                </div>
-              </div>
-            </label>
-          )}
 
           <div>
             <div className="text-sm font-medium mb-2">Authorization Signature</div>
