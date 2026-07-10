@@ -24,6 +24,7 @@ import MessagesBellLink from "@/components/messaging/MessagesBellLink";
 import NotificationsBell from "@/components/notifications/NotificationsBell";
 import MobileBottomNav from "@/components/shell/MobileBottomNav";
 import InstallAppBanner from "@/components/shell/InstallAppBanner";
+import PwaInstallTutorial from "@/components/shell/PwaInstallTutorial";
 import mmarLogo from "@/assets/mmar-logo.jpeg";
 
 const navItems = [
