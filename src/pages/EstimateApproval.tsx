@@ -104,25 +104,15 @@ const EstimateApproval = () => {
     setWorking(false);
     if (error) return toast.error('Could not submit. Please contact us.');
 
-    // Persist 5-star review discount pledge for approvals
-    const willPledge = willApprove && reviewPledge;
-    if (willPledge) {
-      await supabase.from('estimates').update({ review_discount_pledged: true }).eq('id', est.id);
-      // Open Google review page so customer can leave their 5-star rating
-      try { window.open(GOOGLE_REVIEW_URL, '_blank', 'noopener,noreferrer'); } catch {}
-      toast.success('$5 review discount applied — leave us a 5-star review in the new tab!');
-    }
-
     setEst({
       ...est,
       line_items: updatedLines,
       signature_image: signature,
       signed_at: new Date().toISOString(),
       status,
-      review_discount_pledged: willPledge ? true : est.review_discount_pledged,
       ...(status === 'declined' ? { declined_at: new Date().toISOString(), decline_reason: reason || null } : { approved_at: new Date().toISOString() }),
     });
-    if (!willPledge) toast.success(status === 'declined' ? 'Response recorded' : editing ? 'Decision updated!' : 'Estimate signed!');
+    toast.success(status === 'declined' ? 'Response recorded' : editing ? 'Decision updated!' : 'Estimate signed!');
     setEditing(false);
     // Refresh decision history
     const { data: refreshed } = await supabase.rpc('get_estimate_by_token', { _token: token! });
