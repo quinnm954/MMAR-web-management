@@ -27,10 +27,9 @@ const BlogComments = ({ postSlug }: { postSlug: string }) => {
   const load = async () => {
     setLoading(true);
     const { data, error } = await supabase
-      .from("blog_comments")
+      .from("blog_comments_public" as any)
       .select("id, author_name, content, created_at")
       .eq("post_slug", postSlug)
-      .eq("is_approved", true)
       .order("created_at", { ascending: false });
     if (!error && data) setComments(data as Comment[]);
     setLoading(false);
