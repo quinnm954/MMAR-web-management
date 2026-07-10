@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, CreditCard, ArrowLeft, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
+import ReviewPromptCard from "@/components/ReviewPromptCard";
 
 interface LineItem {
   description?: string;
