@@ -140,6 +140,7 @@ const PortalLayout = ({ children }: { children: ReactNode }) => {
 
       <main className="flex-1 p-4 lg:p-8 max-w-6xl pb-mobile-nav lg:pb-8">
         <InstallAppBanner />
+        <PwaInstallTutorial />
         {children}
       </main>
 
