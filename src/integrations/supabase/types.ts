@@ -3250,6 +3250,33 @@ export type Database = {
       }
     }
     Views: {
+      blog_comments_public: {
+        Row: {
+          author_name: string | null
+          content: string | null
+          created_at: string | null
+          id: string | null
+          is_approved: boolean | null
+          post_slug: string | null
+        }
+        Insert: {
+          author_name?: string | null
+          content?: string | null
+          created_at?: string | null
+          id?: string | null
+          is_approved?: boolean | null
+          post_slug?: string | null
+        }
+        Update: {
+          author_name?: string | null
+          content?: string | null
+          created_at?: string | null
+          id?: string | null
+          is_approved?: boolean | null
+          post_slug?: string | null
+        }
+        Relationships: []
+      }
       customer_marketing_export: {
         Row: {
           address_line1: string | null
@@ -3406,29 +3433,18 @@ export type Database = {
         }
         Returns: Json
       }
-      submit_estimate_decision:
-        | {
-            Args: {
-              _decline_reason: string
-              _line_items: Json
-              _signature: string
-              _status: string
-              _token: string
-            }
-            Returns: Json
-          }
-        | {
-            Args: {
-              _decline_reason: string
-              _line_items: Json
-              _requested_date?: string
-              _requested_time_window?: string
-              _signature: string
-              _status: string
-              _token: string
-            }
-            Returns: Json
-          }
+      submit_estimate_decision: {
+        Args: {
+          _decline_reason: string
+          _line_items: Json
+          _requested_date?: string
+          _requested_time_window?: string
+          _signature: string
+          _status: string
+          _token: string
+        }
+        Returns: Json
+      }
       unread_message_count: { Args: { _user_id: string }; Returns: number }
     }
     Enums: {
