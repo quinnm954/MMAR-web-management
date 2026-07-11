@@ -156,13 +156,23 @@ const BusinessCard = () => {
 
           {/* Save + Share */}
           <div className="mt-6 space-y-3">
-            <Button
-              onClick={downloadVcf}
-              className="w-full h-12 bg-gold text-black hover:bg-gold/90 font-semibold"
-            >
-              <Download className="w-5 h-5 mr-2" />
-              Save to Contacts
-            </Button>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <Button
+                onClick={downloadVcf}
+                className="w-full h-12 bg-gold text-black hover:bg-gold/90 font-semibold"
+              >
+                <Download className="w-5 h-5 mr-2" />
+                Save to Contacts
+              </Button>
+              <Button
+                onClick={downloadVcf}
+                variant="outline"
+                className="w-full h-12 border-primary/40 hover:bg-primary/10 font-semibold"
+              >
+                <Download className="w-5 h-5 mr-2" />
+                Download vCard (.vcf)
+              </Button>
+            </div>
             <Button
               onClick={handleShare}
               variant="outline"
