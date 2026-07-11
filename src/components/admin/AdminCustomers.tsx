@@ -301,16 +301,39 @@ const AdminCustomers = () => {
       <Dialog open={!!selected} onOpenChange={(o) => !o && setSelected(null)}>
         <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>{selected?.full_name || "Customer"}</DialogTitle>
-            <p className="text-sm text-muted-foreground flex items-center gap-3 flex-wrap">
-              <span className="inline-flex items-center gap-1"><Mail className="h-3 w-3" /> {selected?.email || "(no email)"}</span>
-              <span className="inline-flex items-center gap-1">
-                <Phone className="h-3 w-3" />
-                {selected?.phone ? (
-                  <a href={`tel:${selected.phone}`} className="text-primary hover:underline">{selected.phone}</a>
-                ) : "(no phone)"}
-              </span>
-            </p>
+            <DialogTitle className="flex items-center justify-between gap-2 flex-wrap">
+              <span>{selected?.full_name || "Customer"}</span>
+              {selected && (
+                <Button size="sm" variant="outline" onClick={() => { const c = selected; setSelected(null); openEdit(c); }} className="gap-1.5">
+                  <Pencil className="h-3.5 w-3.5" /> Edit
+                </Button>
+              )}
+            </DialogTitle>
+            <div className="text-sm text-muted-foreground space-y-1">
+              <div className="flex items-center gap-3 flex-wrap">
+                <span className="inline-flex items-center gap-1"><Mail className="h-3 w-3" /> {selected?.email || "(no email)"}</span>
+                <span className="inline-flex items-center gap-1">
+                  <Phone className="h-3 w-3" />
+                  {selected?.phone ? (
+                    <a href={`tel:${selected.phone}`} className="text-primary hover:underline">{selected.phone}</a>
+                  ) : "(no phone)"}
+                </span>
+                {selected?.phone && (
+                  <a href={`sms:${selected.phone}`} className="text-primary hover:underline text-xs">Text</a>
+                )}
+              </div>
+              {(selected?.address_line1 || selected?.city || selected?.postal_code) && (
+                <div className="text-xs">
+                  {[selected?.address_line1, selected?.address_line2].filter(Boolean).join(", ")}
+                  {(selected?.address_line1) && (selected?.city || selected?.state) ? " · " : ""}
+                  {[selected?.city, selected?.state, selected?.postal_code].filter(Boolean).join(" ")}
+                </div>
+              )}
+              <div className="text-xs">
+                Joined {selected ? new Date(selected.created_at).toLocaleDateString() : "—"}
+                {" · "}Customer ID <span className="font-mono">{selected?.id.slice(0, 8)}</span>
+              </div>
+            </div>
           </DialogHeader>
 
           {detailsLoading || !details ? (
