@@ -13,7 +13,7 @@ const Hero = () => {
         <Suspense fallback={null}>
           <HeroEngineScene />
         </Suspense>
-        <div className="absolute inset-0 bg-gradient-to-b from-background/90 via-background/70 to-background" />
+        <div className="absolute inset-0 bg-gradient-to-b from-background/85 via-background/55 to-background" />
       </div>
 
       <div className="container mx-auto px-4 relative z-10">
