@@ -134,7 +134,7 @@ export default function HeroEngineScene() {
       <Canvas
         shadows
         dpr={[1, 1.5]}
-        camera={{ position: [0, 0.5, 6.5], fov: 45 }}
+        camera={{ position: [0, 0.2, 8], fov: 50 }}
         gl={{ antialias: true, alpha: false }}
         style={{ background: BG }}
       >
