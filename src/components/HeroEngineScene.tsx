@@ -338,22 +338,47 @@ export default function HeroEngineScene() {
     <div className="absolute inset-0 z-0">
       <Canvas
         shadows
-        dpr={[1, 1.5]}
+        dpr={[1, 2]}
         camera={{ position: [1, 1.2, 9.5], fov: 42 }}
-        gl={{ antialias: true, alpha: false }}
+        gl={{
+          antialias: true,
+          alpha: false,
+          toneMapping: THREE.ACESFilmicToneMapping,
+          toneMappingExposure: 1.1,
+          outputColorSpace: THREE.SRGBColorSpace,
+        }}
         style={{ background: BG }}
       >
         <color attach="background" args={[BG]} />
-        <fog attach="fog" args={[BG, 8, 22]} />
+        <fog attach="fog" args={[BG, 10, 26]} />
 
-        <ambientLight intensity={0.65} />
-        <directionalLight position={[5, 6, 4]} intensity={1.5} castShadow shadow-mapSize={[1024, 1024]} />
-        <directionalLight position={[-4, 2, -3]} intensity={0.8} color={SKY_BLUE} />
-        <directionalLight position={[0, 1, -5]} intensity={0.7} color={GOLD} />
-        <pointLight position={[2.5, 1.2, 1]} intensity={2.2} color={GOLD} distance={7} />
-        <pointLight position={[1.6, 1.0, 0]} intensity={2.0} color={SKY_BLUE} distance={6} />
+        <ambientLight intensity={0.25} />
+        <directionalLight
+          position={[5, 8, 4]}
+          intensity={2.2}
+          castShadow
+          shadow-mapSize={[2048, 2048]}
+          shadow-bias={-0.0001}
+        />
+        <directionalLight position={[-4, 2, -3]} intensity={0.6} color={SKY_BLUE} />
+        <directionalLight position={[0, 1, -5]} intensity={0.5} color={GOLD} />
+        <pointLight position={[2.5, 1.2, 1]} intensity={2.0} color={GOLD} distance={7} />
+        <pointLight position={[1.6, 1.0, 0]} intensity={1.6} color={SKY_BLUE} distance={6} />
+
+        <Suspense fallback={null}>
+          <Environment preset="night" background={false} />
+        </Suspense>
 
         <ShelbyGT500 />
+        <ReflectiveFloor />
+        <ContactShadows
+          position={[0, -1.31, 0]}
+          opacity={0.75}
+          scale={16}
+          blur={2.4}
+          far={4}
+          resolution={1024}
+        />
         <FloatingParticles />
 
         <OrbitControls
@@ -361,7 +386,7 @@ export default function HeroEngineScene() {
           enableZoom={false}
           autoRotate
           autoRotateSpeed={0.55}
-          maxPolarAngle={Math.PI / 1.75}
+          maxPolarAngle={Math.PI / 1.9}
           minPolarAngle={Math.PI / 3}
           enableDamping
           dampingFactor={0.05}
@@ -370,3 +395,4 @@ export default function HeroEngineScene() {
     </div>
   );
 }
+
