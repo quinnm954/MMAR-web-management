@@ -1,6 +1,13 @@
-import { useRef, useMemo } from "react";
+import { useRef, useMemo, Suspense } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Float, RoundedBox } from "@react-three/drei";
+import {
+  OrbitControls,
+  Float,
+  RoundedBox,
+  Environment,
+  ContactShadows,
+  MeshReflectorMaterial,
+} from "@react-three/drei";
 import * as THREE from "three";
 
 // Shelby GT500-inspired palette: deep blue body with gold racing stripes,
