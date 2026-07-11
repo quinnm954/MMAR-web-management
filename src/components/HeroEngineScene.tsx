@@ -57,10 +57,9 @@ function EngineAssembly() {
       ))}
 
       {/* Sky-blue intake manifold */}
-      <mesh position={[0, 1.2, -0.1]} castShadow>
-        <roundedBoxGeometry args={[2.2, 0.5, 0.9]} radius={0.12} smoothness={4} />
+      <RoundedBox position={[0, 1.2, -0.1]} args={[2.2, 0.5, 0.9]} radius={0.12} smoothness={4} castShadow>
         <meshStandardMaterial color={SKY_BLUE} roughness={0.3} metalness={0.4} emissive={SKY_BLUE} emissiveIntensity={0.15} />
-      </mesh>
+      </RoundedBox>
 
       {/* Gold alternator pulley */}
       <mesh position={[1.9, 0.2, 0.4]} rotation={[0, 0, Math.PI / 2]} castShadow>
