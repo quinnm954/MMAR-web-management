@@ -1,20 +1,25 @@
-import { Suspense, lazy } from "react";
 import { Button } from "@/components/ui/button";
 import { MapPin, Phone, MessageCircle, Wrench, User, CalendarCheck } from "lucide-react";
 import { Link } from "react-router-dom";
 import { trackConversion } from "@/lib/gtag";
-
-const HeroEngineScene = lazy(() => import("@/components/HeroEngineScene"));
+import heroShelby from "@/assets/hero-shelby.jpg";
 
 const Hero = () => {
   return (
     <section className="relative min-h-[100svh] flex items-center justify-center pt-16 md:pt-20 overflow-hidden bg-background">
       <div className="absolute inset-0 z-0">
-        <Suspense fallback={null}>
-          <HeroEngineScene />
-        </Suspense>
-        <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/40 to-background/80" />
+        <img
+          src={heroShelby}
+          alt="Ford Shelby GT500 with hood open showing a supercharged engine — mobile mechanic hero"
+          width={1920}
+          height={1088}
+          fetchPriority="high"
+          decoding="async"
+          className="w-full h-full object-cover object-center"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/55 to-background" />
       </div>
+
 
       <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-4xl mx-auto text-center">
