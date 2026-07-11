@@ -1,8 +1,10 @@
+import { Suspense, lazy } from "react";
 import { Button } from "@/components/ui/button";
 import { MapPin, Phone, MessageCircle, Wrench, User, CalendarCheck } from "lucide-react";
 import { Link } from "react-router-dom";
-import heroBanner from "@/assets/hero-banner.jpg";
 import { trackConversion } from "@/lib/gtag";
+
+const HeroEngineScene = lazy(() => import("@/components/HeroEngineScene"));
 
 const Hero = () => {
   return (
