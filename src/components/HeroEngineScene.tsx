@@ -276,14 +276,32 @@ function ShelbyGT500() {
       <Wheel x={-2.1} z={1.25} />
       <Wheel x={-2.1} z={-1.25} />
 
-      {/* Ground shadow */}
-      <mesh position={[0, -1.05, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-        <circleGeometry args={[4.5, 48]} />
-        <meshBasicMaterial color={BG} transparent opacity={0.85} />
-      </mesh>
+      {/* (Ground moved to ReflectiveFloor at scene root for real reflections) */}
     </group>
   );
 }
+
+function ReflectiveFloor() {
+  return (
+    <mesh position={[0, -1.32, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+      <planeGeometry args={[40, 40]} />
+      <MeshReflectorMaterial
+        blur={[300, 100]}
+        resolution={1024}
+        mixBlur={1}
+        mixStrength={40}
+        roughness={0.9}
+        depthScale={1.1}
+        minDepthThreshold={0.4}
+        maxDepthThreshold={1.4}
+        color="#0b1220"
+        metalness={0.6}
+        mirror={0.5}
+      />
+    </mesh>
+  );
+}
+
 
 function FloatingParticles() {
   const particles = useMemo(
