@@ -5,7 +5,7 @@ import * as THREE from "three";
 
 const SKY_BLUE = new THREE.Color("hsl(200, 80%, 55%)");
 const GOLD = new THREE.Color("hsl(45, 90%, 55%)");
-const DARK_METAL = new THREE.Color("hsl(220, 20%, 28%)");
+const DARK_METAL = new THREE.Color("hsl(220, 20%, 32%)");
 const MID_METAL = new THREE.Color("hsl(220, 18%, 40%)");
 const BLACK_GLASS = new THREE.Color("hsl(220, 15%, 12%)");
 const BG = "hsl(220, 15%, 8%)";
