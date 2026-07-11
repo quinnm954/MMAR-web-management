@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { MapPin, Phone, MessageCircle, Wrench, User, CalendarCheck } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -5,21 +6,81 @@ import { trackConversion } from "@/lib/gtag";
 import heroShelby from "@/assets/hero-shelby.jpg";
 
 const Hero = () => {
+  const sectionRef = useRef<HTMLElement>(null);
+  const imgRef = useRef<HTMLImageElement>(null);
+
+  useEffect(() => {
+    const section = sectionRef.current;
+    const img = imgRef.current;
+    if (!section || !img) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    let raf = 0;
+    let targetX = 0;
+    let targetY = 0;
+    let currentX = 0;
+    let currentY = 0;
+    const MAX = 18; // px of parallax travel
+
+    const tick = () => {
+      currentX += (targetX - currentX) * 0.08;
+      currentY += (targetY - currentY) * 0.08;
+      img.style.setProperty("--parallax-x", `${currentX.toFixed(2)}px`);
+      img.style.setProperty("--parallax-y", `${currentY.toFixed(2)}px`);
+      raf = requestAnimationFrame(tick);
+    };
+
+    const handleMove = (e: PointerEvent) => {
+      const rect = section.getBoundingClientRect();
+      const nx = (e.clientX - rect.left) / rect.width - 0.5;
+      const ny = (e.clientY - rect.top) / rect.height - 0.5;
+      targetX = -nx * MAX * 2;
+      targetY = -ny * MAX * 2;
+    };
+    const handleLeave = () => {
+      targetX = 0;
+      targetY = 0;
+    };
+
+    section.addEventListener("pointermove", handleMove);
+    section.addEventListener("pointerleave", handleLeave);
+    raf = requestAnimationFrame(tick);
+    return () => {
+      section.removeEventListener("pointermove", handleMove);
+      section.removeEventListener("pointerleave", handleLeave);
+      cancelAnimationFrame(raf);
+    };
+  }, []);
+
   return (
-    <section className="relative min-h-[100svh] flex items-center justify-center pt-16 md:pt-20 overflow-hidden bg-background">
+    <section
+      ref={sectionRef}
+      className="relative min-h-[100svh] flex items-center justify-center pt-16 md:pt-20 overflow-hidden bg-background"
+    >
       <div className="absolute inset-0 z-0 overflow-hidden">
-        <img
-          src={heroShelby}
-          alt="Ford Shelby GT500 with hood open showing a supercharged engine — mobile mechanic hero"
-          width={1920}
-          height={1088}
-          fetchPriority="high"
-          decoding="async"
-          className="w-[110%] h-[110%] -ml-[5%] -mt-[5%] object-cover object-center animate-hero-rotate motion-reduce:animate-none will-change-transform"
-        />
+        <div
+          className="w-full h-full animate-hero-rotate motion-reduce:animate-none will-change-transform"
+        >
+          <img
+            ref={imgRef}
+            src={heroShelby}
+            alt="Ford Shelby GT500 with hood open showing a supercharged engine — mobile mechanic hero"
+            width={1920}
+            height={1088}
+            fetchPriority="high"
+            decoding="async"
+            className="w-[115%] h-[115%] -ml-[7.5%] -mt-[7.5%] object-cover object-center will-change-transform"
+            style={{
+              transform: "translate3d(var(--parallax-x, 0px), var(--parallax-y, 0px), 0)",
+              transition: "transform 0.05s linear",
+            }}
+          />
+        </div>
 
         <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/55 to-background" />
       </div>
+
+
 
 
       <div className="container mx-auto px-4 relative z-10">
