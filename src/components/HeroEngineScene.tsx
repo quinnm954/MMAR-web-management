@@ -1,6 +1,6 @@
 import { useRef, useMemo } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Float } from "@react-three/drei";
+import { OrbitControls, Float, RoundedBox } from "@react-three/drei";
 import * as THREE from "three";
 
 const SKY_BLUE = new THREE.Color("hsl(200, 80%, 55%)");
