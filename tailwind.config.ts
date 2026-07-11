@@ -82,11 +82,16 @@ export default {
           "0%, 100%": { boxShadow: "0 0 20px hsl(200 80% 55% / 0.3)" },
           "50%": { boxShadow: "0 0 40px hsl(200 80% 55% / 0.5)" },
         },
+        "hero-rotate": {
+          "0%, 100%": { transform: "rotate(-2deg) scale(1.04)" },
+          "50%": { transform: "rotate(2deg) scale(1.04)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "pulse-glow": "pulse-glow 2s ease-in-out infinite",
+        "hero-rotate": "hero-rotate 18s ease-in-out infinite",
       },
     },
   },

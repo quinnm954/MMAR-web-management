@@ -7,7 +7,7 @@ import heroShelby from "@/assets/hero-shelby.jpg";
 const Hero = () => {
   return (
     <section className="relative min-h-[100svh] flex items-center justify-center pt-16 md:pt-20 overflow-hidden bg-background">
-      <div className="absolute inset-0 z-0">
+      <div className="absolute inset-0 z-0 overflow-hidden">
         <img
           src={heroShelby}
           alt="Ford Shelby GT500 with hood open showing a supercharged engine — mobile mechanic hero"
@@ -15,8 +15,9 @@ const Hero = () => {
           height={1088}
           fetchPriority="high"
           decoding="async"
-          className="w-full h-full object-cover object-center"
+          className="w-[110%] h-[110%] -ml-[5%] -mt-[5%] object-cover object-center animate-hero-rotate motion-reduce:animate-none will-change-transform"
         />
+
         <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/55 to-background" />
       </div>
 
