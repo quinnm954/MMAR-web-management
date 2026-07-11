@@ -101,15 +101,15 @@ function EngineAssembly() {
 function FloatingParticles() {
   const particles = useMemo(
     () =>
-      Array.from({ length: 14 }).map((_, i) => ({
+      Array.from({ length: 10 }).map((_, i) => ({
         position: [
-          (Math.random() - 0.5) * 6,
-          (Math.random() - 0.5) * 4 + 0.5,
-          (Math.random() - 0.5) * 3,
+          (Math.random() - 0.5) * 5,
+          (Math.random() - 0.5) * 3 - 0.5,
+          (Math.random() - 0.5) * 2.5,
         ] as [number, number, number],
         color: Math.random() > 0.5 ? SKY_BLUE : GOLD,
-        speed: 0.5 + Math.random() * 1.5,
-        radius: 0.05 + Math.random() * 0.08,
+        speed: 0.5 + Math.random() * 1.2,
+        radius: 0.04 + Math.random() * 0.06,
       })),
     []
   );
