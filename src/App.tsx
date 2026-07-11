@@ -71,6 +71,7 @@ import AppointmentConfirmation from "./pages/AppointmentConfirmation";
 import NativeBoot from "./components/NativeBoot";
 import NotificationSettings from "./pages/NotificationSettings";
 import NotificationsPage from "./pages/Notifications";
+import BusinessCard from "./pages/BusinessCard";
 import Messages from "./pages/Messages";
 import PullToRefresh from "./components/PullToRefresh";
 import { captureAttribution } from "@/lib/gtag";
