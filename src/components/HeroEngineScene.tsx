@@ -29,12 +29,12 @@ function Wheel({ x, z }: { x: number; z: number }) {
       {/* Tire */}
       <mesh castShadow>
         <cylinderGeometry args={[0.55, 0.55, 0.36, 40]} />
-        <meshStandardMaterial color={TIRE} roughness={0.9} metalness={0.1} />
+        <meshPhysicalMaterial color={TIRE} roughness={0.85} metalness={0.05} envMapIntensity={0.4} />
       </mesh>
       {/* Rim face (outside) */}
       <mesh position={[0, 0.19, 0]} castShadow>
         <cylinderGeometry args={[0.38, 0.38, 0.02, 32]} />
-        <meshStandardMaterial color={RIM} roughness={0.35} metalness={0.9} />
+        <meshPhysicalMaterial color={RIM} roughness={0.18} metalness={1} envMapIntensity={1.6} />
       </mesh>
       {/* Rim center */}
       <mesh position={[0, 0.2, 0]} castShadow>
@@ -61,7 +61,7 @@ function GlowingEngine() {
       {/* Snorkel intake */}
       <mesh position={[0, 0.75, 0]} castShadow>
         <cylinderGeometry args={[0.12, 0.12, 0.2, 20]} />
-        <meshStandardMaterial color={CHROME} roughness={0.2} metalness={1} />
+        <meshPhysicalMaterial color={CHROME} roughness={0.08} metalness={1} envMapIntensity={2} />
       </mesh>
       {/* Pulleys */}
       <mesh position={[0.7, 0.1, 0.5]} rotation={[0, 0, Math.PI / 2]} castShadow>
@@ -95,139 +95,139 @@ function ShelbyGT500() {
       {/* Lower body / chassis - long and wide */}
       <mesh position={[0, -0.05, 0]} castShadow receiveShadow>
         <boxGeometry args={[bodyLen, 0.75, bodyWid]} />
-        <meshStandardMaterial color={BODY_BLUE} roughness={0.35} metalness={0.7} />
+        <meshPhysicalMaterial color={BODY_BLUE} roughness={0.18} metalness={0.85} clearcoat={1} clearcoatRoughness={0.05} envMapIntensity={1.4} />
       </mesh>
 
       {/* Front fenders (wider haunches) */}
       <mesh position={[2.0, 0.05, 1.15]} castShadow>
         <boxGeometry args={[1.6, 0.55, 0.35]} />
-        <meshStandardMaterial color={BODY_BLUE} roughness={0.35} metalness={0.7} />
+        <meshPhysicalMaterial color={BODY_BLUE} roughness={0.18} metalness={0.85} clearcoat={1} clearcoatRoughness={0.05} envMapIntensity={1.4} />
       </mesh>
       <mesh position={[2.0, 0.05, -1.15]} castShadow>
         <boxGeometry args={[1.6, 0.55, 0.35]} />
-        <meshStandardMaterial color={BODY_BLUE} roughness={0.35} metalness={0.7} />
+        <meshPhysicalMaterial color={BODY_BLUE} roughness={0.18} metalness={0.85} clearcoat={1} clearcoatRoughness={0.05} envMapIntensity={1.4} />
       </mesh>
       {/* Rear haunches */}
       <mesh position={[-2.1, 0.05, 1.15]} castShadow>
         <boxGeometry args={[1.7, 0.6, 0.35]} />
-        <meshStandardMaterial color={BODY_BLUE} roughness={0.35} metalness={0.7} />
+        <meshPhysicalMaterial color={BODY_BLUE} roughness={0.18} metalness={0.85} clearcoat={1} clearcoatRoughness={0.05} envMapIntensity={1.4} />
       </mesh>
       <mesh position={[-2.1, 0.05, -1.15]} castShadow>
         <boxGeometry args={[1.7, 0.6, 0.35]} />
-        <meshStandardMaterial color={BODY_BLUE} roughness={0.35} metalness={0.7} />
+        <meshPhysicalMaterial color={BODY_BLUE} roughness={0.18} metalness={0.85} clearcoat={1} clearcoatRoughness={0.05} envMapIntensity={1.4} />
       </mesh>
 
       {/* Iconic dual racing stripes (gold to match brand) */}
       <mesh position={[0, 0.34, 0.25]} castShadow>
         <boxGeometry args={[bodyLen, 0.02, 0.22]} />
-        <meshStandardMaterial color={GOLD} emissive={GOLD} emissiveIntensity={0.35} roughness={0.3} metalness={0.6} />
+        <meshPhysicalMaterial color={GOLD} emissive={GOLD} emissiveIntensity={0.15} roughness={0.22} metalness={0.85} clearcoat={0.8} clearcoatRoughness={0.1} envMapIntensity={1.3} />
       </mesh>
       <mesh position={[0, 0.34, -0.25]} castShadow>
         <boxGeometry args={[bodyLen, 0.02, 0.22]} />
-        <meshStandardMaterial color={GOLD} emissive={GOLD} emissiveIntensity={0.35} roughness={0.3} metalness={0.6} />
+        <meshPhysicalMaterial color={GOLD} emissive={GOLD} emissiveIntensity={0.15} roughness={0.22} metalness={0.85} clearcoat={0.8} clearcoatRoughness={0.1} envMapIntensity={1.3} />
       </mesh>
 
       {/* Front splitter (aggressive lower lip) */}
       <mesh position={[3.15, -0.35, 0]} castShadow>
         <boxGeometry args={[0.15, 0.08, bodyWid + 0.4]} />
-        <meshStandardMaterial color={BODY_BLUE_DARK} roughness={0.5} metalness={0.5} />
+        <meshPhysicalMaterial color={BODY_BLUE_DARK} roughness={0.28} metalness={0.75} clearcoat={0.8} clearcoatRoughness={0.1} envMapIntensity={1.1} />
       </mesh>
 
       {/* Front grille */}
       <mesh position={[3.22, 0.02, 0]} castShadow>
         <boxGeometry args={[0.05, 0.28, 1.4]} />
-        <meshStandardMaterial color={BODY_BLUE_DARK} roughness={0.7} metalness={0.4} />
+        <meshPhysicalMaterial color={BODY_BLUE_DARK} roughness={0.45} metalness={0.6} envMapIntensity={0.9} />
       </mesh>
 
       {/* Cabin / roof (fastback profile, pushed back) */}
       <mesh position={[-0.6, 0.75, 0]} castShadow>
         <boxGeometry args={[2.6, 0.7, 2.2]} />
-        <meshStandardMaterial color={BODY_BLUE} roughness={0.35} metalness={0.7} />
+        <meshPhysicalMaterial color={BODY_BLUE} roughness={0.18} metalness={0.85} clearcoat={1} clearcoatRoughness={0.05} envMapIntensity={1.4} />
       </mesh>
       {/* Fastback rear slope */}
       <mesh position={[-2.0, 0.55, 0]} rotation={[0, 0, 0.35]} castShadow>
         <boxGeometry args={[1.2, 0.5, 2.15]} />
-        <meshStandardMaterial color={BODY_BLUE} roughness={0.35} metalness={0.7} />
+        <meshPhysicalMaterial color={BODY_BLUE} roughness={0.18} metalness={0.85} clearcoat={1} clearcoatRoughness={0.05} envMapIntensity={1.4} />
       </mesh>
 
       {/* Stripes over the roof */}
       <mesh position={[-0.6, 1.11, 0.25]} castShadow>
         <boxGeometry args={[2.6, 0.02, 0.22]} />
-        <meshStandardMaterial color={GOLD} emissive={GOLD} emissiveIntensity={0.35} roughness={0.3} metalness={0.6} />
+        <meshPhysicalMaterial color={GOLD} emissive={GOLD} emissiveIntensity={0.15} roughness={0.22} metalness={0.85} clearcoat={0.8} clearcoatRoughness={0.1} envMapIntensity={1.3} />
       </mesh>
       <mesh position={[-0.6, 1.11, -0.25]} castShadow>
         <boxGeometry args={[2.6, 0.02, 0.22]} />
-        <meshStandardMaterial color={GOLD} emissive={GOLD} emissiveIntensity={0.35} roughness={0.3} metalness={0.6} />
+        <meshPhysicalMaterial color={GOLD} emissive={GOLD} emissiveIntensity={0.15} roughness={0.22} metalness={0.85} clearcoat={0.8} clearcoatRoughness={0.1} envMapIntensity={1.3} />
       </mesh>
 
       {/* Windshield */}
       <mesh position={[0.65, 0.75, 0]} rotation={[0, 0, -0.55]} castShadow>
         <boxGeometry args={[0.06, 0.9, 2.0]} />
-        <meshStandardMaterial color={BLACK_GLASS} roughness={0.1} metalness={0.8} />
+        <meshPhysicalMaterial color={BLACK_GLASS} roughness={0.05} metalness={0.1} transmission={0.35} thickness={0.5} ior={1.45} clearcoat={1} clearcoatRoughness={0.03} envMapIntensity={1.6} />
       </mesh>
       {/* Side windows */}
       <mesh position={[-0.6, 0.9, 1.11]} castShadow>
         <boxGeometry args={[2.3, 0.5, 0.02]} />
-        <meshStandardMaterial color={BLACK_GLASS} roughness={0.1} metalness={0.8} />
+        <meshPhysicalMaterial color={BLACK_GLASS} roughness={0.05} metalness={0.1} transmission={0.35} thickness={0.5} ior={1.45} clearcoat={1} clearcoatRoughness={0.03} envMapIntensity={1.6} />
       </mesh>
       <mesh position={[-0.6, 0.9, -1.11]} castShadow>
         <boxGeometry args={[2.3, 0.5, 0.02]} />
-        <meshStandardMaterial color={BLACK_GLASS} roughness={0.1} metalness={0.8} />
+        <meshPhysicalMaterial color={BLACK_GLASS} roughness={0.05} metalness={0.1} transmission={0.35} thickness={0.5} ior={1.45} clearcoat={1} clearcoatRoughness={0.03} envMapIntensity={1.6} />
       </mesh>
       {/* Rear glass */}
       <mesh position={[-2.15, 0.75, 0]} rotation={[0, 0, 0.4]} castShadow>
         <boxGeometry args={[0.05, 0.85, 2.0]} />
-        <meshStandardMaterial color={BLACK_GLASS} roughness={0.1} metalness={0.8} />
+        <meshPhysicalMaterial color={BLACK_GLASS} roughness={0.05} metalness={0.1} transmission={0.35} thickness={0.5} ior={1.45} clearcoat={1} clearcoatRoughness={0.03} envMapIntensity={1.6} />
       </mesh>
 
       {/* Rear spoiler */}
       <mesh position={[-3.0, 0.55, 0]} castShadow>
         <boxGeometry args={[0.3, 0.05, bodyWid]} />
-        <meshStandardMaterial color={BODY_BLUE_DARK} roughness={0.4} metalness={0.6} />
+        <meshPhysicalMaterial color={BODY_BLUE_DARK} roughness={0.22} metalness={0.8} clearcoat={1} clearcoatRoughness={0.08} envMapIntensity={1.2} />
       </mesh>
       <mesh position={[-3.0, 0.5, 1.15]} castShadow>
         <boxGeometry args={[0.15, 0.15, 0.08]} />
-        <meshStandardMaterial color={BODY_BLUE_DARK} roughness={0.5} metalness={0.5} />
+        <meshPhysicalMaterial color={BODY_BLUE_DARK} roughness={0.28} metalness={0.75} clearcoat={0.8} clearcoatRoughness={0.1} envMapIntensity={1.1} />
       </mesh>
       <mesh position={[-3.0, 0.5, -1.15]} castShadow>
         <boxGeometry args={[0.15, 0.15, 0.08]} />
-        <meshStandardMaterial color={BODY_BLUE_DARK} roughness={0.5} metalness={0.5} />
+        <meshPhysicalMaterial color={BODY_BLUE_DARK} roughness={0.28} metalness={0.75} clearcoat={0.8} clearcoatRoughness={0.1} envMapIntensity={1.1} />
       </mesh>
 
       {/* Open hood (pivoted at the cowl) with hood scoop */}
       <group position={[1.0, 0.35, 0]} rotation={[0, 0, Math.PI / 3.2]}>
         <mesh position={[0.9, 0, 0]} castShadow>
           <boxGeometry args={[2.1, 0.09, 2.3]} />
-          <meshStandardMaterial color={BODY_BLUE} roughness={0.35} metalness={0.7} />
+          <meshPhysicalMaterial color={BODY_BLUE} roughness={0.18} metalness={0.85} clearcoat={1} clearcoatRoughness={0.05} envMapIntensity={1.4} />
         </mesh>
         {/* Hood stripes */}
         <mesh position={[0.9, 0.06, 0.25]} castShadow>
           <boxGeometry args={[2.1, 0.02, 0.22]} />
-          <meshStandardMaterial color={GOLD} emissive={GOLD} emissiveIntensity={0.35} roughness={0.3} metalness={0.6} />
+          <meshPhysicalMaterial color={GOLD} emissive={GOLD} emissiveIntensity={0.15} roughness={0.22} metalness={0.85} clearcoat={0.8} clearcoatRoughness={0.1} envMapIntensity={1.3} />
         </mesh>
         <mesh position={[0.9, 0.06, -0.25]} castShadow>
           <boxGeometry args={[2.1, 0.02, 0.22]} />
-          <meshStandardMaterial color={GOLD} emissive={GOLD} emissiveIntensity={0.35} roughness={0.3} metalness={0.6} />
+          <meshPhysicalMaterial color={GOLD} emissive={GOLD} emissiveIntensity={0.15} roughness={0.22} metalness={0.85} clearcoat={0.8} clearcoatRoughness={0.1} envMapIntensity={1.3} />
         </mesh>
         {/* Hood scoop */}
         <mesh position={[0.7, 0.18, 0]} castShadow>
           <boxGeometry args={[0.9, 0.18, 0.7]} />
-          <meshStandardMaterial color={BODY_BLUE_DARK} roughness={0.4} metalness={0.6} />
+          <meshPhysicalMaterial color={BODY_BLUE_DARK} roughness={0.22} metalness={0.8} clearcoat={1} clearcoatRoughness={0.08} envMapIntensity={1.2} />
         </mesh>
       </group>
 
       {/* Engine bay walls */}
       <mesh position={[1.9, 0.05, 1.05]} castShadow>
         <boxGeometry args={[2.2, 0.55, 0.08]} />
-        <meshStandardMaterial color={BODY_BLUE_DARK} roughness={0.6} metalness={0.5} />
+        <meshPhysicalMaterial color={BODY_BLUE_DARK} roughness={0.35} metalness={0.7} envMapIntensity={0.9} />
       </mesh>
       <mesh position={[1.9, 0.05, -1.05]} castShadow>
         <boxGeometry args={[2.2, 0.55, 0.08]} />
-        <meshStandardMaterial color={BODY_BLUE_DARK} roughness={0.6} metalness={0.5} />
+        <meshPhysicalMaterial color={BODY_BLUE_DARK} roughness={0.35} metalness={0.7} envMapIntensity={0.9} />
       </mesh>
       <mesh position={[0.85, 0.05, 0]} castShadow>
         <boxGeometry args={[0.08, 0.55, 2.0]} />
-        <meshStandardMaterial color={BODY_BLUE_DARK} roughness={0.6} metalness={0.5} />
+        <meshPhysicalMaterial color={BODY_BLUE_DARK} roughness={0.35} metalness={0.7} envMapIntensity={0.9} />
       </mesh>
 
       <GlowingEngine />
@@ -263,11 +263,11 @@ function ShelbyGT500() {
       {/* Dual exhaust tips */}
       <mesh position={[-3.25, -0.35, 0.5]} rotation={[0, 0, Math.PI / 2]} castShadow>
         <cylinderGeometry args={[0.09, 0.09, 0.14, 20]} />
-        <meshStandardMaterial color={CHROME} roughness={0.2} metalness={1} />
+        <meshPhysicalMaterial color={CHROME} roughness={0.08} metalness={1} envMapIntensity={2} />
       </mesh>
       <mesh position={[-3.25, -0.35, -0.5]} rotation={[0, 0, Math.PI / 2]} castShadow>
         <cylinderGeometry args={[0.09, 0.09, 0.14, 20]} />
-        <meshStandardMaterial color={CHROME} roughness={0.2} metalness={1} />
+        <meshPhysicalMaterial color={CHROME} roughness={0.08} metalness={1} envMapIntensity={2} />
       </mesh>
 
       {/* Wheels - pushed to the corners */}
