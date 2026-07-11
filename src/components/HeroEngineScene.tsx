@@ -29,7 +29,7 @@ function EngineAssembly() {
   );
 
   return (
-    <group ref={groupRef} scale={0.55} position={[0, -0.9, 0]}>
+    <group ref={groupRef} scale={0.6} position={[0, -0.7, 0]}>
       {/* Engine block */}
       <mesh position={[0, 0, 0]} castShadow receiveShadow>
         <boxGeometry args={[3.6, 1.1, 1.6]} />
