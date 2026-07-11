@@ -56,7 +56,7 @@ function CarWithOpenHood() {
   });
 
   return (
-    <group ref={groupRef} scale={0.75} position={[0, -0.65, 0]}>
+    <group ref={groupRef} scale={0.9} position={[0, -1.1, 0]}>
       {/* Lower body / chassis */}
       <mesh position={[0, 0, 0]} castShadow receiveShadow>
         <boxGeometry args={[4.2, 0.7, 1.9]} />
