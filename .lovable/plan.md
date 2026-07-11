@@ -1,38 +1,21 @@
-## Digital Business Card
+Replace the hero background photo with an interactive 3D scene of stylized car engine/vehicle parts using the brand palette (sky blue and gold on a dark background).
 
-Create a shareable web page at `/card` designed to be sent via SMS/QR that presents Mike's Mobile Auto Repair contact info with one-tap action buttons and a "Save to Contacts" vCard download.
+### What will be built
+- **3D hero scene component** (`src/components/HeroEngineScene.tsx`) using React Three Fiber.
+- **Scene content:** a stylized engine block made of primitive 3D shapes (cylinders, boxes, discs) with brand-colored accent parts — glowing sky-blue intake, gold alternator/belt accents, metallic dark body. Parts float gently and the whole assembly slowly rotates.
+- **Interaction:** subtle mouse-driven rotation (OrbitControls with damping, no zoom) plus a fallback auto-rotation.
+- **Hero integration:** update `src/components/Hero.tsx` to replace the `<img>` background with the 3D canvas, keeping the dark gradient overlay and headline text readable.
+- **Fallback:** a CSS gradient background behind the canvas so the hero still looks good if WebGL fails or is disabled.
+- **Performance:** canvas is lazy-loaded, pauses when not visible, and uses a lightweight material setup.
 
-### New file: `src/pages/BusinessCard.tsx`
+### Technical details
+- Add `@react-three/fiber@^8.18` and `@react-three/drei@^9.122.0` (the React 18-compatible versions). `three` is pulled in as a peer dependency.
+- Scene is rendered with `WebGLRenderer` and will work in any browser with WebGL support.
+- No backend or database changes.
+- Existing hero text, CTAs, SEO, and tracking stay unchanged.
+- The old `hero-banner.jpg` will be replaced as the active hero background; the file may be removed or kept unused depending on asset references elsewhere.
 
-Mobile-first, single-viewport card layout using existing design tokens (sky/gold, glass-card, dark bg). Structure:
-
-- **Header block** — MMAR logo, business name (display font), tagline "Mobile Auto Repair — Southwest Florida"
-- **Primary actions** (large tap targets, stacked): 
-  - Call (813) 501-7572 — white
-  - Text (813) 501-7572 — blue
-  - Book Now → `/book` — blue
-  - Email `mikesmarllc@gmail.com` — blue
-- **Secondary row**: Website, Google Reviews, Directions (uses existing GMB URL from `Contact.tsx`)
-- **Save to Contacts button** (yellow accent) — triggers download of a generated `.vcf` blob (client-side, no dependency). Includes FN, ORG, TEL (work + cell), EMAIL, URL, ADR (service area), NOTE.
-- **Share button** — uses existing `shareLink()` from `src/lib/share.ts` to invoke native share sheet with card URL.
-- Footer: small "Capital Services Management, INC." legal line.
-
-Reuses `trackConversion()` from `@/lib/gtag` on call/text/email clicks.
-
-### SEO
-
-Uses `useSeo()` with title "Mike's Mobile Auto Repair — Digital Card", description, canonical `https://mikesmautorepair.com/card`. Person/LocalBusiness JSON-LD already exists sitewide; no extra schema needed.
-
-### Routing
-
-Add `<Route path="/card" element={<BusinessCard />} />` in `src/App.tsx` above the catch-all `/:landingSlug` route.
-
-### Out of scope
-
-- No QR code image generated (user chose page-only). They can generate a QR from any tool pointing at `mikesmautorepair.com/card`.
-- No per-staff variants.
-- No changes to Navigation, Footer, or existing Contact page.
-
-### Technical notes
-
-vCard 3.0 string built inline and downloaded via `Blob` + anchor click — no npm dependency. Filename: `mikes-mobile-auto-repair.vcf`.
+### Verification
+- Run TypeScript and production build checks.
+- Verify the 3D scene renders behind the hero text on desktop and mobile viewports.
+- Confirm the CTA buttons remain clickable and the gradient overlay keeps text legible.
