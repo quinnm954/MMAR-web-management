@@ -7,91 +7,140 @@ const SKY_BLUE = new THREE.Color("hsl(200, 80%, 55%)");
 const GOLD = new THREE.Color("hsl(45, 90%, 55%)");
 const DARK_METAL = new THREE.Color("hsl(220, 15%, 18%)");
 const MID_METAL = new THREE.Color("hsl(220, 15%, 28%)");
+const BLACK_GLASS = new THREE.Color("hsl(220, 15%, 10%)");
 const BG = "hsl(220, 15%, 8%)";
 
-function EngineAssembly() {
+function Wheel({ x, z }: { x: number; z: number }) {
+  return (
+    <mesh position={[x, -0.35, z]} rotation={[0, 0, Math.PI / 2]} castShadow>
+      <cylinderGeometry args={[0.35, 0.35, 0.22, 32]} />
+      <meshStandardMaterial color={DARK_METAL} roughness={0.7} metalness={0.4} />
+    </mesh>
+  );
+}
+
+function GlowingEngine() {
+  return (
+    <group position={[0.9, 0.05, 0]}>
+      <mesh castShadow>
+        <boxGeometry args={[1.6, 0.55, 0.9]} />
+        <meshStandardMaterial color={MID_METAL} roughness={0.5} metalness={0.7} />
+      </mesh>
+      <RoundedBox position={[0, 0.45, 0]} args={[1.2, 0.25, 0.6]} radius={0.06} smoothness={4} castShadow>
+        <meshStandardMaterial color={SKY_BLUE} emissive={SKY_BLUE} emissiveIntensity={0.35} roughness={0.3} metalness={0.4} />
+      </RoundedBox>
+      <mesh position={[0.6, -0.05, 0.35]} rotation={[0, 0, Math.PI / 2]} castShadow>
+        <cylinderGeometry args={[0.2, 0.2, 0.12, 24]} />
+        <meshStandardMaterial color={GOLD} emissive={GOLD} emissiveIntensity={0.35} roughness={0.25} metalness={0.8} />
+      </mesh>
+      <mesh position={[-0.5, -0.05, 0.35]} rotation={[0, 0, Math.PI / 2]} castShadow>
+        <cylinderGeometry args={[0.15, 0.15, 0.12, 24]} />
+        <meshStandardMaterial color={GOLD} emissive={GOLD} emissiveIntensity={0.35} roughness={0.25} metalness={0.8} />
+      </mesh>
+      <mesh position={[0.05, -0.05, 0.45]} rotation={[0, 0, Math.PI / 2]} castShadow>
+        <torusGeometry args={[0.55, 0.025, 6, 48]} />
+        <meshStandardMaterial color={GOLD} emissive={GOLD} emissiveIntensity={0.25} roughness={0.4} metalness={0.5} />
+      </mesh>
+    </group>
+  );
+}
+
+function CarWithOpenHood() {
   const groupRef = useRef<THREE.Group>(null);
 
   useFrame((state) => {
     if (!groupRef.current) return;
     const t = state.clock.getElapsedTime();
-    groupRef.current.rotation.y = t * 0.08 + Math.sin(t * 0.2) * 0.05;
-    groupRef.current.rotation.x = Math.sin(t * 0.15) * 0.03;
+    groupRef.current.rotation.y = Math.sin(t * 0.12) * 0.08;
+    groupRef.current.rotation.x = Math.sin(t * 0.08) * 0.015;
   });
 
-  const cylinders = useMemo(
-    () =>
-      Array.from({ length: 6 }).map((_, i) => ({
-        position: [0.7 * (i - 2.5), 0.55, 0.2 + (i % 2) * 0.15] as [number, number, number],
-        scale: [0.22, 0.55, 0.22] as [number, number, number],
-      })),
-    []
-  );
-
   return (
-    <group ref={groupRef} scale={0.6} position={[0, -0.7, 0]}>
-      {/* Engine block */}
+    <group ref={groupRef} scale={0.75} position={[0, -0.65, 0]}>
+      {/* Lower body / chassis */}
       <mesh position={[0, 0, 0]} castShadow receiveShadow>
-        <boxGeometry args={[3.6, 1.1, 1.6]} />
-        <meshStandardMaterial color={DARK_METAL} roughness={0.5} metalness={0.7} />
+        <boxGeometry args={[4.2, 0.7, 1.9]} />
+        <meshStandardMaterial color={DARK_METAL} roughness={0.4} metalness={0.6} />
       </mesh>
 
-      {/* Oil pan */}
-      <mesh position={[0, -0.95, 0]} castShadow>
-        <boxGeometry args={[3.2, 0.8, 1.4]} />
-        <meshStandardMaterial color={MID_METAL} roughness={0.6} metalness={0.6} />
+      {/* Gold brand stripe along the side */}
+      <mesh position={[0, 0.05, 0.96]} castShadow>
+        <boxGeometry args={[4.0, 0.08, 0.02]} />
+        <meshStandardMaterial color={GOLD} emissive={GOLD} emissiveIntensity={0.3} roughness={0.3} metalness={0.6} />
+      </mesh>
+      <mesh position={[0, 0.05, -0.96]} castShadow>
+        <boxGeometry args={[4.0, 0.08, 0.02]} />
+        <meshStandardMaterial color={GOLD} emissive={GOLD} emissiveIntensity={0.3} roughness={0.3} metalness={0.6} />
       </mesh>
 
-      {/* Cylinder heads */}
-      <mesh position={[0, 0.75, 0.15]} castShadow>
-        <boxGeometry args={[3.5, 0.5, 1.2]} />
-        <meshStandardMaterial color={MID_METAL} roughness={0.5} metalness={0.7} />
+      {/* Cabin / roof */}
+      <mesh position={[-0.4, 0.75, 0]} castShadow>
+        <boxGeometry args={[2.4, 0.75, 1.7]} />
+        <meshStandardMaterial color={DARK_METAL} roughness={0.4} metalness={0.6} />
       </mesh>
 
-      {/* Cylinders / valve covers */}
-      {cylinders.map((c, i) => (
-        <mesh key={i} position={c.position} castShadow>
-          <cylinderGeometry args={[c.scale[0] / 2, c.scale[0] / 2, c.scale[1], 24]} />
-          <meshStandardMaterial color={DARK_METAL} roughness={0.4} metalness={0.8} />
+      {/* Windows */}
+      <mesh position={[-0.4, 0.75, 0.86]} castShadow>
+        <boxGeometry args={[2.2, 0.55, 0.02]} />
+        <meshStandardMaterial color={BLACK_GLASS} roughness={0.1} metalness={0.8} />
+      </mesh>
+      <mesh position={[-0.4, 0.75, -0.86]} castShadow>
+        <boxGeometry args={[2.2, 0.55, 0.02]} />
+        <meshStandardMaterial color={BLACK_GLASS} roughness={0.1} metalness={0.8} />
+      </mesh>
+      <mesh position={[-1.65, 0.75, 0]} rotation={[0, Math.PI / 2, 0]} castShadow>
+        <boxGeometry args={[1.5, 0.55, 0.02]} />
+        <meshStandardMaterial color={BLACK_GLASS} roughness={0.1} metalness={0.8} />
+      </mesh>
+      <mesh position={[0.85, 0.75, 0]} rotation={[0, Math.PI / 2, 0]} castShadow>
+        <boxGeometry args={[1.5, 0.55, 0.02]} />
+        <meshStandardMaterial color={BLACK_GLASS} roughness={0.1} metalness={0.8} />
+      </mesh>
+
+      {/* Open hood (pivoted at the back edge) */}
+      <group position={[0.7, 0.35, 0]} rotation={[-Math.PI / 3.5, 0, 0]}>
+        <mesh position={[0.45, 0, 0]} castShadow>
+          <boxGeometry args={[1.6, 0.08, 1.7]} />
+          <meshStandardMaterial color={MID_METAL} roughness={0.5} metalness={0.7} />
         </mesh>
-      ))}
+      </group>
 
-      {/* Sky-blue intake manifold */}
-      <RoundedBox position={[0, 1.2, -0.1]} args={[2.2, 0.5, 0.9]} radius={0.12} smoothness={4} castShadow>
-        <meshStandardMaterial color={SKY_BLUE} roughness={0.3} metalness={0.4} emissive={SKY_BLUE} emissiveIntensity={0.15} />
-      </RoundedBox>
-
-      {/* Gold alternator pulley */}
-      <mesh position={[1.9, 0.2, 0.4]} rotation={[0, 0, Math.PI / 2]} castShadow>
-        <cylinderGeometry args={[0.45, 0.45, 0.25, 32]} />
-        <meshStandardMaterial color={GOLD} roughness={0.25} metalness={0.8} emissive={GOLD} emissiveIntensity={0.2} />
+      {/* Engine bay walls (so engine looks recessed) */}
+      <mesh position={[0.9, -0.05, 0.8]} castShadow>
+        <boxGeometry args={[1.6, 0.55, 0.08]} />
+        <meshStandardMaterial color={DARK_METAL} roughness={0.6} metalness={0.5} />
+      </mesh>
+      <mesh position={[0.9, -0.05, -0.8]} castShadow>
+        <boxGeometry args={[1.6, 0.55, 0.08]} />
+        <meshStandardMaterial color={DARK_METAL} roughness={0.6} metalness={0.5} />
+      </mesh>
+      <mesh position={[0.05, -0.05, 0]} castShadow>
+        <boxGeometry args={[0.08, 0.55, 1.6]} />
+        <meshStandardMaterial color={DARK_METAL} roughness={0.6} metalness={0.5} />
       </mesh>
 
-      {/* Gold crank pulley */}
-      <mesh position={[-1.6, 0.2, 0.4]} rotation={[0, 0, Math.PI / 2]} castShadow>
-        <cylinderGeometry args={[0.35, 0.35, 0.25, 32]} />
-        <meshStandardMaterial color={GOLD} roughness={0.25} metalness={0.8} emissive={GOLD} emissiveIntensity={0.2} />
+      {/* Glowing engine inside */}
+      <GlowingEngine />
+
+      {/* Headlights */}
+      <mesh position={[2.05, 0.05, 0.55]} castShadow>
+        <boxGeometry args={[0.05, 0.25, 0.35]} />
+        <meshStandardMaterial color={SKY_BLUE} emissive={SKY_BLUE} emissiveIntensity={0.8} roughness={0.2} metalness={0.2} />
+      </mesh>
+      <mesh position={[2.05, 0.05, -0.55]} castShadow>
+        <boxGeometry args={[0.05, 0.25, 0.35]} />
+        <meshStandardMaterial color={SKY_BLUE} emissive={SKY_BLUE} emissiveIntensity={0.8} roughness={0.2} metalness={0.2} />
       </mesh>
 
-      {/* Belt path */}
-      <mesh position={[0.15, 0.2, 0.4]} rotation={[0, 0, Math.PI / 2]} castShadow>
-        <torusGeometry args={[1.75, 0.04, 8, 64]} />
-        <meshStandardMaterial color={GOLD} roughness={0.4} metalness={0.5} emissive={GOLD} emissiveIntensity={0.15} />
-      </mesh>
+      {/* Wheels */}
+      <Wheel x={1.35} z={0.9} />
+      <Wheel x={1.35} z={-0.9} />
+      <Wheel x={-1.35} z={0.9} />
+      <Wheel x={-1.35} z={-0.9} />
 
-      {/* Accent pipes / runners */}
-      <mesh position={[0.8, 0.1, -0.65]} rotation={[0, 0, -0.2]} castShadow>
-        <cylinderGeometry args={[0.12, 0.12, 2.2, 16]} />
-        <meshStandardMaterial color={SKY_BLUE} roughness={0.35} metalness={0.5} emissive={SKY_BLUE} emissiveIntensity={0.1} />
-      </mesh>
-      <mesh position={[-0.8, 0.1, -0.65]} rotation={[0, 0, 0.2]} castShadow>
-        <cylinderGeometry args={[0.12, 0.12, 2.2, 16]} />
-        <meshStandardMaterial color={SKY_BLUE} roughness={0.35} metalness={0.5} emissive={SKY_BLUE} emissiveIntensity={0.1} />
-      </mesh>
-
-      {/* Ground shadow disc */}
-      <mesh position={[0, -2.2, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-        <circleGeometry args={[3.2, 48]} />
+      {/* Ground shadow */}
+      <mesh position={[0, -0.85, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+        <circleGeometry args={[3.0, 48]} />
         <meshBasicMaterial color={BG} transparent opacity={0.85} />
       </mesh>
     </group>
@@ -144,10 +193,10 @@ export default function HeroEngineScene() {
         <ambientLight intensity={0.4} />
         <directionalLight position={[5, 6, 4]} intensity={1.2} castShadow shadow-mapSize={[1024, 1024]} />
         <directionalLight position={[-4, 2, -3]} intensity={0.5} color={SKY_BLUE} />
-        <pointLight position={[2, 2, 2]} intensity={1.5} color={GOLD} distance={8} />
-        <pointLight position={[-2, 1, 2]} intensity={1.2} color={SKY_BLUE} distance={8} />
+        <pointLight position={[2.2, 0.8, 1]} intensity={1.8} color={GOLD} distance={6} />
+        <pointLight position={[1.2, 0.8, 0]} intensity={1.5} color={SKY_BLUE} distance={5} />
 
-        <EngineAssembly />
+        <CarWithOpenHood />
         <FloatingParticles />
 
         <OrbitControls
