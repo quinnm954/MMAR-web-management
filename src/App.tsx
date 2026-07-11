@@ -171,6 +171,7 @@ const App = () => (
             <Route path="/set-password" element={<SetPassword />} />
             <Route path="/share/:token" element={<SharedCustomerSummary />} />
             <Route path="/book" element={<Book />} />
+            <Route path="/card" element={<BusinessCard />} />
             <Route path="/appointments/:token" element={<AppointmentConfirmation />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="/:landingSlug" element={<LocalLanding />} />
