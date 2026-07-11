@@ -20,7 +20,8 @@ const Hero = () => {
     let targetY = 0;
     let currentX = 0;
     let currentY = 0;
-    const MAX = 18; // px of parallax travel
+    const MAX = 18; // px of parallax travel from pointer / orientation
+    const TOUCH_MAX = 22; // px on touch drag
 
     const tick = () => {
       currentX += (targetX - currentX) * 0.08;
@@ -30,7 +31,9 @@ const Hero = () => {
       raf = requestAnimationFrame(tick);
     };
 
+    // --- Desktop: cursor-driven parallax ---
     const handleMove = (e: PointerEvent) => {
+      if (e.pointerType !== "mouse") return; // touch handled separately
       const rect = section.getBoundingClientRect();
       const nx = (e.clientX - rect.left) / rect.width - 0.5;
       const ny = (e.clientY - rect.top) / rect.height - 0.5;
@@ -42,15 +45,88 @@ const Hero = () => {
       targetY = 0;
     };
 
+    // --- Touch: drag/swipe across the hero nudges the image ---
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchBaseX = 0;
+    let touchBaseY = 0;
+    const handleTouchStart = (e: TouchEvent) => {
+      if (!e.touches[0]) return;
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+      touchBaseX = currentX;
+      touchBaseY = currentY;
+    };
+    const handleTouchMove = (e: TouchEvent) => {
+      if (!e.touches[0]) return;
+      const dx = e.touches[0].clientX - touchStartX;
+      const dy = e.touches[0].clientY - touchStartY;
+      const rect = section.getBoundingClientRect();
+      const nx = Math.max(-1, Math.min(1, dx / (rect.width / 2)));
+      const ny = Math.max(-1, Math.min(1, dy / (rect.height / 2)));
+      targetX = touchBaseX + nx * TOUCH_MAX;
+      targetY = touchBaseY + ny * TOUCH_MAX;
+    };
+    const handleTouchEnd = () => {
+      // Ease back to center after the finger lifts
+      targetX = 0;
+      targetY = 0;
+    };
+
+    // --- Device orientation: passive tilt-based parallax ---
+    const handleOrientation = (e: DeviceOrientationEvent) => {
+      if (e.gamma == null || e.beta == null) return;
+      // gamma: left/right tilt (-90..90), beta: front/back tilt (-180..180)
+      const nx = Math.max(-1, Math.min(1, e.gamma / 30));
+      const ny = Math.max(-1, Math.min(1, (e.beta - 40) / 40));
+      targetX = -nx * MAX;
+      targetY = -ny * MAX;
+    };
+
     section.addEventListener("pointermove", handleMove);
     section.addEventListener("pointerleave", handleLeave);
+    section.addEventListener("touchstart", handleTouchStart, { passive: true });
+    section.addEventListener("touchmove", handleTouchMove, { passive: true });
+    section.addEventListener("touchend", handleTouchEnd, { passive: true });
+    section.addEventListener("touchcancel", handleTouchEnd, { passive: true });
+
+    // Attach orientation listener when available. iOS 13+ requires an explicit
+    // permission request from a user gesture; wire that to the first tap.
+    let orientationAttached = false;
+    const attachOrientation = () => {
+      if (orientationAttached) return;
+      window.addEventListener("deviceorientation", handleOrientation);
+      orientationAttached = true;
+    };
+    const DOE = (window as unknown as {
+      DeviceOrientationEvent?: { requestPermission?: () => Promise<string> };
+    }).DeviceOrientationEvent;
+    const needsPermission = typeof DOE?.requestPermission === "function";
+    const requestOrientationOnce = () => {
+      if (!needsPermission) return;
+      DOE!.requestPermission!()
+        .then((state) => {
+          if (state === "granted") attachOrientation();
+        })
+        .catch(() => {});
+    };
+    if (!needsPermission) attachOrientation();
+    else section.addEventListener("touchstart", requestOrientationOnce, { once: true });
+
     raf = requestAnimationFrame(tick);
     return () => {
       section.removeEventListener("pointermove", handleMove);
       section.removeEventListener("pointerleave", handleLeave);
+      section.removeEventListener("touchstart", handleTouchStart);
+      section.removeEventListener("touchmove", handleTouchMove);
+      section.removeEventListener("touchend", handleTouchEnd);
+      section.removeEventListener("touchcancel", handleTouchEnd);
+      section.removeEventListener("touchstart", requestOrientationOnce);
+      if (orientationAttached) window.removeEventListener("deviceorientation", handleOrientation);
       cancelAnimationFrame(raf);
     };
   }, []);
+
 
   return (
     <section
