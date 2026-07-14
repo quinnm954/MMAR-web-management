@@ -179,19 +179,19 @@ const Hero = () => {
             style={{ animationDelay: "0.2s" }}
           >
             <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5 sm:gap-3">
-              <Button variant="hero" size="lg" className="w-full min-h-[52px] px-3 bg-white text-primary hover:bg-white/90 hover:text-primary border-2 border-white" asChild>
+              <Button variant="hero" size="lg" className="w-full min-h-[52px] px-3 bg-white/75 text-primary hover:bg-white/95 hover:text-primary border-2 border-white/80 backdrop-blur-sm" asChild>
                 <a href="tel:8135017572" onClick={() => trackConversion("phone_call")}>
                   <Phone className="w-5 h-5 mr-2 shrink-0" />
                   <span className="truncate">Call Now</span>
                 </a>
               </Button>
-              <Button variant="hero" size="lg" className="w-full min-h-[52px] px-3" asChild>
+              <Button variant="hero" size="lg" className="w-full min-h-[52px] px-3 bg-primary/70 hover:bg-primary/85 backdrop-blur-sm" asChild>
                 <Link to="/book" onClick={() => trackConversion("lead")}>
                   <CalendarCheck className="w-5 h-5 mr-2 shrink-0" />
                   <span className="truncate">Book Online</span>
                 </Link>
               </Button>
-              <Button variant="hero" size="lg" className="w-full min-h-[52px] px-3" asChild>
+              <Button variant="hero" size="lg" className="w-full min-h-[52px] px-3 bg-primary/70 hover:bg-primary/85 backdrop-blur-sm" asChild>
                 <Link to="/services">
                   <Wrench className="w-5 h-5 mr-2 shrink-0" />
                   <span className="truncate">Services</span>
@@ -201,7 +201,7 @@ const Hero = () => {
             <Button
               variant="hero"
               size="lg"
-              className="w-full min-h-[60px] text-sm sm:text-base md:text-lg font-semibold px-3 bg-gradient-to-r from-accent to-accent/80 hover:from-accent/90 hover:to-accent/70 text-accent-foreground shadow-lg"
+              className="w-full min-h-[60px] text-sm sm:text-base md:text-lg font-semibold px-3 bg-gradient-to-r from-accent/75 to-accent/55 hover:from-accent/90 hover:to-accent/70 text-accent-foreground shadow-lg backdrop-blur-sm"
               asChild
             >
               <Link to="/mmar-care">
