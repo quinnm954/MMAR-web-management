@@ -153,7 +153,7 @@ const Hero = () => {
           />
         </div>
 
-        <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/55 to-background" />
+        <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-background/30 to-background md:from-background/80 md:via-background/55 md:to-background" />
       </div>
 
 
