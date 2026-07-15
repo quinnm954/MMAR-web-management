@@ -3303,6 +3303,10 @@ export type Database = {
       }
     }
     Functions: {
+      _notify_staff_customer_action: {
+        Args: { _body: string; _link: string; _title: string }
+        Returns: undefined
+      }
       _send_push: {
         Args: {
           _body: string
