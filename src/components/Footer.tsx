@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import mmarLogo from "@/assets/mmar-logo.jpeg";
+import mmarLogo from "@/assets/mmar-logo.png";
 import { categories } from "@/data/serviceCategories";
 import { cities } from "@/data/cities";
 import LocalServicesDropdown from "@/components/footer/LocalServicesDropdown";
