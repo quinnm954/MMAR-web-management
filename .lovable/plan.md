@@ -1,21 +1,24 @@
-Replace the hero background photo with an interactive 3D scene of stylized car engine/vehicle parts using the brand palette (sky blue and gold on a dark background).
+Plan: New MMAR logo from the reference image
 
-### What will be built
-- **3D hero scene component** (`src/components/HeroEngineScene.tsx`) using React Three Fiber.
-- **Scene content:** a stylized engine block made of primitive 3D shapes (cylinders, boxes, discs) with brand-colored accent parts — glowing sky-blue intake, gold alternator/belt accents, metallic dark body. Parts float gently and the whole assembly slowly rotates.
-- **Interaction:** subtle mouse-driven rotation (OrbitControls with damping, no zoom) plus a fallback auto-rotation.
-- **Hero integration:** update `src/components/Hero.tsx` to replace the `<img>` background with the 3D canvas, keeping the dark gradient overlay and headline text readable.
-- **Fallback:** a CSS gradient background behind the canvas so the hero still looks good if WebGL fails or is disabled.
-- **Performance:** canvas is lazy-loaded, pauses when not visible, and uses a lightweight material setup.
+1. Generate the logo
+   - Use the uploaded reference as the style guide: black Shelby GT500 with white stripes, dripping graffiti "MMAR" lettering, "MIKE'S MOBILE AUTO REPAIR" text, crossed wrenches, shield/badge with speedometer.
+   - Adapt the color palette to the site brand: sky blue `hsl(200,80%,55%)` and gold `hsl(45,90%,55%)` on a dark background.
+   - Output a high-resolution PNG (square, at least 1024×1024) and a transparent-background version where possible.
 
-### Technical details
-- Add `@react-three/fiber@^8.18` and `@react-three/drei@^9.122.0` (the React 18-compatible versions). `three` is pulled in as a peer dependency.
-- Scene is rendered with `WebGLRenderer` and will work in any browser with WebGL support.
-- No backend or database changes.
-- Existing hero text, CTAs, SEO, and tracking stay unchanged.
-- The old `hero-banner.jpg` will be replaced as the active hero background; the file may be removed or kept unused depending on asset references elsewhere.
+2. Produce all required sizes/formats
+   - `src/assets/mmar-logo.png` — main site logo for nav and footer.
+   - `public/favicon.png` and `public/favicon.ico` — browser tab icon.
+   - `public/logo192.png` and `public/logo512.png` — PWA/app icon sizes.
+   - `public/og-image.png` — 1200×630 social share image.
 
-### Verification
-- Run TypeScript and production build checks.
-- Verify the 3D scene renders behind the hero text on desktop and mobile viewports.
-- Confirm the CTA buttons remain clickable and the gradient overlay keeps text legible.
+3. Integrate into the app
+   - Replace `src/assets/mmar-logo.jpeg` usage in `src/components/Navigation.tsx` and `src/components/Footer.tsx` with the new logo.
+   - Update `index.html` favicon and `apple-touch-icon` links.
+   - Update `public/manifest.webmanifest` icon entries to point at the new PWA icons.
+   - Add Open Graph and Twitter Card meta tags in `index.html` pointing at the new `og-image.png`.
+
+4. Verify
+   - Check the preview to confirm the logo renders cleanly in the nav and footer at all breakpoints.
+   - Confirm favicon and PWA icons are referenced correctly.
+
+No other pages or business logic will be changed.
