@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, Printer, Save, Download, Trash2, Send, Loader2 } from "lucide-react";
-import mmarLogo from "@/assets/mmar-logo.jpeg";
+import mmarLogo from "@/assets/mmar-logo.png";
 import SignaturePad from "@/components/financing/SignaturePad";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";

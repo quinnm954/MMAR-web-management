@@ -9,8 +9,8 @@ Disallow: /review
 # Allow common asset directories explicitly (some bots respect this)
 Allow: /assets/
 Allow: /favicon.ico
-Allow: /favicon.jpeg
-Allow: /mmar-logo.jpeg
+Allow: /favicon.png
+Allow: /mmar-logo.png
 
 # Single sitemap index — all other sitemaps are referenced from here
 Sitemap: https://mikesmautorepair.com/sitemap-index.xml

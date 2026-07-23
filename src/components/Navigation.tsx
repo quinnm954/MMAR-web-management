@@ -3,7 +3,7 @@ import { Menu, X, ChevronDown, Phone, User, LogOut, LayoutDashboard, CalendarChe
 import { Button } from "@/components/ui/button";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import mmarLogo from "@/assets/mmar-logo.jpeg";
+import mmarLogo from "@/assets/mmar-logo.png";
 import {
   DropdownMenu,
   DropdownMenuContent,

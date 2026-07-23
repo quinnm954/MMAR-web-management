@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import logo from "@/assets/mmar-logo.jpeg";
+import logo from "@/assets/mmar-logo.png";
 import { Phone, MessageSquare, Globe } from "lucide-react";
 import { PRODUCT_BRAND } from "@/lib/brand";
 

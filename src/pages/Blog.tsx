@@ -65,7 +65,7 @@ const Blog = () => {
       name: "Mike's Mobile Auto Repair",
       logo: {
         "@type": "ImageObject",
-        url: `${SITE}/mmar-logo.jpeg`,
+        url: `${SITE}/mmar-logo.png`,
         width: 600,
         height: 600,
       },

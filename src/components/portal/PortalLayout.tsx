@@ -25,7 +25,7 @@ import NotificationsBell from "@/components/notifications/NotificationsBell";
 import MobileBottomNav from "@/components/shell/MobileBottomNav";
 import InstallAppBanner from "@/components/shell/InstallAppBanner";
 import PwaInstallTutorial from "@/components/shell/PwaInstallTutorial";
-import mmarLogo from "@/assets/mmar-logo.jpeg";
+import mmarLogo from "@/assets/mmar-logo.png";
 
 const navItems = [
   { to: "/portal/dashboard", label: "Dashboard", icon: LayoutDashboard },

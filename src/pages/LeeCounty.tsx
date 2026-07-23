@@ -34,7 +34,7 @@ const LeeCounty = () => {
         "@type": "AutoRepair",
         "@id": `${URL}#business`,
         name: "Mike's Mobile Auto Repair — Lee County, FL",
-        image: `${SITE}/mmar-logo.jpeg`,
+        image: `${SITE}/mmar-logo.png`,
         url: URL,
         telephone: "+18135017572",
         priceRange: "$$",

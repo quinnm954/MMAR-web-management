@@ -1,6 +1,6 @@
 import { Phone, MessageSquare, Mail, Calendar, Globe, Star, MapPin, Download, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import mmarLogo from "@/assets/mmar-logo.jpeg";
+import mmarLogo from "@/assets/mmar-logo.png";
 import { trackConversion } from "@/lib/gtag";
 import { shareLink } from "@/lib/share";
 import { useSeo } from "@/lib/useSeo";
