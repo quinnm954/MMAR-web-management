@@ -1,5 +1,5 @@
 import { Phone, Mail, Star, MapPin, Image as ImageIcon } from "lucide-react";
-import mmarLogo from "@/assets/mmar-logo.jpeg";
+import mmarLogo from "@/assets/mmar-logo.png";
 import { trackConversion } from "@/lib/gtag";
 
 const GMB_URL = "https://share.google/bx2Gb42dslCITJdS8";

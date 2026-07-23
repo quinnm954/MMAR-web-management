@@ -28,7 +28,7 @@ const CityPage = () => {
           "@type": "AutoRepair",
           "@id": `${url}#business`,
           name: `Mike's Mobile Auto Repair — ${city.name}`,
-          image: `${SITE}/mmar-logo.jpeg`,
+          image: `${SITE}/mmar-logo.png`,
           url,
           telephone: "+18135017572",
           priceRange: "$$",

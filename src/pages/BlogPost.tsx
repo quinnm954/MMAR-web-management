@@ -17,7 +17,7 @@ const BlogPost = () => {
   const post = getBlogPostBySlug(slug);
 
   const heroImage = `${SITE}/blog-hero.jpg`;
-  const logoImage = `${SITE}/mmar-logo.jpeg`;
+  const logoImage = `${SITE}/mmar-logo.png`;
   const wordCount = post
     ? post.body.replace(/<[^>]+>/g, " ").trim().split(/\s+/).length
     : 0;

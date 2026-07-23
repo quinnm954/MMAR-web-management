@@ -26,7 +26,7 @@ import {
   MessageSquare,
   Smartphone,
 } from "lucide-react";
-import mmarLogo from "@/assets/mmar-logo.jpeg";
+import mmarLogo from "@/assets/mmar-logo.png";
 import { PLATFORM_BRAND } from "@/lib/brand";
 
 interface Plan {
