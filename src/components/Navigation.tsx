@@ -22,7 +22,6 @@ import {
 const SERVICES = [
   { to: "/services", label: "All Services" },
   { to: "/brake-repair", label: "Brake Repair" },
-  { to: "/oil-change", label: "Oil Change" },
   { to: "/diagnostics", label: "Diagnostics" },
   { to: "/battery-alternator-starter", label: "Battery / Alternator / Starter" },
   { to: "/no-start-diagnostics", label: "No-Start Diagnostics" },

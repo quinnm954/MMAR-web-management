@@ -2,7 +2,6 @@
 // Each entry maps 1:1 to an auto-attach checklist template via the
 // checklist_templates.service_type_match keyword array.
 export const SERVICE_TYPES = [
-  "Oil Change",
   "Brake Service",
   "Tire Service / Alignment",
   "Battery / Electrical",

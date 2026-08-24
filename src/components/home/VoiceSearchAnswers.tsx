@@ -53,9 +53,9 @@ const VoiceSearchAnswers = () => {
               What services do you offer?
             </dt>
             <dd className="speakable-answer text-muted-foreground mt-1">
-              Brake repair, battery replacement, alternators, starters, oil
-              changes, AC repair, check-engine diagnostics, cooling systems,
-              and pre-purchase inspections — all at your home or office.
+              Brake repair, battery replacement, alternators, starters, AC
+              repair, check-engine diagnostics, cooling systems, and suspension
+              work — all at your home or office.
             </dd>
           </div>
 

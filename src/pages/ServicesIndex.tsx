@@ -14,7 +14,6 @@ const featuredLandings = [
   { href: "/mobile-alternator-repair", title: "Mobile Alternator Repair" },
   { href: "/mobile-starter-repair", title: "Mobile Starter Repair" },
   { href: "/mobile-no-start-diagnostics", title: "Mobile No-Start Diagnostics" },
-  { href: "/mobile-oil-change", title: "Mobile Oil Change" },
   { href: "/mobile-engine-diagnostics", title: "Mobile Engine Diagnostics" },
   { href: "/mobile-suspension-steering", title: "Mobile Suspension & Steering" },
 ];

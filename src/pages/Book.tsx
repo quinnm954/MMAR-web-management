@@ -17,7 +17,6 @@ const COMMON_SERVICES = [
   "Battery Replacement",
   "Check Engine Light Diagnostics",
   "AC Service",
-  "Pre-Purchase Inspection",
   "Other / Not Sure",
 ];
 

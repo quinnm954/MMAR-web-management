@@ -30,8 +30,8 @@ const HomeServicesOverview = () => {
             </p>
             <p>
               Florida heat is hard on vehicles. Batteries that would last five years up north barely make two or three down here. Brakes wear faster in stop-and-go traffic on Lee Boulevard, US-41, and Daniels Parkway. Cooling systems get pushed to their limits every summer. Routine{" "}
-              <Link to="/services/oil-fluids" className="text-primary hover:underline">maintenance</Link>{" "}
-              like mobile oil changes, fluid flushes, and multi-point inspections is the cheapest insurance against the kind of breakdown that strands you in 95° heat.
+              <Link to="/services" className="text-primary hover:underline">maintenance</Link>{" "}
+              like brake service, cooling-system checks, and multi-point inspections is the cheapest insurance against the kind of breakdown that strands you in 95° heat.
             </p>
             <p>
               When something does go wrong, our mobile service responds across Lee County — usually within an hour. Dead battery in an office lot in Fort Myers? On-site replacement in 30 minutes. Brakes went metal-on-metal on the way home in Fort Myers? We bring the parts and fix it in your driveway. No-start in a Lehigh Acres garage? We diagnose, replace the failed component, and verify the repair before we leave.

@@ -15,7 +15,6 @@ const featured = [
   { href: "/battery-replacement", icon: BatteryCharging, title: "Battery Replacement", desc: "Fresh battery delivered and installed on-site." },
   { href: "/alternator-repair", icon: Zap, title: "Alternator Repair", desc: "Charging-system tests and same-day swaps." },
   { href: "/no-start-diagnostics", icon: KeyRound, title: "No-Start Diagnosis", desc: "We find why it won't start — and usually fix it on the spot." },
-  { href: "/oil-change", icon: Droplet, title: "Mobile Oil Change", desc: "Full-service oil and filter change at your location." },
 ];
 
 const FeaturedServices = () => {

@@ -10,7 +10,6 @@ const FORT_MYERS: Item[] = [
   { slug: "battery-replacement-fort-myers-fl", label: "Battery Replacement" },
   { slug: "ac-repair-fort-myers-fl", label: "AC Repair" },
   { slug: "engine-diagnostics-fort-myers-fl", label: "Engine Diagnostics" },
-  { slug: "oil-change-fort-myers-fl", label: "Oil Change" },
 ];
 
 const LEHIGH: Item[] = [
@@ -20,7 +19,6 @@ const LEHIGH: Item[] = [
   { slug: "battery-replacement-lehigh-acres-fl", label: "Battery Replacement" },
   { slug: "ac-repair-lehigh-acres-fl", label: "AC Repair" },
   { slug: "engine-diagnostics-lehigh-acres-fl", label: "Engine Diagnostics" },
-  { slug: "oil-change-lehigh-acres-fl", label: "Oil Change" },
 ];
 
 const Column = ({ city, items }: { city: string; items: Item[] }) => (

@@ -85,12 +85,10 @@ const HOME_SERVICES = [
   "Alternator Repair",
   "Vehicle Diagnostics",
   "Check Engine Light Diagnostics",
-  "Oil Change",
   "AC Repair",
   "Cooling System Repair",
   "Starter Replacement",
   "No-Start Diagnostics",
-  "Pre-Purchase Inspection",
 ];
 const HOME_CITIES = [
   { name: "Lehigh Acres", state: "FL", lat: 26.6121, lng: -81.6237 },
@@ -105,7 +103,7 @@ push({
   title:
     "Auto Repair Near Me | Mobile Auto Repair in Lehigh Acres, Fort Myers, Cape Coral, Naples, Estero & Bonita Springs FL",
   description:
-    "Auto repair near me in Lehigh Acres, Fort Myers, Cape Coral, Naples, Estero & Bonita Springs, FL. Mobile mechanic comes to you — diagnostics, brakes, batteries, oil changes. Call (813) 501-7572.",
+    "Auto repair near me in Lehigh Acres, Fort Myers, Cape Coral, Naples, Estero & Bonita Springs, FL. Mobile mechanic comes to you — diagnostics, brakes, batteries, AC. Call (813) 501-7572.",
   canonical: `${SITE}/`,
   // The AutoRepair business entity (with aggregateRating, hours, address,
   // sameAs) is declared once in index.html under @id #business. Here we
