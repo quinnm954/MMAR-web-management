@@ -12,7 +12,6 @@ import {
   Timer,
   Fuel,
   Cpu,
-  Search,
   Truck,
   ClipboardCheck,
   Wrench,
