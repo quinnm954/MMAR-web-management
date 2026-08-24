@@ -12,7 +12,6 @@ import {
   Timer,
   Fuel,
   Cpu,
-  Search,
   Truck,
   ClipboardCheck,
   Wrench,
@@ -54,24 +53,6 @@ export const categories: Category[] = [
       { icon: Power, name: "Engine Misfire Repair" },
       { icon: Wrench, name: "Valve Cover Gasket Replacement" },
       { icon: Wrench, name: "Serpentine Belt Replacement" },
-    ],
-  },
-  {
-    id: "oil-fluids",
-    title: "Oil & Fluids",
-    icon: Droplets,
-    description:
-      "Mobile oil changes and fluid services at your home or office. Conventional, blend, and full synthetic — done right, the first time.",
-    services: [
-      { icon: Droplets, name: "Conventional Oil Change" },
-      { icon: Droplets, name: "Synthetic Blend Oil Change" },
-      { icon: Droplets, name: "Full Synthetic Oil Change" },
-      { icon: Droplets, name: "Oil Filter Replacement" },
-      { icon: Droplets, name: "Transmission Fluid Service" },
-      { icon: Droplets, name: "Coolant Flush" },
-      { icon: Droplets, name: "Brake Fluid Flush" },
-      { icon: Droplets, name: "Power Steering Fluid Service" },
-      { icon: Droplets, name: "Differential Fluid Service" },
     ],
   },
   {
@@ -205,9 +186,8 @@ export const categories: Category[] = [
     title: "Inspections & Fleet",
     icon: ClipboardCheck,
     description:
-      "Pre-purchase inspections, multi-point safety checks, and fleet maintenance plans for businesses across Lehigh Acres and Fort Myers.",
+      "Multi-point safety checks, mobile safety inspections, and fleet maintenance plans for businesses across Lehigh Acres and Fort Myers.",
     services: [
-      { icon: Search, name: "Pre-Purchase Vehicle Inspection" },
       { icon: ClipboardCheck, name: "Mobile Safety Inspection" },
       { icon: ShieldCheck, name: "Multi-Point Inspection" },
       { icon: Truck, name: "Fleet Maintenance" },

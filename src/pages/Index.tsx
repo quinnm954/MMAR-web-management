@@ -43,12 +43,10 @@ const Index = () => {
       "Alternator Repair",
       "Vehicle Diagnostics",
       "Check Engine Light Diagnostics",
-      "Oil Change",
       "AC Repair",
       "Cooling System Repair",
       "Starter Replacement",
       "No-Start Diagnostics",
-      "Pre-Purchase Inspection",
     ];
     const CITIES = [
       { name: "Lehigh Acres", state: "FL", lat: 26.6121, lng: -81.6237 },

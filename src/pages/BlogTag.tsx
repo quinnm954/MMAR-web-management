@@ -49,7 +49,6 @@ const TAG_INTROS: Record<string, { title: string; intro: string; related: { href
     intro:
       "Routine maintenance keeps Lehigh Acres and Fort Myers vehicles on the road longer in our heat, humidity, and salt air. These guides explain what to service and when — and how to do most of it without ever visiting a shop.",
     related: [
-      { href: "/services/oil-fluids", label: "Mobile Oil & Fluid Services" },
       { href: "/services/inspections", label: "Mobile Inspections" },
       { href: "/mobile-oil-change", label: "Mobile Oil Change" },
     ],
