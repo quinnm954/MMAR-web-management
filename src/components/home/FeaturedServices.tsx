@@ -5,7 +5,6 @@ import {
   BatteryCharging,
   Zap,
   KeyRound,
-  Droplet,
   ArrowRight,
 } from "lucide-react";
 
