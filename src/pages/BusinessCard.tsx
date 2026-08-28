@@ -48,6 +48,24 @@ const handleShare = () => {
   });
 };
 
+const CARD_URL = `${WEBSITE}/card`;
+
+const downloadQrCode = () => {
+  const svg = document.querySelector("#card-qr-code svg");
+  if (!svg) return;
+  const serializer = new XMLSerializer();
+  const svgString = serializer.serializeToString(svg);
+  const blob = new Blob([svgString], { type: "image/svg+xml;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "mikes-mobile-auto-repair-card-qr.svg";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+};
+
 const BusinessCard = () => {
   useSeo({
     title: "Mike's Mobile Auto Repair — Digital Business Card",
