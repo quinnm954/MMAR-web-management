@@ -92,6 +92,39 @@ const BusinessCard = () => {
             </p>
           </div>
 
+          {/* QR Code */}
+          <div className="flex flex-col items-center mb-6">
+            <div
+              id="card-qr-code"
+              className="p-3 bg-white rounded-2xl shadow-sm"
+              aria-label="QR code linking to this digital business card"
+            >
+              <QRCodeSVG
+                value={CARD_URL}
+                size={180}
+                level="H"
+                includeMargin={false}
+                bgColor="#ffffff"
+                fgColor="#0f172a"
+                imageSettings={{
+                  src: mmarLogo,
+                  height: 32,
+                  width: 32,
+                  excavate: true,
+                }}
+              />
+            </div>
+            <Button
+              onClick={downloadQrCode}
+              variant="ghost"
+              size="sm"
+              className="mt-3 text-muted-foreground hover:text-foreground"
+            >
+              <QrCode className="w-4 h-4 mr-2" />
+              Download QR Code
+            </Button>
+          </div>
+
           {/* Primary actions */}
           <div className="space-y-3">
             <a
