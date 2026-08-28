@@ -1,4 +1,5 @@
-import { Phone, MessageSquare, Mail, Calendar, Globe, Star, MapPin, Download, Share2 } from "lucide-react";
+import { Phone, MessageSquare, Mail, Calendar, Globe, Star, MapPin, Download, Share2, QrCode } from "lucide-react";
+import { QRCodeSVG } from "qrcode.react";
 import { Button } from "@/components/ui/button";
 import mmarLogo from "@/assets/mmar-logo.png";
 import { trackConversion } from "@/lib/gtag";
