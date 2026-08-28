@@ -1,4 +1,5 @@
-import { Phone, MessageSquare, Mail, Calendar, Globe, Star, MapPin, Download, Share2 } from "lucide-react";
+import { Phone, MessageSquare, Mail, Calendar, Globe, Star, MapPin, Download, Share2, QrCode } from "lucide-react";
+import { QRCodeSVG } from "qrcode.react";
 import { Button } from "@/components/ui/button";
 import mmarLogo from "@/assets/mmar-logo.png";
 import { trackConversion } from "@/lib/gtag";
@@ -47,6 +48,24 @@ const handleShare = () => {
   });
 };
 
+const CARD_URL = `${WEBSITE}/card`;
+
+const downloadQrCode = () => {
+  const svg = document.querySelector("#card-qr-code svg");
+  if (!svg) return;
+  const serializer = new XMLSerializer();
+  const svgString = serializer.serializeToString(svg);
+  const blob = new Blob([svgString], { type: "image/svg+xml;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "mikes-mobile-auto-repair-card-qr.svg";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+};
+
 const BusinessCard = () => {
   useSeo({
     title: "Mike's Mobile Auto Repair — Digital Business Card",
@@ -71,6 +90,39 @@ const BusinessCard = () => {
             <p className="text-sm text-muted-foreground mt-2">
               Mobile Mechanic — Southwest Florida
             </p>
+          </div>
+
+          {/* QR Code */}
+          <div className="flex flex-col items-center mb-6">
+            <div
+              id="card-qr-code"
+              className="p-3 bg-white rounded-2xl shadow-sm"
+              aria-label="QR code linking to this digital business card"
+            >
+              <QRCodeSVG
+                value={CARD_URL}
+                size={180}
+                level="H"
+                includeMargin={false}
+                bgColor="#ffffff"
+                fgColor="#0f172a"
+                imageSettings={{
+                  src: mmarLogo,
+                  height: 32,
+                  width: 32,
+                  excavate: true,
+                }}
+              />
+            </div>
+            <Button
+              onClick={downloadQrCode}
+              variant="ghost"
+              size="sm"
+              className="mt-3 text-muted-foreground hover:text-foreground"
+            >
+              <QrCode className="w-4 h-4 mr-2" />
+              Download QR Code
+            </Button>
           </div>
 
           {/* Primary actions */}
