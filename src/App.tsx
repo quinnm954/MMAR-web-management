@@ -144,7 +144,9 @@ const App = () => (
             <Route path="/settings/notifications" element={<NotificationSettings />} />
             <Route path="/notifications" element={<NotificationsPage />} />
             <Route path="/messages" element={<Messages />} />
+            <Route path="/admin" element={<AdminRedirect />} />
             <Route
+
               path="/admin/dashboard"
               element={
                 <ProtectedRoute>
