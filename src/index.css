@@ -136,6 +136,17 @@
     border: 1px solid hsl(var(--border));
   }
 
+  .home-immersive section,
+  .home-immersive footer {
+    background-color: transparent;
+    background-image: none;
+  }
+
+  .home-immersive .glass-card {
+    background: hsl(var(--card) / 0.68);
+    backdrop-filter: blur(12px);
+  }
+
   .hover-lift {
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease;
   }
