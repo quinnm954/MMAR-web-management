@@ -94,6 +94,20 @@ Deno.serve(async (req) => {
   const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
   const admin = createClient(SUPABASE_URL, SERVICE_KEY);
 
+  const authorization = req.headers.get("Authorization");
+  if (!authorization?.startsWith("Bearer ")) return bad("Authentication required", 401);
+
+  const accessToken = authorization.slice("Bearer ".length);
+  const { data: userData, error: userError } = await admin.auth.getUser(accessToken);
+  const user = userData.user;
+  if (userError || !user) return bad("Authentication required", 401);
+
+  const { data: roleRows } = await admin
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", user.id);
+  const isStaff = roleRows?.some(({ role }) => ["admin", "manager"].includes(role)) ?? false;
+
   let clientSigPath: string | null = null;
   let providerSigPath: string | null = null;
   try {
@@ -114,8 +128,56 @@ Deno.serve(async (req) => {
     null;
   const userAgent = req.headers.get("user-agent") ?? null;
 
-  const customerId = typeof body.customer_id === "string" && /^[0-9a-f-]{36}$/i.test(body.customer_id) ? body.customer_id : null;
+  let customerId = typeof body.customer_id === "string" && /^[0-9a-f-]{36}$/i.test(body.customer_id) ? body.customer_id : null;
   const estimateId = typeof body.estimate_id === "string" && /^[0-9a-f-]{36}$/i.test(body.estimate_id) ? body.estimate_id : null;
+
+  let financialTerms = {
+    total_service_price: body.total_service_price,
+    down_payment: body.down_payment,
+    principal: body.principal,
+    interest: body.interest,
+    total_financed: body.total_financed,
+    monthly_payment: body.monthly_payment,
+  };
+
+  if (!isStaff) {
+    if (!estimateId) return bad("A linked estimate is required", 403);
+    const { data: estimate, error: estimateError } = await admin
+      .from("estimates")
+      .select("customer_id, line_items, status")
+      .eq("id", estimateId)
+      .maybeSingle();
+    if (estimateError || !estimate || estimate.customer_id !== user.id) {
+      return bad("Estimate not found", 403);
+    }
+    if (!["approved", "partially_approved"].includes(estimate.status)) {
+      return bad("The estimate must be approved before financing", 403);
+    }
+
+    const lines = Array.isArray(estimate.line_items)
+      ? estimate.line_items as Array<Record<string, unknown>>
+      : [];
+    const approvedLines = lines.filter((line) => line.status !== "declined");
+    const totalPrice = approvedLines.reduce((sum, line) => sum + Number(line.amount || 0), 0);
+    const partsPrice = approvedLines
+      .filter((line) => (line.kind ?? "part") === "part")
+      .reduce((sum, line) => sum + Number(line.amount || 0), 0);
+    const laborPrice = Math.max(totalPrice - partsPrice, 0);
+    const downPayment = partsPrice + laborPrice * 0.5;
+    const principal = Math.max(totalPrice - downPayment, 0);
+    const interest = principal * 0.25;
+    const totalFinanced = principal + interest;
+
+    customerId = user.id;
+    financialTerms = {
+      total_service_price: totalPrice,
+      down_payment: downPayment,
+      principal,
+      interest,
+      total_financed: totalFinanced,
+      monthly_payment: Math.floor((totalFinanced / 12) * 100) / 100,
+    };
+  }
 
   const { error } = await admin.from("financing_contracts").insert({
     customer_id: customerId,
@@ -126,13 +188,13 @@ Deno.serve(async (req) => {
     agreement_date: body.agreement_date,
     vehicle_info: body.vehicle_info ?? null,
     service_description: body.service_description ?? null,
-    total_service_price: body.total_service_price,
+    total_service_price: financialTerms.total_service_price,
     first_payment_date: body.first_payment_date,
-    down_payment: body.down_payment,
-    principal: body.principal,
-    interest: body.interest,
-    total_financed: body.total_financed,
-    monthly_payment: body.monthly_payment,
+    down_payment: financialTerms.down_payment,
+    principal: financialTerms.principal,
+    interest: financialTerms.interest,
+    total_financed: financialTerms.total_financed,
+    monthly_payment: financialTerms.monthly_payment,
     client_signature_url: clientSigPath,
     client_signed_at: body.client_signed_at ?? null,
     provider_signature_url: providerSigPath,
