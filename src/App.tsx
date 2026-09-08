@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import { GtagRouteTracker } from "@/components/GtagRouteTracker";
 import Index from "./pages/Index";
@@ -84,6 +84,11 @@ const AppBadgeSync = () => {
   return null;
 };
 
+const AdminRedirect = () => {
+  const { search, hash } = useLocation();
+  return <Navigate to={`/admin/dashboard${search}${hash}`} replace />;
+};
+
 const queryClient = new QueryClient();
 
 if (typeof window !== "undefined") captureAttribution();
@@ -144,7 +149,9 @@ const App = () => (
             <Route path="/settings/notifications" element={<NotificationSettings />} />
             <Route path="/notifications" element={<NotificationsPage />} />
             <Route path="/messages" element={<Messages />} />
+            <Route path="/admin" element={<AdminRedirect />} />
             <Route
+
               path="/admin/dashboard"
               element={
                 <ProtectedRoute>
