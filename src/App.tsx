@@ -84,6 +84,11 @@ const AppBadgeSync = () => {
   return null;
 };
 
+const AdminRedirect = () => {
+  const { search, hash } = useLocation();
+  return <Navigate to={`/admin/dashboard${search}${hash}`} replace />;
+};
+
 const queryClient = new QueryClient();
 
 if (typeof window !== "undefined") captureAttribution();
