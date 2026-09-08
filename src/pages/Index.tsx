@@ -15,6 +15,7 @@ import HomeFAQ from "@/components/home/HomeFAQ";
 import LocalPhotoGallery from "@/components/home/LocalPhotoGallery";
 import VoiceSearchAnswers from "@/components/home/VoiceSearchAnswers";
 import FinalCTA from "@/components/home/FinalCTA";
+import heroShelby from "@/assets/hero-shelby.jpg";
 
 import { useSeo } from "@/lib/useSeo";
 
@@ -137,7 +138,20 @@ const Index = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="home-immersive relative min-h-screen bg-transparent">
+      <div className="fixed inset-0 z-0 bg-background" aria-hidden="true">
+        <img
+          src={heroShelby}
+          alt=""
+          width={1920}
+          height={1088}
+          fetchPriority="high"
+          decoding="async"
+          className="h-full w-full object-contain object-center"
+        />
+        <div className="absolute inset-0 bg-background/45" />
+      </div>
+      <div className="relative z-10">
       <Navigation />
       <Hero />
       <div className="container mx-auto px-4 py-8">
@@ -156,6 +170,7 @@ const Index = () => {
 
       <Footer />
       <FloatingCallButton />
+      </div>
     </div>
   );
 };
