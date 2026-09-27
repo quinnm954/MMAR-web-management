@@ -193,6 +193,7 @@ const AdminDashboard = () => {
 
           const selectTab = (value: string) => {
             setActiveTab(value);
+            setSearchParams(prev => { const next = new URLSearchParams(prev); next.set('tab', value); return next; }, { replace: true });
             setUsage(prev => {
               const next = { ...prev, [value]: (prev[value] || 0) + 1 };
               try { localStorage.setItem('admin_tab_usage', JSON.stringify(next)); } catch {}
