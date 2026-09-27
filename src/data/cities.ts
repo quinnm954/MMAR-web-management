@@ -242,61 +242,6 @@ export const cities: City[] = [
     ],
   },
   {
-    slug: "bonita-springs",
-    name: "Bonita Springs",
-    state: "FL",
-    zips: ["34134", "34135"],
-    geo: { lat: 26.3398, lng: -81.7787 },
-    neighborhoods: [
-      "Bonita Beach",
-      "Pelican Landing",
-      "Bonita Bay",
-      "Worthington",
-      "San Carlos Estates",
-      "Spring Creek",
-      "Imperial Parkway",
-    ],
-    neighborhoodNotes: [
-      { name: "Bonita Beach & Pelican Landing", note: "Waterfront salt-air zone — corrosion-resistant hardware and dielectric-greased connectors are the default here." },
-      { name: "Bonita Bay & Worthington", note: "Country-club homes with garaged vehicles — typically lower mileage, higher-trim cars where OE-spec parts and documented procedure matter." },
-      { name: "San Carlos Estates", note: "Larger lots, longer driveways, plenty of room for bigger jobs like timing chains and water pumps." },
-      { name: "Imperial Parkway corridor", note: "Stop-and-go between Bonita and Estero/Naples — brake and AC work runs hot in this corridor year round." },
-      { name: "Spring Creek", note: "Mix of seasonal residents and full-timers; we routinely service vehicles that sit for months and need a full recommission before the next season." },
-    ],
-    intro:
-      "Mike's Mobile Auto Repair delivers on-site mechanical service across Bonita Springs, FL — from Bonita Beach to Worthington and the Imperial Parkway corridor. We arrive with dealer-level scan tools, OE-spec parts, and the salt-air-resistant hardware that southwest Lee County demands.",
-    paragraphs: [
-      "Bonita Springs sits at the south edge of Lee County and shares the same coastal corrosion environment as Naples and Estero. The two core ZIPs (34134 east of US-41, 34135 west) cover roughly 41 square miles between Estero and the Collier County line. Our service truck handles every mechanical service except bodywork on driveways from Bonita Beach to San Carlos Estates.",
-      "Seasonal residency is the variable that defines a lot of Bonita Springs work. A vehicle that sits in a garage from May through October needs a real recommission, not just a battery jump. We test fuel for ethanol-water phase separation, pull coolant for pH, check tire age (date code on the sidewall — anything over 6 years gets replaced regardless of tread), pressure-test the cooling system for slow leaks that emptied the reservoir while the car sat, and refresh brake fluid that has been sitting in 90°F humidity for half a year.",
-      "Salt-air corrosion is identical to Cape Coral and Fort Myers Beach. Within two miles of the Gulf, we install stainless brake hardware, marine-grade tinned-copper ring terminals, dielectric grease on every connector we open, and anti-seize on every threaded fastener. A standard zinc brake hardware kit will seize within 24 months in this environment.",
-      "AC work is a year-round demand in Bonita. R-134a and R-1234yf machines are kept separate. We identify refrigerant before service, evacuate to 29 in Hg with a 30-minute hold, charge by weight to OE spec, and on compressor replacements we always include receiver/drier, expansion valve or orifice tube, full system flush, and PAG oil charged to OE volume. Cutting corners on the flush or the drier is the #1 reason an AC system comes back within a year.",
-      "Brake jobs in Bonita Springs are dictated by Imperial Parkway, Bonita Beach Road, and US-41 stop-and-go. Pad selection is matched to driving profile — ceramic for daily commuters, semi-metallic for trucks and SUVs that tow. Rotors are measured against the discard spec stamped on the hat, and lateral runout is verified with a dial indicator before reassembly. Brake fluid is moisture-tested with a refractometer; >3% triggers a DOT 4 flush.",
-      "Same-day mobile mechanic windows are typical across both Bonita ZIPs. Call or text (813) 501-7572 — a real ASE-grade technician answers and quotes in writing before any work begins.",
-    ],
-    faqs: [
-      {
-        question: "Do you cover both 34134 and 34135 in Bonita Springs?",
-        answer: "Yes — every neighborhood in Bonita Springs, from Bonita Beach and Pelican Landing on the west to Worthington, San Carlos Estates, and the Imperial Parkway corridor on the east.",
-      },
-      {
-        question: "I'm a seasonal resident — can you recommission my car when I get back to Bonita?",
-        answer: "Yes. Seasonal recommission is a defined service: we check fuel for phase separation, coolant pH, tire age (date code on the sidewall), brake fluid moisture, AC performance after a long sit, battery state-of-health, and pressure-test the cooling system for slow leaks. Most cars are road-ready in a single visit.",
-      },
-      {
-        question: "Salt-air corrosion — what do you do differently for waterfront homes?",
-        answer: "Stainless brake hardware kits, marine-grade tinned-copper ring terminals on grounds we replace, dielectric grease on every connector we open, and anti-seize on threaded fasteners. Standard zinc parts-store hardware will seize within 18–24 months this close to the Gulf.",
-      },
-      {
-        question: "Can you do major work like timing chains or water pumps on a driveway in Bonita?",
-        answer: "Yes — provided the driveway has level ground and a safe work area. We've done timing chains, water pumps, head gaskets, and transmission services on driveways from Pelican Landing to San Carlos Estates.",
-      },
-      {
-        question: "What's your warranty in Bonita Springs?",
-        answer: "12 months / 12,000 miles on parts and labor for most repairs, in writing. Coastal corrosion-related exclusions are documented up front — we tell you before the job, not after.",
-      },
-    ],
-  },
-  {
     slug: "estero",
     name: "Estero",
     state: "FL",
@@ -321,7 +266,7 @@ export const cities: City[] = [
     intro:
       "Mike's Mobile Auto Repair serves Estero, FL — from Coconut Point and Miromar Lakes to Grandezza and the Corkscrew Road corridor — with on-site mechanical diagnostics and repair. Dealer-level scan tools, OE-spec parts, transparent up-front quotes.",
     paragraphs: [
-      "Estero sits between Bonita Springs and south Fort Myers, straddling I-75 with retail, country-club, and waterfront neighborhoods. We cover all four ZIPs that touch Estero (33928, 33967, plus the Bonita-overlap 34134/34135) and routinely service driveways, retail parking lots, and small-business yards from Coconut Point to Corkscrew Road.",
+      "Estero sits south of Fort Myers, straddling I-75 with retail, country-club, and waterfront neighborhoods. We cover Estero ZIPs 33928 and 33967 and routinely service driveways, retail parking lots, and small-business yards from Coconut Point to Corkscrew Road.",
       "Estero's vehicle workload skews newer and higher-trim. Many homes are seasonal or country-club — vehicles spend more time garaged but accumulate short-trip, low-RPM use that depletes oil additive packs early and lets carbon build on direct-injection intake valves. Severe-service oil intervals apply almost universally here. We also see a lot of CVT fluid services on Nissans and Subarus that the dealer marked as 'lifetime fill' — that fill is rated for ideal conditions, not Florida heat plus stop-and-go.",
       "Brake work in Estero is driven by Corkscrew Road, US-41, and the I-75 corridor. Same procedure as everywhere we work: pad measurement to discard spec, rotor thickness with a micrometer, lateral runout under 0.002\" verified with a dial indicator, G3500-grade carbon castings on replacement rotors, and high-temp synthetic on slide pins. Brake fluid is moisture-tested with a refractometer.",
       "AC service is year-round. Separate R-134a and R-1234yf machines, refrigerant identified before service, vacuum to 29 in Hg with 30-minute hold, charge by weight. Compressor replacements always include receiver/drier, expansion device, system flush, and PAG oil to OE volume.",
