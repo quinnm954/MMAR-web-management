@@ -52,7 +52,7 @@ async function sendSms(to: string, body: string, sb?: any) {
         thread = ins.data;
       }
       if (!thread) return;
-      const msg = await r.clone().json().catch(() => null) as { sid?: string } | null;
+      const msg = await r.json().catch(() => null) as { sid?: string } | null;
       await sb.from('sms_messages').insert({
         thread_id: thread.id, direction: 'outbound', body, twilio_sid: msg?.sid ?? null, status: 'sent',
       });
@@ -292,9 +292,9 @@ Deno.serve(async (req) => {
       }
       const { data: s } = await sb.from('phone_settings').select('ai_summary_to_number, forward_to_number').eq('id', 1).maybeSingle();
       const owner = s?.ai_summary_to_number || s?.forward_to_number;
-      if (owner) await sendSms(owner, `AI answered a missed call from ${caller || 'unknown'}:\n${summary || '(no summary)'}`);
+      if (owner) await sendSms(owner, `AI answered a missed call from ${caller || 'unknown'}:\n${summary || '(no summary)'}`, sb);
       if (caller && transcript.length > 1) {
-        await sendSms(caller, `Thanks for calling Mike's Mobile Auto Repair! Mike will follow up soon. Book anytime: ${BOOK_URL} Reply STOP to opt out.`);
+        await sendSms(caller, `Thanks for calling Mike's Mobile Auto Repair! Mike will follow up soon. Book anytime: ${BOOK_URL} Reply STOP to opt out.`, sb);
       }
       return json({ ok: true });
     }
