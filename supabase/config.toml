@@ -41,3 +41,6 @@ verify_jwt = false
 
 [functions.receive-inbound-email]
 verify_jwt = false
+
+[functions.ai-receptionist]
+verify_jwt = false

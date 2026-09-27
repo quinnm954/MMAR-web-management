@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Phone, MessageSquare, Voicemail, PhoneMissed, PhoneIncoming, RefreshCw } from 'lucide-react';
+import { Phone, MessageSquare, Voicemail, PhoneMissed, PhoneIncoming, RefreshCw, Bot } from 'lucide-react';
 import { format } from 'date-fns';
 
 type CallLog = {
@@ -21,6 +21,9 @@ type CallLog = {
   customer_id: string | null;
   read_at: string | null;
   created_at: string;
+  ai_handled?: boolean;
+  ai_summary?: string | null;
+  ai_transcript?: { role: string; message: string }[] | null;
 };
 
 type Filter = 'all' | 'missed' | 'voicemail' | 'today';
@@ -37,7 +40,7 @@ export default function AdminCalls() {
       .select('*')
       .order('created_at', { ascending: false })
       .limit(200);
-    setCalls((data ?? []) as CallLog[]);
+    setCalls((data ?? []) as unknown as CallLog[]);
     setLoading(false);
   };
 
@@ -67,6 +70,7 @@ export default function AdminCalls() {
   };
 
   const statusBadge = (c: CallLog) => {
+    if (c.ai_handled) return <Badge className="gap-1 bg-accent text-accent-foreground"><Bot className="h-3 w-3" />AI answered</Badge>;
     if (c.voicemail) return <Badge variant="secondary" className="gap-1"><Voicemail className="h-3 w-3" />Voicemail</Badge>;
     if (c.status === 'missed' || c.status === 'no-answer') return <Badge variant="destructive" className="gap-1"><PhoneMissed className="h-3 w-3" />Missed</Badge>;
     if (c.status === 'completed') return <Badge variant="default" className="gap-1"><PhoneIncoming className="h-3 w-3" />Answered</Badge>;
@@ -115,6 +119,19 @@ export default function AdminCalls() {
                         {format(new Date(c.created_at), 'MMM d, h:mm a')} · {fmtDur(c.duration_seconds)}
                       </span>
                     </div>
+                    {c.ai_summary && (
+                      <p className="text-sm mt-2 border-l-2 border-accent/50 pl-2">{c.ai_summary}</p>
+                    )}
+                    {c.ai_transcript && c.ai_transcript.length > 0 && (
+                      <details className="mt-1 text-sm">
+                        <summary className="cursor-pointer text-muted-foreground text-xs">Full conversation</summary>
+                        <div className="mt-1 space-y-1">
+                          {c.ai_transcript.map((t, i) => (
+                            <p key={i}><span className="font-medium">{t.role === 'agent' ? 'AI' : 'Caller'}:</span> {t.message}</p>
+                          ))}
+                        </div>
+                      </details>
+                    )}
                     {c.transcription && (
                       <p className="text-sm mt-2 italic text-muted-foreground border-l-2 border-primary/30 pl-2">
                         "{c.transcription}"
