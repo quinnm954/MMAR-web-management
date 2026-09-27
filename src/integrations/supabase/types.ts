@@ -395,6 +395,10 @@ export type Database = {
       }
       call_logs: {
         Row: {
+          ai_conversation_id: string | null
+          ai_handled: boolean
+          ai_summary: string | null
+          ai_transcript: Json | null
           answered_at: string | null
           completed_at: string | null
           conversion_uploaded_at: string | null
@@ -420,6 +424,10 @@ export type Database = {
           wbraid: string | null
         }
         Insert: {
+          ai_conversation_id?: string | null
+          ai_handled?: boolean
+          ai_summary?: string | null
+          ai_transcript?: Json | null
           answered_at?: string | null
           completed_at?: string | null
           conversion_uploaded_at?: string | null
@@ -445,6 +453,10 @@ export type Database = {
           wbraid?: string | null
         }
         Update: {
+          ai_conversation_id?: string | null
+          ai_handled?: boolean
+          ai_summary?: string | null
+          ai_transcript?: Json | null
           answered_at?: string | null
           completed_at?: string | null
           conversion_uploaded_at?: string | null
@@ -2057,6 +2069,10 @@ export type Database = {
       }
       phone_settings: {
         Row: {
+          ai_agent_id: string | null
+          ai_enabled: boolean
+          ai_greeting: string
+          ai_summary_to_number: string | null
           business_hours: Json
           forward_to_number: string | null
           id: number
@@ -2069,6 +2085,10 @@ export type Database = {
           voicemail_greeting: string
         }
         Insert: {
+          ai_agent_id?: string | null
+          ai_enabled?: boolean
+          ai_greeting?: string
+          ai_summary_to_number?: string | null
           business_hours?: Json
           forward_to_number?: string | null
           id?: number
@@ -2081,6 +2101,10 @@ export type Database = {
           voicemail_greeting?: string
         }
         Update: {
+          ai_agent_id?: string | null
+          ai_enabled?: boolean
+          ai_greeting?: string
+          ai_summary_to_number?: string | null
           business_hours?: Json
           forward_to_number?: string | null
           id?: number
