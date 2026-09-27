@@ -24,10 +24,10 @@ function toE164(p: string) {
   return p?.startsWith('+') ? p : `+${d}`;
 }
 
-async function sendSms(to: string, body: string, sb?: any) {
+async function sendSms(to: string, body: string, sb?: any, fromOverride?: string) {
   const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
   const TWILIO_API_KEY = Deno.env.get('TWILIO_API_KEY');
-  const FROM = Deno.env.get('TWILIO_FROM_NUMBER');
+  const FROM = fromOverride || Deno.env.get('TWILIO_FROM_NUMBER');
   if (!LOVABLE_API_KEY || !TWILIO_API_KEY || !FROM || !to) return;
   const r = await fetch(`${TWILIO_GW}/Messages.json`, {
     method: 'POST',
