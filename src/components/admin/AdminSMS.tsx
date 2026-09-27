@@ -130,7 +130,7 @@ export default function AdminSMS() {
               <CardTitle className="text-sm">{active.profiles?.full_name || active.phone}</CardTitle>
               <p className="text-xs text-muted-foreground">{active.phone}</p>
               {active.last_invoice && (
-                <Link to="/admin?tab=invoices" className="inline-flex items-center gap-1 text-xs text-primary hover:underline mt-1">
+                <Link to="/admin/dashboard?tab=invoices" className="inline-flex items-center gap-1 text-xs text-primary hover:underline mt-1">
                   <Receipt className="h-3 w-3" /> Linked invoice {active.last_invoice.invoice_number} · ${Number(active.last_invoice.total - active.last_invoice.amount_paid).toFixed(2)} {active.last_invoice.status}
                 </Link>
               )}
