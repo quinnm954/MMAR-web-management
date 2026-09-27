@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -13,8 +13,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { LogOut, FileText, ShieldCheck, Users, CreditCard, Calendar, CalendarCheck, ClipboardList, Receipt, Wrench, Mail, FileSpreadsheet, ClipboardCheck, Package, Settings, KanbanSquare, Clock, BarChart3, Share2, Car, AlertTriangle, FileDown, Activity, History, UserCog, DollarSign, RefreshCw, Phone, PhoneCall, ChevronDown, LayoutDashboard, Bell } from 'lucide-react';
+import { LogOut, FileText, ShieldCheck, Users, CreditCard, Calendar, CalendarCheck, ClipboardList, Receipt, Wrench, Mail, FileSpreadsheet, ClipboardCheck, Package, Settings, KanbanSquare, Clock, BarChart3, Share2, Car, AlertTriangle, FileDown, Activity, History, UserCog, DollarSign, RefreshCw, Phone, PhoneCall, ChevronDown, LayoutDashboard, Bell, MessageSquare } from 'lucide-react';
 import AdminCalls from '@/components/admin/AdminCalls';
+import AdminSMS from '@/components/admin/AdminSMS';
 import AdminPhoneSettings from '@/components/admin/AdminPhoneSettings';
 import AdminTrackingSettings from '@/components/admin/AdminTrackingSettings';
 import AdminEmployees from '@/components/admin/AdminEmployees';
@@ -61,6 +62,7 @@ const PARTS: AppRole[] = ['owner', 'admin', 'manager', 'parts'];
 
 const AdminDashboard = () => {
   const { signOut, user, hasAnyRole, roles } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
   useNativePushRegistration();
   const [stats, setStats] = useState({ customers: 0, activeMemberships: 0, openAppointments: 0, unpaidInvoices: 0 });
   const [contracts, setContracts] = useState<any[]>([]);
@@ -171,6 +173,7 @@ const AdminDashboard = () => {
             { value: 'employees', label: 'Employees', icon: UserCog, roles: ADMIN_ONLY, content: <AdminEmployees /> },
             { value: 'roles', label: 'Roles', icon: ShieldCheck, roles: ADMIN_ONLY, content: <AdminRoles /> },
             { value: 'calls', label: 'Calls', icon: Phone, roles: ADMIN_ONLY, content: <AdminCalls /> },
+            { value: 'texts', label: 'Texts', icon: MessageSquare, roles: ADMIN_ONLY, content: <AdminSMS /> },
             { value: 'phone-settings', label: 'Phone Setup', icon: PhoneCall, roles: ADMIN_ONLY, content: <AdminPhoneSettings /> },
             { value: 'tracking', label: 'Tracking', icon: ShieldCheck, roles: ADMIN_ONLY, content: <AdminTrackingSettings /> },
             { value: 'settings', label: 'Settings', icon: Settings, roles: ADMIN_ONLY, content: <AdminShopSettings /> },
@@ -180,7 +183,9 @@ const AdminDashboard = () => {
             return <p className="text-sm text-muted-foreground">No sections available for your role ({roles.join(', ') || 'none'}).</p>;
           }
           const defaultTab = visible.find(t => t.value === 'dashboard')?.value ?? visible.find(t => t.value === 'customers')?.value ?? visible[0].value;
-          const [activeTab, setActiveTab] = useState(defaultTab);
+          const tabParam = searchParams.get('tab');
+          const initialTab = visible.find(t => t.value === tabParam)?.value ?? defaultTab;
+          const [activeTab, setActiveTab] = useState(initialTab);
           const [usage, setUsage] = useState<Record<string, number>>(() => {
             try { return JSON.parse(localStorage.getItem('admin_tab_usage') || '{}'); } catch { return {}; }
           });
@@ -188,6 +193,7 @@ const AdminDashboard = () => {
 
           const selectTab = (value: string) => {
             setActiveTab(value);
+            setSearchParams(prev => { const next = new URLSearchParams(prev); next.set('tab', value); return next; }, { replace: true });
             setUsage(prev => {
               const next = { ...prev, [value]: (prev[value] || 0) + 1 };
               try { localStorage.setItem('admin_tab_usage', JSON.stringify(next)); } catch {}
@@ -197,7 +203,7 @@ const AdminDashboard = () => {
 
           const groups = [
             { label: 'Workshop', values: ['kanban','calendar','ros','service','inspections','checklists','estimates','invoices','time','shifts','productivity'] },
-            { label: 'Front Desk', values: ['customers','garage','memberships','bookings','share','declined','calls'] },
+            { label: 'Front Desk', values: ['customers','garage','memberships','bookings','share','declined','calls','texts'] },
             { label: 'Admin', values: ['dashboard','reports','catalog','laborpay','quickbooks','financing','warranty','emails','audit','employees','roles','phone-settings','tracking','settings'] },
           ];
           const groupedValues = groups.flatMap(g => g.values);
