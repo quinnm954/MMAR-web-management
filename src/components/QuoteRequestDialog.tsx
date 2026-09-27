@@ -62,6 +62,7 @@ const QuoteRequestDialog = ({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
   const [profileLoaded, setProfileLoaded] = useState(false);
+  const [smsConsent, setSmsConsent] = useState(false);
 
   const STORAGE_KEY = "quoteRequest:contactInfo";
   const isSignedIn = !!user;
@@ -474,6 +475,22 @@ const QuoteRequestDialog = ({
             />
             {errors.notes && <p className="text-xs text-destructive">{errors.notes}</p>}
           </div>
+
+          <label className="flex items-start gap-2 text-xs text-muted-foreground cursor-pointer">
+            <input
+              type="checkbox"
+              className="mt-0.5 h-4 w-4 accent-primary shrink-0"
+              checked={smsConsent}
+              onChange={(e) => setSmsConsent(e.target.checked)}
+            />
+            <span>
+              I agree to receive text messages from Mike's Mobile Auto Repair about my appointments,
+              service updates, estimates, and invoices. Message frequency varies. Msg &amp; data rates may
+              apply. Reply STOP to opt out, HELP for help. Consent is not a condition of purchase. See our{" "}
+              <a href="/privacy" target="_blank" className="text-primary hover:underline">Privacy Policy</a> and{" "}
+              <a href="/terms" target="_blank" className="text-primary hover:underline">Terms</a>.
+            </span>
+          </label>
         </div>
 
         <DialogFooter className="gap-2 sm:gap-2">

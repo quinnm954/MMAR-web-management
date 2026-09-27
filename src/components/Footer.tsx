@@ -106,6 +106,8 @@ const Footer = () => {
           <Link to="/blog" className="text-muted-foreground hover:text-primary">Blog</Link>
           <Link to="/install" className="text-muted-foreground hover:text-primary">Install App</Link>
           <Link to="/warranty-policy" className="text-muted-foreground hover:text-primary">Warranty Policy</Link>
+          <Link to="/privacy" className="text-muted-foreground hover:text-primary">Privacy Policy</Link>
+          <Link to="/terms" className="text-muted-foreground hover:text-primary">Terms</Link>
           <a href="tel:8135017572" className="text-muted-foreground hover:text-primary">(813) 501-7572</a>
           <a href="sms:8135017572" className="text-muted-foreground hover:text-primary">Text Us</a>
         </div>
