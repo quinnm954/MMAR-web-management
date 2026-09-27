@@ -38,8 +38,9 @@ Deno.serve(async (req) => {
   let from = '';
   let to = '';
   let callSid = '';
+  let form: FormData | null = null;
   try {
-    const form = await req.formData();
+    form = await req.formData();
     from = String(form.get('From') || '');
     to = String(form.get('To') || '');
     callSid = String(form.get('CallSid') || '');
@@ -121,13 +122,7 @@ Deno.serve(async (req) => {
   const url = new URL(req.url);
   if (url.searchParams.get('after') === 'dial') {
     // Read DialCallStatus to decide
-    let dialStatus = '';
-    try {
-      const f = await req.formData();
-      dialStatus = String(f.get('DialCallStatus') || '');
-    } catch {
-      // ignore
-    }
+    const dialStatus = String(form?.get('DialCallStatus') || '');
     if (['completed', 'answered'].includes(dialStatus)) {
       return xml(`<Response><Hangup/></Response>`);
     }
@@ -135,7 +130,7 @@ Deno.serve(async (req) => {
     const elKey = Deno.env.get('ELEVENLABS_API_KEY');
     if (settings.ai_enabled && settings.ai_agent_id && elKey) {
       try {
-        const callSidParam = String((await req.clone().formData().catch(() => null))?.get('CallSid') || callSid);
+        const callSidParam = callSid;
         const r = await fetch('https://api.elevenlabs.io/v1/convai/twilio/register-call', {
           method: 'POST',
           headers: { 'xi-api-key': elKey, 'Content-Type': 'application/json' },
