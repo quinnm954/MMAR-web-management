@@ -62,6 +62,7 @@ const PARTS: AppRole[] = ['owner', 'admin', 'manager', 'parts'];
 
 const AdminDashboard = () => {
   const { signOut, user, hasAnyRole, roles } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
   useNativePushRegistration();
   const [stats, setStats] = useState({ customers: 0, activeMemberships: 0, openAppointments: 0, unpaidInvoices: 0 });
   const [contracts, setContracts] = useState<any[]>([]);
