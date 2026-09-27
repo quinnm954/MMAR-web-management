@@ -150,8 +150,8 @@ export default function AdminCalls() {
                       </Button>
                     )}
                     {c.from_number && (
-                      <Button variant="outline" size="sm" asChild>
-                        <a href={`tel:${c.from_number}`}><Phone className="h-3.5 w-3.5 mr-1" />Call back</a>
+                      <Button variant="outline" size="sm" onClick={() => dialInApp(c.from_number!)}>
+                        <Phone className="h-3.5 w-3.5 mr-1" />Call back
                       </Button>
                     )}
                     {!c.read_at && (

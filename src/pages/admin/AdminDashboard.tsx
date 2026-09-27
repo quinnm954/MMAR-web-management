@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { LogOut, FileText, ShieldCheck, Users, CreditCard, Calendar, CalendarCheck, ClipboardList, Receipt, Wrench, Mail, FileSpreadsheet, ClipboardCheck, Package, Settings, KanbanSquare, Clock, BarChart3, Share2, Car, AlertTriangle, FileDown, Activity, History, UserCog, DollarSign, RefreshCw, Phone, PhoneCall, ChevronDown, LayoutDashboard, Bell, MessageSquare } from 'lucide-react';
 import AdminCalls from '@/components/admin/AdminCalls';
+import Softphone from '@/components/admin/Softphone';
 import AdminSMS from '@/components/admin/AdminSMS';
 import AdminPhoneSettings from '@/components/admin/AdminPhoneSettings';
 import AdminTrackingSettings from '@/components/admin/AdminTrackingSettings';
@@ -113,6 +114,7 @@ const AdminDashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <Softphone />
       <header className="border-b border-border bg-card safe-pt">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
