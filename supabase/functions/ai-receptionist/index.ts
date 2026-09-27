@@ -92,7 +92,7 @@ Deno.serve(async (req) => {
           request_body_schema: { type: 'object', properties: props, required },
         },
       });
-      const callSid = { type: 'string', dynamic_variable: 'call_sid', description: 'Call id' };
+      const callSid = { type: 'string', dynamic_variable: 'call_sid' };
       const agentBody = {
         name: "MMAR Receptionist",
         conversation_config: {
