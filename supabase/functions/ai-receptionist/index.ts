@@ -24,7 +24,7 @@ function toE164(p: string) {
   return p?.startsWith('+') ? p : `+${d}`;
 }
 
-async function sendSms(to: string, body: string) {
+async function sendSms(to: string, body: string, sb?: any) {
   const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
   const TWILIO_API_KEY = Deno.env.get('TWILIO_API_KEY');
   const FROM = Deno.env.get('TWILIO_FROM_NUMBER');
@@ -38,7 +38,32 @@ async function sendSms(to: string, body: string) {
     },
     body: new URLSearchParams({ To: toE164(to), From: FROM, Body: body.slice(0, 1500) }),
   });
-  if (!r.ok) console.error('sms failed', r.status, await r.text());
+  if (!r.ok) {
+    console.error('sms failed', r.status, await r.text());
+    return;
+  }
+  // Mirror the outbound text into the SMS log so it shows up in Admin → Texts.
+  if (sb) {
+    try {
+      const phone = toE164(to);
+      let { data: thread } = await sb.from('sms_threads').select('id, unread_count').eq('phone', phone).maybeSingle();
+      if (!thread) {
+        const ins = await sb.from('sms_threads').insert({ phone, last_message_preview: body.slice(0, 80) }).select('id, unread_count').single();
+        thread = ins.data;
+      }
+      if (!thread) return;
+      const msg = await r.clone().json().catch(() => null) as { sid?: string } | null;
+      await sb.from('sms_messages').insert({
+        thread_id: thread.id, direction: 'outbound', body, twilio_sid: msg?.sid ?? null, status: 'sent',
+      });
+      await sb.from('sms_threads').update({
+        last_message_at: new Date().toISOString(),
+        last_message_preview: body.slice(0, 80),
+      }).eq('id', thread.id);
+    } catch (e) {
+      console.error('sms log mirror failed', e);
+    }
+  }
 }
 
 function buildPrompt(cities: string[]) {
