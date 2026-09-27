@@ -136,7 +136,32 @@ Deno.serve(async (req) => {
       if (!r.ok) return json({ error: 'ElevenLabs error', status: r.status, details: txt }, 502);
       if (!agentId) agentId = JSON.parse(txt).agent_id;
       await sb.from('phone_settings').update({ ai_agent_id: agentId }).eq('id', 1);
-      return json({ ok: true, agent_id: agentId, postcall_webhook_url: `${fnBase}?action=postcall&token=${TOKEN}` });
+
+      // Configure the workspace post-call webhook so ElevenLabs sends us transcripts
+      const postcallUrl = `${fnBase}?action=postcall&token=${TOKEN}`;
+      let webhookStatus = 'not attempted';
+      try {
+        const wh = await fetch(`${EL}/v1/workspace/webhooks`, {
+          method: 'POST',
+          headers: { 'xi-api-key': EL_KEY, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: 'MMAR post-call', webhook_url: postcallUrl }),
+        });
+        const whTxt = await wh.text();
+        if (wh.ok) {
+          const whId = JSON.parse(whTxt).webhook_id;
+          const st = await fetch(`${EL}/v1/convai/settings`, {
+            method: 'PATCH',
+            headers: { 'xi-api-key': EL_KEY, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ webhooks: { post_call_webhook_id: whId, events: ['transcript'] } }),
+          });
+          webhookStatus = st.ok ? 'configured' : `settings failed: ${st.status} ${await st.text()}`;
+        } else {
+          webhookStatus = `webhook create failed: ${wh.status} ${whTxt}`;
+        }
+      } catch (e) {
+        webhookStatus = `error: ${(e as Error).message}`;
+      }
+      return json({ ok: true, agent_id: agentId, postcall_webhook_url: postcallUrl, webhook_status: webhookStatus });
     }
 
     // Everything below is called by ElevenLabs and must carry the token
