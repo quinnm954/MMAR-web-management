@@ -1,6 +1,6 @@
 import batteryImg from "@/assets/gallery-battery-lehigh.jpg";
 import brakesImg from "@/assets/gallery-brakes-fortmyers.jpg";
-import vanImg from "@/assets/gallery-van-naples.jpg";
+import vanImg from "@/assets/gallery-service-van.jpg";
 import alternatorImg from "@/assets/gallery-alternator-cape.jpg";
 
 type Photo = { src: string; alt: string; caption: string };
@@ -18,8 +18,8 @@ const PHOTOS: Photo[] = [
   },
   {
     src: vanImg,
-    alt: "Mobile auto repair service van serving Naples FL with tools loaded",
-    caption: "Mobile mechanic service van — Naples, FL",
+    alt: "Mobile auto repair service van in Southwest Florida with tools loaded",
+    caption: "Mobile mechanic service van — Southwest Florida",
   },
   {
     src: alternatorImg,
@@ -37,7 +37,7 @@ const LocalPhotoGallery = () => {
             On-Site Work Across Lehigh Acres and Fort Myers
           </h2>
           <p className="text-muted-foreground text-sm md:text-base">
-            Real mobile auto repair jobs from driveways across Lehigh Acres, Fort Myers, Cape Coral, and Naples.
+            Real mobile auto repair jobs from driveways across Lehigh Acres, Fort Myers, Cape Coral, and Estero.
           </p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

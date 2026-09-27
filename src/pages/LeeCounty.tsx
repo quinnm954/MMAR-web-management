@@ -13,16 +13,16 @@ import { useSeo } from "@/lib/useSeo";
 const SITE = "https://mikesmautorepair.com";
 const URL = `${SITE}/lee-county-fl`;
 
-const LEE_CITIES = ["fort-myers", "cape-coral", "lehigh-acres", "bonita-springs", "estero"];
+const LEE_CITIES = ["fort-myers", "cape-coral", "lehigh-acres", "estero"];
 
 const LeeCounty = () => {
   const matrixCities = cities.filter((c) => LEE_CITIES.includes(c.slug));
 
   useSeo({
     title:
-      "Mobile Mechanic in Lee County, FL | Auto Repair Across Fort Myers, Cape Coral, Lehigh Acres, Bonita Springs & Estero",
+      "Mobile Mechanic in Lee County, FL | Auto Repair Across Fort Myers, Cape Coral, Lehigh Acres & Estero",
     description:
-      "Mike's Mobile Auto Repair serves all of Lee County, FL — Fort Myers, Cape Coral, Lehigh Acres, Bonita Springs, and Estero. Brakes, AC, batteries, engine, transmission, and diagnostics at your driveway. Call (813) 501-7572.",
+      "Mike's Mobile Auto Repair serves Lee County, FL — Fort Myers, Cape Coral, Lehigh Acres, and Estero. Brakes, AC, batteries, engine, transmission, and diagnostics at your driveway. Call (813) 501-7572.",
     canonical: URL,
     breadcrumbs: [
       { name: "Home", url: `${SITE}/` },
@@ -91,7 +91,7 @@ const LeeCounty = () => {
 
           <p className="text-base md:text-lg text-muted-foreground mb-6 leading-relaxed">
             Mike's Mobile Auto Repair serves every major city in Lee County —
-            Fort Myers, Cape Coral, Lehigh Acres, Bonita Springs, and Estero —
+            Fort Myers, Cape Coral, Lehigh Acres, and Estero —
             with on-site mechanical diagnostics and repair. Dealer-level scan
             tools, OE-spec parts, written quotes, and a 12-month / 12,000-mile
             warranty on parts and labor.

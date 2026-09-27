@@ -25,9 +25,7 @@ Mike's Mobile Auto Repair operates as MMAR Care, offering on-site diagnostics, b
 - [Fort Myers](/areas/fort-myers)
 - [Cape Coral](/areas/cape-coral)
 - [Lehigh Acres](/areas/lehigh-acres)
-- [Bonita Springs](/areas/bonita-springs)
 - [Estero](/areas/estero)
-- [Naples](/areas/naples)
 - [North Fort Myers](/areas/north-fort-myers)
 
 ## Optional
