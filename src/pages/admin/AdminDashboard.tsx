@@ -183,7 +183,9 @@ const AdminDashboard = () => {
             return <p className="text-sm text-muted-foreground">No sections available for your role ({roles.join(', ') || 'none'}).</p>;
           }
           const defaultTab = visible.find(t => t.value === 'dashboard')?.value ?? visible.find(t => t.value === 'customers')?.value ?? visible[0].value;
-          const [activeTab, setActiveTab] = useState(defaultTab);
+          const tabParam = searchParams.get('tab');
+          const initialTab = visible.find(t => t.value === tabParam)?.value ?? defaultTab;
+          const [activeTab, setActiveTab] = useState(initialTab);
           const [usage, setUsage] = useState<Record<string, number>>(() => {
             try { return JSON.parse(localStorage.getItem('admin_tab_usage') || '{}'); } catch { return {}; }
           });
