@@ -144,7 +144,7 @@ Deno.serve(async (req) => {
         const wh = await fetch(`${EL}/v1/workspace/webhooks`, {
           method: 'POST',
           headers: { 'xi-api-key': EL_KEY, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name: 'MMAR post-call', webhook_url: postcallUrl }),
+          body: JSON.stringify({ settings: { auth_type: 'hmac', name: 'MMAR post-call', webhook_url: postcallUrl } }),
         });
         const whTxt = await wh.text();
         if (wh.ok) {
