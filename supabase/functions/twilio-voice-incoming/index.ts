@@ -167,9 +167,13 @@ Deno.serve(async (req) => {
     );
   }
 
+  // Ring cell + every admin/owner signed into the Garage Ace in-app phone at the same time
+  const { data: staff } = await sb.from('user_roles').select('user_id').in('role', ['admin', 'owner']);
+  const clients = [...new Set((staff || []).map((r: { user_id: string }) => r.user_id))]
+    .map((id) => `<Client>staff_${String(id).replace(/-/g, '')}</Client>`).join('');
   return xml(
     `<Response>` +
-      `<Dial ${dialAttrs}>${escapeXml(forward)}</Dial>` +
+      `<Dial ${dialAttrs}><Number>${escapeXml(forward)}</Number>${clients}</Dial>` +
     `</Response>`,
   );
 });

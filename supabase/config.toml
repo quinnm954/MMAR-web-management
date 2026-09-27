@@ -44,3 +44,6 @@ verify_jwt = false
 
 [functions.ai-receptionist]
 verify_jwt = false
+
+[functions.twilio-voice-client]
+verify_jwt = false
