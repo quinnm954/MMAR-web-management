@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 
 import FinancingContract from "./pages/FinancingContract";
 import WarrantyPolicy from "./pages/WarrantyPolicy";
+import { PrivacyPolicy, TermsOfService } from "./pages/LegalPage";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import Login from "./pages/Login";
 import { Navigate } from "react-router-dom";
@@ -108,6 +109,8 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/financing-contract" element={<FinancingContract />} />
             <Route path="/warranty-policy" element={<WarrantyPolicy />} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/terms" element={<TermsOfService />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/services" element={<ServicesIndex />} />
             <Route path="/services/pre-purchase-inspection" element={<PrePurchaseInspection />} />
