@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
-import { AlertTriangle, CheckCircle2, Copy, Loader2, Phone } from 'lucide-react';
+import { AlertTriangle, Bot, CheckCircle2, Copy, Loader2, Phone } from 'lucide-react';
 
 type Hours = { open: string; close: string } | null;
 type BusinessHours = Record<'sun'|'mon'|'tue'|'wed'|'thu'|'fri'|'sat', Hours>;
@@ -22,6 +22,10 @@ type Settings = {
   record_calls: boolean;
   transcribe_voicemail: boolean;
   ring_timeout_seconds: number;
+  ai_enabled: boolean;
+  ai_agent_id: string | null;
+  ai_greeting: string;
+  ai_summary_to_number: string | null;
 };
 
 const DAYS: Array<{ key: keyof BusinessHours; label: string }> = [
@@ -41,6 +45,8 @@ const STATUS_URL = `${SUPABASE_URL}/functions/v1/twilio-voice-status`;
 export default function AdminPhoneSettings() {
   const [s, setS] = useState<Settings | null>(null);
   const [busy, setBusy] = useState(false);
+  const [aiBusy, setAiBusy] = useState(false);
+  const [postcallUrl, setPostcallUrl] = useState<string | null>(null);
 
   const load = async () => {
     const { data } = await supabase.from('phone_settings').select('*').eq('id', 1).maybeSingle();
@@ -63,11 +69,30 @@ export default function AdminPhoneSettings() {
         record_calls: s.record_calls,
         transcribe_voicemail: s.transcribe_voicemail,
         ring_timeout_seconds: Number(s.ring_timeout_seconds) || 20,
+        ai_enabled: s.ai_enabled,
+        ai_greeting: s.ai_greeting,
+        ai_summary_to_number: s.ai_summary_to_number || null,
       })
       .eq('id', 1);
     setBusy(false);
     if (error) toast.error(error.message);
     else toast.success('Phone settings saved');
+  };
+
+  const setupAi = async () => {
+    setAiBusy(true);
+    await save();
+    const { data, error } = await supabase.functions.invoke('ai-receptionist?action=setup', { body: {} });
+    setAiBusy(false);
+    if (error || !data?.ok) {
+      let msg = error?.message || 'Setup failed';
+      try { msg = (await (error as any)?.context?.text?.()) || msg; } catch { /* ignore */ }
+      toast.error(msg);
+      return;
+    }
+    setPostcallUrl(data.postcall_webhook_url);
+    setS((prev) => prev ? { ...prev, ai_agent_id: data.agent_id } : prev);
+    toast.success('AI receptionist is ready');
   };
 
   const copy = (v: string) => {
@@ -132,6 +157,41 @@ export default function AdminPhoneSettings() {
               onChange={(e) => setS({ ...s, ring_timeout_seconds: Number(e.target.value) || 20 })}
             />
           </div>
+        </CardContent>
+      </Card>
+
+      <Card className="border-accent/40">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2"><Bot className="h-5 w-5" />AI answering (missed calls)</CardTitle>
+          <CardDescription>When you don't pick up, an AI receptionist answers, answers questions, takes booking requests, and can transfer urgent callers to you. You get a text summary after each call.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between">
+            <Label htmlFor="ai" className="text-base">Let AI answer missed calls</Label>
+            <Switch id="ai" checked={s.ai_enabled} disabled={!s.ai_agent_id} onCheckedChange={(v) => setS({ ...s, ai_enabled: v })} />
+          </div>
+          {!s.ai_agent_id && <p className="text-xs text-muted-foreground">Click "Set up AI receptionist" first.</p>}
+          <div>
+            <Label htmlFor="aig">What the AI says first</Label>
+            <Textarea id="aig" rows={2} value={s.ai_greeting} onChange={(e) => setS({ ...s, ai_greeting: e.target.value })} />
+          </div>
+          <div>
+            <Label htmlFor="ais">Text call summaries to</Label>
+            <Input id="ais" type="tel" placeholder="Defaults to your forward-to number" value={s.ai_summary_to_number ?? ''} onChange={(e) => setS({ ...s, ai_summary_to_number: e.target.value })} />
+          </div>
+          <Button onClick={setupAi} disabled={aiBusy} variant="secondary">
+            {aiBusy && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+            {s.ai_agent_id ? 'Update AI receptionist' : 'Set up AI receptionist'}
+          </Button>
+          {postcallUrl && (
+            <div className="text-sm space-y-2 border-t pt-3">
+              <p>Last step, once: in ElevenLabs → Agents → Settings → Post-call webhook, paste this URL so call summaries arrive here.</p>
+              <div className="flex gap-2">
+                <Input readOnly value={postcallUrl} className="font-mono text-xs" />
+                <Button variant="outline" size="sm" onClick={() => copy(postcallUrl)}><Copy className="h-4 w-4" /></Button>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 
