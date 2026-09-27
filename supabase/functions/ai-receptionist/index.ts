@@ -281,6 +281,7 @@ Deno.serve(async (req) => {
       const caller = String(vars.caller_number || d.metadata?.phone_call?.external_number || '');
       const summary = d.analysis?.transcript_summary || '';
       const transcript = (d.transcript || []).map((t: { role: string; message: string }) => ({ role: t.role, message: t.message }));
+      let dialedNumber = '';
       if (sid) {
         await sb.from('call_logs').upsert({
           twilio_call_sid: sid,
@@ -289,12 +290,16 @@ Deno.serve(async (req) => {
           ai_transcript: transcript,
           ai_conversation_id: d.conversation_id || null,
         }, { onConflict: 'twilio_call_sid' });
+        const { data: cl } = await sb.from('call_logs').select('to_number').eq('twilio_call_sid', sid).maybeSingle();
+        dialedNumber = cl?.to_number || '';
       }
+      // Reply from the number the customer actually dialed, not a stale default.
+      const fromNum = dialedNumber || undefined;
       const { data: s } = await sb.from('phone_settings').select('ai_summary_to_number, forward_to_number').eq('id', 1).maybeSingle();
       const owner = s?.ai_summary_to_number || s?.forward_to_number;
-      if (owner) await sendSms(owner, `AI answered a missed call from ${caller || 'unknown'}:\n${summary || '(no summary)'}`, sb);
+      if (owner) await sendSms(owner, `AI answered a missed call from ${caller || 'unknown'}:\n${summary || '(no summary)'}`, sb, fromNum);
       if (caller && transcript.length > 1) {
-        await sendSms(caller, `Thanks for calling Mike's Mobile Auto Repair! Mike will follow up soon. Book anytime: ${BOOK_URL} Reply STOP to opt out.`, sb);
+        await sendSms(caller, `Thanks for calling Mike's Mobile Auto Repair! Mike will follow up soon. Book anytime: ${BOOK_URL} Reply STOP to opt out.`, sb, fromNum);
       }
       return json({ ok: true });
     }
