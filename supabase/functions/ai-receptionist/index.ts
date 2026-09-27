@@ -161,7 +161,38 @@ Deno.serve(async (req) => {
       } catch (e) {
         webhookStatus = `error: ${(e as Error).message}`;
       }
-      return json({ ok: true, agent_id: agentId, postcall_webhook_url: postcallUrl, webhook_status: webhookStatus });
+      // Point every Twilio number on the account at the Garage Ace call/text handlers
+      const LOVABLE_KEY = Deno.env.get('LOVABLE_API_KEY');
+      const TWILIO_KEY = Deno.env.get('TWILIO_API_KEY');
+      let numbersStatus = 'not attempted';
+      if (LOVABLE_KEY && TWILIO_KEY) {
+        try {
+          const gw = 'https://connector-gateway.lovable.dev/twilio';
+          const gwHeaders = { 'Authorization': `Bearer ${LOVABLE_KEY}`, 'X-Connection-Api-Key': TWILIO_KEY };
+          const list = await fetch(`${gw}/IncomingPhoneNumbers.json`, { headers: gwHeaders });
+          const nums = (await list.json()).incoming_phone_numbers || [];
+          const results: string[] = [];
+          for (const n of nums) {
+            const up = await fetch(`${gw}/IncomingPhoneNumbers/${n.sid}.json`, {
+              method: 'POST',
+              headers: { ...gwHeaders, 'Content-Type': 'application/x-www-form-urlencoded' },
+              body: new URLSearchParams({
+                VoiceUrl: `${supabaseUrl}/functions/v1/twilio-voice-incoming`,
+                VoiceMethod: 'POST',
+                SmsUrl: `${supabaseUrl}/functions/v1/twilio-inbound-sms`,
+                SmsMethod: 'POST',
+              }),
+            });
+            results.push(`${n.phone_number}: ${up.ok ? 'ok' : `failed ${up.status}`}`);
+          }
+          numbersStatus = results.join('; ') || 'no numbers on account';
+        } catch (e) {
+          numbersStatus = `error: ${(e as Error).message}`;
+        }
+      } else {
+        numbersStatus = 'Twilio not connected';
+      }
+      return json({ ok: true, agent_id: agentId, postcall_webhook_url: postcallUrl, webhook_status: webhookStatus, numbers_status: numbersStatus });
     }
 
     // Everything below is called by ElevenLabs and must carry the token
