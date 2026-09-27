@@ -16,7 +16,6 @@ const MATRIX_CITY_SLUGS = new Set([
   "fort-myers",
   "cape-coral",
   "lehigh-acres",
-  "bonita-springs",
   "estero",
 ]);
 

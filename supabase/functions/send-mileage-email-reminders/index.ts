@@ -50,8 +50,8 @@ const NATIONAL: Region = { label: 'National average', multiplier: 1.0 };
 const ZIP3_REGIONS: Record<string, Region> = {
   // --- Florida (primary service area) ---
   '339': { label: 'Fort Myers / Cape Coral, FL', multiplier: 1.05 },
-  '341': { label: 'Naples / Marco Island, FL', multiplier: 1.12 },
-  '342': { label: 'Naples / Bonita Springs, FL', multiplier: 1.12 },
+  '341': { label: 'Southwest Florida, FL', multiplier: 1.12 },
+  '342': { label: 'Southwest Florida Gulf Coast, FL', multiplier: 1.12 },
   '338': { label: 'Lakeland / Polk County, FL', multiplier: 0.98 },
   '335': { label: 'Tampa, FL', multiplier: 1.04 },
   '336': { label: 'Tampa / St. Petersburg, FL', multiplier: 1.04 },

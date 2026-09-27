@@ -94,16 +94,14 @@ const HOME_CITIES = [
   { name: "Lehigh Acres", state: "FL", lat: 26.6121, lng: -81.6237 },
   { name: "Fort Myers", state: "FL", lat: 26.6406, lng: -81.8723 },
   { name: "Cape Coral", state: "FL", lat: 26.5629, lng: -81.9495 },
-  { name: "Naples", state: "FL", lat: 26.1420, lng: -81.7948 },
   { name: "Estero", state: "FL", lat: 26.4384, lng: -81.8068 },
-  { name: "Bonita Springs", state: "FL", lat: 26.3398, lng: -81.7787 },
 ];
 push({
   path: "/",
   title:
-    "Auto Repair Near Me | Mobile Auto Repair in Lehigh Acres, Fort Myers, Cape Coral, Naples, Estero & Bonita Springs FL",
+    "Auto Repair Near Me | Mobile Auto Repair in Lehigh Acres, Fort Myers, Cape Coral & Estero FL",
   description:
-    "Auto repair near me in Lehigh Acres, Fort Myers, Cape Coral, Naples, Estero & Bonita Springs, FL. Mobile mechanic comes to you — diagnostics, brakes, batteries, AC. Call (813) 501-7572.",
+    "Auto repair near me in Lehigh Acres, Fort Myers, Cape Coral, and Estero, FL. Mobile mechanic comes to you — diagnostics, brakes, batteries, AC. Call (813) 501-7572.",
   canonical: `${SITE}/`,
   // The AutoRepair business entity (with aggregateRating, hours, address,
   // sameAs) is declared once in index.html under @id #business. Here we

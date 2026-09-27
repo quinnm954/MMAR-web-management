@@ -81,7 +81,7 @@ const AboutPage = () => {
             <Link to="/areas/lehigh-acres" className="text-primary hover:underline">Lehigh Acres</Link>,{" "}
             <Link to="/areas/fort-myers" className="text-primary hover:underline">Fort Myers</Link>,{" "}
             <Link to="/areas/cape-coral" className="text-primary hover:underline">Cape Coral</Link>,
-            Estero, Bonita Springs, Gateway, and most of Lee County. See the full{" "}
+            Estero, Gateway, and most of Lee County. See the full{" "}
             <Link to="/service-areas" className="text-primary hover:underline">service area map</Link>.
           </p>
 

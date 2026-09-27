@@ -25,7 +25,7 @@ const Index = () => {
   useSeo({
     title: "Mobile Auto Repair Near Me | Mike's Mobile Auto Repair",
     description:
-      "Mobile mechanic in Fort Myers, Cape Coral, Lehigh Acres, Naples & Bonita Springs FL. We come to you: diagnostics, brakes, batteries, oil. Call (813) 501-7572.",
+      "Mobile mechanic in Fort Myers, Cape Coral, Lehigh Acres, Estero, and Gateway, FL. We come to you for diagnostics, brakes, batteries, and repairs. Call (813) 501-7572.",
     canonical: `${SITE}/`,
   });
 
@@ -53,9 +53,7 @@ const Index = () => {
       { name: "Lehigh Acres", state: "FL", lat: 26.6121, lng: -81.6237 },
       { name: "Fort Myers", state: "FL", lat: 26.6406, lng: -81.8723 },
       { name: "Cape Coral", state: "FL", lat: 26.5629, lng: -81.9495 },
-      { name: "Naples", state: "FL", lat: 26.1420, lng: -81.7948 },
       { name: "Estero", state: "FL", lat: 26.4384, lng: -81.8068 },
-      { name: "Bonita Springs", state: "FL", lat: 26.3398, lng: -81.7787 },
     ];
     const ld = {
       "@context": "https://schema.org",

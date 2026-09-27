@@ -45,8 +45,6 @@ const PrePurchaseInspection = () => {
             { "@type": "City", name: "Fort Myers, FL" },
             { "@type": "City", name: "Lehigh Acres, FL" },
             { "@type": "City", name: "Cape Coral, FL" },
-            { "@type": "City", name: "Naples, FL" },
-            { "@type": "City", name: "Bonita Springs, FL" },
           ],
           provider: {
             "@type": "AutoRepair",

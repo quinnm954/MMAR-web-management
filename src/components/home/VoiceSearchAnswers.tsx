@@ -22,8 +22,8 @@ const VoiceSearchAnswers = () => {
             </dt>
             <dd className="speakable-answer text-muted-foreground mt-1">
               Mike's Mobile Auto Repair is a 5-star rated mobile mechanic
-              serving Lehigh Acres, Fort Myers, Cape Coral, Naples, Estero, and
-              Bonita Springs, Florida. Call 813-501-7572 for same-day service.
+              serving Lehigh Acres, Fort Myers, Cape Coral, Estero, and Gateway,
+              Florida. Call 813-501-7572 for same-day service.
             </dd>
           </div>
 

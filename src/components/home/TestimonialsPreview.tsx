@@ -14,7 +14,7 @@ const previews = [
   },
   {
     name: "David Chen",
-    location: "Naples, FL",
+    location: "Estero, FL",
     text: "Best mobile mechanic in Lehigh Acres and Fort Myers. Fair prices and explains everything clearly.",
   },
 ];
