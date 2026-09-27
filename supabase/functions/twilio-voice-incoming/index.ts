@@ -131,7 +131,35 @@ Deno.serve(async (req) => {
     if (['completed', 'answered'].includes(dialStatus)) {
       return xml(`<Response><Hangup/></Response>`);
     }
-    // missed → voicemail
+    // missed → AI receptionist (if enabled), falling back to voicemail
+    const elKey = Deno.env.get('ELEVENLABS_API_KEY');
+    if (settings.ai_enabled && settings.ai_agent_id && elKey) {
+      try {
+        const callSidParam = String((await req.clone().formData().catch(() => null))?.get('CallSid') || callSid);
+        const r = await fetch('https://api.elevenlabs.io/v1/convai/twilio/register-call', {
+          method: 'POST',
+          headers: { 'xi-api-key': elKey, 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            agent_id: settings.ai_agent_id,
+            from_number: from,
+            to_number: to,
+            direction: 'inbound',
+            conversation_initiation_client_data: {
+              dynamic_variables: { call_sid: callSidParam, caller_number: from },
+              conversation_config_override: settings.ai_greeting
+                ? { agent: { first_message: settings.ai_greeting } } : undefined,
+            },
+          }),
+        });
+        if (r.ok) {
+          await sb.from('call_logs').update({ ai_handled: true }).eq('twilio_call_sid', callSidParam);
+          return new Response(await r.text(), { headers: { ...corsHeaders, 'Content-Type': 'text/xml' } });
+        }
+        console.error('register-call failed', r.status, await r.text());
+      } catch (e) {
+        console.error('register-call error', e);
+      }
+    }
     const transcribeAttr = transcribe
       ? ` transcribe="true" transcribeCallback="${transcribeCb}"`
       : '';

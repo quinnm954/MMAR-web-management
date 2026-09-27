@@ -1,0 +1,226 @@
+// AI receptionist (ElevenLabs Agents) for missed calls.
+// Actions (via ?action=):
+//   setup     – admin only: create/update the ElevenLabs agent
+//   booking   – agent tool: create a booking request
+//   transfer  – agent tool: transfer the live call to Mike's cell
+//   postcall  – ElevenLabs post-call webhook: save transcript + text summaries
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.95.0';
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+const json = (b: unknown, status = 200) =>
+  new Response(JSON.stringify(b), { status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+
+const EL = 'https://api.elevenlabs.io';
+const TWILIO_GW = 'https://connector-gateway.lovable.dev/twilio';
+const BOOK_URL = 'https://mikesmautorepair.com/book';
+
+function toE164(p: string) {
+  const d = (p || '').replace(/\D/g, '');
+  if (d.length === 10) return `+1${d}`;
+  if (d.length === 11 && d.startsWith('1')) return `+${d}`;
+  return p?.startsWith('+') ? p : `+${d}`;
+}
+
+async function sendSms(to: string, body: string) {
+  const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+  const TWILIO_API_KEY = Deno.env.get('TWILIO_API_KEY');
+  const FROM = Deno.env.get('TWILIO_FROM_NUMBER');
+  if (!LOVABLE_API_KEY || !TWILIO_API_KEY || !FROM || !to) return;
+  const r = await fetch(`${TWILIO_GW}/Messages.json`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${LOVABLE_API_KEY}`,
+      'X-Connection-Api-Key': TWILIO_API_KEY,
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: new URLSearchParams({ To: toE164(to), From: FROM, Body: body.slice(0, 1500) }),
+  });
+  if (!r.ok) console.error('sms failed', r.status, await r.text());
+}
+
+function buildPrompt(cities: string[]) {
+  return `You are the friendly phone receptionist for Mike's Mobile Auto Repair (MMAR), a mobile mechanic in Southwest Florida. Mike couldn't pick up, so you answer.
+
+Facts:
+- We come to the customer's home, work, or lot. No need to tow to a shop.
+- Service area: ${cities.join(', ')}.
+- Services: diagnostics and check-engine lights, brakes, batteries and starting/charging, alternators and starters, AC repair, cooling system, suspension and steering, belts and hoses, tune-ups, fleet service for dealerships and companies. We do NOT do oil changes or pre-purchase inspections.
+- Pricing: we don't quote exact prices by phone. Labor is affordable, usually better than the average shop. Mike gives a written quote.
+- Same-day service is often available. Phone and text: 813-501-7572.
+- MMAR Care is our maintenance membership plan.
+
+How to act:
+- Be warm, brief, and natural. One question at a time. Short sentences.
+- If they need service, collect: name, vehicle (year, make, model), what's wrong, service address or city, and a preferred day or time. Confirm it back, then call create_booking_request. Tell them Mike will text or call to confirm.
+- If it's urgent (stranded, unsafe), or they ask for a person, call transfer_to_mike.
+- Never invent prices, hours, or promises. If unsure, say Mike will follow up.
+- Caller's number: {{caller_number}}. Use it as their phone unless they give another.`;
+}
+
+Deno.serve(async (req) => {
+  if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
+  const url = new URL(req.url);
+  const action = url.searchParams.get('action') || '';
+  const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+  const sb = createClient(supabaseUrl, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
+  const TOKEN = Deno.env.get('AI_RECEPTIONIST_TOKEN')!;
+  const EL_KEY = Deno.env.get('ELEVENLABS_API_KEY');
+
+  try {
+    // ---------- Admin setup ----------
+    if (action === 'setup') {
+      const auth = req.headers.get('Authorization')?.replace('Bearer ', '') || '';
+      const { data: u } = await sb.auth.getUser(auth);
+      if (!u?.user) return json({ error: 'Unauthorized' }, 401);
+      const { data: isAdmin } = await sb.rpc('has_role', { _user_id: u.user.id, _role: 'admin' });
+      if (!isAdmin) return json({ error: 'Admins only' }, 403);
+      if (!EL_KEY) return json({ error: 'ElevenLabs is not connected' }, 500);
+
+      const { data: s } = await sb.from('phone_settings').select('*').eq('id', 1).maybeSingle();
+      const cities = ['Fort Myers', 'Cape Coral', 'Lehigh Acres', 'Estero', 'Gateway'];
+      const fnBase = `${supabaseUrl}/functions/v1/ai-receptionist`;
+      const tool = (name: string, description: string, props: Record<string, unknown>, required: string[]) => ({
+        type: 'webhook',
+        name,
+        description,
+        api_schema: {
+          url: `${fnBase}?action=${name === 'transfer_to_mike' ? 'transfer' : 'booking'}&token=${TOKEN}`,
+          method: 'POST',
+          request_body_schema: { type: 'object', properties: props, required },
+        },
+      });
+      const callSid = { type: 'string', dynamic_variable: 'call_sid', description: 'Call id' };
+      const agentBody = {
+        name: "MMAR Receptionist",
+        conversation_config: {
+          agent: {
+            first_message: s?.ai_greeting,
+            language: 'en',
+            prompt: {
+              prompt: buildPrompt(cities),
+              tools: [
+                tool('create_booking_request', 'Save a service booking request once details are confirmed.', {
+                  call_sid: callSid,
+                  customer_name: { type: 'string', description: 'Caller full name' },
+                  customer_phone: { type: 'string', description: 'Best phone number' },
+                  vehicle_info: { type: 'string', description: 'Year make model' },
+                  description: { type: 'string', description: 'What is wrong with the vehicle' },
+                  service_address: { type: 'string', description: 'Address or city for service' },
+                  requested_time: { type: 'string', description: 'Preferred day/time, or empty' },
+                }, ['customer_name', 'description']),
+                tool('transfer_to_mike', 'Transfer the caller to Mike for urgent issues or when they ask for a person.', {
+                  call_sid: callSid,
+                  reason: { type: 'string', description: 'Why transferring' },
+                }, ['reason']),
+                { type: 'system', name: 'end_call', description: 'End the call when the conversation is finished.', params: { system_tool_type: 'end_call' } },
+              ],
+            },
+          },
+          tts: { voice_id: 'CwhRBWXzGAHq8TQ4Fs17', model_id: 'eleven_flash_v2' },
+        },
+        platform_settings: {
+          overrides: { conversation_config_override: { agent: { first_message: true } } },
+        },
+      };
+
+      let agentId = s?.ai_agent_id as string | null;
+      const r = await fetch(agentId ? `${EL}/v1/convai/agents/${agentId}` : `${EL}/v1/convai/agents/create`, {
+        method: agentId ? 'PATCH' : 'POST',
+        headers: { 'xi-api-key': EL_KEY, 'Content-Type': 'application/json' },
+        body: JSON.stringify(agentBody),
+      });
+      const txt = await r.text();
+      if (!r.ok) return json({ error: 'ElevenLabs error', status: r.status, details: txt }, 502);
+      if (!agentId) agentId = JSON.parse(txt).agent_id;
+      await sb.from('phone_settings').update({ ai_agent_id: agentId }).eq('id', 1);
+      return json({ ok: true, agent_id: agentId, postcall_webhook_url: `${fnBase}?action=postcall&token=${TOKEN}` });
+    }
+
+    // Everything below is called by ElevenLabs and must carry the token
+    if (url.searchParams.get('token') !== TOKEN) return json({ error: 'Forbidden' }, 403);
+    const body = await req.json().catch(() => ({}));
+
+    if (action === 'booking') {
+      const sid = String(body.call_sid || '');
+      let phone = String(body.customer_phone || '');
+      if (!phone && sid) {
+        const { data: c } = await sb.from('call_logs').select('from_number').eq('twilio_call_sid', sid).maybeSingle();
+        phone = c?.from_number || '';
+      }
+      const notes = [body.requested_time && `Preferred time: ${body.requested_time}`, 'Booked by AI receptionist on a missed call']
+        .filter(Boolean).join('\n');
+      const { error } = await sb.from('booking_requests').insert({
+        customer_name: String(body.customer_name || 'Phone caller').slice(0, 200),
+        customer_phone: phone || 'unknown',
+        vehicle_info: body.vehicle_info ? String(body.vehicle_info).slice(0, 200) : null,
+        description: body.description ? String(body.description).slice(0, 2000) : null,
+        service_address: body.service_address ? String(body.service_address).slice(0, 300) : null,
+        service_type: 'General Repair',
+        source: 'ai_phone',
+        notes,
+      });
+      if (error) {
+        console.error('booking insert', error);
+        return json({ result: 'Could not save. Tell the caller Mike will call them back.' });
+      }
+      return json({ result: 'Booking request saved. Mike will text or call to confirm.' });
+    }
+
+    if (action === 'transfer') {
+      const sid = String(body.call_sid || '');
+      const { data: s } = await sb.from('phone_settings').select('forward_to_number').eq('id', 1).maybeSingle();
+      const fwd = s?.forward_to_number?.trim();
+      if (!sid || !fwd) return json({ result: 'Transfer unavailable. Offer to take a message for Mike.' });
+      const r = await fetch(`${TWILIO_GW}/Calls/${sid}.json`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${Deno.env.get('LOVABLE_API_KEY')}`,
+          'X-Connection-Api-Key': Deno.env.get('TWILIO_API_KEY')!,
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          Twiml: `<Response><Say voice="alice">Connecting you to Mike now.</Say><Dial timeout="25">${fwd}</Dial><Say voice="alice">Sorry, Mike is unavailable. He will call you back shortly.</Say></Response>`,
+        }),
+      });
+      if (!r.ok) {
+        console.error('transfer failed', r.status, await r.text());
+        return json({ result: 'Transfer failed. Offer to take a message for Mike.' });
+      }
+      return json({ result: 'Transferring now.' });
+    }
+
+    if (action === 'postcall') {
+      if (body.type && body.type !== 'post_call_transcription') return json({ ok: true });
+      const d = body.data || {};
+      const vars = d.conversation_initiation_client_data?.dynamic_variables || {};
+      const sid = String(vars.call_sid || d.metadata?.phone_call?.call_sid || '');
+      const caller = String(vars.caller_number || d.metadata?.phone_call?.external_number || '');
+      const summary = d.analysis?.transcript_summary || '';
+      const transcript = (d.transcript || []).map((t: { role: string; message: string }) => ({ role: t.role, message: t.message }));
+      if (sid) {
+        await sb.from('call_logs').upsert({
+          twilio_call_sid: sid,
+          ai_handled: true,
+          ai_summary: summary || null,
+          ai_transcript: transcript,
+          ai_conversation_id: d.conversation_id || null,
+        }, { onConflict: 'twilio_call_sid' });
+      }
+      const { data: s } = await sb.from('phone_settings').select('ai_summary_to_number, forward_to_number').eq('id', 1).maybeSingle();
+      const owner = s?.ai_summary_to_number || s?.forward_to_number;
+      if (owner) await sendSms(owner, `AI answered a missed call from ${caller || 'unknown'}:\n${summary || '(no summary)'}`);
+      if (caller && transcript.length > 1) {
+        await sendSms(caller, `Thanks for calling Mike's Mobile Auto Repair! Mike will follow up soon. Book anytime: ${BOOK_URL} Reply STOP to opt out.`);
+      }
+      return json({ ok: true });
+    }
+
+    return json({ error: 'Unknown action' }, 400);
+  } catch (e) {
+    console.error('ai-receptionist error', e);
+    return json({ error: String(e) }, 500);
+  }
+});
