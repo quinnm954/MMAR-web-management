@@ -175,6 +175,30 @@ const Fleet = () => {
         </div>
       </section>
 
+      {/* Fleet overview video */}
+      <section className="container mx-auto px-4 py-14">
+        <div className="mx-auto max-w-5xl">
+          <div className="mb-6 text-center">
+            <h2 className="mb-2 text-3xl font-bold">Keep your fleet moving</h2>
+            <p className="text-muted-foreground">
+              See how our on-site service helps dealerships and commercial fleets reduce downtime.
+            </p>
+          </div>
+          <div className="overflow-hidden rounded-lg border border-border/60 bg-card shadow-lg">
+            <video
+              className="block h-auto w-full"
+              controls
+              playsInline
+              preload="metadata"
+              aria-label="Mike's Mobile Auto Repair fleet service overview"
+            >
+              <source src="/videos/mmar-fleet-overview.mp4" type="video/mp4" />
+              Your browser does not support this video.
+            </video>
+          </div>
+        </div>
+      </section>
+
       {/* Volume tiers */}
       <section className="container mx-auto px-4 py-14">
         <div className="text-center mb-10">
