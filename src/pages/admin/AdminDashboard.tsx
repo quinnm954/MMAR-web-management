@@ -60,6 +60,8 @@ const ALL: AppRole[] = ['owner', 'admin', 'manager', 'service_advisor', 'technic
 const ADMIN_ONLY: AppRole[] = ['owner', 'admin', 'manager'];
 const ADVISOR: AppRole[] = ['owner', 'admin', 'manager', 'service_advisor'];
 const PARTS: AppRole[] = ['owner', 'admin', 'manager', 'parts'];
+const OWNER_ADMIN: AppRole[] = ['owner', 'admin'];
+const SHOP_FLOOR: AppRole[] = ['owner', 'admin', 'manager', 'service_advisor', 'technician'];
 
 const AdminDashboard = () => {
   const { signOut, user, hasAnyRole, roles } = useAuth();
@@ -159,8 +161,8 @@ const AdminDashboard = () => {
             { value: 'bookings', label: 'Bookings', icon: CalendarCheck, roles: ADVISOR, content: <AdminBookings /> },
             { value: 'service', label: 'Service Records', icon: ClipboardList, roles: ADVISOR, content: <AdminServiceRecords /> },
             { value: 'estimates', label: 'Estimates', icon: FileSpreadsheet, roles: ADVISOR, content: <AdminEstimates /> },
-            { value: 'inspections', label: 'Inspections', icon: ClipboardCheck, roles: ALL, content: <AdminInspections /> },
-            { value: 'checklists', label: 'Checklists', icon: ClipboardList, roles: ALL, content: <AdminChecklists /> },
+            { value: 'inspections', label: 'Inspections', icon: ClipboardCheck, roles: SHOP_FLOOR, content: <AdminInspections /> },
+            { value: 'checklists', label: 'Checklists', icon: ClipboardList, roles: SHOP_FLOOR, content: <AdminChecklists /> },
             { value: 'vehicle-health', label: 'Vehicle Health', icon: ClipboardList, roles: ADVISOR, content: <AdminVehicleHealth /> },
             { value: 'invoices', label: 'Invoices', icon: Receipt, roles: ADVISOR, content: <AdminInvoices /> },
             { value: 'catalog', label: 'Catalog', icon: Package, roles: PARTS, content: <AdminCatalog /> },
@@ -171,14 +173,14 @@ const AdminDashboard = () => {
             { value: 'financing', label: 'Financing', icon: FileText, roles: ADMIN_ONLY, content: <FinancingContractsTable data={contracts} onRefresh={reloadFinancing} /> },
             { value: 'warranty', label: 'Warranty', icon: ShieldCheck, roles: ADMIN_ONLY, content: <WarrantyTable data={warranties} onRefresh={reloadWarranty} /> },
             { value: 'emails', label: 'Emails', icon: Mail, roles: ADMIN_ONLY, content: <AdminEmails /> },
-            { value: 'audit', label: 'Audit Log', icon: History, roles: ADMIN_ONLY, content: <AdminAuditLog /> },
+            { value: 'audit', label: 'Audit Log', icon: History, roles: OWNER_ADMIN, content: <AdminAuditLog /> },
             { value: 'employees', label: 'Employees', icon: UserCog, roles: ADMIN_ONLY, content: <AdminEmployees /> },
-            { value: 'roles', label: 'Roles', icon: ShieldCheck, roles: ADMIN_ONLY, content: <AdminRoles /> },
+            { value: 'roles', label: 'Roles', icon: ShieldCheck, roles: OWNER_ADMIN, content: <AdminRoles /> },
             { value: 'calls', label: 'Calls', icon: Phone, roles: ADVISOR, content: <AdminCalls /> },
             { value: 'texts', label: 'Texts', icon: MessageSquare, roles: ADVISOR, content: <AdminSMS /> },
-            { value: 'phone-settings', label: 'Phone Setup', icon: PhoneCall, roles: ADMIN_ONLY, content: <AdminPhoneSettings /> },
-            { value: 'tracking', label: 'Tracking', icon: ShieldCheck, roles: ADMIN_ONLY, content: <AdminTrackingSettings /> },
-            { value: 'settings', label: 'Settings', icon: Settings, roles: ADMIN_ONLY, content: <AdminShopSettings /> },
+            { value: 'phone-settings', label: 'Phone Setup', icon: PhoneCall, roles: OWNER_ADMIN, content: <AdminPhoneSettings /> },
+            { value: 'tracking', label: 'Tracking', icon: ShieldCheck, roles: OWNER_ADMIN, content: <AdminTrackingSettings /> },
+            { value: 'settings', label: 'Settings', icon: Settings, roles: OWNER_ADMIN, content: <AdminShopSettings /> },
           ];
           const visible = tabs.filter(t => hasAnyRole(t.roles));
           if (visible.length === 0) {
