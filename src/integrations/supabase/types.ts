@@ -2166,6 +2166,185 @@ export type Database = {
         }
         Relationships: []
       }
+      prospect_email_state: {
+        Row: {
+          daily_cap: number
+          id: number
+          lease_until: string | null
+          mailing_address: string | null
+          pause_reason: string | null
+          paused: boolean
+          sent_day: string | null
+          sent_today: number
+          updated_at: string
+        }
+        Insert: {
+          daily_cap?: number
+          id?: number
+          lease_until?: string | null
+          mailing_address?: string | null
+          pause_reason?: string | null
+          paused?: boolean
+          sent_day?: string | null
+          sent_today?: number
+          updated_at?: string
+        }
+        Update: {
+          daily_cap?: number
+          id?: number
+          lease_until?: string | null
+          mailing_address?: string | null
+          pause_reason?: string | null
+          paused?: boolean
+          sent_day?: string | null
+          sent_today?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      prospect_pitches: {
+        Row: {
+          call_script: string
+          category: string
+          created_at: string
+          email_body: string
+          email_subject: string
+        }
+        Insert: {
+          call_script: string
+          category: string
+          created_at?: string
+          email_body: string
+          email_subject: string
+        }
+        Update: {
+          call_script?: string
+          category?: string
+          created_at?: string
+          email_body?: string
+          email_subject?: string
+        }
+        Relationships: []
+      }
+      prospect_touches: {
+        Row: {
+          body: string | null
+          channel: string
+          created_at: string
+          id: string
+          outcome: string | null
+          prospect_id: string
+          step: number | null
+        }
+        Insert: {
+          body?: string | null
+          channel: string
+          created_at?: string
+          id?: string
+          outcome?: string | null
+          prospect_id: string
+          step?: number | null
+        }
+        Update: {
+          body?: string | null
+          channel?: string
+          created_at?: string
+          id?: string
+          outcome?: string | null
+          prospect_id?: string
+          step?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prospect_touches_prospect_id_fkey"
+            columns: ["prospect_id"]
+            isOneToOne: false
+            referencedRelation: "prospects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      prospects: {
+        Row: {
+          address: string | null
+          call_script: string | null
+          category: string
+          city: string
+          created_at: string
+          do_not_contact: boolean
+          email: string | null
+          email_body: string | null
+          email_status: string
+          email_step: number
+          email_subject: string | null
+          enriched_at: string | null
+          id: string
+          last_contacted_at: string | null
+          name: string
+          next_email_at: string | null
+          notes: string | null
+          phone: string | null
+          place_id: string
+          rating: number | null
+          review_count: number | null
+          stage: string
+          updated_at: string
+          website: string | null
+        }
+        Insert: {
+          address?: string | null
+          call_script?: string | null
+          category: string
+          city: string
+          created_at?: string
+          do_not_contact?: boolean
+          email?: string | null
+          email_body?: string | null
+          email_status?: string
+          email_step?: number
+          email_subject?: string | null
+          enriched_at?: string | null
+          id?: string
+          last_contacted_at?: string | null
+          name: string
+          next_email_at?: string | null
+          notes?: string | null
+          phone?: string | null
+          place_id: string
+          rating?: number | null
+          review_count?: number | null
+          stage?: string
+          updated_at?: string
+          website?: string | null
+        }
+        Update: {
+          address?: string | null
+          call_script?: string | null
+          category?: string
+          city?: string
+          created_at?: string
+          do_not_contact?: boolean
+          email?: string | null
+          email_body?: string | null
+          email_status?: string
+          email_step?: number
+          email_subject?: string | null
+          enriched_at?: string | null
+          id?: string
+          last_contacted_at?: string | null
+          name?: string
+          next_email_at?: string | null
+          notes?: string | null
+          phone?: string | null
+          place_id?: string
+          rating?: number | null
+          review_count?: number | null
+          stage?: string
+          updated_at?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
       ro_attachments: {
         Row: {
           appointment_id: string
