@@ -1215,6 +1215,60 @@ export type Database = {
         }
         Relationships: []
       }
+      fleet_accounts: {
+        Row: {
+          city: string
+          company_name: string
+          contact_name: string
+          created_at: string
+          email: string
+          fleet_size: number
+          id: string
+          notes: string | null
+          phone: string
+          sms_consent: boolean
+          status: string
+          updated_at: string
+          user_id: string
+          vehicle_types: string[]
+          yard_address: string
+        }
+        Insert: {
+          city: string
+          company_name: string
+          contact_name: string
+          created_at?: string
+          email: string
+          fleet_size: number
+          id?: string
+          notes?: string | null
+          phone: string
+          sms_consent?: boolean
+          status?: string
+          updated_at?: string
+          user_id: string
+          vehicle_types?: string[]
+          yard_address: string
+        }
+        Update: {
+          city?: string
+          company_name?: string
+          contact_name?: string
+          created_at?: string
+          email?: string
+          fleet_size?: number
+          id?: string
+          notes?: string | null
+          phone?: string
+          sms_consent?: boolean
+          status?: string
+          updated_at?: string
+          user_id?: string
+          vehicle_types?: string[]
+          yard_address?: string
+        }
+        Relationships: []
+      }
       inbound_messages: {
         Row: {
           archived_at: string | null
@@ -3652,6 +3706,22 @@ export type Database = {
           _signature: string
           _status: string
           _token: string
+        }
+        Returns: Json
+      }
+      submit_fleet_registration: {
+        Args: {
+          _city: string
+          _company_name: string
+          _contact_name: string
+          _email: string
+          _fleet_size: number
+          _notes: string
+          _phone: string
+          _sms_consent: boolean
+          _user_id: string
+          _vehicle_types: string[]
+          _yard_address: string
         }
         Returns: Json
       }
