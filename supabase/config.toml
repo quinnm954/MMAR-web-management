@@ -47,3 +47,6 @@ verify_jwt = false
 
 [functions.twilio-voice-client]
 verify_jwt = false
+
+[functions.prospect-email-worker]
+verify_jwt = false

@@ -23,9 +23,11 @@ import { template as adminNewBookingRequest } from './admin-new-booking-request.
 import { template as maintenanceChecklistReminder } from './maintenance-checklist-reminder.tsx'
 import { template as adminMessage } from './admin-message.tsx'
 import { template as techJobAssigned } from './tech-job-assigned.tsx'
+import { template as fleetOutreach } from './fleet-outreach.tsx'
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   'admin-message': adminMessage,
+  'fleet-outreach': fleetOutreach,
   'appointment-confirmed': appointmentConfirmed,
   'service-completed': serviceCompleted,
   'invoice-issued': invoiceIssued,
