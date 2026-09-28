@@ -75,6 +75,7 @@ Deno.serve(async (req) => {
       url: payload.url || "/",
       badge_count: payload.badge_count,
       category: payload.category,
+      tag: payload.category || "garage-ace",
     });
 
     const results: { id: string; ok: boolean; status?: number; error?: string }[] = [];
