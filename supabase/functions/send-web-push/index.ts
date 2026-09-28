@@ -86,7 +86,13 @@ Deno.serve(async (req) => {
         keys: { p256dh: s.p256dh, auth: s.auth },
       };
       try {
-        const res = await webpush.sendNotification(subscription, messageBody, { TTL: 60 });
+        // High urgency wakes the device immediately (banner + sound/vibration
+        // like a native app); 1h TTL so alerts still arrive if the device was
+        // briefly offline instead of being dropped after 60s.
+        const res = await webpush.sendNotification(subscription, messageBody, {
+          TTL: 3600,
+          urgency: "high",
+        });
         results.push({ id: s.id, ok: true, status: res.statusCode });
         await admin
           .from("web_push_subscriptions")
