@@ -50,12 +50,12 @@ const INCLUDED = [
   {
     icon: BadgeDollarSign,
     title: "Zero Mobile Diagnostic Fees",
-    text: "We waive all mobile dispatch and diagnostic fees for your fleet vehicles, saving you over $100 per incident.",
+    text: "We waive all mobile dispatch and diagnostic fees for your fleet vehicles — every time we roll up.",
   },
   {
     icon: Percent,
-    title: "15% Off Major Labor",
-    text: "Enjoy a flat 15% discount on labor rates for any heavy mechanical repairs (suspension, alternators, water pumps, brakes).",
+    title: "Preferred Labor Rates",
+    text: "Heavy mechanical work (suspension, alternators, water pumps, brakes) is billed at labor rates that beat the average repair shop or mobile mechanic.",
   },
 ];
 
@@ -63,13 +63,14 @@ const PLAN_COVERS = [
   "Unlimited digital health inspections",
   "Zero dispatch / diagnostic fees",
   "Priority scheduling",
-  "15% labor discounts",
+  "Preferred labor rates",
   "On-site maintenance coordination",
 ];
 
 const FAQ = [
   { q: "What counts as a fleet?", a: "Any business with 5 or more vehicles under one account qualifies for the Fleet Partner Plan." },
-  { q: "What does the $295/month retainer cover?", a: "Your first 5 vehicles: unlimited digital health inspections, zero dispatch/diagnostic fees, priority scheduling, 15% off major labor, and on-site maintenance coordination. Additional vehicles can be added at a low per-unit rate." },
+  { q: "What does the Fleet Partner Plan include?", a: "Your whole fleet gets unlimited digital health inspections, zero dispatch and diagnostic fees, priority scheduling, preferred labor rates, and on-site maintenance coordination." },
+  { q: "How much does the plan cost?", a: "Every fleet is different — vehicle count, make/model mix, and how hard the vehicles work all change the scope. We quote each fleet individually after a quick fleet audit, and our labor rates are more affordable than the average repair shop or mobile mechanic." },
   { q: "Are parts and fluids included?", a: "No — parts and fluids for routine service are billed transparently per job, so you only pay for what each vehicle actually uses." },
   { q: "When do Yard Days happen?", a: "Usually on a Saturday or before your crews dispatch, so your vehicles are never pulled off a job." },
   { q: "Can we mix vehicle types?", a: "Yes. Vans, pickups, cars, and SUVs — gas, hybrid, EV, and diesel — can all be on one fleet account." },
@@ -86,7 +87,7 @@ const Fleet = () => {
     }
     el.setAttribute(
       "content",
-      "Mobile fleet maintenance in Southwest Florida for trades, contractors, and delivery businesses with 5+ vehicles. Monthly on-site Yard Days, priority dispatch, $295/mo."
+      "Mobile fleet maintenance in Southwest Florida for trades, contractors, and delivery businesses with 5+ vehicles. Monthly on-site Yard Days, priority dispatch, and labor rates that beat the average shop."
     );
 
     const ldId = "ld-fleet-faq";
@@ -196,23 +197,27 @@ const Fleet = () => {
         </div>
       </section>
 
-      {/* Pricing */}
+      {/* Fleet value */}
       <section className="container mx-auto px-4 py-14 border-t border-border/50">
         <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold mb-2">Transparent Pricing</h2>
-          <p className="text-muted-foreground">Simple, predictable overhead that your bookkeeper will love.</p>
+          <h2 className="text-3xl font-bold mb-2">Built Around Uptime</h2>
+          <p className="text-muted-foreground">
+            One plan that keeps every vehicle in your yard serviced, tracked, and on the road.
+          </p>
         </div>
         <Card className="max-w-xl mx-auto border-accent/40">
           <CardContent className="py-8">
             <h3 className="text-2xl font-bold text-center mb-1">The Fleet Partner Plan</h3>
             <p className="text-center text-sm text-muted-foreground mb-6">Minimum requirement: 5 vehicles</p>
-            <div className="text-center mb-2">
-              <span className="text-5xl font-bold text-accent">$295</span>
-              <span className="text-muted-foreground"> / month</span>
+            <div className="mb-6 rounded-lg border border-accent/30 bg-accent/5 p-4 text-center">
+              <p className="text-sm font-semibold text-accent mb-1">
+                Affordable labor, better than the average shop
+              </p>
+              <p className="text-sm text-muted-foreground">
+                No hourly surprises and no upsell pressure — just labor rates that beat the typical repair shop
+                or mobile mechanic, agreed before any wrench turns.
+              </p>
             </div>
-            <p className="text-center text-sm text-muted-foreground mb-6">
-              Flat retainer covers your first 5 vehicles. Additional vehicles can be added at a low per-unit rate.
-            </p>
             <ul className="space-y-2 mb-6">
               {PLAN_COVERS.map((c) => (
                 <li key={c} className="flex items-start gap-2">
@@ -221,8 +226,17 @@ const Fleet = () => {
                 </li>
               ))}
             </ul>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-muted-foreground mb-6">
               Note: Cost of specific parts and fluids for routine service is billed transparently per job.
+            </p>
+            <Button asChild size="lg" className="w-full">
+              <a href={`sms:${PHONE}?&body=${AUDIT_SMS}`}>
+                <ClipboardList className="w-4 h-4 mr-2" />
+                Request a Fleet Audit
+              </a>
+            </Button>
+            <p className="text-center text-xs text-muted-foreground mt-3">
+              Every fleet is quoted individually — vehicle count, make/model mix, and how hard the vehicles work.
             </p>
           </CardContent>
         </Card>
