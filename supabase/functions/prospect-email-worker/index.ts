@@ -35,6 +35,10 @@ Deno.serve(async (req) => {
       .order('created_at').limit(room);
 
     for (const p of due || []) {
+      if (/^(filler|noreply|no-reply|example|test|user|email|yourname|name)@|@(example\.|domain\.|godaddy\.com$|sentry|wixpress\.com$)/i.test(String(p.email))) {
+        await sb.from('prospects').update({ email_status: 'done', notes: `${p.notes ? p.notes + '\n' : ''}Skipped placeholder email ${p.email}` }).eq('id', p.id);
+        continue;
+      }
       const { data: sup } = await sb.from('suppressed_emails').select('id').eq('email', p.email).maybeSingle();
       if (sup) { await sb.from('prospects').update({ email_status: 'done', do_not_contact: true, stage: 'do_not_contact' }).eq('id', p.id); continue; }
       const step = p.email_step + 1;
