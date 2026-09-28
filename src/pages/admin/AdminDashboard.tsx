@@ -17,6 +17,8 @@ import { LogOut, FileText, ShieldCheck, Users, CreditCard, Calendar, CalendarChe
 import AdminCalls from '@/components/admin/AdminCalls';
 import Softphone from '@/components/admin/Softphone';
 import AdminSMS from '@/components/admin/AdminSMS';
+import AdminProspecting from '@/components/admin/AdminProspecting';
+import { Search } from 'lucide-react';
 import AdminPhoneSettings from '@/components/admin/AdminPhoneSettings';
 import AdminTrackingSettings from '@/components/admin/AdminTrackingSettings';
 import AdminEmployees from '@/components/admin/AdminEmployees';
@@ -178,6 +180,7 @@ const AdminDashboard = () => {
             { value: 'roles', label: 'Roles', icon: ShieldCheck, roles: OWNER_ADMIN, content: <AdminRoles /> },
             { value: 'calls', label: 'Calls', icon: Phone, roles: ADVISOR, content: <AdminCalls /> },
             { value: 'texts', label: 'Texts', icon: MessageSquare, roles: ADVISOR, content: <AdminSMS /> },
+            { value: 'prospecting', label: 'Prospecting', icon: Search, roles: OWNER_ADMIN, content: <AdminProspecting /> },
             { value: 'phone-settings', label: 'Phone Setup', icon: PhoneCall, roles: OWNER_ADMIN, content: <AdminPhoneSettings /> },
             { value: 'tracking', label: 'Tracking', icon: ShieldCheck, roles: OWNER_ADMIN, content: <AdminTrackingSettings /> },
             { value: 'settings', label: 'Settings', icon: Settings, roles: OWNER_ADMIN, content: <AdminShopSettings /> },
@@ -207,7 +210,7 @@ const AdminDashboard = () => {
 
           const groups = [
             { label: 'Workshop', values: ['kanban','calendar','ros','service','inspections','checklists','estimates','invoices','time','shifts','productivity'] },
-            { label: 'Front Desk', values: ['customers','garage','memberships','bookings','share','declined','calls','texts'] },
+            { label: 'Front Desk', values: ['customers','garage','memberships','bookings','share','declined','calls','texts','prospecting'] },
             { label: 'Admin', values: ['dashboard','reports','catalog','laborpay','quickbooks','financing','warranty','emails','audit','employees','roles','phone-settings','tracking','settings'] },
           ];
           const groupedValues = groups.flatMap(g => g.values);
