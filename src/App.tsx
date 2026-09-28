@@ -67,6 +67,7 @@ import MmarCare from "./pages/MmarCare";
 import GarageAce from "./pages/GarageAce";
 import WhyGarageAce from "./pages/WhyGarageAce";
 import Fleet from "./pages/Fleet";
+import FleetRegister from "./pages/FleetRegister";
 import Book from "./pages/Book";
 import AppointmentConfirmation from "./pages/AppointmentConfirmation";
 import NativeBoot from "./components/NativeBoot";
@@ -130,6 +131,7 @@ const App = () => (
             <Route path="/memberships/*" element={<Navigate to="/mmar-care" replace />} />
             <Route path="/mmar-care" element={<MmarCare />} />
             <Route path="/fleet" element={<Fleet />} />
+            <Route path="/fleet/register" element={<FleetRegister />} />
             <Route path="/garage-ace" element={<GarageAce />} />
             <Route path="/why-garage-ace" element={<WhyGarageAce />} />
             <Route path="/portal/login" element={<Navigate to="/login" replace />} />
