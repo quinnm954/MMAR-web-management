@@ -56,7 +56,12 @@ export default function AdminProspecting() {
   };
   useEffect(() => { load(); }, []);
 
-  const shown = useMemo(() => filter === 'all' ? rows : rows.filter((r) => r.stage === filter), [rows, filter]);
+  const shown = useMemo(() => {
+    const visible = filter === 'all' ? rows : rows.filter((r) => r.stage === filter);
+    // Businesses we can actually email float to the top of the list.
+    const rank = (r: Prospect) => (r.email && !r.do_not_contact ? 0 : r.email ? 1 : 2);
+    return [...visible].sort((a, b) => rank(a) - rank(b));
+  }, [rows, filter]);
   const drafts = rows.filter((r) => r.email_status === 'draft' && r.email && !r.do_not_contact);
   const needPitch = rows.filter((r) => !r.email_body && !r.do_not_contact);
 
