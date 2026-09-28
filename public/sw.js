@@ -31,7 +31,12 @@ async function handlePush(event) {
     body: payload.body || "",
     icon: "/icons/icon-192.png",
     badge: "/icons/icon-192.png",
-    tag: payload.tag || undefined,
+    // Same-category alerts replace each other instead of stacking, but each
+    // new one still re-alerts (sound/vibration) thanks to renotify.
+    tag: payload.tag || payload.category || "garage-ace",
+    renotify: true,
+    vibrate: [200, 100, 200],
+    timestamp: Date.now(),
     data: { url: payload.url || "/", ...(payload.data || {}) },
   };
 
