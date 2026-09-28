@@ -238,9 +238,9 @@ const Fleet = () => {
               Note: Cost of specific parts and fluids for routine service is billed transparently per job.
             </p>
             <Button asChild size="lg" className="w-full">
-              <a href={`sms:${PHONE}?&body=${AUDIT_SMS}`}>
-                <ClipboardList className="w-4 h-4 mr-2" />
-                Request a Fleet Audit
+              <a href="/fleet/register">
+                <Truck className="w-4 h-4 mr-2" />
+                Create Fleet Account
               </a>
             </Button>
             <p className="text-center text-xs text-muted-foreground mt-3">
