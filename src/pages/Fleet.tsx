@@ -130,12 +130,20 @@ const Fleet = () => {
               businesses with 5 or more vehicles in Southwest Florida. Eliminate downtime, keep your drivers
               working, and let us manage your maintenance calendar.
             </p>
-            <Button asChild size="lg">
-              <a href={`sms:${PHONE}?&body=${AUDIT_SMS}`}>
-                <ClipboardList className="w-4 h-4 mr-2" />
-                Request a Fleet Audit
-              </a>
-            </Button>
+            <div className="flex flex-wrap gap-3">
+              <Button asChild size="lg">
+                <a href="/fleet/register">
+                  <Truck className="w-4 h-4 mr-2" />
+                  Create Fleet Account
+                </a>
+              </Button>
+              <Button asChild size="lg" variant="secondary">
+                <a href={`sms:${PHONE}?&body=${AUDIT_SMS}`}>
+                  <ClipboardList className="w-4 h-4 mr-2" />
+                  Request a Fleet Audit
+                </a>
+              </Button>
+            </div>
           </div>
         </div>
       </section>
