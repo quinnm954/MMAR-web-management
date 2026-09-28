@@ -6,7 +6,7 @@ import { useAuth } from "@/hooks/useAuth";
 import PortalLayout from "@/components/portal/PortalLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Car, CreditCard, Calendar, ArrowRight, RefreshCw, MessageCircle, Bell } from "lucide-react";
+import { Car, CreditCard, Calendar, ArrowRight, RefreshCw, MessageCircle, Bell, Truck } from "lucide-react";
 import { portalStrings } from "@/lib/portalStrings";
 import PushNotificationCard from "@/components/shell/PushNotificationCard";
 import VehicleHealthCard from "@/components/portal/VehicleHealthCard";
@@ -18,16 +18,19 @@ const PortalDashboard = () => {
   const [counts, setCounts] = useState({ vehicles: 0, memberships: 0, appointments: 0 });
   const [name, setName] = useState("");
   const [refreshing, setRefreshing] = useState(false);
+  const [fleetName, setFleetName] = useState<string | null>(null);
 
   const refresh = async () => {
     if (!user) return;
     setRefreshing(true);
-    const [v, m, a, p] = await Promise.all([
+    const [v, m, a, p, f] = await Promise.all([
       supabase.from("vehicles").select("id", { count: "exact", head: true }).eq("owner_id", user.id).eq("is_active", true),
       supabase.from("memberships").select("id", { count: "exact", head: true }).eq("customer_id", user.id).eq("status", "active"),
       supabase.from("appointments").select("id", { count: "exact", head: true }).eq("customer_id", user.id).in("status", ["requested", "scheduled"]),
       supabase.from("profiles").select("full_name").eq("id", user.id).maybeSingle(),
+      supabase.from("fleet_accounts").select("company_name").eq("user_id", user.id).maybeSingle(),
     ]);
+    setFleetName(f.data?.company_name ?? null);
     setCounts({
       vehicles: v.count ?? 0,
       memberships: m.count ?? 0,
@@ -81,6 +84,21 @@ const PortalDashboard = () => {
         <StatCard icon={CreditCard} label="Memberships" value={counts.memberships} link="/portal/membership" />
         <StatCard icon={Calendar} label="Appointments" value={counts.appointments} link="/portal/appointments" />
       </div>
+
+      {fleetName && (
+        <Link to="/portal/fleet" className="block mb-6">
+          <Card className="border-primary/40 hover:border-primary transition-colors">
+            <CardContent className="p-4 flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-primary/10 text-primary"><Truck className="h-5 w-5" /></div>
+              <div className="flex-1">
+                <div className="font-semibold">{fleetName} fleet</div>
+                <p className="text-xs text-muted-foreground">See every vehicle, plan, upcoming service, and balance</p>
+              </div>
+              <ArrowRight className="h-4 w-4 text-primary" />
+            </CardContent>
+          </Card>
+        </Link>
+      )}
 
       <MileageQuickUpdate />
 

@@ -68,6 +68,7 @@ import GarageAce from "./pages/GarageAce";
 import WhyGarageAce from "./pages/WhyGarageAce";
 import Fleet from "./pages/Fleet";
 import FleetRegister from "./pages/FleetRegister";
+import PortalFleet from "./pages/portal/PortalFleet";
 import Book from "./pages/Book";
 import AppointmentConfirmation from "./pages/AppointmentConfirmation";
 import NativeBoot from "./components/NativeBoot";
@@ -139,6 +140,7 @@ const App = () => (
             <Route path="/portal/membership-signup" element={<MembershipSignup />} />
             <Route path="/portal/onboarding" element={<CustomerProtectedRoute><PortalOnboarding /></CustomerProtectedRoute>} />
             <Route path="/portal/dashboard" element={<CustomerProtectedRoute><PortalDashboard /></CustomerProtectedRoute>} />
+            <Route path="/portal/fleet" element={<CustomerProtectedRoute><PortalFleet /></CustomerProtectedRoute>} />
             <Route path="/portal/vehicles" element={<CustomerProtectedRoute><PortalVehicles /></CustomerProtectedRoute>} />
             <Route path="/portal/maintenance" element={<CustomerProtectedRoute><PortalMaintenance /></CustomerProtectedRoute>} />
             <Route path="/portal/membership" element={<CustomerProtectedRoute><PortalMembership /></CustomerProtectedRoute>} />
