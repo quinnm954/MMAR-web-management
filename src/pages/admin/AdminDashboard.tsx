@@ -210,7 +210,7 @@ const AdminDashboard = () => {
 
           const groups = [
             { label: 'Workshop', values: ['kanban','calendar','ros','service','inspections','checklists','estimates','invoices','time','shifts','productivity'] },
-            { label: 'Front Desk', values: ['customers','garage','memberships','bookings','share','declined','calls','texts'] },
+            { label: 'Front Desk', values: ['customers','garage','memberships','bookings','share','declined','calls','texts','prospecting'] },
             { label: 'Admin', values: ['dashboard','reports','catalog','laborpay','quickbooks','financing','warranty','emails','audit','employees','roles','phone-settings','tracking','settings'] },
           ];
           const groupedValues = groups.flatMap(g => g.values);
