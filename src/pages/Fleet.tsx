@@ -197,23 +197,27 @@ const Fleet = () => {
         </div>
       </section>
 
-      {/* Pricing */}
+      {/* Fleet value */}
       <section className="container mx-auto px-4 py-14 border-t border-border/50">
         <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold mb-2">Transparent Pricing</h2>
-          <p className="text-muted-foreground">Simple, predictable overhead that your bookkeeper will love.</p>
+          <h2 className="text-3xl font-bold mb-2">Built Around Uptime</h2>
+          <p className="text-muted-foreground">
+            One plan that keeps every vehicle in your yard serviced, tracked, and on the road.
+          </p>
         </div>
         <Card className="max-w-xl mx-auto border-accent/40">
           <CardContent className="py-8">
             <h3 className="text-2xl font-bold text-center mb-1">The Fleet Partner Plan</h3>
             <p className="text-center text-sm text-muted-foreground mb-6">Minimum requirement: 5 vehicles</p>
-            <div className="text-center mb-2">
-              <span className="text-5xl font-bold text-accent">$295</span>
-              <span className="text-muted-foreground"> / month</span>
+            <div className="mb-6 rounded-lg border border-accent/30 bg-accent/5 p-4 text-center">
+              <p className="text-sm font-semibold text-accent mb-1">
+                Affordable labor, better than the average shop
+              </p>
+              <p className="text-sm text-muted-foreground">
+                No hourly surprises and no upsell pressure — just labor rates that beat the typical repair shop
+                or mobile mechanic, agreed before any wrench turns.
+              </p>
             </div>
-            <p className="text-center text-sm text-muted-foreground mb-6">
-              Flat retainer covers your first 5 vehicles. Additional vehicles can be added at a low per-unit rate.
-            </p>
             <ul className="space-y-2 mb-6">
               {PLAN_COVERS.map((c) => (
                 <li key={c} className="flex items-start gap-2">
@@ -222,8 +226,17 @@ const Fleet = () => {
                 </li>
               ))}
             </ul>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-muted-foreground mb-6">
               Note: Cost of specific parts and fluids for routine service is billed transparently per job.
+            </p>
+            <Button asChild size="lg" className="w-full">
+              <a href={`sms:${PHONE}?&body=${AUDIT_SMS}`}>
+                <ClipboardList className="w-4 h-4 mr-2" />
+                Request a Fleet Audit
+              </a>
+            </Button>
+            <p className="text-center text-xs text-muted-foreground mt-3">
+              Every fleet is quoted individually — vehicle count, make/model mix, and how hard the vehicles work.
             </p>
           </CardContent>
         </Card>
