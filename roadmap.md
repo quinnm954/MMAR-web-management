@@ -7,7 +7,7 @@
 - [ ] When the 813-501-7572 port from Google Voice to Twilio completes, wire it to the AI receptionist: run the ai-receptionist setup action (auto-links every number on the account) or point the number's VoiceUrl at twilio-voice-incoming and SmsUrl at twilio-inbound-sms. Blocked: waiting on the port (1-4 weeks).
 
 ## Fleet Prospecting
-- [ ] Connect Google Maps; tables + RLS
-- [ ] Edge functions: prospect-search, prospect-enrich, prospect-pitch, prospect-email-worker (cron)
-- [ ] Outreach email template
-- [ ] Admin Prospecting tab (search, leads, pitch, tap-to-call, email queue)
+- [x] Connect Google Maps; tables + RLS
+- [x] Edge functions: prospect-search, prospect-enrich, prospect-pitch, prospect-email-worker (cron)
+- [x] Outreach email template
+- [x] Admin Prospecting tab (search, leads, pitch, tap-to-call, email queue)
