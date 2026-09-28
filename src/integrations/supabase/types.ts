@@ -3674,6 +3674,20 @@ export type Database = {
         Args: { _miles: number; _token: string }
         Returns: Json
       }
+      register_fleet_for_me: {
+        Args: {
+          _city: string
+          _company_name: string
+          _contact_name: string
+          _fleet_size: number
+          _notes: string
+          _phone: string
+          _sms_consent: boolean
+          _vehicle_types: string[]
+          _yard_address: string
+        }
+        Returns: Json
+      }
       seed_vehicle_master_checklist: {
         Args: { _vehicle_id: string }
         Returns: number

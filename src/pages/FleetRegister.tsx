@@ -13,6 +13,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CheckCircle2, Loader2, Truck } from "lucide-react";
 import { useSeo } from "@/lib/useSeo";
+import { useAuth } from "@/hooks/useAuth";
 
 const VEHICLE_TYPES = ["Pickup trucks", "Cargo vans", "Box trucks", "SUVs", "Sedans", "Trailers / equipment"];
 const CITIES = ["Fort Myers", "Lehigh Acres", "Cape Coral", "Estero", "Gateway", "Other"];
@@ -38,6 +39,7 @@ export default function FleetRegister() {
     description: "Create a fleet account for on-site mobile maintenance and priority repair in Fort Myers and Lehigh Acres.",
     canonical: "https://mikesmautorepair.com/fleet/register",
   });
+  const { user } = useAuth();
   const [f, setF] = useState<Form>({ company: "", contact: "", email: "", phone: "", password: "", fleetSize: "" as unknown as number, types: [], yard: "", city: "", notes: "", sms: false });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
@@ -49,7 +51,7 @@ export default function FleetRegister() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError(null);
-    const p = schema.safeParse(f);
+    const p = (user ? schema.extend({ email: z.string().optional(), password: z.string().optional() }) : schema).safeParse(f);
     if (!p.success) {
       const errs: Record<string, string> = {};
       p.error.issues.forEach((i) => { errs[String(i.path[0])] ??= i.message; });
@@ -59,6 +61,16 @@ export default function FleetRegister() {
     setErrors({});
     setBusy(true);
     const d = p.data;
+    if (user) {
+      const { error: e2 } = await supabase.rpc("register_fleet_for_me", {
+        _company_name: d.company, _contact_name: d.contact, _phone: d.phone, _fleet_size: d.fleetSize,
+        _vehicle_types: d.types, _yard_address: d.yard, _city: d.city, _notes: d.notes ?? "", _sms_consent: d.sms,
+      });
+      setBusy(false);
+      if (e2) { setFormError(e2.message.includes("already") ? "Your account already has a fleet set up. Open My Fleet in your account." : "Couldn't save your fleet details. Please call/text 813-501-7572."); return; }
+      setDone(true);
+      return;
+    }
     const { data, error } = await supabase.auth.signUp({
       email: d.email,
       password: d.password,
@@ -66,12 +78,12 @@ export default function FleetRegister() {
     });
     if (error || !data.user) {
       setBusy(false);
-      setFormError(error?.message ?? "Couldn't create your account.");
+      setFormError(/already registered/i.test(error?.message ?? "") ? "ALREADY" : (error?.message ?? "Couldn't create your account."));
       return;
     }
     if (data.user.identities && data.user.identities.length === 0) {
       setBusy(false);
-      setFormError("An account with this email already exists. Sign in instead, or call/text 813-501-7572.");
+      setFormError("ALREADY");
       return;
     }
     const { error: rpcErr } = await supabase.rpc("submit_fleet_registration", {
@@ -97,7 +109,7 @@ export default function FleetRegister() {
             <CardContent className="py-10 text-center space-y-4">
               <CheckCircle2 className="w-12 h-12 text-primary mx-auto" />
               <h1 className="text-2xl font-bold">You're registered</h1>
-              <p className="text-muted-foreground">Check your email to confirm your account. Mike will reach out within one business day to schedule your fleet audit.</p>
+              <p className="text-muted-foreground">{user ? <>Your fleet is set up. <Link to="/portal/fleet" className="underline">Open My Fleet</Link>.</> : "Check your email to confirm your account."} Mike will reach out within one business day to schedule your fleet audit.</p>
               <Button asChild variant="secondary"><Link to="/fleet">Back to Fleet</Link></Button>
             </CardContent>
           </Card>
@@ -112,9 +124,9 @@ export default function FleetRegister() {
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div><Label htmlFor="company">Company name</Label><Input id="company" value={f.company} onChange={(e) => set("company", e.target.value)} />{err("company")}</div>
                   <div><Label htmlFor="contact">Your name</Label><Input id="contact" autoComplete="name" value={f.contact} onChange={(e) => set("contact", e.target.value)} />{err("contact")}</div>
-                  <div><Label htmlFor="email">Email</Label><Input id="email" type="email" autoComplete="email" value={f.email} onChange={(e) => set("email", e.target.value)} />{err("email")}</div>
+                  {!user && <><div><Label htmlFor="email">Email</Label><Input id="email" type="email" autoComplete="email" value={f.email} onChange={(e) => set("email", e.target.value)} />{err("email")}</div>
+                  <div><Label htmlFor="password">Create a password</Label><Input id="password" type="password" autoComplete="new-password" value={f.password} onChange={(e) => set("password", e.target.value)} />{err("password")}</div></>}
                   <div><Label htmlFor="phone">Mobile phone</Label><Input id="phone" type="tel" autoComplete="tel" value={f.phone} onChange={(e) => set("phone", e.target.value)} />{err("phone")}</div>
-                  <div><Label htmlFor="password">Create a password</Label><Input id="password" type="password" autoComplete="new-password" value={f.password} onChange={(e) => set("password", e.target.value)} />{err("password")}</div>
                   <div><Label htmlFor="size">Number of vehicles</Label><Input id="size" type="number" min={1} value={f.fleetSize as number} onChange={(e) => set("fleetSize", e.target.value as unknown as number)} />{err("fleetSize")}</div>
                 </div>
                 <div>
@@ -142,9 +154,12 @@ export default function FleetRegister() {
                   <Checkbox className="mt-0.5" checked={f.sms} onCheckedChange={(v) => set("sms", !!v)} />
                   <span>I agree to receive text messages from Mike's Mobile Auto Repair about service, estimates, and invoices. Message frequency varies. Msg & data rates may apply. Reply STOP to opt out, HELP for help. Consent is not a condition of purchase. See our <Link to="/privacy" className="underline">Privacy Policy</Link> and <Link to="/terms" className="underline">Terms</Link>.</span>
                 </label>
-                {formError && <p className="text-sm text-destructive">{formError}</p>}
+                {formError === "ALREADY" ? (
+                  <p className="text-sm text-destructive">You already have an account with this email. <Link to="/login?redirect=/fleet/register" className="underline font-medium">Sign in</Link>, then come back here to add your fleet.</p>
+                ) : formError && <p className="text-sm text-destructive">{formError}</p>}
+                {user && <p className="text-xs text-muted-foreground">Adding this fleet to your account ({user.email}).</p>}
                 <Button type="submit" size="lg" className="w-full" disabled={busy}>{busy && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}Create fleet account</Button>
-                <p className="text-center text-xs text-muted-foreground">Already have an account? <Link to="/login" className="underline">Sign in</Link></p>
+                {!user && <p className="text-center text-xs text-muted-foreground">Already have an account? <Link to="/login" className="underline">Sign in</Link></p>}
               </form>
             </CardContent>
           </Card>
