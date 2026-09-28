@@ -16,7 +16,6 @@ No automated calls or texts go out, which keeps you within federal law (TCPA) an
 
 ## What you'll need to provide
 - **Google Maps connection:** one click. Searches are capped per run to keep costs low.
-- **An email sending service** such as Resend, plus a separate sending address like `fleet@mikesmautorepair.com`. The built-in site email is for customer messages only. Using it for cold email could hurt delivery of your appointment and invoice emails. I'll walk you through setup (about 10 minutes).
 - **Your business mailing address** for the email footer. The law (CAN-SPAM) requires it.
 
 ## Technical details
