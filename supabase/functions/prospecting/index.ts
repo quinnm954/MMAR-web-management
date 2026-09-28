@@ -123,28 +123,53 @@ Deno.serve(async (req) => {
     }
 
     if (action === 'enrich') {
-      const { data: list } = await sb.from('prospects').select('id,website')
-        .is('enriched_at', null).not('website', 'is', null).limit(10);
+      const { data: list } = await sb.from('prospects').select('id,website,name,city')
+        .is('enriched_at', null).limit(10);
+      const BAD = /example|sentry|wix|domain\.com|godaddy|filler|noreply|no-reply|\.(png|jpg|gif|webp)$/i;
+      const pick = (text: string) => {
+        const all = [...text.matchAll(/(?:mailto:)?([A-Z0-9._%+-]+@[A-Z0-9.-]+\.(?:com|net|org|biz|us|co|info))\b/gi)].map((m) => m[1].toLowerCase());
+        return all.find((e) => !BAD.test(e)) || null;
+      };
+      const fcKey = Deno.env.get('FIRECRAWL_API_KEY');
       let emails = 0;
       await Promise.all((list || []).map(async (p) => {
         let email: string | null = null;
-        const base = String(p.website);
-        for (const path of ['', '/contact', '/contact-us']) {
+        if (p.website) {
+          for (const path of ['', '/contact', '/contact-us']) {
+            try {
+              const url = new URL(path || '/', String(p.website)).toString();
+              const r = await fetch(url, { signal: AbortSignal.timeout(6000), redirect: 'follow' });
+              if (!r.ok) continue;
+              email = pick((await r.text()).slice(0, 400000));
+              if (email) break;
+            } catch { /* skip */ }
+          }
+        }
+        // Fall back to a full web search (Google-style) for the business's email
+        if (!email && fcKey) {
           try {
-            const url = new URL(path || '/', base).toString();
-            const r = await fetch(url, { signal: AbortSignal.timeout(6000), redirect: 'follow' });
-            if (!r.ok) continue;
-            const html = (await r.text()).slice(0, 400000);
-            const m = html.match(/mailto:([A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,})/i)
-              || html.match(/\b([A-Z0-9._%+-]+@[A-Z0-9.-]+\.(?:com|net|org|biz|us|co))\b/i);
-            if (m && !/\.(png|jpg|gif|webp)$/i.test(m[1]) && !/example|sentry|wix|domain\.com/i.test(m[1])) { email = m[1].toLowerCase(); break; }
-          } catch { /* skip */ }
+            const r = await fetch('https://api.firecrawl.dev/v2/search', {
+              method: 'POST',
+              headers: { Authorization: `Bearer ${fcKey}`, 'Content-Type': 'application/json' },
+              body: JSON.stringify({ query: `"${p.name}" ${p.city || ''} FL email contact`, limit: 5, country: 'US',
+                scrapeOptions: { formats: ['markdown'], onlyMainContent: true } }),
+              signal: AbortSignal.timeout(45000),
+            });
+            if (r.ok) {
+              const d = await r.json();
+              const items = Array.isArray(d?.data) ? d.data : (d?.data?.web || []);
+              for (const it of items) {
+                email = pick(`${it.description || ''} ${it.markdown || ''}`);
+                if (email) break;
+              }
+            } else console.error('firecrawl search', r.status, await r.text());
+          } catch (e) { console.error('firecrawl error', e); }
         }
         if (email) emails++;
         await sb.from('prospects').update({ email, enriched_at: new Date().toISOString() }).eq('id', p.id);
       }));
       const { count } = await sb.from('prospects').select('id', { count: 'exact', head: true })
-        .is('enriched_at', null).not('website', 'is', null);
+        .is('enriched_at', null);
       return json({ ok: true, checked: list?.length || 0, emails, remaining: count || 0 });
     }
 
