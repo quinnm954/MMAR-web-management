@@ -42,10 +42,15 @@ Deno.serve(async (req) => {
       const { data: sup } = await sb.from('suppressed_emails').select('id').eq('email', p.email).maybeSingle();
       if (sup) { await sb.from('prospects').update({ email_status: 'done', do_not_contact: true, stage: 'do_not_contact' }).eq('id', p.id); continue; }
       const step = p.email_step + 1;
-      const prefix = step === 1 ? '' : step === 2 ? 'Quick follow-up: ' : 'Last note: ';
-      const bodyText = (step === 1 ? '' : 'Following up on my note below in case it got buried.\n\n') +
-        String(p.email_body || '').replaceAll('{{name}}', p.name) +
-        `\n\nMike's Mobile Auto Repair · ${st.mailing_address}`;
+      const trade = String(p.category || 'service').toLowerCase();
+      const subject = step === 1 ? (p.email_subject || 'Keeping your trucks on the road')
+        : step === 2 ? `The real cost of a truck at the shop`
+        : `A free 15-minute look at one of your vehicles?`;
+      const bodyText = step === 1
+        ? String(p.email_body || '').replaceAll('{{name}}', p.name)
+        : step === 2
+        ? `Hi ${p.name} team,\n\nQuick follow-up. When a work truck goes to a repair shop, it's rarely just the repair bill. It's the drive over, the wait, and often two of your crew sitting in a waiting room instead of on a ${trade} job.\n\nWe come to your lot instead, so your people keep working while we handle the vehicle.\n\nWorth a quick call?\n\n— Mike, Mike's Mobile Auto Repair`
+        : `Hi ${p.name} team,\n\nLast note from me. If it's easier, I can stop by your yard and take a 15-minute look at one truck or van, no commitment. You'll see exactly how mobile service works for your fleet.\n\nJust reply with a good day, or call/text 813-501-7572.\n\n— Mike, Mike's Mobile Auto Repair`;
 
       const r = await fetch(`${url}/functions/v1/send-transactional-email`, {
         method: 'POST',
@@ -53,7 +58,7 @@ Deno.serve(async (req) => {
         body: JSON.stringify({
           templateName: 'fleet-outreach', recipientEmail: p.email,
           idempotencyKey: `prospect-${p.id}-${step}`,
-          templateData: { subject: prefix + (p.email_subject || 'Keeping your trucks on the road'), body: bodyText },
+          templateData: { subject, body: bodyText, step, mailingAddress: st.mailing_address },
         }),
       });
       if (r.status === 402 || r.status === 403 || r.status === 429) {
