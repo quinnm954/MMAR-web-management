@@ -1,4 +1,5 @@
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { portalStrings } from "@/lib/portalStrings";
@@ -19,6 +20,7 @@ import {
   ClipboardCheck,
   Bell,
   MessageCircle,
+  Truck,
 } from "lucide-react";
 import MessagesBellLink from "@/components/messaging/MessagesBellLink";
 import NotificationsBell from "@/components/notifications/NotificationsBell";
@@ -27,7 +29,7 @@ import InstallAppBanner from "@/components/shell/InstallAppBanner";
 import PwaInstallTutorial from "@/components/shell/PwaInstallTutorial";
 import mmarLogo from "@/assets/mmar-logo.png";
 
-const navItems = [
+const baseNavItems = [
   { to: "/portal/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/portal/vehicles", label: "My Vehicles", icon: Car },
   { to: "/portal/maintenance", label: "Maintenance Log", icon: Wrench },
@@ -49,6 +51,14 @@ const PortalLayout = ({ children }: { children: ReactNode }) => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   useNativePushRegistration();
+  const [isFleet, setIsFleet] = useState(false);
+  useEffect(() => {
+    if (!user) return;
+    supabase.from("fleet_accounts").select("id").eq("user_id", user.id).maybeSingle().then(({ data }) => setIsFleet(!!data));
+  }, [user]);
+  const navItems = isFleet
+    ? [baseNavItems[0], { to: "/portal/fleet", label: "My Fleet", icon: Truck }, ...baseNavItems.slice(1)]
+    : baseNavItems;
 
   const handleSignOut = async () => {
     await signOut();
@@ -65,7 +75,9 @@ const PortalLayout = ({ children }: { children: ReactNode }) => {
 
   const bottomNavItems = [
     { to: "/portal/dashboard", label: "Home", icon: LayoutDashboard, end: true },
-    { to: "/portal/vehicles", label: "Vehicles", icon: Car },
+    isFleet
+      ? { to: "/portal/fleet", label: "Fleet", icon: Truck }
+      : { to: "/portal/vehicles", label: "Vehicles", icon: Car },
     { to: "/portal/appointments", label: "Book", icon: Calendar },
     { to: "/portal/vehicle-health", label: "Health", icon: ClipboardList },
   ];

@@ -62,7 +62,7 @@ export default function FleetRegister() {
     const { data, error } = await supabase.auth.signUp({
       email: d.email,
       password: d.password,
-      options: { emailRedirectTo: `${window.location.origin}/portal`, data: { full_name: d.contact, company_name: d.company } },
+      options: { emailRedirectTo: `${window.location.origin}/portal/fleet`, data: { full_name: d.contact, company_name: d.company } },
     });
     if (error || !data.user) {
       setBusy(false);
