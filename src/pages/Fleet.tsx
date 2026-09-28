@@ -50,12 +50,12 @@ const INCLUDED = [
   {
     icon: BadgeDollarSign,
     title: "Zero Mobile Diagnostic Fees",
-    text: "We waive all mobile dispatch and diagnostic fees for your fleet vehicles, saving you over $100 per incident.",
+    text: "We waive all mobile dispatch and diagnostic fees for your fleet vehicles — every time we roll up.",
   },
   {
     icon: Percent,
-    title: "15% Off Major Labor",
-    text: "Enjoy a flat 15% discount on labor rates for any heavy mechanical repairs (suspension, alternators, water pumps, brakes).",
+    title: "Preferred Labor Rates",
+    text: "Heavy mechanical work (suspension, alternators, water pumps, brakes) is billed at labor rates that beat the average repair shop or mobile mechanic.",
   },
 ];
 
@@ -63,13 +63,14 @@ const PLAN_COVERS = [
   "Unlimited digital health inspections",
   "Zero dispatch / diagnostic fees",
   "Priority scheduling",
-  "15% labor discounts",
+  "Preferred labor rates",
   "On-site maintenance coordination",
 ];
 
 const FAQ = [
   { q: "What counts as a fleet?", a: "Any business with 5 or more vehicles under one account qualifies for the Fleet Partner Plan." },
-  { q: "What does the $295/month retainer cover?", a: "Your first 5 vehicles: unlimited digital health inspections, zero dispatch/diagnostic fees, priority scheduling, 15% off major labor, and on-site maintenance coordination. Additional vehicles can be added at a low per-unit rate." },
+  { q: "What does the Fleet Partner Plan include?", a: "Your whole fleet gets unlimited digital health inspections, zero dispatch and diagnostic fees, priority scheduling, preferred labor rates, and on-site maintenance coordination." },
+  { q: "How much does the plan cost?", a: "Every fleet is different — vehicle count, make/model mix, and how hard the vehicles work all change the scope. We quote each fleet individually after a quick fleet audit, and our labor rates are more affordable than the average repair shop or mobile mechanic." },
   { q: "Are parts and fluids included?", a: "No — parts and fluids for routine service are billed transparently per job, so you only pay for what each vehicle actually uses." },
   { q: "When do Yard Days happen?", a: "Usually on a Saturday or before your crews dispatch, so your vehicles are never pulled off a job." },
   { q: "Can we mix vehicle types?", a: "Yes. Vans, pickups, cars, and SUVs — gas, hybrid, EV, and diesel — can all be on one fleet account." },
@@ -86,7 +87,7 @@ const Fleet = () => {
     }
     el.setAttribute(
       "content",
-      "Mobile fleet maintenance in Southwest Florida for trades, contractors, and delivery businesses with 5+ vehicles. Monthly on-site Yard Days, priority dispatch, $295/mo."
+      "Mobile fleet maintenance in Southwest Florida for trades, contractors, and delivery businesses with 5+ vehicles. Monthly on-site Yard Days, priority dispatch, and labor rates that beat the average shop."
     );
 
     const ldId = "ld-fleet-faq";
