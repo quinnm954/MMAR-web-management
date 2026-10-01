@@ -38,6 +38,47 @@ const INTERVALS: Array<{ name: string; intervalMiles: number; keywords: string[]
   { name: 'Oxygen sensor replacement', intervalMiles: 100000, keywords: ['oxygen sensor', 'o2 sensor'], competitorPriceRange: [275, 575], importance: 'A lazy O2 sensor causes the engine to run rich, hurting MPG by 10–15% and slowly poisoning the catalytic converter (a $1,000+ part).' },
 ];
 
+// Time-based intervals (months) — a service is also due when this much time has passed since it was last done.
+const INTERVAL_MONTHS: Record<string, number> = {
+  'Tire rotation': 6, 'Multi-point inspection': 12, 'Wheel alignment check': 12, 'Brake inspection': 12,
+  'Cabin air filter': 12, 'Battery test': 12, 'Fuel system cleaning': 24, 'Engine air filter': 24,
+  'Brake fluid flush': 24, 'A/C system performance check': 12, 'Brake pads & rotors': 36,
+  'Power steering fluid flush': 48, 'Transmission fluid service': 48, 'Coolant flush': 60,
+  'Spark plug replacement': 60, 'Differential fluid service': 48, 'Transfer case fluid (4WD/AWD)': 48,
+  'PCV valve replacement': 60, 'Serpentine belt inspection': 48, 'Fuel filter replacement': 48,
+  'Shocks & struts inspection': 60, 'Timing belt replacement': 84, 'Oxygen sensor replacement': 96,
+};
+// Oil changes are not offered, so never remind about them.
+const ACTIVE_INTERVALS = INTERVALS.filter((i) => !i.name.toLowerCase().startsWith('oil'));
+const DUE_SOON_DAYS = 30;
+const TWILIO_GW = 'https://connector-gateway.lovable.dev/twilio';
+function toE164(p: string) {
+  const d = (p || '').replace(/\D/g, '');
+  if (d.length === 10) return `+1${d}`;
+  if (d.length === 11 && d.startsWith('1')) return `+${d}`;
+  return '';
+}
+async function sendSms(sb: any, to: string, body: string): Promise<string | undefined> {
+  const LK = Deno.env.get('LOVABLE_API_KEY'); const TK = Deno.env.get('TWILIO_API_KEY'); const FROM = Deno.env.get('TWILIO_FROM_NUMBER');
+  if (!LK || !TK || !FROM) return 'Twilio not configured';
+  const r = await fetch(`${TWILIO_GW}/Messages.json`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${LK}`, 'X-Connection-Api-Key': TK, 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({ To: to, From: FROM, Body: body }),
+  });
+  const txt = await r.text();
+  if (!r.ok) return `twilio ${r.status}: ${txt.slice(0, 200)}`;
+  try {
+    let { data: thread } = await sb.from('sms_threads').select('id').eq('phone', to).maybeSingle();
+    if (!thread) thread = (await sb.from('sms_threads').insert({ phone: to, last_message_preview: body.slice(0, 80) }).select('id').single()).data;
+    if (thread) {
+      await sb.from('sms_messages').insert({ thread_id: thread.id, direction: 'outbound', body, twilio_sid: JSON.parse(txt)?.sid ?? null, status: 'sent' });
+      await sb.from('sms_threads').update({ last_message_at: new Date().toISOString(), last_message_preview: body.slice(0, 80) }).eq('id', thread.id);
+    }
+  } catch (e) { console.error('sms mirror failed', e); }
+  return undefined;
+}
+
 // Show items overdue OR coming due within this many miles
 const DUE_SOON_WINDOW = 2500;
 
@@ -109,8 +150,7 @@ Deno.serve(async (req) => {
   const { data: vehicles, error: vErr } = await sb
     .from('vehicles')
     .select('id, owner_id, year, make, model, current_mileage, avg_miles_per_day, last_mileage_update_at')
-    .not('current_mileage', 'is', null)
-    .gt('current_mileage', 0);
+    .not('owner_id', 'is', null);
 
   if (vErr) {
     return new Response(JSON.stringify({ error: vErr.message }), {
@@ -125,7 +165,8 @@ Deno.serve(async (req) => {
   // Avoids refetching the same owner profile (and re-resolving their ZIP region)
   // when a customer has multiple vehicles in this batch.
   type OwnerCacheEntry = {
-    profile: { id: string; full_name: string | null; email: string | null; postal_code: string | null } | null;
+    profile: { id: string; full_name: string | null; email: string | null; phone: string | null; postal_code: string | null } | null;
+    emailOk: boolean; smsOk: boolean;
     region: Region;
   };
   const ownerCache = new Map<string, OwnerCacheEntry>();
@@ -138,10 +179,13 @@ Deno.serve(async (req) => {
     ownerCacheMisses++;
     const { data: profile } = await sb
       .from('profiles')
-      .select('id, full_name, email, postal_code')
+      .select('id, full_name, email, phone, postal_code')
       .eq('id', ownerId)
       .maybeSingle();
+    const { data: prefs } = await sb.from('notification_preferences').select('email_enabled, sms_enabled').eq('user_id', ownerId).maybeSingle();
     const entry: OwnerCacheEntry = {
+      emailOk: prefs?.email_enabled !== false,
+      smsOk: prefs?.sms_enabled !== false,
       profile: profile ?? null,
       region: regionForZip(profile?.postal_code),
     };
@@ -162,46 +206,60 @@ Deno.serve(async (req) => {
       if (recent) { skipped.push({ vehicle_id: v.id, reason: 'cooldown' }); continue; }
 
       // Owner profile + email + ZIP for regional pricing (cached per run)
-      const { profile, region } = await getOwner(v.owner_id);
-      if (!profile?.email) { skipped.push({ vehicle_id: v.id, reason: 'no_email' }); continue; }
+      const { profile, region, emailOk, smsOk } = await getOwner(v.owner_id);
+      const email = emailOk ? profile?.email : null;
+      const phone = smsOk ? toE164(profile?.phone || '') : '';
+      if (!email && !phone) { skipped.push({ vehicle_id: v.id, reason: 'no_contact' }); continue; }
 
       // All service records for this vehicle (need mileage_at_service + service_type)
       const { data: records } = await sb
         .from('service_records')
-        .select('service_type, mileage_at_service')
-        .eq('vehicle_id', v.id)
-        .not('mileage_at_service', 'is', null);
+        .select('service_type, mileage_at_service, service_date')
+        .eq('vehicle_id', v.id);
 
       const avgPerDay = Number(v.avg_miles_per_day) || 0;
-      const dueServices = INTERVALS.map((cfg) => {
+      const curMiles = Number(v.current_mileage) || 0;
+      const nowMs = Date.now();
+      const dueServices = ACTIVE_INTERVALS.map((cfg) => {
         const allKeywords = [...cfg.keywords, cfg.name.toLowerCase()];
-        const matches = (records || []).filter((r) => {
-          const t = (r.service_type || '').toLowerCase();
-          return allKeywords.some((kw) => t.includes(kw));
-        });
-        const lastMiles = matches.length
-          ? Math.max(...matches.map((m) => m.mileage_at_service as number))
-          : null;
-        const baseline = lastMiles ?? 0;
-        const overdueBy = (v.current_mileage as number) - (baseline + cfg.intervalMiles);
-        // Project a due date when we have an average miles/day signal
+        const matches = (records || []).filter((r) => allKeywords.some((kw) => (r.service_type || '').toLowerCase().includes(kw)));
+        const miles = matches.map((m) => Number(m.mileage_at_service)).filter((n) => n > 0);
+        const lastMiles = miles.length ? Math.max(...miles) : null;
+        const dates = matches.map((m) => m.service_date ? Date.parse(m.service_date) : NaN).filter((n) => !isNaN(n));
+        const lastDate = dates.length ? Math.max(...dates) : null;
+        // Mileage due (needs a current odometer reading)
+        const overdueBy = curMiles > 0 ? curMiles - ((lastMiles ?? 0) + cfg.intervalMiles) : -Infinity;
+        const mileageDue = overdueBy >= -DUE_SOON_WINDOW;
+        // Time due (needs a past service date)
+        const months = INTERVAL_MONTHS[cfg.name];
+        let timeDue = false; let timeNote: string | undefined;
+        if (months && lastDate) {
+          const dueAt = new Date(lastDate); dueAt.setMonth(dueAt.getMonth() + months);
+          const daysLeft = Math.round((dueAt.getTime() - nowMs) / 86400000);
+          timeDue = daysLeft <= DUE_SOON_DAYS;
+          const label = dueAt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+          timeNote = `every ${months} months · ${daysLeft < 0 ? `was due ${label}` : `due by ${label}`}`;
+        }
         let projectedDueDate: string | undefined;
-        if (avgPerDay > 0 && overdueBy < 0) {
-          const daysOut = Math.round(Math.abs(overdueBy) / avgPerDay);
-          const d = new Date(Date.now() + daysOut * 86400000);
-          projectedDueDate = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        const avgPerDay = Number(v.avg_miles_per_day) || 0;
+        if (avgPerDay > 0 && overdueBy < 0 && isFinite(overdueBy)) {
+          projectedDueDate = new Date(nowMs + Math.round(Math.abs(overdueBy) / avgPerDay) * 86400000)
+            .toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
         }
         return {
           name: cfg.name,
           intervalMiles: cfg.intervalMiles,
           lastServiceMiles: lastMiles,
-          overdueBy,
+          overdueBy: isFinite(overdueBy) ? overdueBy : 0,
+          due: mileageDue || timeDue,
+          timeNote: timeDue ? timeNote : undefined,
           projectedDueDate,
           competitorPriceRange: applyRegion(cfg.competitorPriceRange, region.multiplier),
           importance: cfg.importance,
         };
       })
-        .filter((s) => s.overdueBy >= -DUE_SOON_WINDOW)
+        .filter((s) => s.due)
+        .map(({ due: _d, ...rest }) => rest)
         .sort((a, b) => b.overdueBy - a.overdueBy);
 
       if (dueServices.length === 0) { skipped.push({ vehicle_id: v.id, reason: 'nothing_due' }); continue; }
@@ -211,13 +269,13 @@ Deno.serve(async (req) => {
       const sbUrl = Deno.env.get('SUPABASE_URL')!;
       const sbKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im93Z3B4dWpmeXRza2RmbXJoamdrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU4MTQ5NDMsImV4cCI6MjA4MTM5MDk0M30.6zEygmSkP74HP3J8jrzIUmnZ82pMQc0FgbG6qeo_bFc';
       let invErr: string | undefined;
-      try {
+      if (email) try {
         const r = await fetch(`${sbUrl}/functions/v1/send-transactional-email`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${sbKey}`, apikey: sbKey },
           body: JSON.stringify({
             templateName: 'mileage-service-reminder',
-            recipientEmail: profile.email,
+            recipientEmail: email,
             idempotencyKey: `mileage-reminder-${v.id}-${new Date().toISOString().slice(0, 10)}`,
             templateData: {
               customerName: profile.full_name?.split(' ')[0] || undefined,
@@ -233,11 +291,24 @@ Deno.serve(async (req) => {
         invErr = e?.message || String(e);
       }
 
+      // Text message reminder
+      let smsErr: string | undefined;
+      if (phone) {
+        const names = dueServices.slice(0, 2).map((d) => d.name).join(', ');
+        const more = dueServices.length > 2 ? ` +${dueServices.length - 2} more` : '';
+        const first = profile?.full_name?.split(' ')[0];
+        const body = `MMAR: ${first ? `Hi ${first}, your` : 'Your'} ${vehicleLabel} is due for ${names}${more}. We come to you. Book: mikesmautorepair.com/book or reply here. Reply STOP to opt out.`;
+        smsErr = await sendSms(sb, phone, body);
+      }
+      if (smsErr && !email) invErr = smsErr;
+      else if (smsErr) invErr = `${invErr ? invErr + '; ' : ''}sms: ${smsErr}`;
+
       await sb.from('service_reminders_sent').insert({
         customer_id: v.owner_id,
         reminder_type: REMINDER_TYPE,
         reference_id: v.id,
-        message: `Mileage reminder: ${dueServices.length} service(s) due`,
+        phone: phone || null,
+        message: `Maintenance reminder (${[email && 'email', phone && 'text'].filter(Boolean).join(' + ')}): ${dueServices.length} service(s) due`,
         status: invErr ? 'failed' : 'sent',
         error: invErr,
       });

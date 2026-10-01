@@ -14,6 +14,7 @@ interface DueService {
   overdueBy: number
   competitorPriceRange?: [number, number]
   importance?: string
+  timeNote?: string
 }
 
 interface Props {
@@ -44,7 +45,7 @@ const MileageServiceReminderEmail = ({ customerName, vehicle, currentMileage, du
           <Text style={text}>{customerName ? `Hi ${customerName},` : 'Hi there,'}</Text>
           <Text style={text}>
             Based on your {vehicle ?? 'vehicle'}{currentMileage ? ` (${fmt(currentMileage)} miles)` : ''}, the
-            following mileage-based services are due or overdue. Keeping up with these protects your warranty and
+            following services are due or overdue by mileage or time. Keeping up with these protects your warranty and
             prevents bigger repair bills down the road.
           </Text>
           <Text style={smallText}>
@@ -78,6 +79,7 @@ const MileageServiceReminderEmail = ({ customerName, vehicle, currentMileage, du
                       : ' · no record on file'}
                     {' · '}{statusLabel}
                   </Text>
+                  {s.timeNote && <Text style={itemMeta}>{s.timeNote}</Text>}
                   {s.competitorPriceRange && (
                     <Text style={priceRow}>
                       <span style={priceLabel}>{priceRegionLabel ? `${priceRegionLabel} price:` : 'Competitor price:'}</span>{' '}
