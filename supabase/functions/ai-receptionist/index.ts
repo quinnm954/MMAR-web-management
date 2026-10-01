@@ -67,7 +67,7 @@ async function sendSms(to: string, body: string, sb?: any, fromOverride?: string
 }
 
 function buildPrompt(cities: string[]) {
-  return `You are the friendly phone receptionist for Mike's Mobile Auto Repair (MMAR), a mobile mechanic in Southwest Florida. Mike couldn't pick up, so you answer.
+  return `You are the friendly phone receptionist for Mike's Mobile Auto Repair (MMAR), a mobile mechanic in Southwest Florida. You answer every call for the shop.
 
 Facts:
 - We come to the customer's home, work, or lot. No need to tow to a shop.
@@ -82,7 +82,7 @@ How to act:
 - Today is {{today}} (Eastern time). You answer 24/7, any day.
 - Appointments can be set any day of the week, but only between 10 AM and 5 PM Eastern. Never offer or accept a time before 10 AM or after 5 PM; suggest the nearest time inside that window instead. Never book a time that has already passed today.
 - If they need service, collect: name, vehicle (year, make, model), what's wrong, service address or city, and the day and time they want. Turn the day into a real date (YYYY-MM-DD) and the time into 24-hour HH:MM. Confirm it back, then call create_booking_request. If the tool says the time is invalid, offer another time in the window. Tell them the appointment is set for that time and Mike will text to confirm.
-- If it's urgent (stranded, unsafe), or they ask for a person, call transfer_to_mike.
+- Handle everything yourself. Only call transfer_to_mike when the caller specifically asks to speak with Mike (or the owner) by name. Do not transfer for general questions, bookings, or urgent jobs; take the details and tell them Mike will text right away. If someone just asks for "a person", offer to help first and transfer only if they insist on Mike.
 - Never invent prices, hours, or promises. If unsure, say Mike will follow up.
 - Caller's number: {{caller_number}}. Use it as their phone unless they give another.`;
 }
@@ -319,7 +319,7 @@ Deno.serve(async (req) => {
       const fromNum = dialedNumber || undefined;
       const { data: s } = await sb.from('phone_settings').select('ai_summary_to_number, forward_to_number').eq('id', 1).maybeSingle();
       const owner = s?.ai_summary_to_number || s?.forward_to_number;
-      if (owner) await sendSms(owner, `AI answered a missed call from ${caller || 'unknown'}:\n${summary || '(no summary)'}`, sb, fromNum);
+      if (owner) await sendSms(owner, `AI answered a call from ${caller || 'unknown'}:\n${summary || '(no summary)'}`, sb, fromNum);
       if (caller && transcript.length > 1) {
         await sendSms(caller, `Thanks for calling Mike's Mobile Auto Repair! Mike will follow up soon. Book anytime: ${BOOK_URL} Reply STOP to opt out.`, sb, fromNum);
       }
