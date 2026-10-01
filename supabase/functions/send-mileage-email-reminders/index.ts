@@ -152,7 +152,7 @@ Deno.serve(async (req) => {
   // Pull all vehicles with mileage info + owner
   const { data: vehicles, error: vErr } = await sb
     .from('vehicles')
-    .select('id, owner_id, year, make, model, current_mileage, avg_miles_per_day, last_mileage_update_at')
+    .select('id, owner_id, year, make, model, current_mileage, avg_miles_per_day, last_mileage_update_at, created_at')
     .not('owner_id', 'is', null);
 
   if (vErr) {
@@ -226,6 +226,10 @@ Deno.serve(async (req) => {
       const avgPerDay = Number(v.avg_miles_per_day) || 0;
       const curMiles = Number(v.current_mileage) || 0;
       const nowMs = Date.now();
+      // Vehicles with no service history at all: anchor time-based intervals to
+      // when the vehicle was added, so reminders still go out on a schedule.
+      const noHistory = !(records || []).length;
+      const addedAt = noHistory && v.created_at ? Date.parse(v.created_at) : null;
       const dueServices = ACTIVE_INTERVALS.map((cfg) => {
         const allKeywords = [...cfg.keywords, cfg.name.toLowerCase()];
         const matches = (records || []).filter((r) => allKeywords.some((kw) => (r.service_type || '').toLowerCase().includes(kw)));
@@ -237,11 +241,13 @@ Deno.serve(async (req) => {
         // Only remind for services we have a record of — no history means we can't know it's due.
         const overdueBy = curMiles > 0 && lastMiles !== null ? curMiles - (lastMiles + cfg.intervalMiles) : -Infinity;
         const mileageDue = overdueBy >= -DUE_SOON_WINDOW;
-        // Time due (needs a past service date)
+        // Time due (needs a past service date; for vehicles with no history,
+        // count from when the vehicle was added so reminders keep flowing)
         const months = INTERVAL_MONTHS[cfg.name];
+        const anchorDate = lastDate ?? addedAt;
         let timeDue = false; let timeNote: string | undefined;
-        if (months && lastDate) {
-          const dueAt = new Date(lastDate); dueAt.setMonth(dueAt.getMonth() + months);
+        if (months && anchorDate) {
+          const dueAt = new Date(anchorDate); dueAt.setMonth(dueAt.getMonth() + months);
           const daysLeft = Math.round((dueAt.getTime() - nowMs) / 86400000);
           timeDue = daysLeft <= DUE_SOON_DAYS;
           const label = dueAt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
