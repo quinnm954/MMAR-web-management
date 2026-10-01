@@ -3,6 +3,7 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 
 const BUSINESS = "Mike's Mobile Auto Repair (operated by Capital Services Management, INC.)";
+const CONTACT = "Contact us at (813) 501-7572, mikesmarllc@gmail.com, or 1143 Joel Blvd, Lehigh Acres, FL 33936.";
 
 const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
   <section className="space-y-2">
@@ -33,7 +34,7 @@ const Shell = ({ title, children }: { title: string; children: React.ReactNode }
 export const PrivacyPolicy = () => (
   <Shell title="Privacy Policy">
     <Section title="Who we are">
-      <p>This policy explains how {BUSINESS} collects and uses your information. Contact us at (813) 501-7572.</p>
+      <p>This policy explains how {BUSINESS} collects and uses your information. {CONTACT}</p>
     </Section>
     <Section title="Information we collect">
       <p>Your name, mobile number, email, service address, vehicle details, and messages you send us when you request service, create an account, call, or text us.</p>
