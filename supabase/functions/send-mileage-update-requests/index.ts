@@ -1,3 +1,4 @@
+import { sendAndLog } from '../_shared/send-and-log.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.95.0';
 
 const corsHeaders = {
@@ -81,8 +82,7 @@ Deno.serve(async (req) => {
         ? Math.floor((Date.now() - new Date(v.last_mileage_update_at).getTime()) / 86400000)
         : null;
 
-      const { error: invErr } = await sb.functions.invoke('send-transactional-email', {
-        body: {
+      const { error: invErr } = await sendAndLog({
           templateName: 'mileage-update-request',
           recipientEmail: owner.email,
           idempotencyKey: `mileage-update-req-${v.id}-${new Date().toISOString().slice(0, 10)}`,
@@ -93,8 +93,7 @@ Deno.serve(async (req) => {
             daysSinceUpdate: daysSince,
             updateUrl: `${SITE_URL}/m/${tok.token}`,
           },
-        },
-      });
+        });
 
       await sb.from('service_reminders_sent').insert({
         customer_id: v.owner_id,

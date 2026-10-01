@@ -1,3 +1,4 @@
+import { sendAndLog } from '../_shared/send-and-log.ts';
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import Stripe from "https://esm.sh/stripe@17.7.0?target=deno";
 const SITE_URL = "https://shop-flow-home.lovable.app";
@@ -47,8 +48,7 @@ async function sendInvoicePaidReceipt(
 
   const paidAt = inv.paid_at ? new Date(inv.paid_at).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }) : "";
 
-  await admin.functions.invoke("send-transactional-email", {
-    body: {
+  await sendAndLog({
       templateName: "invoice-paid-receipt",
       recipientEmail: prof.email,
       idempotencyKey: `invoice-paid-receipt-${invoiceId}`,
@@ -68,8 +68,7 @@ async function sendInvoicePaidReceipt(
         lineItems: Array.isArray(inv.line_items) ? inv.line_items : [],
         invoiceUrl: `${SITE_URL}/portal/invoices/${invoiceId}`,
       },
-    },
-  });
+    });
 }
 
 // Public webhook — no JWT verification
@@ -191,8 +190,7 @@ Deno.serve(async (req) => {
               .maybeSingle();
             const planName = (m as any).plan?.name as string | undefined;
             if (prof?.email) {
-              await admin.functions.invoke("send-transactional-email", {
-                body: {
+              await sendAndLog({
                   templateName: "membership-welcome",
                   recipientEmail: prof.email,
                   idempotencyKey: `membership-welcome-${membershipId}`,
@@ -201,8 +199,7 @@ Deno.serve(async (req) => {
                     planName,
                     portalUrl: "https://shop-flow-home.lovable.app/portal/membership",
                   },
-                },
-              });
+                });
             }
           }
         } catch (e) {

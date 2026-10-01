@@ -1,3 +1,4 @@
+import { sendAndLog } from '../_shared/send-and-log.ts';
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import Stripe from "https://esm.sh/stripe@17.7.0?target=deno";
 
@@ -104,8 +105,7 @@ Deno.serve(async (req) => {
       ? new Date(inv.paid_at).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })
       : new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
 
-    const { error: mailErr } = await admin.functions.invoke("send-transactional-email", {
-      body: {
+    const { error: mailErr } = await sendAndLog({
         templateName: "invoice-paid-receipt",
         recipientEmail: prof.email,
         idempotencyKey: `invoice-paid-receipt-${invoice_id}`,
@@ -125,8 +125,7 @@ Deno.serve(async (req) => {
           lineItems: Array.isArray(inv.line_items) ? inv.line_items : [],
           invoiceUrl: `${SITE_URL}/portal/invoices/${invoice_id}`,
         },
-      },
-    });
+      });
 
     if (mailErr) {
       return new Response(JSON.stringify({ error: mailErr.message }), {
