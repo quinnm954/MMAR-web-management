@@ -55,7 +55,8 @@ Deno.serve(async (req) => {
 
       const r = await sendAndLog({
         templateName: 'fleet-outreach', recipientEmail: p.email,
-        idempotencyKey: `prospect-${p.id}-${step}`,
+        // "m2": earlier keys were burned by sends that failed before the domain was verified.
+        idempotencyKey: `prospect-${p.id}-${step}-m2`,
         templateData: { subject, body: bodyText, step, mailingAddress: st.mailing_address },
       });
       if (r.status === 402 || r.status === 403 || r.status === 429) {
