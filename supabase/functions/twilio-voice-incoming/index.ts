@@ -163,6 +163,7 @@ Deno.serve(async (req) => {
     // Read DialCallStatus to decide
     const dialStatus = String(form?.get('DialCallStatus') || '');
     if (['completed', 'answered'].includes(dialStatus)) {
+      await sb.from('call_logs').update({ answered_at: new Date().toISOString() }).eq('twilio_call_sid', callSid);
       return xml(`<Response><Hangup/></Response>`);
     }
     // missed → AI receptionist (if enabled), falling back to voicemail
