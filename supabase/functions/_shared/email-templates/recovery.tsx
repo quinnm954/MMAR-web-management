@@ -53,7 +53,7 @@ const container = { padding: '20px 25px' }
 const h1 = {
   fontSize: '22px',
   fontWeight: 'bold' as const,
-  color: '#0a1628',
+  color: '#000000',
   margin: '0 0 20px',
 }
 const text = {
@@ -63,8 +63,8 @@ const text = {
   margin: '0 0 25px',
 }
 const button = {
-  backgroundColor: '#1ca3e0',
-  color: '#0a1628',
+  backgroundColor: '#000000',
+  color: '#ffffff',
   fontSize: '14px',
   border: '1px solid #000000',
   borderRadius: '8px',
