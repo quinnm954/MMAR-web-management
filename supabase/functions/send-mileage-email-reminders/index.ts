@@ -234,7 +234,8 @@ Deno.serve(async (req) => {
         const dates = matches.map((m) => m.service_date ? Date.parse(m.service_date) : NaN).filter((n) => !isNaN(n));
         const lastDate = dates.length ? Math.max(...dates) : null;
         // Mileage due (needs a current odometer reading)
-        const overdueBy = curMiles > 0 ? curMiles - ((lastMiles ?? 0) + cfg.intervalMiles) : -Infinity;
+        // Only remind for services we have a record of — no history means we can't know it's due.
+        const overdueBy = curMiles > 0 && lastMiles !== null ? curMiles - (lastMiles + cfg.intervalMiles) : -Infinity;
         const mileageDue = overdueBy >= -DUE_SOON_WINDOW;
         // Time due (needs a past service date)
         const months = INTERVAL_MONTHS[cfg.name];
