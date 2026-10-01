@@ -98,6 +98,14 @@ Deno.serve(async (req) => {
   const EL_KEY = Deno.env.get('ELEVENLABS_API_KEY');
 
   try {
+    // ---------- List available voices (token-guarded) ----------
+    if (action === 'voices') {
+      if (url.searchParams.get('token') !== TOKEN) return json({ error: 'Unauthorized' }, 401);
+      if (!EL_KEY) return json({ error: 'ElevenLabs is not connected' }, 500);
+      const r = await fetch(`${EL}/v1/voices`, { headers: { 'xi-api-key': EL_KEY } });
+      const d = await r.json();
+      return json({ voices: (d.voices || []).map((v: { voice_id: string; name: string }) => ({ id: v.voice_id, name: v.name })) });
+    }
     // ---------- Admin setup ----------
     if (action === 'setup') {
       const auth = req.headers.get('Authorization')?.replace('Bearer ', '') || '';
