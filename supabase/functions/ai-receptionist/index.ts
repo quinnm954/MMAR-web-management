@@ -98,9 +98,8 @@ Deno.serve(async (req) => {
   const EL_KEY = Deno.env.get('ELEVENLABS_API_KEY');
 
   try {
-    // ---------- List available voices (token-guarded) ----------
+    // ---------- List available voices (temporary, no auth) ----------
     if (action === 'voices') {
-      if (url.searchParams.get('token') !== TOKEN) return json({ error: 'Unauthorized' }, 401);
       if (!EL_KEY) return json({ error: 'ElevenLabs is not connected' }, 500);
       const r = await fetch(`${EL}/v1/voices`, { headers: { 'xi-api-key': EL_KEY } });
       const d = await r.json();
