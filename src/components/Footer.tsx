@@ -33,6 +33,15 @@ const Footer = () => {
             >
               Text: (813) 501-7572
             </a>
+            <a
+              href="mailto:mikesmarllc@gmail.com"
+              className="block text-primary hover:underline text-sm font-medium"
+            >
+              mikesmarllc@gmail.com
+            </a>
+            <p className="mt-1 text-sm text-muted-foreground">
+              1143 Joel Blvd, Lehigh Acres, FL 33936
+            </p>
             <p className="mt-3 text-xs text-muted-foreground leading-relaxed">
               <span className="block"><span className="font-semibold text-foreground/80">Hours:</span> 9am–5pm daily · By appointment only</span>
               <span className="block mt-1"><span className="font-semibold text-foreground/80">Service area:</span> Lee County, FL — Fort Myers, Cape Coral, Lehigh Acres, Estero, Gateway</span>
