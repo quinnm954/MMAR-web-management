@@ -98,12 +98,19 @@ Deno.serve(async (req) => {
   const EL_KEY = Deno.env.get('ELEVENLABS_API_KEY');
 
   try {
-    // ---------- List available voices (temporary, no auth) ----------
-    if (action === 'voices') {
+    // ---------- Temp: patch live agent voice ----------
+    if (action === 'setvoice') {
       if (!EL_KEY) return json({ error: 'ElevenLabs is not connected' }, 500);
-      const r = await fetch(`${EL}/v1/voices`, { headers: { 'xi-api-key': EL_KEY } });
-      const d = await r.json();
-      return json({ voices: (d.voices || []).map((v: { voice_id: string; name: string }) => ({ id: v.voice_id, name: v.name })) });
+      const { data: s } = await sb.from('phone_settings').select('ai_agent_id').eq('id', 1).maybeSingle();
+      if (!s?.ai_agent_id) return json({ error: 'No agent' }, 400);
+      const r = await fetch(`${EL}/v1/convai/agents/${s.ai_agent_id}`, {
+        method: 'PATCH',
+        headers: { 'xi-api-key': EL_KEY, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ conversation_config: { tts: { voice_id: 'vrzf30JViL81pJHyaGSU', model_id: 'eleven_flash_v2' } } }),
+      });
+      const d = await r.text();
+      if (!r.ok) return json({ error: `ElevenLabs ${r.status}: ${d}` }, 500);
+      return json({ ok: true });
     }
     // ---------- Admin setup ----------
     if (action === 'setup') {
@@ -155,7 +162,7 @@ Deno.serve(async (req) => {
               ],
             },
           },
-          tts: { voice_id: 'DODLEQrClDo8wCz460ld', model_id: 'eleven_flash_v2' },
+          tts: { voice_id: 'vrzf30JViL81pJHyaGSU', model_id: 'eleven_flash_v2' },
         },
         platform_settings: {
           overrides: { conversation_config_override: { agent: { first_message: true } } },
