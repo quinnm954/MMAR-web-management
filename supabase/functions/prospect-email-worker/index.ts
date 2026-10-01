@@ -1,3 +1,4 @@
+import { sendAndLog } from '../_shared/send-and-log.ts';
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
 
@@ -52,20 +53,17 @@ Deno.serve(async (req) => {
         ? `Hi ${p.name} team,\n\nQuick follow-up. When a work truck goes to a repair shop, it's rarely just the repair bill. It's the drive over, the wait, and often two of your crew sitting in a waiting room instead of on a ${trade} job.\n\nWe come to your lot instead, so your people keep working while we handle the vehicle.\n\nWorth a quick call?\n\n— Mike, Mike's Mobile Auto Repair`
         : `Hi ${p.name} team,\n\nLast note from me. If it's easier, I can stop by your yard and take a 15-minute look at one truck or van, no commitment. You'll see exactly how mobile service works for your fleet.\n\nJust reply with a good day, or call/text 813-501-7572.\n\n— Mike, Mike's Mobile Auto Repair`;
 
-      const r = await fetch(`${url}/functions/v1/send-transactional-email`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${srk}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          templateName: 'fleet-outreach', recipientEmail: p.email,
-          idempotencyKey: `prospect-${p.id}-${step}`,
-          templateData: { subject, body: bodyText, step, mailingAddress: st.mailing_address },
-        }),
+      const r = await sendAndLog({
+        templateName: 'fleet-outreach', recipientEmail: p.email,
+        idempotencyKey: `prospect-${p.id}-${step}`,
+        templateData: { subject, body: bodyText, step, mailingAddress: st.mailing_address },
       });
       if (r.status === 402 || r.status === 403 || r.status === 429) {
-        await sb.from('prospect_email_state').update({ paused: true, pause_reason: `Email service returned ${r.status}: ${(await r.text()).slice(0, 300)}` }).eq('id', 1);
+        await sb.from('prospect_email_state').update({ paused: true, pause_reason: `Email service returned ${r.status}: ${(r.error?.message ?? '').slice(0, 300)}` }).eq('id', 1);
         break;
       }
-      if (!r.ok) { console.error('send failed', r.status, await r.text()); continue; }
+      if (r.error) { console.error('send failed', r.status, r.error.message); continue; }
+      if (!r.sent) continue;
       await sb.from('prospect_touches').upsert({ prospect_id: p.id, channel: 'email', step, body: bodyText, outcome: 'sent' }, { onConflict: 'prospect_id,channel,step' });
       const next = step < 3 ? new Date(now.getTime() + FOLLOWUP_DAYS[step - 1] * 86400000).toISOString() : null;
       await sb.from('prospects').update({

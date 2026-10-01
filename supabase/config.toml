@@ -7,22 +7,14 @@ project_id = "owgpxujfytskdfmrhjgk"
     verify_jwt = false
   [functions.bootstrap-customer-from-booking]
     verify_jwt = false
-  [functions.handle-email-suppression]
-    verify_jwt = false
-  [functions.handle-email-unsubscribe]
-    verify_jwt = false
   [functions.preview-transactional-email]
     verify_jwt = false
-  [functions.process-email-queue]
-    verify_jwt = true
   [functions.prospect-email-worker]
     verify_jwt = false
   [functions.receive-inbound-email]
     verify_jwt = false
   [functions.record-mileage-from-token]
     verify_jwt = false
-  [functions.send-transactional-email]
-    verify_jwt = true
   [functions.stripe-webhook]
     verify_jwt = false
   [functions.twilio-inbound-sms]
@@ -37,3 +29,21 @@ project_id = "owgpxujfytskdfmrhjgk"
     verify_jwt = false
   [functions.twilio-voice-transcription]
     verify_jwt = false
+
+[functions.notify-booking-request]
+verify_jwt = false
+
+[functions.notify-appointment-confirmed]
+verify_jwt = false
+
+[functions.notify-service-completed]
+verify_jwt = false
+
+[functions.send-admin-message]
+verify_jwt = false
+
+[functions.handle-email-events]
+verify_jwt = false
+
+[functions.notify-tech-job-assigned]
+verify_jwt = false

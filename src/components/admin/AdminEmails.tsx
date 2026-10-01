@@ -228,19 +228,8 @@ const AdminEmails = () => {
     }
     setComposeBusy(true);
     const threadId = composeThreadId || crypto.randomUUID();
-    const { error } = await supabase.functions.invoke('send-transactional-email', {
-      body: {
-        templateName: 'admin-message',
-        recipientEmail: composeTo,
-        idempotencyKey: `admin-msg-${crypto.randomUUID()}`,
-        templateData: { subject: composeSubject, body: composeBody },
-        metadata: {
-          subject: composeSubject,
-          body_text: composeBody,
-          preview: composeBody.slice(0, 140),
-          thread_id: threadId,
-        },
-      },
+    const { error } = await supabase.functions.invoke('send-admin-message', {
+      body: { to: composeTo, subject: composeSubject, body: composeBody, threadId },
     });
     setComposeBusy(false);
     if (error) {

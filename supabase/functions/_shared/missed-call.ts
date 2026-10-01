@@ -1,3 +1,4 @@
+import { sendAndLog } from './send-and-log.ts';
 // Missed-call follow-up: one text (and an email for account holders) per caller per 12 hours.
 const TWILIO_GW = 'https://connector-gateway.lovable.dev/twilio';
 const COOLDOWN_HOURS = 12;
@@ -70,19 +71,14 @@ export async function sendMissedCallFollowup(sb: any, caller: string, fromNumber
   if (prof?.email) {
     const { data: prefs } = await sb.from('notification_preferences').select('email_enabled').eq('user_id', prof.id).maybeSingle();
     if (prefs?.email_enabled !== false) {
-      const url = Deno.env.get('SUPABASE_URL')!;
-      const key = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
       try {
-        await fetch(`${url}/functions/v1/send-transactional-email`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${key}`, apikey: key },
-          body: JSON.stringify({
-            templateName: 'missed-call-followup',
-            recipientEmail: prof.email,
-            idempotencyKey: `missed-call-${digits}-${new Date().toISOString().slice(0, 13)}`,
-            templateData: { customerName: first },
-          }),
+        const r = await sendAndLog({
+          templateName: 'missed-call-followup',
+          recipientEmail: prof.email,
+          idempotencyKey: `missed-call-${digits}-${new Date().toISOString().slice(0, 13)}`,
+          templateData: { customerName: first },
         });
+        if (r.error) console.error('missed-call email failed', r.error.message);
       } catch (e) { console.error('missed-call email failed', e); }
     }
   }

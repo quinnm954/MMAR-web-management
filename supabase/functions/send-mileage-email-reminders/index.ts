@@ -1,3 +1,4 @@
+import { sendAndLog } from '../_shared/send-and-log.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.95.0';
 import { smsAllowed } from '../_shared/missed-call.ts';
 
@@ -286,14 +287,9 @@ Deno.serve(async (req) => {
       const markDoneUrl = `https://mikesmautorepair.com/portal/maintenance?vehicle=${v.id}&due=${encodeURIComponent(dueServices.map((d) => d.name).join('|'))}`;
       const vehicleLabel = [v.year, v.make, v.model].filter(Boolean).join(' ') || 'your vehicle';
 
-      const sbUrl = Deno.env.get('SUPABASE_URL')!;
-      const sbKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im93Z3B4dWpmeXRza2RmbXJoamdrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU4MTQ5NDMsImV4cCI6MjA4MTM5MDk0M30.6zEygmSkP74HP3J8jrzIUmnZ82pMQc0FgbG6qeo_bFc';
       let invErr: string | undefined;
       if (email) try {
-        const r = await fetch(`${sbUrl}/functions/v1/send-transactional-email`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${sbKey}`, apikey: sbKey },
-          body: JSON.stringify({
+        const r = await sendAndLog({
             templateName: 'mileage-service-reminder',
             recipientEmail: email,
             idempotencyKey: `mileage-reminder-${v.id}-${new Date().toISOString().slice(0, 10)}`,
@@ -305,9 +301,8 @@ Deno.serve(async (req) => {
               priceRegionLabel: region.label,
               markDoneUrl,
             },
-          }),
         });
-        if (!r.ok) invErr = `send-transactional-email ${r.status}: ${(await r.text()).slice(0, 200)}`;
+        if (r.error) invErr = `email ${r.status ?? ''}: ${r.error.message.slice(0, 200)}`;
       } catch (e: any) {
         invErr = e?.message || String(e);
       }

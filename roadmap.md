@@ -11,3 +11,7 @@
 - [x] Edge functions: prospect-search, prospect-enrich, prospect-pitch, prospect-email-worker (cron)
 - [x] Outreach email template
 - [x] Admin Prospecting tab (search, leads, pitch, tap-to-call, email queue)
+
+## Email
+- [x] Email sending update (ready to review; publish to finish)
+- [x] Email domain notify.mikesmautorepair.com set up (finishing verification)

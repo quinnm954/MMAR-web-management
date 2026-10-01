@@ -1,3 +1,4 @@
+import { sendAndLog } from '../_shared/send-and-log.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.95.0';
 
 const corsHeaders = {
@@ -13,21 +14,8 @@ const SB_SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 const SB_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im93Z3B4dWpmeXRza2RmbXJoamdrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU4MTQ5NDMsImV4cCI6MjA4MTM5MDk0M30.6zEygmSkP74HP3J8jrzIUmnZ82pMQc0FgbG6qeo_bFc';
 
 async function sendTxEmail(body: Record<string, unknown>): Promise<{ error?: string }> {
-  try {
-    const r = await fetch(`${SB_URL}/functions/v1/send-transactional-email`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${SB_ANON_KEY}`,
-        apikey: SB_ANON_KEY,
-      },
-      body: JSON.stringify(body),
-    });
-    if (!r.ok) return { error: `send-transactional-email ${r.status}: ${(await r.text()).slice(0, 200)}` };
-    return {};
-  } catch (e: any) {
-    return { error: e?.message || String(e) };
-  }
+  const r = await sendAndLog(body as any);
+  return r.error ? { error: r.error.message } : {};
 }
 
 Deno.serve(async (req) => {

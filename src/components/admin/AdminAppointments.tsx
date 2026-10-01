@@ -83,10 +83,8 @@ const AdminAppointments = () => {
       (patch.status === "scheduled" && row?.status !== "scheduled") ||
       (patch.scheduled_at && row?.status === "requested");
     if (becameScheduled && row?.customer?.email) {
-      const { sendNotification } = await import("@/lib/notify");
       const when = (patch.scheduled_at as string) || row.scheduled_at || row.requested_date || "";
-      sendNotification({
-        templateName: "appointment-confirmed",
+      void supabase.functions.invoke("notify-appointment-confirmed", { body: {
         recipientEmail: row.customer.email,
         idempotencyKey: `appt-confirmed-${id}-${when}`,
         templateData: {
@@ -95,7 +93,7 @@ const AdminAppointments = () => {
           serviceType: row.service_type,
           vehicle: row.vehicle ? `${row.vehicle.year ?? ""} ${row.vehicle.make ?? ""} ${row.vehicle.model ?? ""}`.trim() : undefined,
         },
-      });
+      } }).then(() => {}, () => {});
     }
     load();
   };
