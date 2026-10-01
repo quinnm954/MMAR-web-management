@@ -91,7 +91,10 @@ const AdminServiceRecords = () => {
     const vehicleStr = vehicle ? `${vehicle.year ?? ""} ${vehicle.make ?? ""} ${vehicle.model ?? ""}`.trim() : undefined;
 
     if (customer?.email && inserted?.id) {
-      const { sendNotification } = await import("@/lib/notify");
+      const sendNotification = (p: { templateName: "service-completed" | "invoice-issued"; recipientEmail: string; idempotencyKey: string; templateData: Record<string, unknown> }) => {
+        const { templateName, ...rest } = p;
+        void supabase.functions.invoke("notify-service-completed", { body: { kind: templateName, ...rest } }).then(() => {}, () => {});
+      };
       // Service completed email
       sendNotification({
         templateName: "service-completed",
