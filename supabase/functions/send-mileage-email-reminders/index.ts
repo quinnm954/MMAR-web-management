@@ -146,6 +146,8 @@ Deno.serve(async (req) => {
   const sent: any[] = [];
   const skipped: any[] = [];
   const errors: any[] = [];
+  let dryRun = new URL(req.url).searchParams.get('dry_run') === '1';
+  try { const b = await req.clone().json(); if (b?.dry_run) dryRun = true; } catch { /* no body */ }
 
   // Pull all vehicles with mileage info + owner
   const { data: vehicles, error: vErr } = await sb
@@ -267,6 +269,8 @@ Deno.serve(async (req) => {
         .sort((a, b) => b.overdueBy - a.overdueBy);
 
       if (dueServices.length === 0) { skipped.push({ vehicle_id: v.id, reason: 'nothing_due' }); continue; }
+
+      if (dryRun) { sent.push({ vehicle_id: v.id, dry_run: true, email: !!email, text: !!phone, due: dueServices.map((d) => d.name) }); continue; }
 
       const vehicleLabel = [v.year, v.make, v.model].filter(Boolean).join(' ') || 'your vehicle';
 
