@@ -23,11 +23,12 @@ interface Props {
   currentMileage?: number
   dueServices?: DueService[]
   priceRegionLabel?: string
+  markDoneUrl?: string
 }
 
 const fmt = (n: number) => n.toLocaleString('en-US')
 
-const MileageServiceReminderEmail = ({ customerName, vehicle, currentMileage, dueServices = [], priceRegionLabel }: Props) => {
+const MileageServiceReminderEmail = ({ customerName, vehicle, currentMileage, dueServices = [], priceRegionLabel, markDoneUrl }: Props) => {
   const serviceList = dueServices.map((s) => s.name).join(', ')
   const quoteBody = `Hi Mike — I'd like a quote for: ${serviceList || 'recommended maintenance'}${vehicle ? ` on my ${vehicle}` : ''}. Please apply my 20% mileage reminder discount.`
   const smsQuoteHref = `sms:${PHONE}?&body=${encodeURIComponent(quoteBody)}`
@@ -119,6 +120,12 @@ const MileageServiceReminderEmail = ({ customerName, vehicle, currentMileage, du
           <Text style={text}>
             Prefer the web?{' '}
             <Link href={webQuoteHref} style={link}>Request your quote online →</Link>
+          </Text>
+
+          <Text style={text}>
+            Already had any of these done?{' '}
+            <Link href={markDoneUrl || `${SITE_URL}/portal/maintenance`} style={link}>Mark them completed →</Link>
+            {' '}Enter the month and approximate mileage and we'll update your account and reminders.
           </Text>
 
           <Text style={smallText}>
