@@ -1,0 +1,1 @@
+REVOKE ALL ON FUNCTION public.start_booking_bot() FROM PUBLIC, anon, authenticated;
