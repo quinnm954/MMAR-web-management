@@ -210,6 +210,8 @@ Deno.serve(async (req) => {
                 VoiceMethod: 'POST',
                 SmsUrl: `${supabaseUrl}/functions/v1/twilio-inbound-sms`,
                 SmsMethod: 'POST',
+                StatusCallback: `${supabaseUrl}/functions/v1/twilio-voice-status`,
+                StatusCallbackMethod: 'POST',
               }),
             });
             results.push(`${n.phone_number}: ${up.ok ? 'ok' : `failed ${up.status}`}`);
