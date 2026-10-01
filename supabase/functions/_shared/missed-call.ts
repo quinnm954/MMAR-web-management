@@ -2,6 +2,26 @@
 const TWILIO_GW = 'https://connector-gateway.lovable.dev/twilio';
 const COOLDOWN_HOURS = 12;
 
+// Carriers only allow business texts once the A2P campaign is approved. Sending earlier got the
+// account suspended, so every automated text checks this first.
+let smsCache: { ok: boolean; at: number } | null = null;
+export async function smsAllowed(): Promise<boolean> {
+  if (smsCache && Date.now() - smsCache.at < 10 * 60000) return smsCache.ok;
+  const LK = Deno.env.get('LOVABLE_API_KEY'); const TK = Deno.env.get('TWILIO_API_KEY');
+  if (!LK || !TK) return false;
+  const h = { Authorization: `Bearer ${LK}`, 'X-Connection-Api-Key': TK };
+  let ok = false;
+  try {
+    const svcs = await (await fetch(`${TWILIO_GW}/messaging/v1/Services`, { headers: h })).json();
+    for (const svc of svcs.services || []) {
+      const c = await (await fetch(`${TWILIO_GW}/messaging/v1/Services/${svc.sid}/Compliance/Usa2p`, { headers: h })).json();
+      if ((c.compliance || []).some((x: any) => x.campaign_status === 'VERIFIED')) { ok = true; break; }
+    }
+  } catch (e) { console.error('a2p check failed', e); }
+  smsCache = { ok, at: Date.now() };
+  return ok;
+}
+
 const last10 = (p: string) => (p || '').replace(/\D/g, '').slice(-10);
 
 export async function sendMissedCallFollowup(sb: any, caller: string, fromNumber?: string) {
@@ -24,7 +44,9 @@ export async function sendMissedCallFollowup(sb: any, caller: string, fromNumber
   let err: string | undefined;
   const LK = Deno.env.get('LOVABLE_API_KEY'); const TK = Deno.env.get('TWILIO_API_KEY');
   const FROM = fromNumber || Deno.env.get('TWILIO_FROM_NUMBER');
-  if (LK && TK && FROM) {
+  const canText = await smsAllowed();
+  if (!canText) err = 'Texting paused until carrier campaign is approved';
+  else if (LK && TK && FROM) {
     const r = await fetch(`${TWILIO_GW}/Messages.json`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${LK}`, 'X-Connection-Api-Key': TK, 'Content-Type': 'application/x-www-form-urlencoded' },

@@ -1,4 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.95.0';
+import { smsAllowed } from '../_shared/missed-call.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -159,6 +160,7 @@ Deno.serve(async (req) => {
     });
   }
 
+  const canText = await smsAllowed();
   const cooldownIso = new Date(Date.now() - REMINDER_COOLDOWN_DAYS * 86400000).toISOString();
 
   // Per-run cache: owner_id -> { profile, region }.
@@ -201,14 +203,16 @@ Deno.serve(async (req) => {
         .select('id')
         .eq('reminder_type', REMINDER_TYPE)
         .eq('reference_id', v.id)
+        .eq('status', 'sent')
         .gte('sent_at', cooldownIso)
+        .limit(1)
         .maybeSingle();
       if (recent) { skipped.push({ vehicle_id: v.id, reason: 'cooldown' }); continue; }
 
       // Owner profile + email + ZIP for regional pricing (cached per run)
       const { profile, region, emailOk, smsOk } = await getOwner(v.owner_id);
       const email = emailOk ? profile?.email : null;
-      const phone = smsOk ? toE164(profile?.phone || '') : '';
+      const phone = smsOk && canText ? toE164(profile?.phone || '') : '';
       if (!email && !phone) { skipped.push({ vehicle_id: v.id, reason: 'no_contact' }); continue; }
 
       // All service records for this vehicle (need mileage_at_service + service_type)
