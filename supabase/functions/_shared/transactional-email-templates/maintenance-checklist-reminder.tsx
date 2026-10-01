@@ -1,6 +1,7 @@
 import * as React from 'npm:react@18.3.1'
 import { Body, Container, Head, Heading, Html, Preview, Text, Section, Hr, Button } from 'npm:@react-email/components@0.0.22'
 import type { TemplateEntry } from './registry.ts'
+import { BrandHeader, BrandCard } from './_brand.tsx'
 
 const SITE_NAME = "Mike's Mobile Auto Repair"
 const PHONE = '813-501-7572'
@@ -17,6 +18,8 @@ const MaintenanceChecklistReminderEmail = ({ customerName, vehicle, checklistUrl
     <Preview>Take 60 seconds to tell us what's already been done on your {vehicle ?? 'vehicle'}</Preview>
     <Body style={main}>
       <Container style={container}>
+        <BrandHeader />
+        <BrandCard>
         <Heading style={h1}>Finish your maintenance checklist</Heading>
         <Text style={text}>{customerName ? `Hi ${customerName},` : 'Hi there,'}</Text>
         <Text style={text}>
@@ -41,6 +44,7 @@ const MaintenanceChecklistReminderEmail = ({ customerName, vehicle, checklistUrl
         </Text>
         <Hr style={hr} />
         <Text style={footer}>— The {SITE_NAME} Team</Text>
+      </BrandCard>
       </Container>
     </Body>
   </Html>
@@ -58,7 +62,7 @@ export const template = {
 } satisfies TemplateEntry
 
 const main = { backgroundColor: '#ffffff', fontFamily: 'Arial, sans-serif' }
-const container = { padding: '24px', maxWidth: '560px', margin: '0 auto' }
+const container = { maxWidth: '580px', margin: '0 auto', padding: '24px 16px' }
 const h1 = { fontSize: '24px', fontWeight: 'bold', color: '#0a1628', margin: '0 0 16px' }
 const text = { fontSize: '15px', color: '#334155', lineHeight: '1.6', margin: '0 0 16px' }
 const smallText = { fontSize: '13px', color: '#64748b', lineHeight: '1.5', margin: '0 0 12px' }

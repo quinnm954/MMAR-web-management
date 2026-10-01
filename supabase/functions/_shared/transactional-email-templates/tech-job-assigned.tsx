@@ -1,6 +1,7 @@
 import * as React from 'npm:react@18.3.1'
 import { Body, Button, Container, Head, Heading, Html, Preview, Text, Section, Hr } from 'npm:@react-email/components@0.0.22'
 import type { TemplateEntry } from './registry.ts'
+import { BrandHeader, BrandCard } from './_brand.tsx'
 
 const SITE_NAME = "Mike's Mobile Auto Repair"
 
@@ -26,6 +27,8 @@ const TechJobAssignedEmail = ({
     <Preview>New job assigned{serviceType ? ` — ${serviceType}` : ''}</Preview>
     <Body style={main}>
       <Container style={container}>
+        <BrandHeader />
+        <BrandCard>
         <Heading style={h1}>🔧 New Job Assigned</Heading>
         <Text style={text}>
           {technicianName ? `Hey ${technicianName},` : 'Hey there,'} you've been assigned a new job
@@ -47,6 +50,7 @@ const TechJobAssignedEmail = ({
         )}
         <Hr style={hr} />
         <Text style={footer}>{SITE_NAME} · Technician notification</Text>
+      </BrandCard>
       </Container>
     </Body>
   </Html>
@@ -72,7 +76,7 @@ export const template = {
 } satisfies TemplateEntry
 
 const main = { backgroundColor: '#ffffff', fontFamily: 'Arial, sans-serif' }
-const container = { padding: '24px', maxWidth: '560px', margin: '0 auto' }
+const container = { maxWidth: '580px', margin: '0 auto', padding: '24px 16px' }
 const h1 = { fontSize: '22px', fontWeight: 'bold', color: '#0a1628', margin: '0 0 16px' }
 const text = { fontSize: '15px', color: '#334155', lineHeight: '1.6', margin: '0 0 16px' }
 const card = { backgroundColor: '#f1f5f9', borderLeft: '4px solid #eab308', padding: '16px 20px', margin: '20px 0', borderRadius: '4px' }
