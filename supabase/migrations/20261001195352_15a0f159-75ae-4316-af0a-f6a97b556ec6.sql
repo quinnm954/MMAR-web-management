@@ -1,0 +1,2 @@
+ALTER TABLE public.service_reminders_sent ALTER COLUMN customer_id DROP NOT NULL, ALTER COLUMN reference_id DROP NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_reminders_type_phone_sent ON public.service_reminders_sent (reminder_type, phone, sent_at DESC);

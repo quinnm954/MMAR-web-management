@@ -5,6 +5,7 @@
 //   transfer  – agent tool: transfer the live call to Mike's cell
 //   postcall  – ElevenLabs post-call webhook: save transcript + text summaries
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.95.0';
+import { sendMissedCallFollowup } from '../_shared/missed-call.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -209,6 +210,8 @@ Deno.serve(async (req) => {
                 VoiceMethod: 'POST',
                 SmsUrl: `${supabaseUrl}/functions/v1/twilio-inbound-sms`,
                 SmsMethod: 'POST',
+                StatusCallback: `${supabaseUrl}/functions/v1/twilio-voice-status`,
+                StatusCallbackMethod: 'POST',
               }),
             });
             results.push(`${n.phone_number}: ${up.ok ? 'ok' : `failed ${up.status}`}`);
@@ -322,6 +325,9 @@ Deno.serve(async (req) => {
       if (owner) await sendSms(owner, `AI answered a call from ${caller || 'unknown'}:\n${summary || '(no summary)'}`, sb, fromNum);
       if (caller && transcript.length > 1) {
         await sendSms(caller, `Thanks for calling Mike's Mobile Auto Repair! Mike will follow up soon. Book anytime: ${BOOK_URL} Reply STOP to opt out.`, sb, fromNum);
+      } else if (caller) {
+        // Caller hung up before talking to the AI — treat as a missed call
+        await sendMissedCallFollowup(sb, caller, fromNum);
       }
       return json({ ok: true });
     }
