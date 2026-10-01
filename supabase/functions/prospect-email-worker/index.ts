@@ -55,7 +55,8 @@ Deno.serve(async (req) => {
 
       const r = await sendAndLog({
         templateName: 'fleet-outreach', recipientEmail: p.email,
-        idempotencyKey: `prospect-${p.id}-${step}`,
+        // Per-day key: dedupes retries within a day, but a failed send can be retried the next day.
+        idempotencyKey: `prospect-${p.id}-${step}-${today}-${now.getUTCHours()}`,
         templateData: { subject, body: bodyText, step, mailingAddress: st.mailing_address },
       });
       if (r.status === 402 || r.status === 403 || r.status === 429) {
