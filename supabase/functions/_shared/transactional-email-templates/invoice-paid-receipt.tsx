@@ -1,6 +1,7 @@
 import * as React from 'npm:react@18.3.1'
 import { Body, Button, Container, Head, Heading, Html, Preview, Text, Section, Hr, Row, Column } from 'npm:@react-email/components@0.0.22'
 import type { TemplateEntry } from './registry.ts'
+import { BrandHeader, BrandCard } from './_brand.tsx'
 
 const SITE_NAME = "Mike's Mobile Auto Repair"
 const PHONE = '813-501-7572'
@@ -41,6 +42,8 @@ const InvoicePaidReceiptEmail = ({
     <Preview>Receipt {invoiceNumber ? `for ${invoiceNumber}` : ''} — Thank you!</Preview>
     <Body style={main}>
       <Container style={container}>
+        <BrandHeader />
+        <BrandCard>
         <Section style={paidBanner}>
           <Text style={paidBadge}>✓ PAID</Text>
         </Section>
@@ -118,6 +121,7 @@ const InvoicePaidReceiptEmail = ({
 
         <Hr style={hr} />
         <Text style={footer}>— The {SITE_NAME} Team</Text>
+      </BrandCard>
       </Container>
     </Body>
   </Html>
@@ -152,7 +156,7 @@ export const template = {
 } satisfies TemplateEntry
 
 const main = { backgroundColor: '#ffffff', fontFamily: 'Arial, sans-serif' }
-const container = { padding: '24px', maxWidth: '560px', margin: '0 auto' }
+const container = { maxWidth: '580px', margin: '0 auto', padding: '24px 16px' }
 const paidBanner = { textAlign: 'center' as const, margin: '0 0 12px' }
 const paidBadge = { display: 'inline-block', backgroundColor: '#d1fae5', color: '#065f46', padding: '6px 16px', borderRadius: '999px', fontSize: '13px', fontWeight: 'bold' as const, letterSpacing: '1px', margin: 0 }
 const h1 = { fontSize: '24px', fontWeight: 'bold' as const, color: '#0a1628', margin: '0 0 16px', textAlign: 'center' as const }
