@@ -45,7 +45,6 @@ import PortalRepairOrders from "./pages/portal/PortalRepairOrders";
 import PortalFinancing from "./pages/portal/PortalFinancing";
 import CustomerProtectedRoute from "./components/portal/CustomerProtectedRoute";
 import NotFound from "./pages/NotFound";
-import Unsubscribe from "./pages/Unsubscribe";
 import MileageUpdate from "./pages/MileageUpdate";
 import TechDashboard from "./pages/tech/TechDashboard";
 import TechJobs from "./pages/tech/TechJobs";
@@ -166,7 +165,6 @@ const App = () => (
                 </ProtectedRoute>
               }
             />
-            <Route path="/unsubscribe" element={<Unsubscribe />} />
             <Route path="/m/:token" element={<MileageUpdate />} />
             <Route path="/tech" element={<TechProtectedRoute><TechDashboard /></TechProtectedRoute>} />
             <Route path="/tech/jobs" element={<TechProtectedRoute><TechJobs /></TechProtectedRoute>} />

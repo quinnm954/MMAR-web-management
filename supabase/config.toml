@@ -44,3 +44,6 @@ verify_jwt = false
 
 [functions.handle-email-events]
 verify_jwt = false
+
+[functions.notify-tech-job-assigned]
+verify_jwt = false
