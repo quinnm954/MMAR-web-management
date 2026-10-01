@@ -305,6 +305,9 @@ export type Database = {
       }
       booking_requests: {
         Row: {
+          bot_history: Json
+          bot_status: string | null
+          bot_updated_at: string | null
           confirmation_token: string
           converted_appointment_id: string | null
           created_at: string
@@ -334,6 +337,9 @@ export type Database = {
           wbraid: string | null
         }
         Insert: {
+          bot_history?: Json
+          bot_status?: string | null
+          bot_updated_at?: string | null
           confirmation_token?: string
           converted_appointment_id?: string | null
           created_at?: string
@@ -363,6 +369,9 @@ export type Database = {
           wbraid?: string | null
         }
         Update: {
+          bot_history?: Json
+          bot_status?: string | null
+          bot_updated_at?: string | null
           confirmation_token?: string
           converted_appointment_id?: string | null
           created_at?: string
@@ -3598,6 +3607,10 @@ export type Database = {
       }
       admin_decline_booking_request: {
         Args: { _id: string; _reason?: string }
+        Returns: Json
+      }
+      bot_confirm_booking_request: {
+        Args: { _date: string; _id: string; _time: string }
         Returns: Json
       }
       create_checklist_from_template: {
