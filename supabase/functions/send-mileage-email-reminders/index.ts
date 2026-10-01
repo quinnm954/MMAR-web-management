@@ -275,6 +275,10 @@ Deno.serve(async (req) => {
         .map(({ due: _d, ...rest }) => rest)
         .sort((a, b) => b.overdueBy - a.overdueBy);
 
+      // No-history vehicles can flag many time-based services at once; keep the
+      // reminder short and let the rest surface in later monthly cycles.
+      if (noHistory && dueServices.length > 5) dueServices.length = 5;
+
       if (dueServices.length === 0) { skipped.push({ vehicle_id: v.id, reason: 'nothing_due' }); continue; }
 
       if (dryRun) { sent.push({ vehicle_id: v.id, dry_run: true, email: !!email, text: !!phone, due: dueServices.map((d) => d.name) }); continue; }
