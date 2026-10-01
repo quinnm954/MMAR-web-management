@@ -79,7 +79,9 @@ Facts:
 
 How to act:
 - Be warm, brief, and natural. One question at a time. Short sentences.
-- If they need service, collect: name, vehicle (year, make, model), what's wrong, service address or city, and a preferred day or time. Confirm it back, then call create_booking_request. Tell them Mike will text or call to confirm.
+- Today is {{today}} (Eastern time). You answer 24/7, any day.
+- Appointments can be set any day of the week, but only between 10 AM and 5 PM Eastern. Never offer or accept a time before 10 AM or after 5 PM; suggest the nearest time inside that window instead. Never book a time that has already passed today.
+- If they need service, collect: name, vehicle (year, make, model), what's wrong, service address or city, and the day and time they want. Turn the day into a real date (YYYY-MM-DD) and the time into 24-hour HH:MM. Confirm it back, then call create_booking_request. If the tool says the time is invalid, offer another time in the window. Tell them the appointment is set for that time and Mike will text to confirm.
 - If it's urgent (stranded, unsafe), or they ask for a person, call transfer_to_mike.
 - Never invent prices, hours, or promises. If unsure, say Mike will follow up.
 - Caller's number: {{caller_number}}. Use it as their phone unless they give another.`;
@@ -134,7 +136,8 @@ Deno.serve(async (req) => {
                   vehicle_info: { type: 'string', description: 'Year make model' },
                   description: { type: 'string', description: 'What is wrong with the vehicle' },
                   service_address: { type: 'string', description: 'Address or city for service' },
-                  requested_time: { type: 'string', description: 'Preferred day/time, or empty' },
+                  requested_date: { type: 'string', description: 'Appointment date YYYY-MM-DD' },
+                  requested_time: { type: 'string', description: 'Appointment time HH:MM 24-hour, between 10:00 and 17:00 Eastern' },
                 }, ['customer_name', 'description']),
                 tool('transfer_to_mike', 'Transfer the caller to Mike for urgent issues or when they ask for a person.', {
                   call_sid: callSid,
@@ -231,7 +234,24 @@ Deno.serve(async (req) => {
         const { data: c } = await sb.from('call_logs').select('from_number').eq('twilio_call_sid', sid).maybeSingle();
         phone = c?.from_number || '';
       }
-      const notes = [body.requested_time && `Preferred time: ${body.requested_time}`, 'Booked by AI receptionist on a missed call']
+      // Validate requested slot: any day, 10:00–17:00 Eastern, not in the past
+      const dateStr = String(body.requested_date || '').trim();
+      const timeStr = String(body.requested_time || '').trim();
+      let window: string | null = null;
+      if (dateStr || timeStr) {
+        const dm = /^\d{4}-\d{2}-\d{2}$/.test(dateStr);
+        const tm = timeStr.match(/^(\d{1,2}):(\d{2})$/);
+        if (!dm || !tm) return json({ result: 'Need a date as YYYY-MM-DD and a time as HH:MM. Ask the caller again.' });
+        const mins = Number(tm[1]) * 60 + Number(tm[2]);
+        if (mins < 600 || mins > 1020) return json({ result: 'Invalid time. Appointments are only between 10 AM and 5 PM. Offer a time in that window.' });
+        const nowEt = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/New_York' }));
+        const todayEt = `${nowEt.getFullYear()}-${String(nowEt.getMonth() + 1).padStart(2, '0')}-${String(nowEt.getDate()).padStart(2, '0')}`;
+        if (dateStr < todayEt || (dateStr === todayEt && mins <= nowEt.getHours() * 60 + nowEt.getMinutes()))
+          return json({ result: 'That time has already passed. Offer a later time between 10 AM and 5 PM.' });
+        const h = Number(tm[1]), label = `${((h + 11) % 12) + 1}:${tm[2]} ${h < 12 ? 'AM' : 'PM'}`;
+        window = label;
+      }
+      const notes = [window && `Requested appointment: ${dateStr} at ${window}`, 'Booked by AI receptionist']
         .filter(Boolean).join('\n');
       const { error } = await sb.from('booking_requests').insert({
         customer_name: String(body.customer_name || 'Phone caller').slice(0, 200),
@@ -241,13 +261,15 @@ Deno.serve(async (req) => {
         service_address: body.service_address ? String(body.service_address).slice(0, 300) : null,
         service_type: 'General Repair',
         source: 'ai_phone',
+        requested_date: window ? dateStr : null,
+        requested_time_window: window,
         notes,
       });
       if (error) {
         console.error('booking insert', error);
         return json({ result: 'Could not save. Tell the caller Mike will call them back.' });
       }
-      return json({ result: 'Booking request saved. Mike will text or call to confirm.' });
+      return json({ result: window ? `Appointment set for ${dateStr} at ${window}. Mike will text to confirm.` : 'Booking request saved. Mike will text or call to confirm.' });
     }
 
     if (action === 'transfer') {
