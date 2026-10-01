@@ -13,5 +13,5 @@
 - [x] Admin Prospecting tab (search, leads, pitch, tap-to-call, email queue)
 
 ## Email
-- [ ] Email sending update to managed delivery (in progress)
-- [ ] Set up email domain notify.mikesmautorepair.com (user request)
+- [x] Email sending update (ready to review; publish to finish)
+- [x] Email domain notify.mikesmautorepair.com set up (finishing verification)
