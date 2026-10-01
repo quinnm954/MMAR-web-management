@@ -98,20 +98,6 @@ Deno.serve(async (req) => {
   const EL_KEY = Deno.env.get('ELEVENLABS_API_KEY');
 
   try {
-    // ---------- Temp: patch live agent voice ----------
-    if (action === 'setvoice') {
-      if (!EL_KEY) return json({ error: 'ElevenLabs is not connected' }, 500);
-      const { data: s } = await sb.from('phone_settings').select('ai_agent_id').eq('id', 1).maybeSingle();
-      if (!s?.ai_agent_id) return json({ error: 'No agent' }, 400);
-      const r = await fetch(`${EL}/v1/convai/agents/${s.ai_agent_id}`, {
-        method: 'PATCH',
-        headers: { 'xi-api-key': EL_KEY, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ conversation_config: { tts: { voice_id: 'vrzf30JViL81pJHyaGSU', model_id: 'eleven_flash_v2' } } }),
-      });
-      const d = await r.text();
-      if (!r.ok) return json({ error: `ElevenLabs ${r.status}: ${d}` }, 500);
-      return json({ ok: true });
-    }
     // ---------- Admin setup ----------
     if (action === 'setup') {
       const auth = req.headers.get('Authorization')?.replace('Bearer ', '') || '';
