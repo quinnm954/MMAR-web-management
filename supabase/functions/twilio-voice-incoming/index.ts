@@ -126,10 +126,15 @@ Deno.serve(async (req) => {
     return null;
   };
 
-  // Outside hours OR no forward number → AI receptionist, then voicemail
-  if (!inHours || !forward) {
+  // AI receptionist intercepts every new inbound call. It transfers to Mike only when asked.
+  const url0 = new URL(req.url);
+  if (url0.searchParams.get('after') !== 'dial') {
     const ai = await tryAi();
     if (ai) return ai;
+  }
+
+  // AI unavailable: outside hours OR no forward number → voicemail
+  if (!inHours || !forward) {
     const transcribeAttr = transcribe
       ? ` transcribe="true" transcribeCallback="${transcribeCb}"`
       : '';
