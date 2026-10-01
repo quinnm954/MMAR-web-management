@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import PortalLayout from "@/components/portal/PortalLayout";
@@ -43,7 +44,11 @@ const PortalMaintenance = () => {
   const [vehicleId, setVehicleId] = useState<string>("");
   const [records, setRecords] = useState<ServiceRecord[]>([]);
   const [drafts, setDrafts] = useState<Record<string, string>>({}); // service_name -> miles input
+  const [months, setMonths] = useState<Record<string, string>>({}); // service_name -> YYYY-MM
   const [savingName, setSavingName] = useState<string | null>(null);
+  const [params] = useSearchParams();
+  const dueParam = useMemo(() => new Set((params.get("due") || "").split("|").filter(Boolean)), [params]);
+  const thisMonth = new Date().toISOString().slice(0, 7);
 
   const load = async () => {
     if (!user) return;
@@ -56,15 +61,15 @@ const PortalMaintenance = () => {
       .order("created_at", { ascending: false });
     const list = (vData as Vehicle[]) ?? [];
     setVehicles(list);
-    const targetId = vehicleId || list[0]?.id || "";
+    const wanted = params.get("vehicle");
+    const targetId = vehicleId || (wanted && list.find((v) => v.id === wanted)?.id) || list[0]?.id || "";
     setVehicleId(targetId);
     if (targetId) {
       const { data: rData } = await supabase
         .from("service_records")
         .select("id, vehicle_id, service_type, mileage_at_service, service_date, technician_notes")
         .eq("vehicle_id", targetId)
-        .not("mileage_at_service", "is", null)
-        .order("mileage_at_service", { ascending: false });
+        .order("service_date", { ascending: false });
       setRecords((rData as ServiceRecord[]) ?? []);
     } else {
       setRecords([]);
@@ -79,15 +84,15 @@ const PortalMaintenance = () => {
 
   // Most recent self-reported / matched mileage per canonical service name
   const lastMilesByName = useMemo(() => {
-    const out: Record<string, { miles: number; recordId: string }> = {};
+    const out: Record<string, { miles: number | null; date: string; recordId: string }> = {};
     for (const r of records) {
       const match = MAINTENANCE_INTERVALS.find(
         (m) => m.name.toLowerCase() === (r.service_type || "").toLowerCase(),
       );
-      if (!match || r.mileage_at_service == null) continue;
+      if (!match) continue;
       const cur = out[match.name];
-      if (!cur || r.mileage_at_service > cur.miles) {
-        out[match.name] = { miles: r.mileage_at_service, recordId: r.id };
+      if (!cur || r.service_date > cur.date) {
+        out[match.name] = { miles: r.mileage_at_service, date: r.service_date, recordId: r.id };
       }
     }
     return out;
@@ -96,18 +101,20 @@ const PortalMaintenance = () => {
   const saveRow = async (name: string) => {
     if (!user || !vehicleId) return;
     const raw = drafts[name];
-    const miles = Number(raw);
-    if (!raw || !Number.isFinite(miles) || miles <= 0) {
+    const month = months[name] || thisMonth;
+    const miles = raw ? Number(raw) : null;
+    if (raw && (!Number.isFinite(miles) || (miles as number) <= 0)) {
       toast.error("Enter a valid mileage");
       return;
     }
+    if (month > thisMonth) { toast.error("Pick a month that isn't in the future"); return; }
     setSavingName(name);
     const { error } = await supabase.from("service_records").insert({
       customer_id: user.id,
       vehicle_id: vehicleId,
       service_type: name,
       mileage_at_service: miles,
-      service_date: new Date().toISOString().slice(0, 10),
+      service_date: `${month}-01`,
       technician_notes: SELF_REPORTED_NOTE,
     });
     setSavingName(null);
@@ -115,7 +122,12 @@ const PortalMaintenance = () => {
       toast.error(error.message);
       return;
     }
-    toast.success(`${name} logged at ${miles.toLocaleString()} mi`);
+    // Keep the odometer current when the reported mileage is higher
+    const veh = vehicles.find((v) => v.id === vehicleId);
+    if (miles && (!veh?.current_mileage || miles > veh.current_mileage)) {
+      await supabase.from("vehicles").update({ current_mileage: miles, last_mileage_update_at: new Date().toISOString() }).eq("id", vehicleId);
+    }
+    toast.success(`${name} marked done`);
     setDrafts((d) => ({ ...d, [name]: "" }));
     load();
   };
@@ -123,7 +135,7 @@ const PortalMaintenance = () => {
   const removeRow = async (name: string) => {
     const last = lastMilesByName[name];
     if (!last) return;
-    if (!confirm(`Remove your ${name} record at ${last.miles.toLocaleString()} mi?`)) return;
+    if (!confirm(`Remove your latest ${name} record?`)) return;
     const { error } = await supabase.from("service_records").delete().eq("id", last.recordId);
     if (error) {
       toast.error(error.message);
@@ -143,7 +155,7 @@ const PortalMaintenance = () => {
           <div>
             <h1 className="text-2xl font-bold">Maintenance log</h1>
             <p className="text-sm text-muted-foreground">
-              Track services performed elsewhere so we only remind you about what you actually need.
+              Mark a service done with the month and approximate mileage, and we'll update your reminders.
             </p>
           </div>
         </div>
@@ -188,17 +200,21 @@ const PortalMaintenance = () => {
                     {MAINTENANCE_INTERVALS.map((item) => {
                       const last = lastMilesByName[item.name];
                       const draft = drafts[item.name] ?? "";
-                      const nextDue = last ? last.miles + item.intervalMiles : null;
+                      const nextDue = last?.miles ? last.miles + item.intervalMiles : null;
+                      const isDue = dueParam.has(item.name);
                       return (
-                        <li key={item.name} className="px-4 py-3 flex flex-col sm:flex-row sm:items-center gap-3">
+                        <li key={item.name} className={`px-4 py-3 flex flex-col sm:flex-row sm:items-center gap-3 ${isDue ? "bg-accent/10 border-l-4 border-accent" : ""}`}>
                           <div className="flex-1 min-w-0">
-                            <div className="font-medium text-sm text-foreground">{item.name}</div>
+                            <div className="font-medium text-sm text-foreground">{item.name}{isDue && <span className="ml-2 text-[10px] uppercase font-bold text-accent">Due</span>}</div>
                             <div className="text-[11px] text-muted-foreground">
                               every {item.intervalMiles.toLocaleString()} mi
                               {last ? (
                                 <>
                                   {" · last "}
-                                  <span className="text-foreground font-medium">{fmt(last.miles)} mi</span>
+                                  <span className="text-foreground font-medium">
+                                    {new Date(last.date + "T00:00:00").toLocaleDateString("en-US", { month: "short", year: "numeric" })}
+                                    {last.miles ? ` · ${fmt(last.miles)} mi` : ""}
+                                  </span>
                                   {nextDue ? ` · next due ${fmt(nextDue)} mi` : ""}
                                 </>
                               ) : (
@@ -206,11 +222,19 @@ const PortalMaintenance = () => {
                               )}
                             </div>
                           </div>
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <Input
+                              type="month"
+                              aria-label="Month done"
+                              className="w-36 h-9"
+                              max={thisMonth}
+                              value={months[item.name] ?? thisMonth}
+                              onChange={(e) => setMonths((m) => ({ ...m, [item.name]: e.target.value }))}
+                            />
                             <Input
                               type="text"
                               inputMode="numeric"
-                              placeholder="miles"
+                              placeholder="approx. miles"
                               className="w-28 h-9"
                               value={draft}
                               onChange={(e) =>
@@ -220,14 +244,14 @@ const PortalMaintenance = () => {
                             <Button
                               size="sm"
                               onClick={() => saveRow(item.name)}
-                              disabled={savingName === item.name || !draft}
+                              disabled={savingName === item.name}
                             >
                               {savingName === item.name ? (
                                 <Loader2 className="h-3.5 w-3.5 animate-spin" />
                               ) : last ? (
-                                <><Plus className="h-3.5 w-3.5 mr-1" /> Update</>
+                                <><Plus className="h-3.5 w-3.5 mr-1" /> Mark done</>
                               ) : (
-                                <><Save className="h-3.5 w-3.5 mr-1" /> Save</>
+                                <><Save className="h-3.5 w-3.5 mr-1" /> Mark done</>
                               )}
                             </Button>
                             {last && (

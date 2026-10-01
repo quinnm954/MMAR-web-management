@@ -273,6 +273,7 @@ Deno.serve(async (req) => {
 
       if (dryRun) { sent.push({ vehicle_id: v.id, dry_run: true, email: !!email, text: !!phone, due: dueServices.map((d) => d.name) }); continue; }
 
+      const markDoneUrl = `https://mikesmautorepair.com/portal/maintenance?vehicle=${v.id}&due=${encodeURIComponent(dueServices.map((d) => d.name).join('|'))}`;
       const vehicleLabel = [v.year, v.make, v.model].filter(Boolean).join(' ') || 'your vehicle';
 
       const sbUrl = Deno.env.get('SUPABASE_URL')!;
@@ -292,6 +293,7 @@ Deno.serve(async (req) => {
               currentMileage: v.current_mileage,
               dueServices,
               priceRegionLabel: region.label,
+              markDoneUrl,
             },
           }),
         });
@@ -306,7 +308,7 @@ Deno.serve(async (req) => {
         const names = dueServices.slice(0, 2).map((d) => d.name).join(', ');
         const more = dueServices.length > 2 ? ` +${dueServices.length - 2} more` : '';
         const first = profile?.full_name?.split(' ')[0];
-        const body = `MMAR: ${first ? `Hi ${first}, your` : 'Your'} ${vehicleLabel} is due for ${names}${more}. We come to you. Book: mikesmautorepair.com/book or reply here. Reply STOP to opt out.`;
+        const body = `MMAR: ${first ? `Hi ${first}, your` : 'Your'} ${vehicleLabel} is due for ${names}${more}. Already done? Mark it: mikesmautorepair.com/portal/maintenance Book: mikesmautorepair.com/book Reply STOP to opt out.`;
         smsErr = await sendSms(sb, phone, body);
       }
       if (smsErr && !email) invErr = smsErr;
