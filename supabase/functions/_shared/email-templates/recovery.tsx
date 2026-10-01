@@ -1,6 +1,7 @@
 /// <reference types="npm:@types/react@18.3.1" />
 
 import * as React from 'npm:react@18.3.1'
+import { BrandFooter } from '../transactional-email-templates/_brand.tsx'
 
 import {
   Body,
@@ -41,6 +42,7 @@ export const RecoveryEmail = ({
           If you didn't request a password reset, you can safely ignore this
           email. Your password will not be changed.
         </Text>
+      <BrandFooter />
       </Container>
     </Body>
   </Html>

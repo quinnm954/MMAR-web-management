@@ -1,6 +1,7 @@
 /// <reference types="npm:@types/react@18.3.1" />
 
 import * as React from 'npm:react@18.3.1'
+import { BrandFooter } from '../transactional-email-templates/_brand.tsx'
 
 import {
   Body,
@@ -40,6 +41,7 @@ export const MagicLinkEmail = ({
         <Text style={footer}>
           If you didn't request this link, you can safely ignore this email.
         </Text>
+      <BrandFooter />
       </Container>
     </Body>
   </Html>

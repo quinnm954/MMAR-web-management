@@ -1,6 +1,7 @@
 /// <reference types="npm:@types/react@18.3.1" />
 
 import * as React from 'npm:react@18.3.1'
+import { BrandFooter } from '../transactional-email-templates/_brand.tsx'
 
 import {
   Body,
@@ -61,6 +62,7 @@ export const EmailChangeEmail = ({
           If you didn't request this change, please secure your account
           immediately.
         </Text>
+      <BrandFooter />
       </Container>
     </Body>
   </Html>
