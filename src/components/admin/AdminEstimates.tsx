@@ -529,7 +529,7 @@ const AdminEstimates = () => {
       </Card>
 
       <Dialog open={!!editing} onOpenChange={o => !o && setEditing(null)}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="w-[96vw] max-w-6xl h-[94vh] max-h-[94vh] overflow-y-auto">
           <DialogHeader><DialogTitle>{editing?.id ? 'Edit Estimate' : 'New Estimate'}</DialogTitle></DialogHeader>
           {editing && (
             <div className="space-y-4">
