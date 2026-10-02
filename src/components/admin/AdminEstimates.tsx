@@ -52,13 +52,15 @@ const AdminEstimates = () => {
   const [editing, setEditing] = useState<any | null>(null);
   const [importing, setImporting] = useState(false);
   const [preview, setPreview] = useState<any | null>(null);
+  const [ptSession, setPtSession] = useState<string | null>(null);
+  const [ptLoading, setPtLoading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const load = async () => {
     const [e, c, v, ca, s, lr] = await Promise.all([
       supabase.from('estimates').select('*').order('created_at', { ascending: false }),
       supabase.from('profiles').select('id, full_name, email'),
-      supabase.from('vehicles').select('id, owner_id, year, make, model'),
+      supabase.from('vehicles').select('id, owner_id, year, make, model, vin'),
       supabase.from('catalog_items').select('*').eq('is_active', true).order('name'),
       supabase.from('shop_settings').select('*').eq('id', 1).single(),
       supabase.from('labor_rates').select('hourly_rate, is_default').order('is_default', { ascending: false }),
