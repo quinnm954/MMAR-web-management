@@ -559,12 +559,6 @@ const AdminEstimates = () => {
                 <div className="flex items-center justify-between">
                   <Label>Line Items</Label>
                   <div className="flex gap-2">
-                    <Select onValueChange={v => addLine(v)}>
-                      <SelectTrigger className="w-[200px] h-8"><SelectValue placeholder="+ From catalog" /></SelectTrigger>
-                      <SelectContent>
-                        {catalog.map(c => <SelectItem key={c.id} value={c.id}>{c.name} (${Number(c.unit_price).toFixed(2)})</SelectItem>)}
-                      </SelectContent>
-                    </Select>
                     <Button size="sm" variant="outline" onClick={() => addLine()}><Plus className="h-3 w-3 mr-1" /> Part</Button>
                     <Button size="sm" variant="outline" onClick={addLaborLine}><Plus className="h-3 w-3 mr-1" /> Labor</Button>
                     <Button size="sm" variant="outline" onClick={() => { setLaborOpen(o => !o); setLaborResults([]); }}><Wrench className="h-3 w-3 mr-1" /> Labor Guide</Button>
