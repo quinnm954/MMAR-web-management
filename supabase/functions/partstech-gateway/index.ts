@@ -113,6 +113,26 @@ Deno.serve(async (req) => {
       return json({ quote: data })
     }
 
+    if (action === 'olp-labor') {
+      const { year, make, model, job } = body as Record<string, string>
+      if (!year || !make || !model) return json({ error: 'Vehicle year, make and model required' }, 400)
+      const key = Deno.env.get('OPEN_LABOR_API_KEY')
+      if (!key) return json({ error: 'Labor guide key not configured' }, 500)
+      const qs = new URLSearchParams({ year: String(year), make: String(make).toLowerCase(), model: String(model).toLowerCase() })
+      if (job) qs.set('job', String(job))
+      const res = await fetch(`https://openlaborproject.com/api/v1/labor-times?${qs}`, { headers: { 'x-api-key': key } })
+      const text = await res.text()
+      let data: unknown
+      try { data = JSON.parse(text) } catch { data = text }
+      if (!res.ok) return json({ error: 'Labor lookup failed', status: res.status, detail: data }, 502)
+      const d = (data as any)?.data ?? {}
+      const results: { engine: string; job: string; hours: number }[] = []
+      for (const e of d.engines ?? []) for (const t of e.laborTimes ?? []) {
+        if (typeof t.hours === 'number') results.push({ engine: e.engine ?? '', job: t.job ?? '', hours: t.hours })
+      }
+      return json({ vehicle: `${d.year ?? year} ${d.make ?? make} ${d.model ?? model}`, results, meta: (data as any)?.meta ?? null })
+    }
+
     if (action === 'labor-search') {
       const { vin, vehicleId, keyword } = body as Record<string, string | number>
       if (!keyword) return json({ error: 'keyword required' }, 400)
