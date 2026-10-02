@@ -12,7 +12,10 @@ async function getToken(): Promise<string> {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       accessType: 'user',
-      credentials: { user: { id: user, key } },
+      credentials: {
+        user: { id: user, key },
+        partner: { id: Deno.env.get('PARTSTECH_PARTNER') ?? user, key: Deno.env.get('PARTSTECH_PARTNER_KEY') ?? key },
+      },
     }),
   })
   if (!res.ok) throw new Error(`PartsTech auth failed: ${res.status} ${await res.text()}`)
