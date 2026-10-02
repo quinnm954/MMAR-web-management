@@ -31,7 +31,7 @@ Deno.serve(async (req) => {
     customerEmail: b.customer_email || undefined,
     serviceType: b.service_type,
     vehicle: b.vehicle_info || undefined,
-    requestedDate: b.requested_date || undefined,
+    requestedDate: b.requested_date ? new Date(`${String(b.requested_date).slice(0, 10)}T12:00:00Z`).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' }) : undefined,
     requestedTimeWindow: b.requested_time_window || undefined,
     serviceAddress: b.service_address || undefined,
     description: b.description || undefined,
