@@ -12,7 +12,7 @@ export function json(data: unknown, status = 200) {
   })
 }
 
-const STAFF = ['admin', 'manager', 'service_advisor', 'technician', 'parts']
+const STAFF = ['owner', 'admin', 'manager', 'service_advisor', 'technician', 'parts']
 
 /** Returns the staff user's id, or a Response to return when not staff. */
 export async function requireStaff(req: Request): Promise<{ userId: string } | Response> {
