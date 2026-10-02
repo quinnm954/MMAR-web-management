@@ -31,7 +31,11 @@ function nowEastern() {
   return new Date().toLocaleString('en-US', { timeZone: 'America/New_York', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit' });
 }
 
-const ordinal = (n: number) => `${n}${[, 'st', 'nd', 'rd'][(n % 100 >> 3) ^ 1 && n % 10] || 'th'}`;
+const ordinal = (n: number) => {
+  const t = n % 100;
+  if (t >= 11 && t <= 13) return `${n}th`;
+  return `${n}${({ 1: 'st', 2: 'nd', 3: 'rd' } as Record<number, string>)[n % 10] || 'th'}`;
+};
 
 // "2026-10-05" -> "Monday, Oct 5th" (null if invalid or in the past)
 export function friendlyDate(iso?: string | null) {
@@ -142,7 +146,8 @@ export async function handleBotReply(sb: any, from: string, body: string) {
   const system = `You text customers for Mike's Mobile Auto Repair (mobile mechanic, Southwest Florida) to set an appointment for their booking request.
 Now: ${nowEastern()} (Eastern).
 Request: service "${req.service_type || ''}", vehicle "${req.vehicle_info || ''}", issue "${req.description || ''}", address "${req.service_address || ''}".
-Rules: appointments any day, ONLY between 10:00 and 17:00 Eastern, never in the past. Offer the nearest valid time if they ask outside it. Keep replies short and friendly (1-2 sentences, SMS). Never quote prices. Once the customer clearly agrees to one specific date and time, set confirmed=true. If they ask for a person, are upset, or it's urgent/unsafe, set handoff=true and say Mike will reach out.
+Customer's requested date/window: ${req.requested_date || 'none'} ${req.requested_time_window || ''}.
+Rules: appointments any day, ONLY between 10:00 and 17:00 Eastern, never in the past. Offer the nearest valid time if they ask outside it. You are texting as Mike: warm, casual, human, short (1-2 sentences). Never re-ask for info already given above or in the chat. Write dates like "Monday, Oct 5th" and times like "10:30 AM" — never raw formats like 2026-10-05 or 14:00. Never paste page titles or system wording. Never quote prices. Once the customer clearly agrees to one specific date and time, set confirmed=true. If they ask for a person, are upset, or it's urgent/unsafe, set handoff=true and say Mike will reach out.
 Respond ONLY with JSON: {"reply": string, "confirmed": boolean, "date": "YYYY-MM-DD" or null, "time": "HH:MM" 24h or null, "handoff": boolean}`;
 
   let ai;
