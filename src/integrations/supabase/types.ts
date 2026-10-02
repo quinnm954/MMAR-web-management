@@ -2130,6 +2130,39 @@ export type Database = {
         }
         Relationships: []
       }
+      partstech_quotes: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          estimate_id: string | null
+          id: string
+          imported: boolean
+          payload: Json | null
+          session_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          estimate_id?: string | null
+          id?: string
+          imported?: boolean
+          payload?: Json | null
+          session_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          estimate_id?: string | null
+          id?: string
+          imported?: boolean
+          payload?: Json | null
+          session_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       phone_settings: {
         Row: {
           ai_agent_id: string | null
@@ -2825,6 +2858,8 @@ export type Database = {
           estimate_valid_days: number
           id: number
           labor_cost_per_hour: number
+          parts_markup_pct: number
+          partstech_enabled: boolean
           shop_supplies_max: number
           shop_supplies_pct: number
           tax_rate: number
@@ -2835,6 +2870,8 @@ export type Database = {
           estimate_valid_days?: number
           id?: number
           labor_cost_per_hour?: number
+          parts_markup_pct?: number
+          partstech_enabled?: boolean
           shop_supplies_max?: number
           shop_supplies_pct?: number
           tax_rate?: number
@@ -2845,6 +2882,8 @@ export type Database = {
           estimate_valid_days?: number
           id?: number
           labor_cost_per_hour?: number
+          parts_markup_pct?: number
+          partstech_enabled?: boolean
           shop_supplies_max?: number
           shop_supplies_pct?: number
           tax_rate?: number
