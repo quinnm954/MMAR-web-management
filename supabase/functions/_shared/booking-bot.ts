@@ -31,6 +31,59 @@ function nowEastern() {
   return new Date().toLocaleString('en-US', { timeZone: 'America/New_York', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit' });
 }
 
+const ordinal = (n: number) => `${n}${[, 'st', 'nd', 'rd'][(n % 100 >> 3) ^ 1 && n % 10] || 'th'}`;
+
+// "2026-10-05" -> "Monday, Oct 5th" (null if invalid or in the past)
+export function friendlyDate(iso?: string | null) {
+  if (!iso || !/^\d{4}-\d{2}-\d{2}/.test(iso)) return null;
+  const d = new Date(`${iso.slice(0, 10)}T12:00:00Z`);
+  if (isNaN(d.getTime())) return null;
+  const todayEt = new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
+  if (iso.slice(0, 10) < todayEt) return null;
+  const wd = d.toLocaleDateString('en-US', { weekday: 'long', timeZone: 'UTC' });
+  const mo = d.toLocaleDateString('en-US', { month: 'short', timeZone: 'UTC' });
+  return `${wd}, ${mo} ${ordinal(d.getUTCDate())}`;
+}
+
+// Turns page titles like "Mobile Mechanic in Lehigh Acres, FL" into natural service wording.
+export function cleanService(s?: string | null) {
+  let t = (s || '').trim();
+  if (!t) return null;
+  t = t.replace(/\s+(in|near)\s+[A-Z][\w\s.]*,?\s*(FL|Florida)?\s*$/i, '').replace(/\s*[|–—-]\s*.*$/, '').trim();
+  if (/^(mobile )?(mechanic|auto repair|car repair|service|repair|general|other|quote)s?$/i.test(t) || /mike'?s|mmar/i.test(t)) return null;
+  return t.toLowerCase().replace(/\bac\b/g, 'AC').replace(/\babs\b/g, 'ABS');
+}
+
+function windowPart(w?: string | null) {
+  const s = (w || '').toLowerCase();
+  if (s.includes('late')) return { label: 'afternoon', suggest: '3:00 PM' };
+  if (s.includes('afternoon') || s.includes('evening')) return { label: 'afternoon', suggest: '1:00 PM' };
+  if (s.includes('morning')) return { label: 'morning', suggest: '10:30 AM' };
+  return null;
+}
+
+function cityFrom(addr?: string | null) {
+  const m = (addr || '').match(/([A-Za-z .]+),\s*(FL|Florida)\b/i);
+  return m ? m[1].trim().split(/\s{2,}/).pop() : null;
+}
+
+export function buildOpener(req: any) {
+  const first = (req.customer_name || '').trim().split(/\s+/)[0];
+  const svc = cleanService(req.service_type);
+  const vehicle = (req.vehicle_info || '').trim();
+  const city = cityFrom(req.service_address) || (req.service_type || '').match(/in ([A-Z][\w ]+),\s*FL/)?.[1];
+  const what = svc ? `your ${svc} request` : 'your service request';
+  const forCar = vehicle ? ` for the ${vehicle}` : '';
+  const where = city ? ` in ${city}` : '';
+  const day = friendlyDate(req.requested_date);
+  const win = windowPart(req.requested_time_window);
+  let ask: string;
+  if (day && win) ask = `I see you asked for ${day} in the ${win.label}. Would ${win.suggest} work to lock that in, or is another time between 10am and 5pm better?`;
+  else if (day) ask = `I see you asked for ${day}. What time works best? We're out any time between 10am and 5pm.`;
+  else ask = `What day and time work best for you? We come out any day between 10am and 5pm.`;
+  return `Hi${first ? ` ${first}` : ''}, this is Mike with Mike's Mobile Auto Repair! Got ${what}${forCar}${where}. ${ask} Reply STOP to opt out.`;
+}
+
 export async function startBot(sb: any, id: string) {
   const { data: req } = await sb.from('booking_requests')
     .update({ bot_status: 'active', bot_updated_at: new Date().toISOString() })
@@ -38,9 +91,7 @@ export async function startBot(sb: any, id: string) {
     .gte('created_at', new Date(Date.now() - 30 * 60_000).toISOString())
     .select('*').maybeSingle();
   if (!req || !req.customer_phone) return { skipped: true };
-  const first = (req.customer_name || '').split(' ')[0];
-  const pref = req.requested_date ? ` You asked for ${req.requested_date}${req.requested_time_window ? ` (${req.requested_time_window})` : ''}.` : '';
-  const text = `Hi${first ? ` ${first}` : ''}, this is Mike's Mobile Auto Repair about your ${req.service_type || 'service'} request.${pref} What day and time works best? We book appointments any day between 10am and 5pm. Reply STOP to opt out.`;
+  const text = buildOpener(req);
   await sendSms(sb, req.customer_phone, text);
   await sb.from('booking_requests').update({ bot_history: [{ role: 'assistant', content: text }] }).eq('id', id);
   return { started: true };
