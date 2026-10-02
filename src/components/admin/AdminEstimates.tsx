@@ -288,6 +288,34 @@ const AdminEstimates = () => {
     updateLines([...(editing.line_items || []), line]);
   };
 
+  const [laborOpen, setLaborOpen] = useState(false);
+  const [laborJob, setLaborJob] = useState('');
+  const [laborResults, setLaborResults] = useState<{ engine: string; job: string; hours: number }[]>([]);
+  const [laborLoading, setLaborLoading] = useState(false);
+
+  const searchLabor = async () => {
+    const vehicle = vehicles.find(v => v.id === editing?.vehicle_id);
+    if (!vehicle?.year || !vehicle?.make || !vehicle?.model) return toast.error('Pick a vehicle with year, make and model first');
+    setLaborLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('partstech-gateway?action=olp-labor', {
+        body: { year: vehicle.year, make: vehicle.make, model: vehicle.model, job: laborJob.trim() || undefined },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      setLaborResults(data.results ?? []);
+      if (!data.results?.length) toast.info('No labor times found — try a shorter job name');
+    } catch (e: any) {
+      toast.error(e.message || 'Labor lookup failed');
+    } finally { setLaborLoading(false); }
+  };
+
+  const addBookLabor = (r: { engine: string; job: string; hours: number }) => {
+    const line: LineItem = { description: `${r.job} (book labor${r.engine ? `, ${r.engine}` : ''})`, quantity: r.hours, unit_price: defaultLaborRate || 0, amount: r.hours * (defaultLaborRate || 0), labor_hours: r.hours, kind: 'labor' };
+    updateLines([...(editing.line_items || []), line]);
+    toast.success(`Added ${r.hours} hrs`);
+  };
+
   const lookupPartsTech = async () => {
     const vehicle = vehicles.find(v => v.id === editing?.vehicle_id);
     if (!vehicle && !editing?.vehicle_id) {
@@ -539,6 +567,7 @@ const AdminEstimates = () => {
                     </Select>
                     <Button size="sm" variant="outline" onClick={() => addLine()}><Plus className="h-3 w-3 mr-1" /> Part</Button>
                     <Button size="sm" variant="outline" onClick={addLaborLine}><Plus className="h-3 w-3 mr-1" /> Labor</Button>
+                    <Button size="sm" variant="outline" onClick={() => { setLaborOpen(o => !o); setLaborResults([]); }}><Wrench className="h-3 w-3 mr-1" /> Labor Guide</Button>
                     <Button size="sm" variant="outline" onClick={addDiagnosisFee}><Plus className="h-3 w-3 mr-1" /> Diagnosis Fee</Button>
                     <Button size="sm" variant="outline" onClick={lookupPartsTech} disabled={ptLoading} title="Look up live O'Reilly parts & pricing via PartsTech">
                       {ptLoading && !ptSession ? <Loader2 className="h-3 w-3 mr-1 animate-spin" /> : <ExternalLink className="h-3 w-3 mr-1" />} PartsTech
@@ -550,6 +579,31 @@ const AdminEstimates = () => {
                     )}
                   </div>
                 </div>
+                {laborOpen && (
+                  <div className="border rounded p-3 space-y-2 bg-muted/30">
+                    <div className="flex gap-2">
+                      <Input className="h-8" placeholder="Job, e.g. brake pads, starter, alternator (blank = all)" value={laborJob}
+                        onChange={e => setLaborJob(e.target.value)} onKeyDown={e => e.key === 'Enter' && searchLabor()} />
+                      <Button size="sm" onClick={searchLabor} disabled={laborLoading}>
+                        {laborLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : 'Search'}
+                      </Button>
+                    </div>
+                    {laborResults.length > 0 && (
+                      <div className="max-h-56 overflow-y-auto divide-y">
+                        {laborResults.map((r, i) => (
+                          <div key={i} className="flex items-center justify-between py-1.5 text-sm">
+                            <span>{r.job} <span className="text-muted-foreground">{r.engine}</span></span>
+                            <span className="flex items-center gap-2">
+                              <span className="font-medium">{r.hours} hrs</span>
+                              <Button size="sm" variant="outline" className="h-7" onClick={() => addBookLabor(r)}><Plus className="h-3 w-3" /></Button>
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    <p className="text-xs text-muted-foreground">Labor times from Open Labor Project · billed at your default labor rate.</p>
+                  </div>
+                )}
                 <div className="border rounded overflow-x-auto">
                   <Table>
                     <TableHeader>
