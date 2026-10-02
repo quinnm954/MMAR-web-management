@@ -28,7 +28,7 @@ interface Appointment {
 
 import { SERVICE_TYPES } from "@/lib/serviceTypes";
 
-const TIME_WINDOWS = ["Morning (8am-12pm)", "Afternoon (12pm-4pm)", "Evening (4pm-7pm)"];
+const TIME_WINDOWS = ["Morning (10am – 12pm)", "Early Afternoon (12pm – 3pm)", "Late Afternoon (3pm – 5pm)"];
 
 const statusColor = (s: string) => {
   if (s === "scheduled") return "bg-primary/15 text-primary";

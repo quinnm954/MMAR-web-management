@@ -323,7 +323,7 @@ const AdminBookingRequests = () => {
             </div>
             <div>
               <Label htmlFor="cwin">Time window</Label>
-              <Input id="cwin" placeholder="e.g. Morning (8am – 12pm)" value={window} onChange={(e) => setWindow(e.target.value)} />
+              <Input id="cwin" placeholder="e.g. Morning (10am – 12pm)" value={window} onChange={(e) => setWindow(e.target.value)} />
             </div>
             <div>
               <Label htmlFor="cnotes">Internal notes (optional)</Label>

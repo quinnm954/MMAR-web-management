@@ -68,7 +68,7 @@ Deno.serve(async (req) => {
     if (!thread?.phone) continue;
 
     const when = new Date(appt.scheduled_at!);
-    const msg = `${SHOP_NAME}: Reminder — your ${appt.service_type} appointment is scheduled for ${when.toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}. Reply CANCEL to reschedule.`;
+    const msg = `Hi, this is Mike with Mike's Mobile Auto Repair! Just a reminder I'll see you ${when.toLocaleString('en-US', { timeZone: 'America/New_York', weekday: 'long', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}${appt.service_type ? ` for your ${String(appt.service_type).replace(/\s+(in|near)\s+[A-Z].*$/i, '').toLowerCase()}` : ''}. Need to change it? Just text me back. Reply STOP to opt out.`;
 
     const res = await sendSms(thread.phone, msg);
     await sb.from('service_reminders_sent').insert({

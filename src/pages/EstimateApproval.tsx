@@ -18,7 +18,7 @@ import BrandedDocLayout from '@/components/BrandedDocLayout';
 import DocReferences from '@/components/DocReferences';
 import { PRODUCT_BRAND } from '@/lib/brand';
 
-const TIME_WINDOWS = ['Morning (8a–12p)', 'Afternoon (12p–4p)', 'Evening (4p–7p)'];
+const TIME_WINDOWS = ['Morning (10am – 12pm)', 'Early Afternoon (12pm – 3pm)', 'Late Afternoon (3pm – 5pm)'];
 
 const EstimateApproval = () => {
   const { token } = useParams();

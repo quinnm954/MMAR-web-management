@@ -29,8 +29,9 @@ import { useAuth } from "@/hooks/useAuth";
 const currentYear = new Date().getFullYear();
 const digitsOnly = (v: string) => v.replace(/\D/g, "");
 const TIME_WINDOWS = [
-  "Morning (8am – 12pm)",
-  "Afternoon (12pm – 5pm)",
+  "Morning (10am – 12pm)",
+  "Early Afternoon (12pm – 3pm)",
+  "Late Afternoon (3pm – 5pm)",
   "Evening (5pm – 8pm)",
 ];
 
