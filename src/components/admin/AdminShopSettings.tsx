@@ -101,6 +101,14 @@ const AdminShopSettings = () => {
             <Input type="number" step="0.01" value={settings.labor_cost_per_hour ?? 35} onChange={e => setSettings({ ...settings, labor_cost_per_hour: parseFloat(e.target.value) || 0 })} />
             <p className="text-xs text-muted-foreground mt-1">Used in profit reports to estimate employee cost per invoice.</p>
           </div>
+          <div><Label>Parts Markup % (PartsTech / O'Reilly imports)</Label>
+            <Input type="number" step="1" value={settings.parts_markup_pct ?? 35} onChange={e => setSettings({ ...settings, parts_markup_pct: parseFloat(e.target.value) || 0 })} />
+            <p className="text-xs text-muted-foreground mt-1">Wholesale cost × (1 + markup) = customer price when importing parts carts.</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <Switch checked={settings.partstech_enabled ?? true} onCheckedChange={v => setSettings({ ...settings, partstech_enabled: v })} />
+            <Label>PartsTech parts lookup enabled</Label>
+          </div>
           <div className="col-span-2"><Button onClick={saveSettings}>Save Settings</Button></div>
         </CardContent>
       </Card>

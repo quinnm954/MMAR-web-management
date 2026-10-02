@@ -52,13 +52,15 @@ const AdminEstimates = () => {
   const [editing, setEditing] = useState<any | null>(null);
   const [importing, setImporting] = useState(false);
   const [preview, setPreview] = useState<any | null>(null);
+  const [ptSession, setPtSession] = useState<string | null>(null);
+  const [ptLoading, setPtLoading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const load = async () => {
     const [e, c, v, ca, s, lr] = await Promise.all([
       supabase.from('estimates').select('*').order('created_at', { ascending: false }),
       supabase.from('profiles').select('id, full_name, email'),
-      supabase.from('vehicles').select('id, owner_id, year, make, model'),
+      supabase.from('vehicles').select('id, owner_id, year, make, model, vin'),
       supabase.from('catalog_items').select('*').eq('is_active', true).order('name'),
       supabase.from('shop_settings').select('*').eq('id', 1).single(),
       supabase.from('labor_rates').select('hourly_rate, is_default').order('is_default', { ascending: false }),
@@ -286,6 +288,80 @@ const AdminEstimates = () => {
     updateLines([...(editing.line_items || []), line]);
   };
 
+  const lookupPartsTech = async () => {
+    const vehicle = vehicles.find(v => v.id === editing?.vehicle_id);
+    if (!vehicle && !editing?.vehicle_id) {
+      // Allow lookup without a vehicle, but warn that fitment won't be locked
+    }
+    setPtLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('partstech-gateway?action=create-quote', {
+        body: {
+          vin: vehicle?.vin ?? undefined,
+          year: vehicle?.year ?? undefined,
+          make: vehicle?.make ?? undefined,
+          model: vehicle?.model ?? undefined,
+          estimateId: editing?.id ?? undefined,
+        },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      setPtSession(data.sessionId);
+      window.open(data.redirectUrl, '_blank');
+      toast.success('PartsTech catalog opened — pick parts, click "Submit Quote", then come back and tap Import Cart');
+    } catch (e: any) {
+      toast.error(e.message || 'PartsTech lookup failed');
+    } finally {
+      setPtLoading(false);
+    }
+  };
+
+  const importPartsTechCart = async () => {
+    if (!ptSession) return;
+    setPtLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke(`partstech-gateway?action=get-quote&sessionId=${ptSession}`, { body: {} });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      const payload = data?.quote?.payload;
+      if (!payload) {
+        toast.info('No cart yet — click "Submit Quote" in the PartsTech tab first');
+        return;
+      }
+      const parts: any[] = payload.parts ?? payload.lines ?? payload.items ?? [];
+      if (!Array.isArray(parts) || parts.length === 0) {
+        toast.error('Cart came back empty');
+        return;
+      }
+      const markup = 1 + (Number(settings?.parts_markup_pct ?? 35) / 100);
+      const newLines: LineItem[] = parts.map((p: any) => {
+        const qty = Number(p.quantity ?? p.qty ?? 1) || 1;
+        const cost = Number(p.cost ?? p.wholesalePrice ?? p.unitCost ?? 0) || 0;
+        const price = cost > 0 ? +(cost * markup).toFixed(2) : Number(p.price ?? p.retailPrice ?? 0) || 0;
+        const brand = p.brand ?? p.brandName ?? '';
+        const name = p.description ?? p.partName ?? p.name ?? 'Part';
+        const num = p.partNumber ?? p.part_number ?? '';
+        return {
+          description: `${brand ? brand + ' ' : ''}${name}${num ? ` (Part #${num})` : ''}`,
+          quantity: qty,
+          unit_price: price,
+          amount: +(qty * price).toFixed(2),
+          unit_cost: cost,
+          labor_hours: 0,
+          kind: 'part' as const,
+        };
+      });
+      updateLines([...(editing.line_items || []), ...newLines]);
+      await supabase.from('partstech_quotes').update({ imported: true }).eq('session_id', ptSession);
+      toast.success(`Imported ${newLines.length} parts from PartsTech (${settings?.parts_markup_pct ?? 35}% markup applied)`);
+      setPtSession(null);
+    } catch (e: any) {
+      toast.error(e.message || 'Cart import failed');
+    } finally {
+      setPtLoading(false);
+    }
+  };
+
 
   const updateLine = (idx: number, patch: Partial<LineItem>) => {
     const lines = [...editing.line_items];
@@ -464,6 +540,14 @@ const AdminEstimates = () => {
                     <Button size="sm" variant="outline" onClick={() => addLine()}><Plus className="h-3 w-3 mr-1" /> Part</Button>
                     <Button size="sm" variant="outline" onClick={addLaborLine}><Plus className="h-3 w-3 mr-1" /> Labor</Button>
                     <Button size="sm" variant="outline" onClick={addDiagnosisFee}><Plus className="h-3 w-3 mr-1" /> Diagnosis Fee</Button>
+                    <Button size="sm" variant="outline" onClick={lookupPartsTech} disabled={ptLoading} title="Look up live O'Reilly parts & pricing via PartsTech">
+                      {ptLoading && !ptSession ? <Loader2 className="h-3 w-3 mr-1 animate-spin" /> : <ExternalLink className="h-3 w-3 mr-1" />} PartsTech
+                    </Button>
+                    {ptSession && (
+                      <Button size="sm" onClick={importPartsTechCart} disabled={ptLoading} title="Import the cart you submitted in PartsTech">
+                        {ptLoading ? <Loader2 className="h-3 w-3 mr-1 animate-spin" /> : <Upload className="h-3 w-3 mr-1" />} Import Cart
+                      </Button>
+                    )}
                   </div>
                 </div>
                 <div className="border rounded overflow-x-auto">
