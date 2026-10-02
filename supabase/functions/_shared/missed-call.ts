@@ -41,7 +41,7 @@ export async function sendMissedCallFollowup(sb: any, caller: string, fromNumber
   const prof = (profs || []).find((p: any) => last10(p.phone) === digits) || null;
   const first = prof?.full_name?.split(' ')[0];
 
-  const body = `MMAR: ${first ? `Hi ${first}, sorry` : 'Sorry'} we missed your call! Mike will follow up shortly. Reply here with what you need or book anytime: mikesmautorepair.com/book Reply STOP to opt out.`;
+  const body = `Hi${first ? ` ${first}` : ''}, this is Mike with Mike's Mobile Auto Repair. Sorry I missed your call! Just text me back here with what's going on with your vehicle and I'll get you taken care of, or book online: mikesmautorepair.com/book Reply STOP to opt out.`;
   let err: string | undefined;
   const LK = Deno.env.get('LOVABLE_API_KEY'); const TK = Deno.env.get('TWILIO_API_KEY');
   const FROM = fromNumber || Deno.env.get('TWILIO_FROM_NUMBER');

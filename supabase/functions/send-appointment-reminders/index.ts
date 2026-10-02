@@ -143,10 +143,11 @@ Deno.serve(async (req) => {
 
         const when = fmtWindow(a.scheduled_at);
         const lead = win === "24h" ? "tomorrow" : "in about 2 hours";
-        const title = `MMAR Care reminder`;
-        const body = `Your ${a.service_type} appointment is ${lead} (${when}).${
-          a.service_address ? ` We'll meet you at ${a.service_address}.` : ""
-        } Reply or call (813) 501-7572 if anything changes.`;
+        const title = `Mike's Mobile Auto Repair`;
+        const svc = String(a.service_type || "").replace(/\s+(in|near)\s+[A-Z].*$/i, "").trim().toLowerCase();
+        const body = `Hi, this is Mike! Just a heads-up, I'll see you ${lead} (${when})${svc ? ` for your ${svc}` : ""}.${
+          a.service_address ? ` I'll meet you at ${a.service_address}.` : ""
+        } Anything change? Just text me back or call (813) 501-7572. Reply STOP to opt out.`;
 
         // Push (best effort)
         if (!pref || pref.push_enabled !== false) {

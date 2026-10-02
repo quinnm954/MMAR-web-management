@@ -324,7 +324,7 @@ Deno.serve(async (req) => {
       const owner = s?.ai_summary_to_number || s?.forward_to_number;
       if (owner) await sendSms(owner, `AI answered a call from ${caller || 'unknown'}:\n${summary || '(no summary)'}`, sb, fromNum);
       if (caller && transcript.length > 1) {
-        await sendSms(caller, `Thanks for calling Mike's Mobile Auto Repair! Mike will follow up soon. Book anytime: ${BOOK_URL} Reply STOP to opt out.`, sb, fromNum);
+        await sendSms(caller, `Thanks for calling Mike's Mobile Auto Repair! This is Mike. I've got your call details and will text you shortly. Questions in the meantime? Just reply here. Reply STOP to opt out.`, sb, fromNum);
       } else if (caller) {
         // Caller hung up before talking to the AI — treat as a missed call
         await sendMissedCallFollowup(sb, caller, fromNum);
