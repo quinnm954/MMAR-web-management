@@ -15,6 +15,8 @@ export type LaborQuote = {
   job?: string;
   vehicle?: string;
   results?: { engine: string; job: string; hours: number }[];
+  lo?: number; // lowest hours across engines (for the range)
+  hi?: number; // highest hours across engines
 };
 
 const DIAG = /diag|check engine|engine light|noise|won'?t start|no start|not sure|inspect|leak|overheat|smell|vibrat|general|something|problem|issue/i;
@@ -104,8 +106,16 @@ export async function buildLaborQuote(sb: any, req: any): Promise<LaborQuote> {
       else if (wantsOne && !wantsPair) { const o = f.filter((j) => /one side|single|each/i.test(j.job)); if (o.length) f = o; }
       if (f.length) jobs = f;
     }
+    // Range across engines for the chosen job(s): each engine uses its highest matching value.
+    const names = new Set(jobs.map((j) => j.job));
+    const perEngine = new Map<string, number>();
+    for (const x of results) if (names.has(x.job)) perEngine.set(x.engine, Math.max(perEngine.get(x.engine) ?? 0, x.hours));
+    const vals = [...perEngine.values()];
+    const lo = vals.length ? Math.min(...vals) : undefined, hi = vals.length ? Math.max(...vals) : undefined;
+    // Several items to choose from: keep only the highest labor value.
+    if (jobs.length > 1) jobs = [jobs.reduce((a, b) => (b.hours > a.hours ? b : a))];
     const engine = engineMatched ? pick[0].engine : undefined;
-    return { kind: 'labor', rate, job: svc, vehicle: `${veh.year} ${veh.make} ${veh.model}`, results, jobs, engine, engineMatched };
+    return { kind: 'labor', rate, job: svc, vehicle: `${veh.year} ${veh.make} ${veh.model}`, results, jobs, engine, engineMatched, lo, hi };
   } catch (e) { console.error('olp', e); return { kind: 'none', rate, job: svc }; }
 }
 
@@ -115,11 +125,11 @@ const hr = (n: number) => `${Math.round(n * 10) / 10}`;
 export function quoteSentence(q: LaborQuote) {
   if (q.kind === 'diagnosis') return 'Diagnosis is $100, and $50 of that goes toward the repair labor.';
   if (q.kind !== 'labor' || !q.jobs?.length) return '';
-  // Without a known engine we don't quote numbers; the bot asks for the engine first.
-  if (!q.engineMatched) return '';
-  const lab = q.jobs.length === 1
-    ? `Labor for the ${q.job} on your ${q.engine} is about ${hr(q.jobs[0].hours)} hrs (${usd(q.jobs[0].hours * q.rate)}).`
-    : `Labor on your ${q.engine}: ${q.jobs.map((j) => `${j.job} about ${hr(j.hours)} hrs (${usd(j.hours * q.rate)})`).join('; ')}.`;
+  const h = q.jobs[0].hours;
+  // Engine unknown: quote cheapest to most expensive across engines.
+  const lab = !q.engineMatched && q.lo != null && q.hi != null && q.hi > q.lo
+    ? `Labor for the ${q.job} on your ${q.vehicle} runs about ${usd(q.lo * q.rate)} to ${usd(q.hi * q.rate)} depending on the engine.`
+    : `Labor for the ${q.job}${q.engine ? ` on your ${q.engine}` : ''} is about ${hr(h)} hrs (${usd(h * q.rate)}).`;
   return `${lab} Parts are extra — we can get them for you or you can supply your own.`;
 }
 

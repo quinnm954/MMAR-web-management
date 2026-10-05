@@ -295,7 +295,7 @@ Deno.serve(async (req) => {
       const q = await buildLaborQuote(sb, { service_type: String(body.repair || ''), description: String(body.repair || ''), vehicle_info: String(body.vehicle_info || '') }).catch(() => null);
       if (!q) return json({ result: 'No labor quote available. Say Mike will text a written quote.' });
       if (q.kind === 'diagnosis') return json({ result: 'This sounds like it needs diagnosis, not a named repair. Explain the diagnosis fee.' });
-      if (q.kind === 'labor' && !q.engineMatched) return json({ result: 'Labor depends on the engine. Ask for engine size, then call quote_labor again. If they do not know, say Mike will text the exact quote.' });
+      if (q.kind === 'labor' && !q.engineMatched) return json({ result: `Engine not known yet. Give this range: ${quoteSentence(q)} If they know the engine size, call quote_labor again for the exact number.` });
       const s = quoteSentence(q);
       return json({ result: s ? `Tell the caller (as a ballpark, not final): ${s}` : 'No labor match. Say Mike will text a written quote.' });
     }
