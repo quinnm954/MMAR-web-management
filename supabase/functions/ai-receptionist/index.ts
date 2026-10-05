@@ -84,6 +84,7 @@ How to act:
 - Today is {{today}} (Eastern time). You answer 24/7, any day.
 - Appointments can be set any day of the week, but only between 10 AM and 5 PM Eastern. Never offer or accept a time before 10 AM or after 5 PM; suggest the nearest time inside that window instead. Never book a time that has already passed today.
 - NEVER suggest a specific time from your own head. Before offering any time, call check_open_times (with the day they want, or tomorrow) and only offer times it returns. It already accounts for other appointments and Mike's drive time, so a time in the next hour is never available. Speed wins the job: callers who wait call another shop. We do NOT take same-day appointments: if asked about today, say "We're fully booked today" and offer the earliest open time tomorrow or later, e.g. "The soonest we can get there is 10 AM tomorrow — want that?" Only if they can't make it, offer the next earliest. Don't ask "what day works for you?" before offering the earliest slot. Call check_open_times as soon as you know they need service, before collecting every detail.
+- Returning customers: at the start of every call, call lookup_caller. If it finds an account, greet them by first name and VERIFY instead of asking: e.g. "Is this for the 2011 Chevy Cruze at 123 Main St?" If they have several vehicles, ask which one. Only ask for details that are missing or changed (like engine size if not on file). Never read their email or full phone number aloud.
 - If they need service, collect: name, vehicle (year, make, model, and engine size like 1.4L or V6 — ask once; if they don't know, move on), what's wrong, service address or city, and the day and time they want. Turn the day into a real date (YYYY-MM-DD) and the time into 24-hour HH:MM. Confirm it back, then call create_booking_request. If the tool says the time is invalid, offer another time in the window. Tell them the time is requested and the shop will text shortly to confirm it. Never say it is confirmed or booked.
 - You are NOT Mike and never claim to be him. If a caller asks whether they're speaking with Mike, say you're the shop's receptionist and Mike is the owner.
 - Handle everything yourself. Only call transfer_to_mike when the caller specifically asks to speak with Mike (or the owner) by name. Do not transfer for general questions, bookings, or urgent jobs; take the details and tell them Mike will text right away. If someone just asks for "a person", offer to help first and transfer only if they insist on Mike.
@@ -131,7 +132,7 @@ Deno.serve(async (req) => {
         name,
         description,
         api_schema: {
-          url: `${fnBase}?action=${name === 'transfer_to_mike' ? 'transfer' : name === 'check_open_times' ? 'availability' : 'booking'}&token=${TOKEN}`,
+          url: `${fnBase}?action=${name === 'transfer_to_mike' ? 'transfer' : name === 'check_open_times' ? 'availability' : name === 'lookup_caller' ? 'lookup' : 'booking'}&token=${TOKEN}`,
           method: 'POST',
           request_body_schema: { type: 'object', properties: props, required },
         },
@@ -146,6 +147,9 @@ Deno.serve(async (req) => {
             prompt: {
               prompt: buildPrompt(cities),
               tools: [
+                tool('lookup_caller', 'Look up whether the caller already has an account. Call this first, right after greeting.', {
+                  caller_number: { type: 'string', dynamic_variable: 'system__caller_id' },
+                }, ['caller_number']),
                 tool('check_open_times', 'Get open appointment start times. Call before offering any time.', {
                   date: { type: 'string', description: 'Day the caller wants, YYYY-MM-DD (tomorrow if unsure)' },
                 }, ['date']),
@@ -252,6 +256,18 @@ Deno.serve(async (req) => {
     // Everything below is called by ElevenLabs and must carry the token
     if (url.searchParams.get('token') !== TOKEN) return json({ error: 'Forbidden' }, 403);
     const body = await req.json().catch(() => ({}));
+
+    if (action === 'lookup') {
+      const digits = String(body.caller_number || '').replace(/\D/g, '').slice(-10);
+      if (digits.length !== 10) return json({ result: 'No account found for this number. Collect details as normal.' });
+      const { data: profs } = await sb.from('profiles').select('id, full_name, email, phone, address_line1, city, state').not('phone', 'is', null).ilike('phone', `%${digits.slice(-4)}%`).limit(50);
+      const p = (profs || []).find((x: any) => String(x.phone).replace(/\D/g, '').slice(-10) === digits);
+      if (!p) return json({ result: 'No account found for this number. Collect details as normal.' });
+      const { data: vs } = await sb.from('vehicles').select('year, make, model, engine').eq('owner_id', p.id).eq('is_active', true).limit(5);
+      const veh = [...new Set((vs || []).map((v: any) => [v.year, v.make, v.model, v.engine].filter(Boolean).join(' ').toLowerCase()))].join('; ');
+      const addr = [p.address_line1, p.city].filter(Boolean).join(', ');
+      return json({ result: `Existing customer on file. Name: ${p.full_name || 'unknown'}. Vehicles: ${veh || 'none on file'}. Service address: ${addr || 'none on file'}. Verify these with the caller instead of asking from scratch; only ask for what is missing or changed.` });
+    }
 
     if (action === 'availability') {
       const d = String(body.date || '').trim();
