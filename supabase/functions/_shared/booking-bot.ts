@@ -60,7 +60,7 @@ export function cleanService(s?: string | null) {
 
 
 // ---- Availability: no double booking, travel-aware lead time ----
-export const LEAD_MIN = 90;   // minimum notice so Mike can finish up and drive over
+export const LEAD_MIN = 60;   // minimum notice so Mike can finish up and drive over
 export const BLOCK_MIN = 120; // each job holds ~1.5h work + 30m travel
 const OPEN_MIN = 600, CLOSE_MIN = 1020, STEP = 30;
 
@@ -143,7 +143,8 @@ export function buildOpener(req: any, avail: { date: string; slots: number[] }[]
   const inWin = reqDay && range ? reqDay.slots.find((m) => m >= range[0] && m < range[1]) : undefined;
   const nextOpen = avail.flatMap((d) => d.slots.map((m) => ({ d: d.date, m })))[0];
   let ask: string;
-  if (day && win && inWin !== undefined) ask = `I see you asked for ${day} in the ${win.label}. Would ${label12(inWin)} work to lock that in?`;
+  const sooner = nextOpen && nextOpen.d < String(req.requested_date || '').slice(0, 10) ? ` We can also come sooner — ${friendlyDate(nextOpen.d)} at ${label12(nextOpen.m)}.` : '';
+  if (day && win && inWin !== undefined) ask = `I see you asked for ${day} in the ${win.label}. Would ${label12(inWin)} work to lock that in?${sooner}`;
   else if (day && reqDay && reqDay.slots.length) ask = `I see you asked for ${day}. Our next opening that day is ${label12(reqDay.slots[0])} — would that work?`;
   else if (day && nextOpen) ask = `${day} is all booked up, sorry! The next opening is ${friendlyDate(nextOpen.d)} at ${label12(nextOpen.m)} — would that work?`;
   else if (day) ask = `I see you asked for ${day}. What time works best? We're out any time between 10am and 5pm.`;
@@ -216,6 +217,7 @@ Request: service "${req.service_type || ''}", vehicle "${req.vehicle_info || ''}
 Customer's requested date/window: ${req.requested_date || 'none'} ${req.requested_time_window || ''}.
 OPEN start times (already account for existing appointments, drive time, and at least ${LEAD_MIN} minutes notice):
 ${availText}
+Speed matters: customers who wait call someone else. Always lead with the EARLIEST open time (today if any), then their requested day if different. Don't ask open-ended 'what time works?' — propose a specific time.
 Rules: ONLY offer or confirm times from the OPEN list above — never any other time, and never a time that's about to start. If they ask for a time that isn't listed, say it's taken and offer the closest open times. You are a text assistant for the shop: warm, casual, human, short (1-2 sentences). Never claim to personally be Mike — you text on behalf of the shop; if the customer asks for Mike or the owner by name, set handoff=true and say Mike will reach out. Never re-ask for info already given above or in the chat. Write dates like "Monday, Oct 5th" and times like "10:30 AM" — never raw formats like 2026-10-05 or 14:00. Never paste page titles or system wording. Never quote prices. Once the customer clearly agrees to one specific date and time, set confirmed=true. If they ask for a person, are upset, or it's urgent/unsafe, set handoff=true and say Mike will reach out.
 Respond ONLY with JSON: {"reply": string, "confirmed": boolean, "date": "YYYY-MM-DD" or null, "time": "HH:MM" 24h or null, "handoff": boolean}`;
 
