@@ -256,8 +256,9 @@ const AdminEstimates = () => {
 
   const recalc = (li: LineItem[]) => {
     // Only parts are taxable / accrue shop supplies. Labor and fees never do.
-    const taxableSubtotal = li.reduce((s, i) => (i.kind ?? 'part') === 'part' ? s + (Number(i.quantity) * Number(i.unit_price)) : s, 0);
-    const nonTaxableSubtotal = li.reduce((s, i) => (i.kind ?? 'part') === 'part' ? s : s + (Number(i.quantity) * Number(i.unit_price)), 0);
+      const lineTotal = (i: LineItem) => (i.kind ?? 'part') === 'labor' ? Number(i.labor_hours || 0) * Number(i.unit_price) : Number(i.quantity) * Number(i.unit_price);
+      const taxableSubtotal = li.reduce((s, i) => (i.kind ?? 'part') === 'part' ? s + lineTotal(i) : s, 0);
+      const nonTaxableSubtotal = li.reduce((s, i) => (i.kind ?? 'part') === 'part' ? s : s + lineTotal(i), 0);
     const subtotal = taxableSubtotal + nonTaxableSubtotal;
     const shop = Math.min(taxableSubtotal * (settings?.shop_supplies_pct ?? 0.05), settings?.shop_supplies_max ?? 50);
     const tax = (taxableSubtotal + shop) * (settings?.tax_rate ?? 0.07);
@@ -311,7 +312,7 @@ const AdminEstimates = () => {
   };
 
   const addBookLabor = (r: { engine: string; job: string; hours: number }) => {
-    const line: LineItem = { description: `${r.job} (book labor${r.engine ? `, ${r.engine}` : ''})`, quantity: r.hours, unit_price: defaultLaborRate || 0, amount: r.hours * (defaultLaborRate || 0), labor_hours: r.hours, kind: 'labor' };
+    const line: LineItem = { description: `${r.job} (book labor${r.engine ? `, ${r.engine}` : ''})`, quantity: 1, unit_price: defaultLaborRate || 0, amount: r.hours * (defaultLaborRate || 0), labor_hours: r.hours, kind: 'labor' };
     updateLines([...(editing.line_items || []), line]);
     toast.success(`Added ${r.hours} hrs`);
   };
