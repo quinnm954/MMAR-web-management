@@ -7,6 +7,7 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.95.0';
 import { sendMissedCallFollowup } from '../_shared/missed-call.ts';
 import { isSlotOpen, openSlots, label12 } from '../_shared/booking-bot.ts';
+import { buildLaborQuote, quoteSentence } from '../_shared/labor-quote.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -143,7 +144,7 @@ Deno.serve(async (req) => {
         name,
         description,
         api_schema: {
-          url: `${fnBase}?action=${name === 'transfer_to_mike' ? 'transfer' : name === 'check_open_times' ? 'availability' : name === 'lookup_caller' ? 'lookup' : 'booking'}&token=${TOKEN}`,
+          url: `${fnBase}?action=${name === 'transfer_to_mike' ? 'transfer' : name === 'check_open_times' ? 'availability' : name === 'lookup_caller' ? 'lookup' : name === 'quote_labor' ? 'quote' : 'booking'}&token=${TOKEN}`,
           method: 'POST',
           request_body_schema: { type: 'object', properties: props, required },
         },
@@ -164,6 +165,10 @@ Deno.serve(async (req) => {
                 tool('check_open_times', 'Get open appointment start times. Call before offering any time.', {
                   date: { type: 'string', description: 'Day the caller wants, YYYY-MM-DD (tomorrow if unsure)' },
                 }, ['date']),
+                tool('quote_labor', 'Get ballpark book labor for a specific named repair. Needs vehicle with engine.', {
+                  vehicle_info: { type: 'string', description: 'Year make model engine, e.g. 2011 Chevy Cruze 1.4L' },
+                  repair: { type: 'string', description: 'The specific repair, e.g. alternator replacement' },
+                }, ['vehicle_info', 'repair']),
                 tool('create_booking_request', 'Save a service booking request once details are confirmed.', {
                   call_sid: callSid,
                   customer_name: { type: 'string', description: 'Caller full name' },
@@ -282,6 +287,15 @@ Deno.serve(async (req) => {
       const veh = [...new Set((vs || []).map((v: any) => [v.year, v.make, v.model, v.engine].filter(Boolean).join(' ').toLowerCase()))].join('; ');
       const addr = [p.address_line1, p.city].filter(Boolean).join(', ');
       return json({ result: `Existing customer on file. Name: ${p.full_name || 'unknown'}. Vehicles: ${veh || 'none on file'}. Service address: ${addr || 'none on file'}. Verify these with the caller instead of asking from scratch; only ask for what is missing or changed.` });
+    }
+
+    if (action === 'quote') {
+      const q = await buildLaborQuote(sb, { service_type: String(body.repair || ''), description: String(body.repair || ''), vehicle_info: String(body.vehicle_info || '') }).catch(() => null);
+      if (!q) return json({ result: 'No labor quote available. Say Mike will text a written quote.' });
+      if (q.kind === 'diagnosis') return json({ result: 'This sounds like it needs diagnosis, not a named repair. Explain the diagnosis fee.' });
+      if (q.kind === 'labor' && !q.engineMatched) return json({ result: 'Labor depends on the engine. Ask for engine size, then call quote_labor again. If they do not know, say Mike will text the exact quote.' });
+      const s = quoteSentence(q);
+      return json({ result: s ? `Tell the caller (as a ballpark, not final): ${s}` : 'No labor match. Say Mike will text a written quote.' });
     }
 
     if (action === 'availability') {
