@@ -409,9 +409,7 @@ Deno.serve(async (req) => {
       }
       // Reply from the number the customer actually dialed, not a stale default.
       const fromNum = dialedNumber || undefined;
-      const { data: s } = await sb.from('phone_settings').select('ai_summary_to_number, forward_to_number').eq('id', 1).maybeSingle();
-      const owner = s?.ai_summary_to_number || s?.forward_to_number;
-      if (owner) await sendSms(owner, `AI answered a call from ${caller || 'unknown'}:\n${summary || '(no summary)'}`, sb, fromNum);
+      // Call summaries live in Admin → Calls; no forwarded text to the owner.
       if (caller && transcript.length > 1) {
         // Only follow up when there's something pending (a booking request saved during the call).
         const d10 = caller.replace(/\D/g, '').slice(-10);

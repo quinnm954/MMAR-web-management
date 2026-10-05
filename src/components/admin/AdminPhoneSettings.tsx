@@ -175,10 +175,6 @@ export default function AdminPhoneSettings() {
             <Label htmlFor="aig">What the AI says first</Label>
             <Textarea id="aig" rows={2} value={s.ai_greeting} onChange={(e) => setS({ ...s, ai_greeting: e.target.value })} />
           </div>
-          <div>
-            <Label htmlFor="ais">Text call summaries to</Label>
-            <Input id="ais" type="tel" placeholder="Defaults to your forward-to number" value={s.ai_summary_to_number ?? ''} onChange={(e) => setS({ ...s, ai_summary_to_number: e.target.value })} />
-          </div>
           <Button onClick={setupAi} disabled={aiBusy} variant="secondary">
             {aiBusy && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
             {s.ai_agent_id ? 'Update AI receptionist' : 'Set up AI receptionist'}

@@ -435,10 +435,10 @@ const QuoteRequestDialog = ({
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="notes">Notes (optional)</Label>
+            <Label htmlFor="notes">What's going on? (part to replace or symptoms)</Label>
             <Textarea
               id="notes"
-              placeholder="Symptoms, sounds, when it started…"
+              placeholder="e.g. replace front brake pads, or clunking over bumps / loose steering…"
               rows={3}
               value={notes}
               aria-invalid={!!errors.notes}
