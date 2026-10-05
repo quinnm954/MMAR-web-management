@@ -1,0 +1,2 @@
+ALTER TABLE public.booking_requests DROP CONSTRAINT booking_requests_source_check;
+ALTER TABLE public.booking_requests ADD CONSTRAINT booking_requests_source_check CHECK (source = ANY (ARRAY['in_app','google','phone','sms','walk_in','other','ai_phone']));
