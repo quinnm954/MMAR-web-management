@@ -131,7 +131,7 @@ export default function AdminRoles() {
                   </div>
                   {available.length > 0 && (
                     <div className="flex items-center gap-2">
-                      <Select value={available.includes(selected) ? selected : available[0]} onValueChange={(v) => setPerUserRole(p => ({ ...p, [u.id]: v as Role }))}>
+                      <Select value={(available as string[]).includes(selected) ? selected : available[0]} onValueChange={(v) => setPerUserRole(p => ({ ...p, [u.id]: v as Role }))}>
                         <SelectTrigger className="w-[160px]"><SelectValue /></SelectTrigger>
                         <SelectContent>{available.map(r => <SelectItem key={r} value={r}>{r}</SelectItem>)}</SelectContent>
                       </Select>
