@@ -1,3 +1,4 @@
+import { enrollSuffix } from '../_shared/enroll.ts';
 import { sendAndLog } from '../_shared/send-and-log.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.95.0';
 import { smsAllowed } from '../_shared/missed-call.ts';
@@ -313,7 +314,7 @@ Deno.serve(async (req) => {
         const names = dueServices.slice(0, 2).map((d) => d.name).join(', ');
         const more = dueServices.length > 2 ? ` +${dueServices.length - 2} more` : '';
         const first = profile?.full_name?.split(' ')[0];
-        const body = `MMAR: ${first ? `Hi ${first}, your` : 'Your'} ${vehicleLabel} is due for ${names}${more}. Already done? Mark it: mikesmautorepair.com/portal/maintenance Book: mikesmautorepair.com/book Reply STOP to opt out.`;
+        const body = `MMAR: ${first ? `Hi ${first}, your` : 'Your'} ${vehicleLabel} is due for ${names}${more}. Already done? Mark it: mikesmautorepair.com/portal/maintenance Book: mikesmautorepair.com/book Reply STOP to opt out.${await enrollSuffix(sb, v.owner_id)}`;
         smsErr = await sendSms(sb, phone, body);
       }
       if (smsErr && !email) invErr = smsErr;

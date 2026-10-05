@@ -1,3 +1,4 @@
+import { enrollSuffix } from '../_shared/enroll.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.95.0';
 
 const corsHeaders = {
@@ -68,7 +69,7 @@ Deno.serve(async (req) => {
     if (!thread?.phone) continue;
 
     const when = new Date(appt.scheduled_at!);
-    const msg = `Hi, this is Mike's Mobile Auto Repair! Just a reminder we'll see you ${when.toLocaleString('en-US', { timeZone: 'America/New_York', weekday: 'long', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}${appt.service_type ? ` for your ${String(appt.service_type).replace(/\s+(in|near)\s+[A-Z].*$/i, '').toLowerCase()}` : ''}. Need to change it? Just text us back. Reply STOP to opt out.`;
+    const msg = `Hi, this is Mike's Mobile Auto Repair! Just a reminder we'll see you ${when.toLocaleString('en-US', { timeZone: 'America/New_York', weekday: 'long', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}${appt.service_type ? ` for your ${String(appt.service_type).replace(/\s+(in|near)\s+[A-Z].*$/i, '').toLowerCase()}` : ''}. Need to change it? Just text us back. Reply STOP to opt out.${await enrollSuffix(sb, appt.customer_id)}`;
 
     const res = await sendSms(thread.phone, msg);
     await sb.from('service_reminders_sent').insert({
@@ -116,7 +117,7 @@ Deno.serve(async (req) => {
     if (!thread?.phone) continue;
 
     const dueText = rec.due_date ? ` by ${rec.due_date}` : rec.due_mileage ? ` at ${rec.due_mileage} miles` : '';
-    const msg = `${SHOP_NAME}: Your vehicle is due for ${rec.recommendation}${dueText}. Reply BOOK to schedule.`;
+    const msg = `${SHOP_NAME}: Your vehicle is due for ${rec.recommendation}${dueText}. Reply BOOK to schedule.${await enrollSuffix(sb, rec.customer_id)}`;
     const res = await sendSms(thread.phone, msg);
     await sb.from('service_reminders_sent').insert({
       customer_id: rec.customer_id,
