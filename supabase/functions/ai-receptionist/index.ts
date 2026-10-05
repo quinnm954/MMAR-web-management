@@ -8,6 +8,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.95.0';
 import { sendMissedCallFollowup } from '../_shared/missed-call.ts';
 import { isSlotOpen, openSlots, label12 } from '../_shared/booking-bot.ts';
 import { buildLaborQuote, quoteSentence } from '../_shared/labor-quote.ts';
+import { autoConfirmBooking } from '../_shared/auto-confirm.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -87,7 +88,7 @@ How to act:
 - Appointments can be set any day of the week, but only between 10 AM and 5 PM Eastern. Never offer or accept a time before 10 AM or after 5 PM; suggest the nearest time inside that window instead. Never book a time that has already passed today.
 - NEVER suggest a specific time from your own head. Before offering any time, call check_open_times (with the day they want, or tomorrow) and only offer times it returns. It already accounts for other appointments and Mike's drive time, so a time in the next hour is never available. Speed wins the job: callers who wait call another shop. We do NOT take same-day appointments: if asked about today, say "We're fully booked today" and offer the earliest open time tomorrow or later, e.g. "The soonest we can get there is 10 AM tomorrow — want that?" Only if they can't make it, offer the next earliest. Don't ask "what day works for you?" before offering the earliest slot. Call check_open_times as soon as you know they need service, before collecting every detail.
 - Returning customers: at the start of every call, call lookup_caller. If it finds an account, greet them by first name and VERIFY instead of asking: e.g. "Is this for the 2011 Chevy Cruze at 123 Main St?" If they have several vehicles, ask which one. Only ask for details that are missing or changed (like engine size if not on file). Never read their email or full phone number aloud.
-- If they need service, collect: name, vehicle (year, make, model, and engine size like 1.4L or V6 — ask once; if they don't know, move on), what's wrong, service address or city, and the day and time they want. Turn the day into a real date (YYYY-MM-DD) and the time into 24-hour HH:MM. Confirm it back, then call create_booking_request. If the tool says the time is invalid, offer another time in the window. Tell them the time is requested and the shop will text shortly to confirm it. Never say it is confirmed or booked.
+- If they need service, collect: name, vehicle (year, make, model, and engine size like 1.4L or V6 — ask once; if they don't know, move on), what's wrong, service address or city, and the day and time they want. Turn the day into a real date (YYYY-MM-DD) and the time into 24-hour HH:MM. Confirm it back, then call create_booking_request. If the tool says the time is invalid, offer another time in the window. If the caller clearly agreed to the price you gave (labor ballpark or diagnosis fee), set price_approved=true and the tool books it for real; only then say they're confirmed. Otherwise tell them the time is requested and the shop will text shortly to confirm. Only say 'confirmed' when the tool says CONFIRMED.
 - You are NOT Mike and never claim to be him. If a caller asks whether they're speaking with Mike, say you're the shop's receptionist and Mike is the owner.
 - Handle everything yourself. Only call transfer_to_mike when the caller specifically asks to speak with Mike (or the owner) by name. Do not transfer for general questions, bookings, or urgent jobs; take the details and tell them Mike will text right away. If someone just asks for "a person", offer to help first and transfer only if they insist on Mike.
 - Diagnosis fee: ONLY when the customer doesn't know what's wrong (a warning light, noise, no-start with no known cause, electrical issue, 'not sure'). If they name a part or repair ("replace my alternator", "need a starter", "brakes"), there is NO diagnosis fee — never mention it; say "Since you already know it's the alternator, there's no diagnosis fee." For unknown problems, say once BEFORE confirming a time: "$100 diagnosis, and $50 of it goes toward the repair if you go ahead — so it really only costs you fifty." Make sure they're okay with it.
@@ -178,6 +179,7 @@ Deno.serve(async (req) => {
                   service_address: { type: 'string', description: 'Address or city for service' },
                   requested_date: { type: 'string', description: 'Appointment date YYYY-MM-DD' },
                   requested_time: { type: 'string', description: 'Appointment time HH:MM 24-hour, between 10:00 and 17:00 Eastern' },
+                  price_approved: { type: 'boolean', description: 'true only if the caller clearly said yes to the price you gave (labor ballpark or diagnosis fee)' },
                 }, ['customer_name', 'description']),
                 tool('transfer_to_mike', 'Transfer the caller to Mike for urgent issues or when they ask for a person.', {
                   call_sid: callSid,
@@ -316,6 +318,7 @@ Deno.serve(async (req) => {
       const dateStr = String(body.requested_date || '').trim();
       const timeStr = String(body.requested_time || '').trim();
       let window: string | null = null;
+      let slotTime = '';
       if (dateStr || timeStr) {
         const dm = /^\d{4}-\d{2}-\d{2}$/.test(dateStr);
         const tm = timeStr.match(/^(\d{1,2}):(\d{2})$/);
@@ -334,10 +337,11 @@ Deno.serve(async (req) => {
         }
         const h = Number(tm[1]), label = `${((h + 11) % 12) + 1}:${tm[2]} ${h < 12 ? 'AM' : 'PM'}`;
         window = label;
+        slotTime = `${tm[1].padStart(2, '0')}:${tm[2]}`;
       }
       const notes = [window && `Requested appointment: ${dateStr} at ${window}`, 'Booked by AI receptionist']
         .filter(Boolean).join('\n');
-      const { error } = await sb.from('booking_requests').insert({
+      const { data: ins, error } = await sb.from('booking_requests').insert({
         customer_name: String(body.customer_name || 'Phone caller').slice(0, 200),
         customer_phone: phone || 'unknown',
         vehicle_info: body.vehicle_info ? String(body.vehicle_info).slice(0, 200) : null,
@@ -348,10 +352,14 @@ Deno.serve(async (req) => {
         requested_date: window ? dateStr : null,
         requested_time_window: window,
         notes,
-      });
+      }).select('id').single();
       if (error) {
         console.error('booking insert', error);
         return json({ result: 'Could not save. Tell the caller Mike will call them back.' });
+      }
+      if (window && body.price_approved === true && ins?.id) {
+        const c = await autoConfirmBooking(sb, ins.id, dateStr, slotTime).catch(() => ({ ok: false }));
+        if (c.ok) return json({ result: `Booked and CONFIRMED for ${dateStr} at ${window}. Tell the caller they're all set, Mike will be there then, and the written estimate will come by text or email shortly.` });
       }
       return json({ result: window ? `Requested ${dateStr} at ${window}. Tell the caller it is requested (not confirmed yet) and the shop will text shortly to confirm.` : 'Booking request saved. Mike will text or call to confirm.' });
     }
