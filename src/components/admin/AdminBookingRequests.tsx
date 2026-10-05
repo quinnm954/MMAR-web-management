@@ -177,7 +177,8 @@ const AdminBookingRequests = () => {
     const est = await supabase.functions.invoke("estimate-for-appointment", { body: { bookingId: confirming.id } });
     setBusy(false);
     if (est.error) toast.warning("Booking confirmed, but the estimate couldn't be created. Make one from Estimates.");
-    else toast.success("Booking confirmed and estimate created.");
+    else if (est.data?.kind === 'none') toast.success("Booking confirmed. No labor match — finish the draft estimate in Estimates to send it.");
+    else toast.success("Booking confirmed and estimate sent to the customer.");
     setConfirming(null);
     load();
   };
