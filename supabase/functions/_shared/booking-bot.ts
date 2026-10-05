@@ -247,7 +247,7 @@ Respond ONLY with JSON: {"reply": string, "confirmed": boolean, "date": "YYYY-MM
       const day = avail.find((d) => d.date === ai.date)?.slots.length ? avail.find((d) => d.date === ai.date)! : avail.find((d) => d.slots.length);
       reply = day ? `Sorry, that time's already taken. I can do ${friendlyDate(day.date)} at ${day.slots.slice(0, 3).map(label12).join(', ')} — which works best?` : "Sorry, that time's already taken. What other day works for you?";
     } else {
-      // Manual confirmation for now: save the requested time, staff approves it in Bookings.
+      // Price accepted -> auto-confirm (draft estimate for staff); otherwise save as a request for manual OK.
       const h = Number(ai.time.split(':')[0]);
       const label = `${((h + 11) % 12) + 1}:${ai.time.split(':')[1]} ${h < 12 ? 'AM' : 'PM'}`;
       const auto = ai.price_ok ? await autoConfirmBooking(sb, req.id, ai.date, ai.time).catch(() => ({ ok: false })) : { ok: false };
