@@ -18,10 +18,11 @@ Deno.serve(async (req) => {
   }
   const sb = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!)
   const { data: est } = await sb.from('estimates').select('customer_id').eq('approval_token', token).maybeSingle()
-  if (!est) return j({ error: 'This link is no longer valid' }, 404)
-  const { data: u } = await sb.auth.admin.getUserById(est.customer_id)
+  const customerId = est?.customer_id || (await sb.from('enrollment_tokens').select('user_id').eq('token', token).maybeSingle()).data?.user_id
+  if (!customerId) return j({ error: 'This link is no longer valid' }, 404)
+  const { data: u } = await sb.auth.admin.getUserById(customerId)
   const user = u?.user
-  if (!user || user.email || !user.user_metadata?.needs_enrollment) return j({ error: 'This account is already set up — please sign in.', done: true }, 409)
+  if (!user || user.email) return j({ error: 'This account is already set up — please sign in.', done: true }, 409)
   if (b.check === true) return j({ ok: true, name: user.user_metadata?.full_name || '' })
   const { error } = await sb.auth.admin.updateUserById(user.id, {
     email, password, email_confirm: true,

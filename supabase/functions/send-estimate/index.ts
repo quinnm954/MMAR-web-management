@@ -4,6 +4,7 @@ import { corsHeaders, json, requireStaff } from '../_shared/staff-auth.ts';
 import { sendAndLog } from '../_shared/send-and-log.ts';
 import { smsAllowed } from '../_shared/missed-call.ts';
 import { sendSms } from '../_shared/booking-bot.ts';
+import { enrollSuffix } from '../_shared/enroll.ts';
 
 const SITE = 'https://mikesmautorepair.com';
 
@@ -24,7 +25,7 @@ Deno.serve(async (req) => {
     const url = `${SITE}/estimate/${est.approval_token}`;
     const total = `$${Number(est.total || 0).toFixed(2)}`;
     if (phone.length === 10 && await smsAllowed().catch(() => false)) {
-      await sendSms(sb, phone, `${first ? `${first}, your` : 'Your'} estimate from Mike's Mobile Auto Repair is ready (${total}): ${url}`);
+      await sendSms(sb, phone, `${first ? `${first}, your` : 'Your'} estimate from Mike's Mobile Auto Repair is ready (${total}): ${url}${await enrollSuffix(sb, est.customer_id)}`);
       return json({ ok: true, via: 'sms' });
     }
     if (!email) return json({ ok: true, via: 'none' });

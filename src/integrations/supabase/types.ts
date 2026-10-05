@@ -984,6 +984,24 @@ export type Database = {
         }
         Relationships: []
       }
+      enrollment_tokens: {
+        Row: {
+          created_at: string
+          token: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          token?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          token?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       estimate_decision_logs: {
         Row: {
           actor_id: string | null

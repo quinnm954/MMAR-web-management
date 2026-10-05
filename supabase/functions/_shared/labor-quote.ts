@@ -3,6 +3,7 @@
 import { cleanService, sendSms } from './booking-bot.ts';
 import { sendAndLog } from './send-and-log.ts';
 import { smsAllowed } from './missed-call.ts';
+import { enrollSuffix } from './enroll.ts';
 const SITE = 'https://mikesmautorepair.com';
 
 export type LaborQuote = {
@@ -113,7 +114,7 @@ export async function createDraftEstimate(sb: any, req: any, q: LaborQuote, opts
   const sendEmail = email || (!textOk ? (await sb.from('profiles').select('email').eq('id', prof.id).maybeSingle()).data?.email?.trim().toLowerCase() || '' : '');
   if (textOk) {
     const first = (req.customer_name || '').split(' ')[0];
-    await sendSms(sb, phone, `${first ? `${first}, your` : 'Your'} estimate from Mike's Mobile Auto Repair is ready: ${SITE}/estimate/${data.approval_token}${isNew ? `\nWe started an account for you — finish setting it up here: ${SITE}/enroll/${data.approval_token}` : ''}`);
+    await sendSms(sb, phone, `${first ? `${first}, your` : 'Your'} estimate from Mike's Mobile Auto Repair is ready: ${SITE}/estimate/${data.approval_token}${await enrollSuffix(sb, prof.id)}`);
   } else if (sendEmail) {
     const { data: link } = await sb.auth.admin.generateLink({ type: 'magiclink', email: sendEmail, options: { redirectTo: `${SITE}/portal/estimates` } }).catch(() => ({ data: null }));
     await sendAndLog({
