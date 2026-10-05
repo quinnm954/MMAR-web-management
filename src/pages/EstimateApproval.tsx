@@ -236,7 +236,6 @@ const EstimateApproval = () => {
         <p className="text-[11px] text-muted-foreground">Final invoice will reflect approved items plus tax/shop supplies.</p>
       </div>
 
-      {est.notes && <div className="mt-4 text-sm bg-muted/50 border border-border rounded p-3 whitespace-pre-wrap">{est.notes}</div>}
 
       {!locked && (
         <div className="mt-5 space-y-3">
