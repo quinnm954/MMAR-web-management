@@ -130,7 +130,7 @@ export default function AdminSMS() {
               className={`w-full text-left p-2 rounded ${active?.id === t.id ? 'bg-primary/10' : 'hover:bg-muted'}`}
             >
               <div className="flex justify-between items-center">
-                <span className="font-semibold text-sm">{t.profiles?.full_name || t.phone}</span>
+                <span className="font-semibold text-sm truncate">{t.display_name || t.phone}{t.display_tag && <span className="ml-1.5 text-[10px] font-normal uppercase text-muted-foreground">{t.display_tag}</span>}</span>
                 {t.unread_count > 0 && <Badge>{t.unread_count}</Badge>}
               </div>
               <div className="text-xs text-muted-foreground truncate">{t.last_message_preview}</div>
@@ -153,7 +153,7 @@ export default function AdminSMS() {
         ) : (
           <>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm">{active.profiles?.full_name || active.phone}</CardTitle>
+              <CardTitle className="text-sm">{active.display_name || active.phone}{active.display_tag && <span className="ml-2 text-[10px] font-normal uppercase text-muted-foreground">{active.display_tag}</span>}</CardTitle>
               <p className="text-xs text-muted-foreground">{active.phone}</p>
               {active.last_invoice && (
                 <Link to="/admin/dashboard?tab=invoices" className="inline-flex items-center gap-1 text-xs text-primary hover:underline mt-1">
