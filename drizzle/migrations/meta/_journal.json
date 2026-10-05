@@ -57,6 +57,13 @@
       "when": 1791217134263,
       "tag": "0007_invoice_at_appointment_time",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1791217161711,
+      "tag": "0008_invoice_at_appointment_time_fix",
+      "breakpoints": true
     }
   ]
 }
