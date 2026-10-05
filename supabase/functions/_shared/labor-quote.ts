@@ -28,11 +28,25 @@ async function shopRate(sb: any) {
   return Number(data?.[0]?.hourly_rate) || 125;
 }
 
+// A named part/repair in the request means a specific job, even if the service type is generic ("General Repair").
+const PARTS = /starter|alternator|battery|brake|rotor|caliper|pads?\b|water pump|thermostat|radiator|serpentine|belt|timing|spark plug|ignition coil|fuel pump|o2 sensor|oxygen sensor|shocks?|struts?|tie rod|ball joint|control arm|wheel bearing|cv axle|axle|motor mount|oil change|tune.?up|ac compressor|condenser|blower motor|window regulator|headlight|tail ?light|hose|gasket|catalytic|muffler|exhaust/i;
+const DESIGNATED = /replace|repair|install|swap|change|new\b/i;
+
+function specificJob(text: string): string | null {
+  const m = text.match(PARTS);
+  if (!m) return null;
+  if (/not sure|no idea|don'?t know|diagnos|check (it|out)|figure out|suspect|maybe|possibly/i.test(text)) return null;
+  const part = m[0].toLowerCase();
+  return /replace|install|new\b/i.test(text) || !DESIGNATED.test(text) ? `${part} replacement` : `${part} replacement`;
+}
+
 export async function buildLaborQuote(sb: any, req: any): Promise<LaborQuote> {
   const rate = await shopRate(sb);
-  const svc = cleanService(req.service_type);
   const text = `${req.service_type || ''} ${req.description || ''}`;
-  if (!svc || DIAG.test(text)) return { kind: 'diagnosis', rate };
+  const named = specificJob(text);
+  const generic = cleanService(req.service_type);
+  const svc = named || (generic && !DIAG.test(text) ? generic : null);
+  if (!svc) return { kind: 'diagnosis', rate };
   const veh = parseVehicle(req.vehicle_info);
   const key = Deno.env.get('OPEN_LABOR_API_KEY');
   if (!veh || !key) return { kind: 'none', rate, job: svc };
