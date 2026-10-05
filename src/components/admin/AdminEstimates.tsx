@@ -147,17 +147,17 @@ const AdminEstimates = () => {
         }
 
         if (kind === 'labor') {
-          // Normalize: quantity = hours, unit_price = hourly rate, labor_hours mirrors qty.
-          if (laborHrs <= 0 && qty > 0) laborHrs = qty;
+          // Normalize: quantity = 1, unit_price = hourly rate, labor_hours = billable hours.
+          if (laborHrs <= 0 && qty > 1) laborHrs = qty;
           if (laborHrs <= 0 && lineTotal > 0 && fallbackLaborRate > 0) {
             laborHrs = +(lineTotal / fallbackLaborRate).toFixed(2);
           }
-          if (qty <= 0) qty = laborHrs;
+          if (laborHrs <= 0) laborHrs = 1;
+          qty = 1;
           if (price <= 0) {
-            if (lineTotal > 0 && qty > 0) price = +(lineTotal / qty).toFixed(2);
+            if (lineTotal > 0 && laborHrs > 0) price = +(lineTotal / laborHrs).toFixed(2);
             else price = fallbackLaborRate;
           }
-          if (qty <= 0 && lineTotal > 0 && price > 0) qty = +(lineTotal / price).toFixed(2);
         } else {
           if (qty <= 0) qty = 1;
           if (price <= 0 && lineTotal > 0 && qty > 0) price = +(lineTotal / qty).toFixed(2);
