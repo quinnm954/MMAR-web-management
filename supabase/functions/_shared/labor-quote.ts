@@ -36,7 +36,7 @@ function specificJob(text: string): string | null {
   if (!m) return null;
   if (/not sure|no idea|don'?t know|diagnos|check (it|out)|figure out|suspect|maybe|possibly/i.test(text)) return null;
   const part = m[0].toLowerCase();
-  return `${part} replacement`;
+  return /oil change|tune.?up|repair/.test(part) ? part : `${part} replacement`;
 }
 
 export async function buildLaborQuote(sb: any, req: any): Promise<LaborQuote> {
