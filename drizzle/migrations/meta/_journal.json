@@ -85,6 +85,13 @@
       "when": 1791221275950,
       "tag": "0011_tighten_technician_access",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1791222283160,
+      "tag": "0012_widen_appointments_source",
+      "breakpoints": true
     }
   ]
 }

@@ -1,0 +1,2 @@
+ALTER TABLE public.appointments DROP CONSTRAINT appointments_source_check;
+ALTER TABLE public.appointments ADD CONSTRAINT appointments_source_check CHECK (source = ANY (ARRAY['in_app','google','phone','sms','walk_in','other','ai_phone','ai_sms','website','booking_request','admin']));
