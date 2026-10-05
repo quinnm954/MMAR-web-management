@@ -34,7 +34,6 @@ import AdminServiceRecords from '@/components/admin/AdminServiceRecords';
 import AdminInvoices from '@/components/admin/AdminInvoices';
 import AdminEmails from '@/components/admin/AdminEmails';
 import AdminEstimates from '@/components/admin/AdminEstimates';
-import AdminInspections from '@/components/admin/AdminInspections';
 import AdminCatalog from '@/components/admin/AdminCatalog';
 import AdminShopSettings from '@/components/admin/AdminShopSettings';
 import AdminReports from '@/components/admin/AdminReports';
@@ -162,8 +161,7 @@ const AdminDashboard = () => {
             { value: 'bookings', label: 'Bookings', icon: CalendarCheck, roles: ADVISOR, content: <AdminBookings /> },
             { value: 'service', label: 'Service Records', icon: ClipboardList, roles: ADVISOR, content: <AdminServiceRecords /> },
             { value: 'estimates', label: 'Estimates', icon: FileSpreadsheet, roles: ADVISOR, content: <AdminEstimates /> },
-            { value: 'inspections', label: 'Inspections', icon: ClipboardCheck, roles: SHOP_FLOOR, content: <AdminInspections /> },
-            { value: 'checklists', label: 'Checklists', icon: ClipboardList, roles: SHOP_FLOOR, content: <AdminChecklists /> },
+            { value: 'inspections', label: 'Inspections', icon: ClipboardCheck, roles: SHOP_FLOOR, content: <AdminChecklists /> },
             { value: 'vehicle-health', label: 'Vehicle Health', icon: ClipboardList, roles: ADVISOR, content: <AdminVehicleHealth /> },
             { value: 'invoices', label: 'Invoices', icon: Receipt, roles: ADVISOR, content: <AdminInvoices /> },
             { value: 'catalog', label: 'Catalog', icon: Package, roles: PARTS, content: <AdminCatalog /> },
@@ -190,7 +188,8 @@ const AdminDashboard = () => {
             return <p className="text-sm text-muted-foreground">No sections available for your role ({roles.join(', ') || 'none'}).</p>;
           }
           const defaultTab = visible.find(t => t.value === 'dashboard')?.value ?? visible.find(t => t.value === 'customers')?.value ?? visible[0].value;
-          const tabParam = searchParams.get('tab');
+          const rawTab = searchParams.get('tab');
+          const tabParam = rawTab === 'checklists' ? 'inspections' : rawTab;
           const initialTab = visible.find(t => t.value === tabParam)?.value ?? defaultTab;
           const [activeTab, setActiveTab] = useState(initialTab);
           const [usage, setUsage] = useState<Record<string, number>>(() => {
@@ -209,7 +208,7 @@ const AdminDashboard = () => {
           };
 
           const groups = [
-            { label: 'Workshop', values: ['calendar','ros','service','inspections','checklists','estimates','invoices','time','shifts','productivity'] },
+            { label: 'Workshop', values: ['calendar','ros','service','inspections','estimates','invoices','time','shifts','productivity'] },
             { label: 'Front Desk', values: ['customers','garage','memberships','bookings','share','declined','fleet-accounts','calls','texts','prospecting'] },
             { label: 'Admin', values: ['dashboard','reports','catalog','laborpay','quickbooks','financing','warranty','emails','audit','employees','roles','phone-settings','tracking','settings'] },
           ];
