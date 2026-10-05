@@ -71,6 +71,13 @@
       "when": 1791217204725,
       "tag": "0009_skip_duplicate_invoice_for_appointment",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1791219356414,
+      "tag": "0010_notify_staff_texts_calls",
+      "breakpoints": true
     }
   ]
 }
