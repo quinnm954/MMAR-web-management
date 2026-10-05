@@ -1,3 +1,4 @@
+import AdminInspections from '@/components/admin/AdminInspections';
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -72,13 +73,15 @@ const STATUSES = ["open", "in_progress", "completed"];
 
 const AdminChecklists = () => {
   return (
-    <Tabs defaultValue="templates" className="space-y-4">
+    <Tabs defaultValue="active" className="space-y-4">
       <TabsList>
+        <TabsTrigger value="active"><ListChecks className="h-4 w-4 mr-1" /> Inspections</TabsTrigger>
+        <TabsTrigger value="reports"><FileText className="h-4 w-4 mr-1" /> Customer reports</TabsTrigger>
         <TabsTrigger value="templates"><FileText className="h-4 w-4 mr-1" /> Templates</TabsTrigger>
-        <TabsTrigger value="active"><ListChecks className="h-4 w-4 mr-1" /> Active checklists</TabsTrigger>
       </TabsList>
       <TabsContent value="templates"><TemplatesPanel /></TabsContent>
       <TabsContent value="active"><ChecklistsPanel /></TabsContent>
+      <TabsContent value="reports"><AdminInspections /></TabsContent>
     </Tabs>
   );
 };
