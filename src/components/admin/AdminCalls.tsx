@@ -16,7 +16,6 @@ type CallLog = {
   to_number: string | null;
   status: string;
   duration_seconds: number | null;
-  recording_url: string | null;
   transcription: string | null;
   voicemail: boolean;
   customer_id: string | null;
