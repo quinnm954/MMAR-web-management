@@ -15,6 +15,13 @@
       "when": 1791210004000,
       "tag": "0001_appointment_calendar_time_from_window",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791210155922,
+      "tag": "0002_appointment_time_follows_booking",
+      "breakpoints": true
     }
   ]
 }
