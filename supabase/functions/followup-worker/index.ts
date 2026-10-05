@@ -120,7 +120,7 @@ Deno.serve(async () => {
         if (p?.email) await sendAndLog({ templateName: 'review-request', recipientEmail: p.email, idempotencyKey: `review-request-${inv.id}`, templateData: { customerName: first(p.full_name) } });
         if (textsOk && p?.phone) {
           const hi = first(p.full_name) ? `Hi ${first(p.full_name)}, ` : 'Hi, ';
-          await sendSms(sb, p.phone, `${hi}thanks again for choosing Mike's Mobile Auto Repair! If we did a good job, a quick Google review would mean a lot: ${SITE}/review Reply STOP to opt out.`);
+          await sendSms(sb, p.phone, `${hi}thanks again for choosing Mike's Mobile Auto Repair! If we did a good job, would you rate your service? It takes 10 seconds: ${SITE}/review Reply STOP to opt out.`);
         }
         out.reviews++;
       }

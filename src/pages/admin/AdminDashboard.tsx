@@ -20,7 +20,7 @@ import AdminSMS from '@/components/admin/AdminSMS';
 import AdminReviewFeedback from '@/components/admin/AdminReviewFeedback';
 import AdminProspecting from '@/components/admin/AdminProspecting';
 import AdminFleetAccounts from '@/components/admin/AdminFleetAccounts';
-import { Search } from 'lucide-react';
+import { Search, Star } from 'lucide-react';
 import AdminPhoneSettings from '@/components/admin/AdminPhoneSettings';
 import AdminTrackingSettings from '@/components/admin/AdminTrackingSettings';
 import AdminEmployees from '@/components/admin/AdminEmployees';
