@@ -88,7 +88,7 @@ export default function AdminSMS() {
 
   return (
     <div className="grid md:grid-cols-3 gap-4 h-[calc(100dvh-260px)] min-h-[420px] max-h-[800px]">
-      <Card className="md:col-span-1 flex flex-col max-h-[40vh] md:max-h-none">
+      <Card className="md:col-span-1 flex flex-col min-h-0 overflow-hidden max-h-[40vh] md:max-h-none">
         <CardHeader className="pb-2">
           <CardTitle className="text-sm flex items-center gap-2"><MessageSquare className="h-4 w-4" /> Conversations</CardTitle>
           <div className="flex gap-1 pt-2">
@@ -96,7 +96,7 @@ export default function AdminSMS() {
             <Button size="sm" onClick={startNew}>New</Button>
           </div>
         </CardHeader>
-        <CardContent className="flex-1 overflow-y-auto p-2 space-y-1">
+        <CardContent className="flex-1 min-h-0 overflow-y-auto p-2 space-y-1">
           {threads.map(t => (
             <button
               key={t.id}
@@ -121,7 +121,7 @@ export default function AdminSMS() {
         </CardContent>
       </Card>
 
-      <Card className="md:col-span-2 flex flex-col max-h-[55vh] md:max-h-none">
+      <Card className="md:col-span-2 flex flex-col min-h-0 overflow-hidden max-h-[55vh] md:max-h-none">
         {!active ? (
           <CardContent className="flex-1 flex items-center justify-center text-muted-foreground">Select a conversation</CardContent>
         ) : (
@@ -135,7 +135,7 @@ export default function AdminSMS() {
                 </Link>
               )}
             </CardHeader>
-            <CardContent className="flex-1 overflow-y-auto space-y-2">
+            <CardContent className="flex-1 min-h-0 overflow-y-auto space-y-2">
               {messages.map(m => {
                 const inv = m.invoice_id ? invoicesById[m.invoice_id] : null;
                 return (
