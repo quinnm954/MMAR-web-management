@@ -71,15 +71,38 @@ export default function Softphone() {
     return () => clearInterval(t);
   }, [status]);
 
+  /** Ask for this device's microphone and route audio to its speaker. */
+  const ensureAudio = async () => {
+    try {
+      const s = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } });
+      s.getTracks().forEach((t) => t.stop());
+      const audio = deviceRef.current?.audio;
+      if (audio) {
+        await audio.setInputDevice('default').catch(() => {});
+        if (audio.isOutputSelectionSupported) {
+          await audio.speakerDevices.set('default').catch(() => {});
+          await audio.ringtoneDevices.set('default').catch(() => {});
+        }
+      }
+      return true;
+    } catch {
+      toast.error('Allow microphone access for this app to make and take calls');
+      return false;
+    }
+  };
+
   const dial = async (n: string) => {
     const d = deviceRef.current;
     const to = n.replace(/[^\d+]/g, '');
     if (!d || status === 'offline') return toast.error('Phone is not connected yet');
     if (to.length < 10) return toast.error('Enter a full phone number');
+    if (!(await ensureAudio())) return;
     setPeer(to); setStatus('connecting'); setOpen(true);
     try { attach(await d.connect({ params: { To: to } })); }
     catch (e) { toast.error(String(e)); setStatus('ready'); }
   };
+
+  const answer = async () => { if (await ensureAudio()) callRef.current?.accept(); };
 
   useEffect(() => {
     const h = (e: Event) => { const n = (e as CustomEvent).detail?.number; if (n) { setNumber(n); dial(n); } };
@@ -93,7 +116,7 @@ export default function Softphone() {
   if (!open) {
     return (
       <button
-        onClick={() => setOpen(true)}
+        onClick={() => { setOpen(true); ensureAudio(); }}
         className="fixed bottom-24 right-4 z-50 h-14 w-14 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center md:bottom-6"
         aria-label="Open phone"
       >
@@ -118,7 +141,7 @@ export default function Softphone() {
           <PhoneIncoming className="h-8 w-8 mx-auto text-accent animate-pulse" />
           <p className="font-mono text-lg">{peer}</p>
           <div className="flex gap-2">
-            <Button className="flex-1" onClick={() => callRef.current?.accept()}>Answer</Button>
+            <Button className="flex-1" onClick={answer}>Answer</Button>
             <Button className="flex-1" variant="destructive" onClick={() => callRef.current?.reject()}>Decline</Button>
           </div>
         </div>
