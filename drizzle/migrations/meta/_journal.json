@@ -50,6 +50,13 @@
       "when": 1791216134065,
       "tag": "0006_allow_ai_phone_source",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1791217134263,
+      "tag": "0007_invoice_at_appointment_time",
+      "breakpoints": true
     }
   ]
 }
