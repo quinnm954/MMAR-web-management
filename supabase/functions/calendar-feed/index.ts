@@ -44,6 +44,9 @@ Deno.serve(async (req) => {
   if (!tok) return new Response('Not found', { status: 404 });
   const { data: staff } = await sb.rpc('is_staff', { _user_id: tok.user_id });
   if (!staff) return new Response('Not found', { status: 404 });
+  const { data: roles } = await sb.from('user_roles').select('role').eq('user_id', tok.user_id);
+  const techOnly = !(roles || []).some((r) => ['owner', 'admin', 'manager', 'service_advisor'].includes(r.role));
+  const LINK = techOnly ? `${SITE}/tech/jobs` : `${SITE}/admin`;
 
   const now = new Date();
   const from = new Date(now.getTime() - 14 * 86400000);
@@ -51,14 +54,17 @@ Deno.serve(async (req) => {
   const fromD = from.toISOString().slice(0, 10), toD = to.toISOString().slice(0, 10);
   const stamp = utc(now);
 
-  const { data: appts } = await sb.from('appointments')
+  let apptQ = sb.from('appointments')
     .select('id,service_type,description,scheduled_at,requested_date,requested_time_window,service_address,status,technician_notes,customer_id,vehicle_id')
     .neq('status', 'cancelled').neq('status', 'canceled')
     .or(`and(scheduled_at.gte.${from.toISOString()},scheduled_at.lte.${to.toISOString()}),and(scheduled_at.is.null,requested_date.gte.${fromD},requested_date.lte.${toD})`);
-  const { data: reqs } = await sb.from('booking_requests')
+  if (techOnly) apptQ = apptQ.eq('assigned_technician_id', tok.user_id);
+  const { data: appts } = await apptQ;
+  const { data: reqsAll } = await sb.from('booking_requests')
     .select('id,customer_name,customer_phone,vehicle_info,service_type,description,service_address,requested_date,requested_time_window,status')
     .not('status', 'in', '(declined,converted,confirmed,cancelled)')
     .gte('requested_date', fromD).lte('requested_date', toD);
+  const reqs = techOnly ? [] : reqsAll;
 
   const custIds = [...new Set((appts || []).map((a) => a.customer_id).filter(Boolean))];
   const vehIds = [...new Set((appts || []).map((a) => a.vehicle_id).filter(Boolean))];
@@ -68,7 +74,7 @@ Deno.serve(async (req) => {
   const V = new Map((vehs || []).map((v) => [v.id, v]));
 
   const lines: string[] = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Garage Ace//Schedule//EN', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH',
-    'X-WR-CALNAME:Garage Ace Schedule', 'X-WR-TIMEZONE:America/New_York', 'REFRESH-INTERVAL;VALUE=DURATION:PT15M', 'X-PUBLISHED-TTL:PT15M', ...VTZ];
+    `X-WR-CALNAME:${techOnly ? 'My Garage Ace Jobs' : 'Garage Ace Schedule'}`, 'X-WR-TIMEZONE:America/New_York', 'REFRESH-INTERVAL;VALUE=DURATION:PT15M', 'X-PUBLISHED-TTL:PT15M', ...VTZ];
 
   for (const a of appts || []) {
     const p = P.get(a.customer_id), v = V.get(a.vehicle_id);
@@ -82,18 +88,18 @@ Deno.serve(async (req) => {
       const [st, en] = windowRange(a.requested_time_window);
       lines.push(`DTSTART;TZID=America/New_York:${local(a.requested_date, st)}`, `DTEND;TZID=America/New_York:${local(a.requested_date, en)}`);
     }
-    const desc = [p?.phone && `Phone: ${p.phone}`, a.description, a.technician_notes && `Notes: ${a.technician_notes}`, `Status: ${a.status}`, `${SITE}/admin`].filter(Boolean).join('\n');
-    lines.push(`SUMMARY:${esc(title)}`, `LOCATION:${esc(a.service_address)}`, `DESCRIPTION:${esc(desc)}`, `URL:${SITE}/admin`, 'STATUS:CONFIRMED', 'END:VEVENT');
+    const desc = [p?.phone && `Phone: ${p.phone}`, a.description, a.technician_notes && `Notes: ${a.technician_notes}`, `Status: ${a.status}`, LINK].filter(Boolean).join('\n');
+    lines.push(`SUMMARY:${esc(title)}`, `LOCATION:${esc(a.service_address)}`, `DESCRIPTION:${esc(desc)}`, `URL:${LINK}`, 'STATUS:CONFIRMED', 'END:VEVENT');
   }
 
   for (const r of reqs || []) {
     if (!r.requested_date) continue;
     const [st, en] = windowRange(r.requested_time_window);
     const title = `PENDING: ${r.service_type || 'Request'}: ${r.customer_name || 'Customer'}${r.vehicle_info ? ` (${r.vehicle_info})` : ''}`;
-    const desc = [r.customer_phone && `Phone: ${r.customer_phone}`, r.requested_time_window && `Asked for: ${r.requested_time_window}`, r.description, 'Not confirmed yet - confirm in Booking Requests.', `${SITE}/admin`].filter(Boolean).join('\n');
+    const desc = [r.customer_phone && `Phone: ${r.customer_phone}`, r.requested_time_window && `Asked for: ${r.requested_time_window}`, r.description, 'Not confirmed yet - confirm in Booking Requests.', LINK].filter(Boolean).join('\n');
     lines.push('BEGIN:VEVENT', `UID:req-${r.id}@garageace`, `DTSTAMP:${stamp}`,
       `DTSTART;TZID=America/New_York:${local(r.requested_date, st)}`, `DTEND;TZID=America/New_York:${local(r.requested_date, en)}`,
-      `SUMMARY:${esc(title)}`, `LOCATION:${esc(r.service_address)}`, `DESCRIPTION:${esc(desc)}`, `URL:${SITE}/admin`, 'STATUS:TENTATIVE', 'TRANSP:TRANSPARENT', 'END:VEVENT');
+      `SUMMARY:${esc(title)}`, `LOCATION:${esc(r.service_address)}`, `DESCRIPTION:${esc(desc)}`, `URL:${LINK}`, 'STATUS:TENTATIVE', 'TRANSP:TRANSPARENT', 'END:VEVENT');
   }
   lines.push('END:VCALENDAR');
 

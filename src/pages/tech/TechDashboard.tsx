@@ -18,6 +18,7 @@ import {
   Bell,
 } from "lucide-react";
 import PushNotificationCard from "@/components/shell/PushNotificationCard";
+import CalendarFeedSettings from "@/components/admin/CalendarFeedSettings";
 
 interface Stats {
   jobsToday: number;
@@ -148,6 +149,7 @@ const TechDashboard = () => {
     <TechLayout>
       <div className="space-y-6">
         <PushNotificationCard />
+        <CalendarFeedSettings variant="tech" />
         <div>
           <p className="text-sm text-muted-foreground">{greeting}</p>
           <h1 className="text-2xl font-bold">Tech Dashboard</h1>
