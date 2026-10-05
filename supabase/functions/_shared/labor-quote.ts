@@ -20,6 +20,8 @@ export type LaborQuote = {
 };
 
 const DIAG = /diag|check engine|engine light|noise|won'?t start|no start|not sure|inspect|leak|overheat|smell|vibrat|general|something|problem|issue/i;
+// Category titles from the website service pages — too broad to quote.
+const BROAD = /suspension\s*&?\s*(and\s*)?steering|brake (repair|service)s?|engine repair|drivetrain|electrical|mobile .* repair$|repair & service|a\/?c (repair|service)|cooling system|heating/i;
 
 export function parseVehicle(v?: string | null) {
   const m = (v || '').match(/\b(19[89]\d|20[0-3]\d)\s+([A-Za-z-]+)\s+([A-Za-z0-9-]+)/);
@@ -48,8 +50,10 @@ export async function buildLaborQuote(sb: any, req: any): Promise<LaborQuote> {
   const named = specificJob(text);
   const generic = cleanService(req.service_type);
   // A specific service type ("Timing Belt Replacement") wins over a single part word found in it.
-  const svc = (generic && !DIAG.test(generic) && PARTS.test(generic) ? generic : null) || named || (generic && !DIAG.test(text) ? generic : null);
-  if (!svc) return { kind: 'diagnosis', rate };
+  // Broad categories ("Suspension & Steering", "Brake Service") are NEVER sent to the labor guide —
+  // only a named part/repair gets a labor quote; otherwise we clarify or use the diagnosis fee.
+  const svc = (generic && !DIAG.test(generic) && PARTS.test(generic) && !BROAD.test(generic) ? generic : null) || named;
+  if (!svc) return { kind: 'diagnosis', rate, vague: true } as LaborQuote;
   const veh = parseVehicle(req.vehicle_info);
   const key = Deno.env.get('OPEN_LABOR_API_KEY');
   if (!veh || !key) return { kind: 'none', rate, job: svc };
