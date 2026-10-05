@@ -174,7 +174,7 @@ export async function createDraftEstimate(sb: any, req: any, q: LaborQuote, opts
       templateName: 'estimate-ready', recipientEmail: sendEmail, idempotencyKey: `estimate-ready-${data.id}`,
       templateData: {
         name: (req.customer_name || '').split(' ')[0] || undefined, estimateNumber: data.estimate_number || '',
-        total: q.kind === 'diagnosis' ? '$100 diagnosis ($50 credited to repair labor)' : `$${Math.round(total)} labor (parts extra)`,
+        total: q.kind === 'diagnosis' ? '$100 diagnosis ($50 credited to repair labor)' : lines.length > 1 ? `${lines.length} labor options from $${Math.round(Math.min(...lines.map((l) => l.amount)))} (parts extra)` : `$${Math.round(total)} labor (parts extra)`,
         approvalUrl: `${SITE}/estimate/${data.approval_token}`, accountUrl: link?.properties?.action_link || `${SITE}/login`,
       },
       metadata: { auto_quote: true, new_account: isNew },
