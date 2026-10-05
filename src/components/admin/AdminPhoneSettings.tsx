@@ -115,8 +115,8 @@ export default function AdminPhoneSettings() {
           </CardTitle>
           <CardDescription>
             {s.routing_enabled
-              ? 'Inbound calls forward to your cell, get recorded, and missed calls go to voicemail.'
-              : 'Calls hitting your Twilio number will hear the "system upgrade" greeting and hang up. Nothing is forwarded or recorded. Turn this ON only after porting is complete and you have entered a forward-to number.'}
+              ? 'The AI receptionist answers calls and you get transcripts. Urgent calls transfer to your cell, and missed calls go to voicemail (transcribed, no audio kept).'
+              : 'Calls hitting your Twilio number will hear the "system upgrade" greeting and hang up. Nothing is forwarded. Turn this ON only after porting is complete and you have entered a forward-to number.'}
           </CardDescription>
         </CardHeader>
         <CardContent className="flex items-center justify-between">
@@ -238,7 +238,7 @@ export default function AdminPhoneSettings() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Greetings & recording</CardTitle>
+          <CardTitle>Greetings & voicemail</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
@@ -258,13 +258,6 @@ export default function AdminPhoneSettings() {
               value={s.unavailable_greeting}
               onChange={(e) => setS({ ...s, unavailable_greeting: e.target.value })}
             />
-          </div>
-          <div className="flex items-center justify-between">
-            <div>
-              <Label className="text-base">Record answered calls</Label>
-              <p className="text-xs text-muted-foreground">Two-channel recording, available in the Calls tab.</p>
-            </div>
-            <Switch checked={s.record_calls} onCheckedChange={(v) => setS({ ...s, record_calls: v })} />
           </div>
           <div className="flex items-center justify-between">
             <div>

@@ -16,7 +16,6 @@ type CallLog = {
   to_number: string | null;
   status: string;
   duration_seconds: number | null;
-  recording_url: string | null;
   transcription: string | null;
   voicemail: boolean;
   customer_id: string | null;
@@ -137,11 +136,6 @@ export default function AdminCalls() {
                       <p className="text-sm mt-2 italic text-muted-foreground border-l-2 border-primary/30 pl-2">
                         "{c.transcription}"
                       </p>
-                    )}
-                    {c.recording_url && (
-                      <audio controls preload="none" className="mt-2 w-full max-w-md h-9">
-                        <source src={c.recording_url} type="audio/mpeg" />
-                      </audio>
                     )}
                   </div>
                   <div className="flex flex-col gap-1.5 shrink-0">
