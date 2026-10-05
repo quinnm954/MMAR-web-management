@@ -14,9 +14,10 @@ import {
 import { Button } from "@/components/ui/button";
 import {
   Loader2, Search, Mail, Phone, Car, CreditCard, Calendar, FileText, Receipt, Download,
-  Plus, Pencil, Trash2,
+  Plus, Pencil, Trash2, HeartPulse,
 } from "lucide-react";
 import { toast } from "sonner";
+import VehicleMasterChecklist from "@/components/VehicleMasterChecklist";
 
 interface Customer {
   id: string;
@@ -45,6 +46,7 @@ const AdminCustomers = () => {
   const [selected, setSelected] = useState<Customer | null>(null);
   const [details, setDetails] = useState<any>(null);
   const [detailsLoading, setDetailsLoading] = useState(false);
+  const [healthVehicleId, setHealthVehicleId] = useState<string | null>(null);
 
   // add/edit dialog
   const [editOpen, setEditOpen] = useState(false);
