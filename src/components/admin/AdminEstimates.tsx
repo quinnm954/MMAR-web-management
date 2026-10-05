@@ -569,14 +569,18 @@ const AdminEstimates = () => {
                     <Button size="sm" variant="outline" onClick={addLaborLine}><Plus className="h-3 w-3 mr-1" /> Labor</Button>
                     <Button size="sm" variant="outline" onClick={() => { setLaborOpen(o => !o); setLaborResults([]); }}><Wrench className="h-3 w-3 mr-1" /> Labor Guide</Button>
                     <Button size="sm" variant="outline" onClick={addDiagnosisFee}><Plus className="h-3 w-3 mr-1" /> Diagnosis Fee</Button>
-                    <Button size="sm" variant="outline" onClick={lookupPartsTech} disabled={ptLoading} title="Look up live O'Reilly parts & pricing via PartsTech">
-                      {ptLoading && !ptSession ? <Loader2 className="h-3 w-3 mr-1 animate-spin" /> : <ExternalLink className="h-3 w-3 mr-1" />} PartsTech
+                    <Button size="sm" variant="outline" title="Copy vehicle info and open First Call Online" onClick={async () => {
+                      const v: any = vehicles.find(x => x.id === editing?.vehicle_id);
+                      const text = v ? [v.year, v.make, v.model, v.engine || v.engine_size, v.vin ? `VIN: ${v.vin}` : ''].filter(Boolean).join(' ') : '';
+                      const w = Math.min(1000, window.screen.availWidth / 2);
+                      window.open('https://www.firstcallonline.com', 'firstcall', `popup=yes,width=${w},height=${Math.min(900, window.screen.availHeight)},left=${window.screen.availWidth - w},top=0`);
+                      if (text) {
+                        try { await navigator.clipboard.writeText(text); toast.success(`Copied: ${text} — paste it into First Call`); }
+                        catch { toast.info(text); }
+                      } else toast.info('No vehicle selected — pick one to auto-copy its details');
+                    }}>
+                      <ExternalLink className="h-3 w-3 mr-1" /> First Call
                     </Button>
-                    {ptSession && (
-                      <Button size="sm" onClick={importPartsTechCart} disabled={ptLoading} title="Import the cart you submitted in PartsTech">
-                        {ptLoading ? <Loader2 className="h-3 w-3 mr-1 animate-spin" /> : <Upload className="h-3 w-3 mr-1" />} Import Cart
-                      </Button>
-                    )}
                   </div>
                 </div>
                 {laborOpen && (
