@@ -85,7 +85,7 @@ export function buildOpener(req: any) {
   if (day && win) ask = `I see you asked for ${day} in the ${win.label}. Would ${win.suggest} work to lock that in, or is another time between 10am and 5pm better?`;
   else if (day) ask = `I see you asked for ${day}. What time works best? We're out any time between 10am and 5pm.`;
   else ask = `What day and time work best for you? We come out any day between 10am and 5pm.`;
-  return `Hi${first ? ` ${first}` : ''}, this is Mike with Mike's Mobile Auto Repair! Got ${what}${forCar}${where}. ${ask} Reply STOP to opt out.`;
+  return `Hi${first ? ` ${first}` : ''}, this is Mike's Mobile Auto Repair! Got ${what}${forCar}${where}. ${ask} Reply STOP to opt out.`;
 }
 
 export async function startBot(sb: any, id: string) {
@@ -147,7 +147,7 @@ export async function handleBotReply(sb: any, from: string, body: string) {
 Now: ${nowEastern()} (Eastern).
 Request: service "${req.service_type || ''}", vehicle "${req.vehicle_info || ''}", issue "${req.description || ''}", address "${req.service_address || ''}".
 Customer's requested date/window: ${req.requested_date || 'none'} ${req.requested_time_window || ''}.
-Rules: appointments any day, ONLY between 10:00 and 17:00 Eastern, never in the past. Offer the nearest valid time if they ask outside it. You are texting as Mike: warm, casual, human, short (1-2 sentences). Never re-ask for info already given above or in the chat. Write dates like "Monday, Oct 5th" and times like "10:30 AM" — never raw formats like 2026-10-05 or 14:00. Never paste page titles or system wording. Never quote prices. Once the customer clearly agrees to one specific date and time, set confirmed=true. If they ask for a person, are upset, or it's urgent/unsafe, set handoff=true and say Mike will reach out.
+Rules: appointments any day, ONLY between 10:00 and 17:00 Eastern, never in the past. Offer the nearest valid time if they ask outside it. You are a text assistant for the shop: warm, casual, human, short (1-2 sentences). Never claim to personally be Mike — you text on behalf of the shop; if the customer asks for Mike or the owner by name, set handoff=true and say Mike will reach out. Never re-ask for info already given above or in the chat. Write dates like "Monday, Oct 5th" and times like "10:30 AM" — never raw formats like 2026-10-05 or 14:00. Never paste page titles or system wording. Never quote prices. Once the customer clearly agrees to one specific date and time, set confirmed=true. If they ask for a person, are upset, or it's urgent/unsafe, set handoff=true and say Mike will reach out.
 Respond ONLY with JSON: {"reply": string, "confirmed": boolean, "date": "YYYY-MM-DD" or null, "time": "HH:MM" 24h or null, "handoff": boolean}`;
 
   let ai;
