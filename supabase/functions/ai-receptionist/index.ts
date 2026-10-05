@@ -171,6 +171,8 @@ Deno.serve(async (req) => {
         },
         platform_settings: {
           overrides: { conversation_config_override: { agent: { first_message: true } } },
+          // Privacy: never save call audio — transcripts only.
+          privacy: { record_voice: false },
         },
       };
 
