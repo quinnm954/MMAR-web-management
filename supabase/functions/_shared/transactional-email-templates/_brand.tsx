@@ -1,11 +1,11 @@
 import * as React from 'npm:react@18.3.1'
 import { Link, Section, Text, Img } from 'npm:@react-email/components@0.0.22'
 
-const LOGO_URL = 'https://mikesmautorepair.com/mmar-logo.jpeg'
+const LOGO_URL = 'https://mikesmautorepair.com/mmar-logo.png'
 
 export const BrandHeader = ({ tag = 'MOBILE AUTO REPAIR' }: { tag?: string }) => (
   <Section style={header}>
-    <Img src={LOGO_URL} width="104" alt="MMAR" style={logo} />
+    <Img src={LOGO_URL} width="156" height="156" alt="Mike's Mobile Auto Repair" style={logo} />
     <Text style={brand}>MMAR</Text>
     <Text style={name}>Mike's Mobile Auto Repair</Text>
     <Text style={tagline}>{tag}</Text>
@@ -17,7 +17,7 @@ export const BrandCard = ({ children }: { children: React.ReactNode }) => (
 )
 
 const header = { backgroundColor: '#0f172a', borderTop: '4px solid #38aee8', padding: '22px 28px 20px', textAlign: 'center' as const }
-const logo = { display: 'block', width: '104px', height: '60px', objectFit: 'cover' as const, margin: '0 auto 12px', borderRadius: '4px' }
+const logo = { display: 'block', width: '156px', height: '156px', objectFit: 'contain' as const, margin: '0 auto 10px' }
 const brand = { color: '#ffffff', fontSize: '28px', lineHeight: '32px', fontWeight: 800, letterSpacing: '0', margin: '0' }
 const name = { color: '#cbd5e1', fontSize: '13px', lineHeight: '20px', fontWeight: 600, margin: '3px 0 0' }
 const tagline = { color: '#e5b72c', fontSize: '10px', lineHeight: '16px', fontWeight: 700, margin: '10px 0 0' }
