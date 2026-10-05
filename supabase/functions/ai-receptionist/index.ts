@@ -264,7 +264,7 @@ Deno.serve(async (req) => {
       const p = (profs || []).find((x: any) => String(x.phone).replace(/\D/g, '').slice(-10) === digits);
       if (!p) return json({ result: 'No account found for this number. Collect details as normal.' });
       const { data: vs } = await sb.from('vehicles').select('year, make, model, engine').eq('owner_id', p.id).eq('is_active', true).limit(5);
-      const veh = (vs || []).map((v: any) => [v.year, v.make, v.model, v.engine].filter(Boolean).join(' ')).join('; ');
+      const veh = [...new Set((vs || []).map((v: any) => [v.year, v.make, v.model, v.engine].filter(Boolean).join(' ').toLowerCase()))].join('; ');
       const addr = [p.address_line1, p.city].filter(Boolean).join(', ');
       return json({ result: `Existing customer on file. Name: ${p.full_name || 'unknown'}. Vehicles: ${veh || 'none on file'}. Service address: ${addr || 'none on file'}. Verify these with the caller instead of asking from scratch; only ask for what is missing or changed.` });
     }
