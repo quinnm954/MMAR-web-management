@@ -60,13 +60,13 @@ export function quoteSentence(q: LaborQuote) {
 }
 
 // Draft estimate for admin review (only when the booker already has an account).
-export async function createDraftEstimate(sb: any, req: any, q: LaborQuote) {
-  if (q.kind === 'none') return null;
+export async function createDraftEstimate(sb: any, req: any, q: LaborQuote, opts: { appointmentId?: string; customerId?: string } = {}) {
+  if (q.kind === 'none' && !opts.appointmentId) return null;
   const email = (req.customer_email || '').trim().toLowerCase();
   const phone = (req.customer_phone || '').replace(/\D/g, '').slice(-10);
-  let prof: any = null;
+  let prof: any = opts.customerId ? { id: opts.customerId } : null;
   let isNew = false;
-  if (email) prof = (await sb.from('profiles').select('id').ilike('email', email).limit(1)).data?.[0];
+  if (!prof && email) prof = (await sb.from('profiles').select('id').ilike('email', email).limit(1)).data?.[0];
   if (!prof && phone) prof = ((await sb.from('profiles').select('id, phone').not('phone', 'is', null)).data || []).find((p: any) => (p.phone || '').replace(/\D/g, '').slice(-10) === phone);
   if (!prof && email) {
     // Auto-create a login-by-link account for new customers.
@@ -83,6 +83,17 @@ export async function createDraftEstimate(sb: any, req: any, q: LaborQuote) {
     prof = { id: c.user.id }; isNew = true;
   }
   if (!prof) return null;
+  const valid = new Date(Date.now() + 30 * 86400_000).toISOString().slice(0, 10);
+  if (q.kind === 'none') {
+    // No labor match: leave an unsent draft on the appointment for staff to fill in.
+    const { data, error } = await sb.from('estimates').insert({
+      customer_id: prof.id, appointment_id: opts.appointmentId, status: 'draft', line_items: [], subtotal: 0, total: 0, valid_until: valid,
+      customer_phone: req.customer_phone || null,
+      notes: `Auto-created for confirmed booking (${req.service_type || 'service'}, ${req.vehicle_info || 'vehicle n/a'}). No labor guide match — add labor and parts, then send.`,
+    }).select('id').single();
+    if (error) { console.error('draft estimate', error); return null; }
+    return data.id as string;
+  }
   let line;
   if (q.kind === 'diagnosis') line = { description: 'Diagnosis fee ($50 credited to repair labor)', quantity: 1, unit_price: 100, amount: 100, kind: 'labor' };
   else {
@@ -90,10 +101,9 @@ export async function createDraftEstimate(sb: any, req: any, q: LaborQuote) {
     line = { description: `${q.job} (book labor${q.minHours !== q.maxHours ? `, ${hr(q.minHours!)}–${hr(h)} hrs by engine` : ''})`, quantity: h, unit_price: q.rate, amount: h * q.rate, labor_hours: h, kind: 'labor' };
   }
   const total = line.amount;
-  const valid = new Date(Date.now() + 30 * 86400_000).toISOString().slice(0, 10);
   const { data, error } = await sb.from('estimates').insert({
     customer_id: prof.id, status: 'sent', sent_at: new Date().toISOString(), line_items: [line], subtotal: total, total, valid_until: valid,
-    customer_phone: req.customer_phone || null,
+    customer_phone: req.customer_phone || null, appointment_id: opts.appointmentId || null,
     notes: `Auto-drafted from booking request (${req.vehicle_info || 'vehicle n/a'}). Labor times are estimates — verify hours and add parts. Sent to customer automatically.`,
   }).select('id, estimate_number, approval_token').single();
   if (error) { console.error('draft estimate', error); return null; }
