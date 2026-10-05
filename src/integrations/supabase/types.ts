@@ -1035,6 +1035,8 @@ export type Database = {
           decline_reason: string | null
           declined_at: string | null
           estimate_number: string | null
+          followup_count: number
+          followup_last_at: string | null
           id: string
           line_items: Json
           notes: string | null
@@ -1062,6 +1064,8 @@ export type Database = {
           decline_reason?: string | null
           declined_at?: string | null
           estimate_number?: string | null
+          followup_count?: number
+          followup_last_at?: string | null
           id?: string
           line_items?: Json
           notes?: string | null
@@ -1089,6 +1093,8 @@ export type Database = {
           decline_reason?: string | null
           declined_at?: string | null
           estimate_number?: string | null
+          followup_count?: number
+          followup_last_at?: string | null
           id?: string
           line_items?: Json
           notes?: string | null
@@ -1293,6 +1299,24 @@ export type Database = {
           user_id?: string
           vehicle_types?: string[]
           yard_address?: string
+        }
+        Relationships: []
+      }
+      followup_worker_state: {
+        Row: {
+          id: number
+          last_run_at: string | null
+          lease_until: string | null
+        }
+        Insert: {
+          id?: number
+          last_run_at?: string | null
+          lease_until?: string | null
+        }
+        Update: {
+          id?: number
+          last_run_at?: string | null
+          lease_until?: string | null
         }
         Relationships: []
       }
@@ -1538,6 +1562,7 @@ export type Database = {
       invoices: {
         Row: {
           amount_paid: number
+          auto_sent_at: string | null
           created_at: string
           customer_id: string
           discount_amount: number
@@ -1551,6 +1576,9 @@ export type Database = {
           membership_id: string | null
           paid_at: string | null
           pdf_url: string | null
+          reminder_count: number
+          reminder_last_at: string | null
+          review_requested_at: string | null
           service_record_id: string | null
           shop_supplies: number
           status: string
@@ -1566,6 +1594,7 @@ export type Database = {
         }
         Insert: {
           amount_paid?: number
+          auto_sent_at?: string | null
           created_at?: string
           customer_id: string
           discount_amount?: number
@@ -1579,6 +1608,9 @@ export type Database = {
           membership_id?: string | null
           paid_at?: string | null
           pdf_url?: string | null
+          reminder_count?: number
+          reminder_last_at?: string | null
+          review_requested_at?: string | null
           service_record_id?: string | null
           shop_supplies?: number
           status?: string
@@ -1594,6 +1626,7 @@ export type Database = {
         }
         Update: {
           amount_paid?: number
+          auto_sent_at?: string | null
           created_at?: string
           customer_id?: string
           discount_amount?: number
@@ -1607,6 +1640,9 @@ export type Database = {
           membership_id?: string | null
           paid_at?: string | null
           pdf_url?: string | null
+          reminder_count?: number
+          reminder_last_at?: string | null
+          review_requested_at?: string | null
           service_record_id?: string | null
           shop_supplies?: number
           status?: string

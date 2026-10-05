@@ -25,11 +25,17 @@ import { template as adminMessage } from './admin-message.tsx'
 import { template as techJobAssigned } from './tech-job-assigned.tsx'
 import { template as fleetOutreach } from './fleet-outreach.tsx'
 import { template as missedCallFollowup } from './missed-call-followup.tsx'
+import { template as estimateReminder } from './estimate-reminder.tsx'
+import { template as invoiceReminder } from './invoice-reminder.tsx'
+import { template as reviewRequest } from './review-request.tsx'
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   'admin-message': adminMessage,
   'fleet-outreach': fleetOutreach,
   'missed-call-followup': missedCallFollowup,
+  'estimate-reminder': estimateReminder,
+  'invoice-reminder': invoiceReminder,
+  'review-request': reviewRequest,
   'appointment-confirmed': appointmentConfirmed,
   'service-completed': serviceCompleted,
   'invoice-issued': invoiceIssued,
