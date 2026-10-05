@@ -83,6 +83,7 @@ How to act:
 - Be warm, brief, and natural. One question at a time. Short sentences.
 - Today is {{today}} (Eastern time). You answer 24/7, any day.
 - Appointments can be set any day of the week, but only between 10 AM and 5 PM Eastern. Never offer or accept a time before 10 AM or after 5 PM; suggest the nearest time inside that window instead. Never book a time that has already passed today.
+- NEVER suggest a specific time from your own head. Before offering any time, call check_open_times (with the day they want, or today) and only offer times it returns. It already accounts for other appointments and Mike's drive time, so a time starting in the next 90 minutes is never available. If their day is full, offer the earliest open times it lists.
 - If they need service, collect: name, vehicle (year, make, model), what's wrong, service address or city, and the day and time they want. Turn the day into a real date (YYYY-MM-DD) and the time into 24-hour HH:MM. Confirm it back, then call create_booking_request. If the tool says the time is invalid, offer another time in the window. Tell them the appointment is set for that time and Mike will text to confirm.
 - You are NOT Mike and never claim to be him. If a caller asks whether they're speaking with Mike, say you're the shop's receptionist and Mike is the owner.
 - Handle everything yourself. Only call transfer_to_mike when the caller specifically asks to speak with Mike (or the owner) by name. Do not transfer for general questions, bookings, or urgent jobs; take the details and tell them Mike will text right away. If someone just asks for "a person", offer to help first and transfer only if they insist on Mike.
@@ -117,7 +118,7 @@ Deno.serve(async (req) => {
         name,
         description,
         api_schema: {
-          url: `${fnBase}?action=${name === 'transfer_to_mike' ? 'transfer' : 'booking'}&token=${TOKEN}`,
+          url: `${fnBase}?action=${name === 'transfer_to_mike' ? 'transfer' : name === 'check_open_times' ? 'availability' : 'booking'}&token=${TOKEN}`,
           method: 'POST',
           request_body_schema: { type: 'object', properties: props, required },
         },
@@ -132,6 +133,9 @@ Deno.serve(async (req) => {
             prompt: {
               prompt: buildPrompt(cities),
               tools: [
+                tool('check_open_times', 'Get open appointment start times. Call before offering any time.', {
+                  date: { type: 'string', description: 'Day the caller wants, YYYY-MM-DD (today if unsure)' },
+                }, ['date']),
                 tool('create_booking_request', 'Save a service booking request once details are confirmed.', {
                   call_sid: callSid,
                   customer_name: { type: 'string', description: 'Caller full name' },
@@ -231,6 +235,13 @@ Deno.serve(async (req) => {
     // Everything below is called by ElevenLabs and must carry the token
     if (url.searchParams.get('token') !== TOKEN) return json({ error: 'Forbidden' }, 403);
     const body = await req.json().catch(() => ({}));
+
+    if (action === 'availability') {
+      const d = String(body.date || '').trim();
+      const av = await openSlots(sb, /^\d{4}-\d{2}-\d{2}$/.test(d) ? d : null, 4);
+      const lines = av.map((x) => `${x.date}: ${x.slots.length ? x.slots.map(label12).join(', ') : 'fully booked'}`);
+      return json({ result: `Open start times (Eastern). Only offer these:\n${lines.join('\n')}` });
+    }
 
     if (action === 'booking') {
       const sid = String(body.call_sid || '');
