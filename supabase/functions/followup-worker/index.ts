@@ -58,6 +58,18 @@ Deno.serve(async () => {
       out.estimates++;
     }
 
+    // 1b) At appointment time: turn the approved estimate into an invoice so it is sent below
+    //      and is paid/acknowledged by the time the repair is done.
+    const { data: appts } = await sb.from('appointments').select('id')
+      .not('status', 'in', '(cancelled,canceled,completed,no_show,declined)')
+      .gte('scheduled_at', new Date(now.getTime() - 12 * 3600000).toISOString())
+      .lte('scheduled_at', new Date(now.getTime() + 45 * 60000).toISOString())
+      .limit(BATCH);
+    for (const a of appts || []) {
+      const { error } = await sb.rpc('create_invoice_for_appointment', { _appointment_id: a.id });
+      if (error) out.errors.push(`appt invoice ${a.id}: ${error.message}`);
+    }
+
     // 2) Invoices: send when created, then remind on day 3 and day 7
     const stripeKey = Deno.env.get('STRIPE_SECRET_KEY');
     const stripe = stripeKey ? new Stripe(stripeKey, { apiVersion: '2025-08-27.basil' }) : null;
