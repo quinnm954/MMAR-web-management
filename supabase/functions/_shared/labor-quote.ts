@@ -80,7 +80,7 @@ export async function buildLaborQuote(sb: any, req: any): Promise<LaborQuote> {
     if (jobs.length > 1) {
       // Prefer the job named exactly like the requested part (Starter, not Starter Solenoid).
       const base = svc.toLowerCase().replace(/ replacement$/, '').replace(/s$/, '');
-      const exact = jobs.filter((j) => j.job.toLowerCase().replace(/ replacement$/, '').replace(/s$/, '') === base && !new RegExp(`\\b${base}\\b`, 'i').test(text.replace(new RegExp(base, 'i'), '')));
+      const exact = jobs.filter((j) => j.job.toLowerCase().replace(/ replacement$/, '').replace(/s$/, '') === base);
       if (exact.length) jobs = exact;
     }
     if (jobs.length > 1) {
