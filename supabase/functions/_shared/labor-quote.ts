@@ -30,7 +30,7 @@ async function shopRate(sb: any) {
 }
 
 // A named part/repair in the request means a specific job, even if the service type is generic ("General Repair").
-const PARTS = /starter|alternator|battery|brake|rotor|caliper|pads?\b|water pump|thermostat|radiator|serpentine|belt|timing|spark plug|ignition coil|fuel pump|o2 sensor|oxygen sensor|shocks?|struts?|tie rod|ball joint|control arm|wheel bearing|cv axle|axle|motor mount|oil change|tune.?up|ac compressor|condenser|blower motor|window regulator|headlight|tail ?light|hose|gasket|catalytic|muffler|exhaust/i;
+const PARTS = /starter|alternator|battery|brake|rotor|caliper|pads?\b|water pump|thermostat|radiator|serpentine|timing belt|timing chain|belt|timing|spark plug|ignition coil|fuel pump|o2 sensor|oxygen sensor|shocks?|struts?|tie rod|ball joint|control arm|wheel bearing|cv axle|axle|motor mount|oil change|tune.?up|ac compressor|condenser|blower motor|window regulator|headlight|tail ?light|hose|gasket|catalytic|muffler|exhaust/i;
 
 function specificJob(text: string): string | null {
   const m = text.match(PARTS);
@@ -45,7 +45,8 @@ export async function buildLaborQuote(sb: any, req: any): Promise<LaborQuote> {
   const text = `${req.service_type || ''} ${req.description || ''}`;
   const named = specificJob(text);
   const generic = cleanService(req.service_type);
-  const svc = named || (generic && !DIAG.test(text) ? generic : null);
+  // A specific service type ("Timing Belt Replacement") wins over a single part word found in it.
+  const svc = (generic && !DIAG.test(generic) && PARTS.test(generic) ? generic : null) || named || (generic && !DIAG.test(text) ? generic : null);
   if (!svc) return { kind: 'diagnosis', rate };
   const veh = parseVehicle(req.vehicle_info);
   const key = Deno.env.get('OPEN_LABOR_API_KEY');
@@ -82,6 +83,15 @@ export async function buildLaborQuote(sb: any, req: any): Promise<LaborQuote> {
       const base = svc.toLowerCase().replace(/ replacement$/, '').replace(/s$/, '');
       const exact = jobs.filter((j) => j.job.toLowerCase().replace(/ replacement$/, '').replace(/s$/, '') === base);
       if (exact.length) jobs = exact;
+      else {
+        // Keep only the jobs that best match the requested words (Timing Belt, not Ignition Timing Adjustment).
+        const words = base.split(/\s+/).filter((w) => w.length > 2);
+        const score = (j: string) => words.filter((w) => j.toLowerCase().includes(w)).length;
+        const best = Math.max(...jobs.map((j) => score(j.job)));
+        if (best > 0) jobs = jobs.filter((j) => score(j.job) === best);
+        // Of equal matches prefer the plain job name (Timing Belt over Timing Belt Kit/Tensioner).
+        if (jobs.length > 1) { const shortest = Math.min(...jobs.map((j) => j.job.length)); const s1 = jobs.filter((j) => j.job.length === shortest); if (!/kit|tensioner|all|pair|both|front|rear/i.test(text)) jobs = s1; }
+      }
     }
     if (jobs.length > 1) {
       const wantsPair = /\b(pair|both|all|set|front and rear|2|two)\b/i.test(text);
