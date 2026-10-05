@@ -23,7 +23,33 @@ export default function AdminSMS() {
       .from('sms_threads')
       .select('*, profiles:customer_id(full_name, email), last_invoice:last_invoice_id(id, invoice_number, total, amount_paid, status)')
       .order('last_message_at', { ascending: false });
-    setThreads(data ?? []);
+    const list = data ?? [];
+    const key = (p?: string | null) => (p || '').replace(/\D/g, '').slice(-10);
+    const [{ data: profs }, { data: emps }, { data: roles }] = await Promise.all([
+      supabase.from('profiles').select('id, full_name, phone').not('phone', 'is', null),
+      supabase.from('employees').select('full_name, phone, user_id').not('phone', 'is', null),
+      supabase.from('user_roles').select('user_id, role'),
+    ]);
+    const roleOf: Record<string, string> = {};
+    const rank = ['owner', 'admin', 'manager', 'service_advisor', 'technician', 'parts'];
+    (roles ?? []).forEach((r: any) => {
+      const cur = roleOf[r.user_id];
+      if (rank.includes(r.role) && (!cur || rank.indexOf(r.role) < rank.indexOf(cur))) roleOf[r.user_id] = r.role;
+    });
+    const byPhone: Record<string, { name: string; tag?: string }> = {};
+    (profs ?? []).forEach((p: any) => {
+      const k = key(p.phone);
+      if (k.length === 10 && p.full_name) byPhone[k] = { name: p.full_name, tag: roleOf[p.id] ? roleOf[p.id].replace('_', ' ') : 'customer' };
+    });
+    (emps ?? []).forEach((e: any) => {
+      const k = key(e.phone);
+      if (k.length === 10 && e.full_name) byPhone[k] = { name: e.full_name, tag: (e.user_id && roleOf[e.user_id]?.replace('_', ' ')) || 'employee' };
+    });
+    setThreads(list.map((t: any) => {
+      const m = byPhone[key(t.phone)];
+      const name = t.profiles?.full_name || m?.name || null;
+      return { ...t, display_name: name, display_tag: name ? (m?.tag || 'customer') : null };
+    }));
   };
 
   useEffect(() => {
