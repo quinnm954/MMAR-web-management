@@ -164,7 +164,6 @@ const AdminDashboard = () => {
             { value: 'inspections', label: 'Inspections', icon: ClipboardCheck, roles: SHOP_FLOOR, content: <AdminChecklists /> },
             { value: 'vehicle-health', label: 'Vehicle Health', icon: ClipboardList, roles: ADVISOR, content: <AdminVehicleHealth /> },
             { value: 'invoices', label: 'Invoices', icon: Receipt, roles: ADVISOR, content: <AdminInvoices /> },
-            { value: 'catalog', label: 'Catalog', icon: Package, roles: PARTS, content: <AdminCatalog /> },
             { value: 'laborpay', label: 'Labor Pay', icon: DollarSign, roles: ADMIN_ONLY, content: <AdminTechLaborPay /> },
             { value: 'share', label: 'Share', icon: Share2, roles: ADVISOR, content: <AdminCustomerShare /> },
             { value: 'declined', label: 'Declined', icon: AlertTriangle, roles: ADVISOR, content: <AdminDeclinedWork /> },
@@ -210,7 +209,7 @@ const AdminDashboard = () => {
           const groups = [
             { label: 'Workshop', values: ['calendar','ros','service','inspections','estimates','invoices','time','shifts','productivity'] },
             { label: 'Front Desk', values: ['customers','garage','memberships','bookings','share','declined','fleet-accounts','calls','texts','prospecting'] },
-            { label: 'Admin', values: ['dashboard','reports','catalog','laborpay','quickbooks','financing','warranty','emails','audit','employees','roles','phone-settings','tracking','settings'] },
+            { label: 'Admin', values: ['dashboard','reports','laborpay','quickbooks','financing','warranty','emails','audit','employees','roles','phone-settings','tracking','settings'] },
           ];
           const groupedValues = groups.flatMap(g => g.values);
           const ungrouped = visible.filter(t => !groupedValues.includes(t.value));
