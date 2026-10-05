@@ -1,6 +1,6 @@
 import * as React from 'npm:react@18.3.1'
 import { renderAsync } from 'npm:@react-email/components@0.0.22'
-import { EmailAPIError, sendLovableEmail } from 'npm:@lovable.dev/email-js@0.1.0'
+import { EmailAPIError, sendLovableEmail } from 'npm:@lovable.dev/email-js@0.3.1'
 import { TEMPLATES } from './registry.ts'
 
 // Server-only: reads LOVABLE_API_KEY. Import from edge functions only — never
@@ -8,7 +8,7 @@ import { TEMPLATES } from './registry.ts'
 
 // Configuration baked in at scaffold time
 const DEFAULT_REPLY_TO = 'quinnm954@outlook.com'
-const SITE_NAME = "MMAR Care"
+const SITE_NAME = "MMAR"
 // SENDER_DOMAIN is the verified sender subdomain FQDN (e.g., "notify.example.com").
 // It MUST match the subdomain delegated to Lovable's nameservers. NEVER use the root domain.
 const SENDER_DOMAIN = "notify.mikesmautorepair.com"
