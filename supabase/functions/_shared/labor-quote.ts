@@ -2,6 +2,7 @@
 // Parts are never priced here — customer can supply their own or the shop sources them.
 import { cleanService, sendSms } from './booking-bot.ts';
 import { sendAndLog } from './send-and-log.ts';
+import { smsAllowed } from './missed-call.ts';
 const SITE = 'https://mikesmautorepair.com';
 
 export type LaborQuote = {
@@ -107,10 +108,16 @@ export async function createDraftEstimate(sb: any, req: any, q: LaborQuote, opts
     notes: `Auto-drafted from booking request (${req.vehicle_info || 'vehicle n/a'}). Labor times are estimates — verify hours and add parts. Sent to customer automatically.`,
   }).select('id, estimate_number, approval_token').single();
   if (error) { console.error('draft estimate', error); return null; }
-  if (email) {
-    const { data: link } = await sb.auth.admin.generateLink({ type: 'magiclink', email, options: { redirectTo: `${SITE}/portal/estimates` } }).catch(() => ({ data: null }));
+  // Texts once A2P texting is approved; email until then (falls back to the account's email).
+  const textOk = !!phone && await smsAllowed().catch(() => false);
+  const sendEmail = email || (!textOk ? (await sb.from('profiles').select('email').eq('id', prof.id).maybeSingle()).data?.email?.trim().toLowerCase() || '' : '');
+  if (textOk) {
+    const first = (req.customer_name || '').split(' ')[0];
+    await sendSms(sb, phone, `${first ? `${first}, your` : 'Your'} estimate from Mike's Mobile Auto Repair is ready: ${SITE}/estimate/${data.approval_token}${isNew ? `\nWe started an account for you — finish setting it up here: ${SITE}/enroll/${data.approval_token}` : ''}`);
+  } else if (sendEmail) {
+    const { data: link } = await sb.auth.admin.generateLink({ type: 'magiclink', email: sendEmail, options: { redirectTo: `${SITE}/portal/estimates` } }).catch(() => ({ data: null }));
     await sendAndLog({
-      templateName: 'estimate-ready', recipientEmail: email, idempotencyKey: `estimate-ready-${data.id}`,
+      templateName: 'estimate-ready', recipientEmail: sendEmail, idempotencyKey: `estimate-ready-${data.id}`,
       templateData: {
         name: (req.customer_name || '').split(' ')[0] || undefined, estimateNumber: data.estimate_number || '',
         total: q.kind === 'diagnosis' ? '$100 diagnosis ($50 credited to repair labor)' : `$${Math.round(total)} labor (parts extra)`,
@@ -118,10 +125,6 @@ export async function createDraftEstimate(sb: any, req: any, q: LaborQuote, opts
       },
       metadata: { auto_quote: true, new_account: isNew },
     });
-  }
-  else if (phone) {
-    const first = (req.customer_name || '').split(' ')[0];
-    await sendSms(sb, phone, `${first ? `${first}, your` : 'Your'} estimate from Mike's Mobile Auto Repair is ready: ${SITE}/estimate/${data.approval_token}${isNew ? `\nWe started an account for you — finish setting it up here: ${SITE}/enroll/${data.approval_token}` : ''}`);
   }
   return data.id as string;
 }

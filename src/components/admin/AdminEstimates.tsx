@@ -448,11 +448,15 @@ const AdminEstimates = () => {
     const customer = customers.find(c => c.id === est.customer_id);
     const url = `${window.location.origin}/estimate/${est.approval_token}`;
     await supabase.from('estimates').update({ status: 'sent', sent_at: new Date().toISOString() }).eq('id', est.id);
-    await shareLink({
+    const { data: sent, error: sendErr } = await supabase.functions.invoke('send-estimate', { body: { id: est.id } });
+    if (sendErr) toast.error("Estimate marked sent, but the customer couldn't be notified.");
+    else if (sent?.via === 'email') toast.success('Estimate emailed to the customer.');
+    else if (sent?.via === 'sms') toast.success('Estimate texted to the customer.');
+    else await shareLink({
       url,
       title: `Estimate ${est.estimate_number ?? ''}`.trim(),
       text: `${customer?.full_name || 'Customer'}, here is your estimate from MMAR Care for $${Number(est.total).toFixed(2)}:`,
-      copyToastMessage: 'Estimate link copied — share with the customer',
+      copyToastMessage: 'No email on file — estimate link copied to share with the customer',
     });
     load();
   };
