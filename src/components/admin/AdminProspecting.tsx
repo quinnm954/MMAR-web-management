@@ -177,7 +177,7 @@ export default function AdminProspecting() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="flex max-h-[65vh] min-h-[320px] flex-col overflow-hidden md:max-h-[calc(100dvh-220px)] md:min-h-0">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Leads ({shown.length})</CardTitle>
           <Select value={filter} onValueChange={setFilter}>
@@ -188,7 +188,7 @@ export default function AdminProspecting() {
             </SelectContent>
           </Select>
         </CardHeader>
-        <CardContent className="divide-y">
+        <CardContent className="flex-1 min-h-0 divide-y overflow-y-auto">
           {shown.length === 0 && <p className="text-sm text-muted-foreground py-4">No leads yet. Pick categories above and click Search.</p>}
           {shown.map((p) => (
             <div key={p.id} className="py-3 flex flex-wrap items-center gap-3">
