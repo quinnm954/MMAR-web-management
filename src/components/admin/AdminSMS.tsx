@@ -87,8 +87,8 @@ export default function AdminSMS() {
   };
 
   return (
-    <div className="grid md:grid-cols-3 gap-4 h-[600px]">
-      <Card className="md:col-span-1 flex flex-col">
+    <div className="grid md:grid-cols-3 gap-4 h-[calc(100dvh-260px)] min-h-[420px] max-h-[800px]">
+      <Card className="md:col-span-1 flex flex-col max-h-[40vh] md:max-h-none">
         <CardHeader className="pb-2">
           <CardTitle className="text-sm flex items-center gap-2"><MessageSquare className="h-4 w-4" /> Conversations</CardTitle>
           <div className="flex gap-1 pt-2">
