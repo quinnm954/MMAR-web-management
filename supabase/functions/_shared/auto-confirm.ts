@@ -42,10 +42,10 @@ export async function autoConfirmBooking(sb: any, bookingId: string, date: strin
       estimateId = await createDraftEstimate(sb, fresh || req, q, { appointmentId: apptId, customerId });
     }
   } catch (e) { console.error('auto-confirm estimate', e); }
-  await sb.rpc('_notify_staff_customer_action', {
+  try { await sb.rpc('_notify_staff_customer_action', {
     _title: 'Booking auto-confirmed — check estimate',
     _body: `${req.customer_name || 'Customer'} is booked ${date} ${time}. Review the draft estimate and press Send.`,
     _link: '/admin/dashboard?tab=estimates',
-  }).catch(() => {});
+  }); } catch (e) { console.error('notify', e); }
   return { ok: true, appointmentId: apptId, estimateId };
 }
