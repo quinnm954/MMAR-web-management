@@ -1,7 +1,7 @@
 import * as React from 'npm:react@18.3.1'
 import { Link, Section, Text, Img } from 'npm:@react-email/components@0.0.22'
 
-const LOGO_URL = 'https://mikesmautorepair.com/mmar-logo.png'
+const LOGO_URL = 'https://mikesmautorepair.com/__l5e/assets-v1/5b5c6d68-8a7d-4ec8-92f0-7c3c4fd0d096/mmar-logo.png'
 
 export const BrandHeader = ({ tag = 'MOBILE AUTO REPAIR' }: { tag?: string }) => (
   <Section style={header}>
