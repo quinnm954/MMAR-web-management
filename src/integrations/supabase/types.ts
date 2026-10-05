@@ -402,6 +402,24 @@ export type Database = {
         }
         Relationships: []
       }
+      calendar_feed_tokens: {
+        Row: {
+          created_at: string
+          token: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          token?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          token?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       call_logs: {
         Row: {
           ai_conversation_id: string | null
@@ -3676,6 +3694,7 @@ export type Database = {
         Returns: string
       }
       get_appointment_confirmation: { Args: { _token: string }; Returns: Json }
+      get_calendar_feed_token: { Args: { _rotate?: boolean }; Returns: string }
       get_estimate_by_token: { Args: { _token: string }; Returns: Json }
       get_public_tracking_settings: { Args: never; Returns: Json }
       get_shared_customer_summary: { Args: { _token: string }; Returns: Json }
