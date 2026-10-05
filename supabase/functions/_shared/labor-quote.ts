@@ -9,8 +9,9 @@ const SITE = 'https://mikesmautorepair.com';
 export type LaborQuote = {
   kind: 'diagnosis' | 'labor' | 'none';
   rate: number;
-  minHours?: number;
-  maxHours?: number;
+  jobs?: { job: string; hours: number }[];
+  engine?: string;
+  engineMatched?: boolean;
   job?: string;
   vehicle?: string;
   results?: { engine: string; job: string; hours: number }[];
@@ -57,11 +58,44 @@ export async function buildLaborQuote(sb: any, req: any): Promise<LaborQuote> {
     const results: { engine: string; job: string; hours: number }[] = [];
     for (const e of d.engines ?? []) for (const t of e.laborTimes ?? []) if (typeof t.hours === 'number' && t.hours > 0) results.push({ engine: e.engine ?? '', job: t.job ?? svc, hours: t.hours });
     if (!results.length) return { kind: 'none', rate, job: svc };
-    // Narrow to the customer's engine (e.g. "1.4L", "2.0", "V6") when given.
-    const eng = (req.vehicle_info || '').match(/\b(\d\.\d)\s*l?\b/i)?.[1] || (req.vehicle_info || '').match(/\b(v6|v8|v10|i4|i6|4[- ]?cyl|6[- ]?cyl|8[- ]?cyl|hybrid|diesel)\b/i)?.[1];
-    const pick = eng ? results.filter((x) => x.engine.toLowerCase().replace(/[- ]/g, '').includes(eng.toLowerCase().replace(/[- ]/g, ''))) : [];
-    const hrs = (pick.length ? pick : results).map((x) => x.hours);
-    return { kind: 'labor', rate, job: svc, vehicle: `${veh.year} ${veh.make} ${veh.model}`, results, minHours: Math.min(...hrs), maxHours: Math.max(...hrs) };
+    // Narrow to the customer's engine: liters (1.4, 1.4L, 1.4T, 1400cc) or cylinders (V6, I4, 4 cyl).
+    const vtxt = `${req.engine || ''} ${req.vehicle_info || ''} ${req.description || ''}`;
+    const cc = vtxt.match(/\b(\d{4})\s*cc\b/i)?.[1];
+    const liters = vtxt.match(/\b(\d\.\d)\s*(?:l|t|liter|litre)?\b/i)?.[1] || (cc ? (Number(cc) / 1000).toFixed(1) : undefined);
+    const cylM = vtxt.match(/\b(?:v|i|l)(4|5|6|8|10)\b|\b(4|5|6|8|10)[- ]?cyl/i);
+    const cyl = cylM?.[1] || cylM?.[2];
+    const engines = [...new Set(results.map((x) => x.engine))];
+    let pick = results;
+    if (liters) pick = results.filter((x) => x.engine.toLowerCase().startsWith(`${liters}l`) || x.engine.includes(liters));
+    if (cyl && pick.length && [...new Set(pick.map((x) => x.engine))].length > 1) {
+      const byCyl = pick.filter((x) => new RegExp(`\\b[vil]${cyl}\\b`, 'i').test(x.engine));
+      if (byCyl.length) pick = byCyl;
+    }
+    if (!pick.length) pick = results;
+    const engineMatched = engines.length === 1 || new Set(pick.map((x) => x.engine)).size === 1;
+    // One line per job version (e.g. "Rear Shocks - Pair" vs "one side"), never a spread.
+    const byJob = new Map<string, number>();
+    for (const x of pick) byJob.set(x.job, Math.max(byJob.get(x.job) ?? 0, x.hours));
+    let jobs = [...byJob].map(([job, hours]) => ({ job, hours }));
+    if (jobs.length > 1) {
+      // Prefer the job named exactly like the requested part (Starter, not Starter Solenoid).
+      const base = svc.toLowerCase().replace(/ replacement$/, '').replace(/s$/, '');
+      const exact = jobs.filter((j) => j.job.toLowerCase().replace(/ replacement$/, '').replace(/s$/, '') === base);
+      if (exact.length) jobs = exact;
+    }
+    if (jobs.length > 1) {
+      const wantsPair = /\b(pair|both|all|set|front and rear|2|two)\b/i.test(text);
+      const wantsOne = /\b(one|single|1|left|right|driver|passenger)\b/i.test(text);
+      const wantsFront = /\bfront\b/i.test(text), wantsRear = /\b(rear|back)\b/i.test(text);
+      let f = jobs;
+      if (wantsFront && !wantsRear) f = f.filter((j) => /front/i.test(j.job) || !/rear/i.test(j.job));
+      if (wantsRear && !wantsFront) f = f.filter((j) => /rear/i.test(j.job) || !/front/i.test(j.job));
+      if (wantsPair && !wantsOne) { const p = f.filter((j) => /pair|both|set/i.test(j.job)); if (p.length) f = p; }
+      else if (wantsOne && !wantsPair) { const o = f.filter((j) => /one side|single|each/i.test(j.job)); if (o.length) f = o; }
+      if (f.length) jobs = f;
+    }
+    const engine = engineMatched ? pick[0].engine : undefined;
+    return { kind: 'labor', rate, job: svc, vehicle: `${veh.year} ${veh.make} ${veh.model}`, results, jobs, engine, engineMatched };
   } catch (e) { console.error('olp', e); return { kind: 'none', rate, job: svc }; }
 }
 
@@ -70,11 +104,13 @@ const hr = (n: number) => `${Math.round(n * 10) / 10}`;
 
 export function quoteSentence(q: LaborQuote) {
   if (q.kind === 'diagnosis') return 'Diagnosis is $100, and $50 of that goes toward the repair labor.';
-  if (q.kind !== 'labor' || q.minHours == null || q.maxHours == null) return '';
-  const lab = q.minHours === q.maxHours
-    ? `about ${hr(q.minHours)} hrs (${usd(q.minHours * q.rate)})`
-    : `about ${hr(q.minHours)}–${hr(q.maxHours)} hrs (${usd(q.minHours * q.rate)}–${usd(q.maxHours * q.rate)}) depending on engine`;
-  return `Labor for the ${q.job} is typically ${lab}. Parts are extra — we can get them for you or you can supply your own.`;
+  if (q.kind !== 'labor' || !q.jobs?.length) return '';
+  // Without a known engine we don't quote numbers; the bot asks for the engine first.
+  if (!q.engineMatched) return '';
+  const lab = q.jobs.length === 1
+    ? `Labor for the ${q.job} on your ${q.engine} is about ${hr(q.jobs[0].hours)} hrs (${usd(q.jobs[0].hours * q.rate)}).`
+    : `Labor on your ${q.engine}: ${q.jobs.map((j) => `${j.job} about ${hr(j.hours)} hrs (${usd(j.hours * q.rate)})`).join('; ')}.`;
+  return `${lab} Parts are extra — we can get them for you or you can supply your own.`;
 }
 
 // Draft estimate for admin review (only when the booker already has an account).
@@ -112,15 +148,22 @@ export async function createDraftEstimate(sb: any, req: any, q: LaborQuote, opts
     if (error) { console.error('draft estimate', error); return null; }
     return data.id as string;
   }
-  let line;
-  if (q.kind === 'diagnosis') line = { description: 'Diagnosis fee ($50 credited to repair labor)', quantity: 1, unit_price: 100, amount: 100, kind: 'labor' };
-  else {
-    const h = q.maxHours!;
-    line = { description: `${q.job} (book labor${q.minHours !== q.maxHours ? `, ${hr(q.minHours!)}–${hr(h)} hrs by engine` : ''})`, quantity: h, unit_price: q.rate, amount: h * q.rate, labor_hours: h, kind: 'labor' };
+  let lines: any[];
+  if (q.kind === 'diagnosis') lines = [{ description: 'Diagnosis fee ($50 credited to repair labor)', quantity: 1, unit_price: 100, amount: 100, kind: 'labor' }];
+  else lines = (q.jobs || []).map((j) => ({ description: `${j.job} (book labor)`, quantity: j.hours, unit_price: q.rate, amount: j.hours * q.rate, labor_hours: j.hours, kind: 'labor' }));
+  const total = lines.reduce((s, l) => s + l.amount, 0);
+  // Engine unknown and engines differ: leave an unsent draft for staff instead of guessing.
+  if (q.kind === 'labor' && !q.engineMatched) {
+    const { data, error } = await sb.from('estimates').insert({
+      customer_id: prof.id, appointment_id: opts.appointmentId || null, status: 'draft', line_items: lines, subtotal: total, total, valid_until: valid,
+      customer_phone: req.customer_phone || null,
+      notes: `Auto-drafted (${req.vehicle_info || 'vehicle n/a'}). Engine size unknown — confirm engine, adjust hours, add parts, then send.`,
+    }).select('id').single();
+    if (error) { console.error('draft estimate', error); return null; }
+    return data.id as string;
   }
-  const total = line.amount;
   const { data, error } = await sb.from('estimates').insert({
-    customer_id: prof.id, status: 'sent', sent_at: new Date().toISOString(), line_items: [line], subtotal: total, total, valid_until: valid,
+    customer_id: prof.id, status: 'sent', sent_at: new Date().toISOString(), line_items: lines, subtotal: total, total, valid_until: valid,
     customer_phone: req.customer_phone || null, appointment_id: opts.appointmentId || null,
     notes: `Auto-drafted from booking request (${req.vehicle_info || 'vehicle n/a'}). Labor times are estimates — verify hours and add parts. Sent to customer automatically.`,
   }).select('id, estimate_number, approval_token').single();
@@ -137,7 +180,7 @@ export async function createDraftEstimate(sb: any, req: any, q: LaborQuote, opts
       templateName: 'estimate-ready', recipientEmail: sendEmail, idempotencyKey: `estimate-ready-${data.id}`,
       templateData: {
         name: (req.customer_name || '').split(' ')[0] || undefined, estimateNumber: data.estimate_number || '',
-        total: q.kind === 'diagnosis' ? '$100 diagnosis ($50 credited to repair labor)' : `$${Math.round(total)} labor (parts extra)`,
+        total: q.kind === 'diagnosis' ? '$100 diagnosis ($50 credited to repair labor)' : lines.length > 1 ? `${lines.length} labor options from $${Math.round(Math.min(...lines.map((l) => l.amount)))} (parts extra)` : `$${Math.round(total)} labor (parts extra)`,
         approvalUrl: `${SITE}/estimate/${data.approval_token}`, accountUrl: link?.properties?.action_link || `${SITE}/login`,
       },
       metadata: { auto_quote: true, new_account: isNew },
