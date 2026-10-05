@@ -78,6 +78,12 @@ export async function buildLaborQuote(sb: any, req: any): Promise<LaborQuote> {
     for (const x of pick) byJob.set(x.job, Math.max(byJob.get(x.job) ?? 0, x.hours));
     let jobs = [...byJob].map(([job, hours]) => ({ job, hours }));
     if (jobs.length > 1) {
+      // Prefer the job named exactly like the requested part (Starter, not Starter Solenoid).
+      const base = svc.toLowerCase().replace(/ replacement$/, '').replace(/s$/, '');
+      const exact = jobs.filter((j) => j.job.toLowerCase().replace(/ replacement$/, '').replace(/s$/, '') === base && !new RegExp(`\\b${base}\\b`, 'i').test(text.replace(new RegExp(base, 'i'), '')));
+      if (exact.length) jobs = exact;
+    }
+    if (jobs.length > 1) {
       const wantsPair = /\b(pair|both|all|set|front and rear|2|two)\b/i.test(text);
       const wantsOne = /\b(one|single|1|left|right|driver|passenger)\b/i.test(text);
       const wantsFront = /\bfront\b/i.test(text), wantsRear = /\b(rear|back)\b/i.test(text);
