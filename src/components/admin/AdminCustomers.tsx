@@ -344,10 +344,28 @@ const AdminCustomers = () => {
             <div className="space-y-5">
               <Section icon={Car} title={`Vehicles (${details.vehicles.length})`}>
                 {details.vehicles.length === 0 ? <Empty /> : details.vehicles.map((v: any) => (
-                  <Row key={v.id} primary={`${v.year} ${v.make} ${v.model}${v.trim ? ' ' + v.trim : ''}`}
-                       secondary={[v.license_plate, v.vin, v.current_mileage ? `${v.current_mileage.toLocaleString()} mi` : null].filter(Boolean).join(' • ')} />
+                  <div key={v.id} className="flex items-center gap-2">
+                    <div className="flex-1 min-w-0">
+                      <Row primary={`${v.year} ${v.make} ${v.model}${v.trim ? ' ' + v.trim : ''}`}
+                           secondary={[v.license_plate, v.vin, v.current_mileage ? `${v.current_mileage.toLocaleString()} mi` : null].filter(Boolean).join(' • ')} />
+                    </div>
+                    <Button
+                      size="sm"
+                      variant={healthVehicleId === v.id ? "default" : "outline"}
+                      className="gap-1.5 shrink-0"
+                      onClick={() => setHealthVehicleId(healthVehicleId === v.id ? null : v.id)}
+                    >
+                      <HeartPulse className="h-3.5 w-3.5" /> Health
+                    </Button>
+                  </div>
                 ))}
               </Section>
+
+              {healthVehicleId && selected && (
+                <Section icon={HeartPulse} title="Vehicle Health">
+                  <VehicleMasterChecklist vehicleId={healthVehicleId} mode="admin" customerId={selected.id} />
+                </Section>
+              )}
 
               <Section icon={CreditCard} title={`Memberships (${details.memberships.length})`}>
                 {details.memberships.length === 0 ? <Empty /> : details.memberships.map((m: any) => (
