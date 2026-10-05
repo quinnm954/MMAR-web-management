@@ -167,7 +167,7 @@ Deno.serve(async (req) => {
               ],
             },
           },
-          tts: { voice_id: 'vrzf30JViL81pJHyaGSU', model_id: 'eleven_flash_v2' },
+          tts: { voice_id: 'kyu5ji11Ocj3MIcc9vdQ', model_id: 'eleven_flash_v2' },
         },
         platform_settings: {
           overrides: { conversation_config_override: { agent: { first_message: true } } },
