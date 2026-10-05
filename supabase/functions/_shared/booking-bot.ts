@@ -236,24 +236,26 @@ Respond ONLY with JSON: {"reply": string, "confirmed": boolean, "date": "YYYY-MM
 
   let reply = ai.reply;
   let status = ai.handoff ? 'handoff' : 'active';
+  let requested = false;
   if (ai.confirmed && ai.date && ai.time) {
     const open = await isSlotOpen(sb, ai.date, ai.time, req.converted_appointment_id).catch(() => false);
-    const { error } = open ? await sb.rpc('bot_confirm_booking_request', { _id: req.id, _date: ai.date, _time: ai.time }) : { error: 'taken' };
-    if (error) {
+    if (!open) {
       const day = avail.find((d) => d.date === ai.date)?.slots.length ? avail.find((d) => d.date === ai.date)! : avail.find((d) => d.slots.length);
       reply = day ? `Sorry, that time's already taken. I can do ${friendlyDate(day.date)} at ${day.slots.slice(0, 3).map(label12).join(', ')} — which works best?` : "Sorry, that time's already taken. What other day works for you?";
     } else {
-      status = 'confirmed';
+      // Manual confirmation for now: save the requested time, staff approves it in Bookings.
       const h = Number(ai.time.split(':')[0]);
       const label = `${((h + 11) % 12) + 1}:${ai.time.split(':')[1]} ${h < 12 ? 'AM' : 'PM'}`;
-      const d = new Date(`${ai.date}T12:00:00`).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
-      reply = `You're booked for ${d} at ${label}. Mike will see you then! Text this number if anything changes.`;
+      await sb.from('booking_requests').update({ requested_date: ai.date, requested_time_window: label }).eq('id', req.id);
+      status = 'handoff'; requested = true;
+      reply = `Got it — I've requested ${friendlyDate(ai.date)} at ${label} for you. We'll text you shortly to confirm.`;
+      await sb.rpc('_notify_staff_customer_action', { _title: 'Booking needs your OK', _body: `${req.customer_name || from} wants ${friendlyDate(ai.date)} at ${label}`, _link: '/admin/dashboard?tab=bookings' }).catch(() => {});
     }
   }
   await sendSms(sb, from, reply);
   const update: Record<string, unknown> = { bot_history: [...history, { role: 'assistant', content: reply }], bot_updated_at: new Date().toISOString() };
   if (status !== 'confirmed') update.bot_status = status;
   await sb.from('booking_requests').update(update).eq('id', req.id);
-  if (status === 'handoff') await sb.rpc('_notify_staff_customer_action', { _title: 'Customer wants Mike', _body: `${req.customer_name || from}: ${body.slice(0, 120)}`, _link: '/admin/dashboard?tab=frontdesk' }).catch(() => {});
+  if (status === 'handoff' && !requested) await sb.rpc('_notify_staff_customer_action', { _title: 'Customer wants Mike', _body: `${req.customer_name || from}: ${body.slice(0, 120)}`, _link: '/admin/dashboard?tab=frontdesk' }).catch(() => {});
   return true;
 }
