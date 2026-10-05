@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { format } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -159,7 +160,7 @@ const AdminAppointments = () => {
                 <Input
                   type="datetime-local"
                   className="h-8 text-xs"
-                  defaultValue={r.scheduled_at ? new Date(r.scheduled_at).toISOString().slice(0, 16) : ""}
+                  defaultValue={r.scheduled_at ? format(new Date(r.scheduled_at), "yyyy-MM-dd'T'HH:mm") : ""}
                   onBlur={(e) => e.target.value && update(r.id, { scheduled_at: new Date(e.target.value).toISOString(), status: r.status === "requested" ? "scheduled" : r.status })}
                 />
               </div>
