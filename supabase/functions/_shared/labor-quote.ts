@@ -98,11 +98,13 @@ const hr = (n: number) => `${Math.round(n * 10) / 10}`;
 
 export function quoteSentence(q: LaborQuote) {
   if (q.kind === 'diagnosis') return 'Diagnosis is $100, and $50 of that goes toward the repair labor.';
-  if (q.kind !== 'labor' || q.minHours == null || q.maxHours == null) return '';
-  const lab = q.minHours === q.maxHours
-    ? `about ${hr(q.minHours)} hrs (${usd(q.minHours * q.rate)})`
-    : `about ${hr(q.minHours)}–${hr(q.maxHours)} hrs (${usd(q.minHours * q.rate)}–${usd(q.maxHours * q.rate)}) depending on engine`;
-  return `Labor for the ${q.job} is typically ${lab}. Parts are extra — we can get them for you or you can supply your own.`;
+  if (q.kind !== 'labor' || !q.jobs?.length) return '';
+  // Without a known engine we don't quote numbers; the bot asks for the engine first.
+  if (!q.engineMatched) return '';
+  const lab = q.jobs.length === 1
+    ? `Labor for the ${q.job} on your ${q.engine} is about ${hr(q.jobs[0].hours)} hrs (${usd(q.jobs[0].hours * q.rate)}).`
+    : `Labor on your ${q.engine}: ${q.jobs.map((j) => `${j.job} about ${hr(j.hours)} hrs (${usd(j.hours * q.rate)})`).join('; ')}.`;
+  return `${lab} Parts are extra — we can get them for you or you can supply your own.`;
 }
 
 // Draft estimate for admin review (only when the booker already has an account).
@@ -140,15 +142,22 @@ export async function createDraftEstimate(sb: any, req: any, q: LaborQuote, opts
     if (error) { console.error('draft estimate', error); return null; }
     return data.id as string;
   }
-  let line;
-  if (q.kind === 'diagnosis') line = { description: 'Diagnosis fee ($50 credited to repair labor)', quantity: 1, unit_price: 100, amount: 100, kind: 'labor' };
-  else {
-    const h = q.maxHours!;
-    line = { description: `${q.job} (book labor${q.minHours !== q.maxHours ? `, ${hr(q.minHours!)}–${hr(h)} hrs by engine` : ''})`, quantity: h, unit_price: q.rate, amount: h * q.rate, labor_hours: h, kind: 'labor' };
+  let lines: any[];
+  if (q.kind === 'diagnosis') lines = [{ description: 'Diagnosis fee ($50 credited to repair labor)', quantity: 1, unit_price: 100, amount: 100, kind: 'labor' }];
+  else lines = (q.jobs || []).map((j) => ({ description: `${j.job} (book labor)`, quantity: j.hours, unit_price: q.rate, amount: j.hours * q.rate, labor_hours: j.hours, kind: 'labor' }));
+  const total = lines.reduce((s, l) => s + l.amount, 0);
+  // Engine unknown and engines differ: leave an unsent draft for staff instead of guessing.
+  if (q.kind === 'labor' && !q.engineMatched) {
+    const { data, error } = await sb.from('estimates').insert({
+      customer_id: prof.id, appointment_id: opts.appointmentId || null, status: 'draft', line_items: lines, subtotal: total, total, valid_until: valid,
+      customer_phone: req.customer_phone || null,
+      notes: `Auto-drafted (${req.vehicle_info || 'vehicle n/a'}). Engine size unknown — confirm engine, adjust hours, add parts, then send.`,
+    }).select('id').single();
+    if (error) { console.error('draft estimate', error); return null; }
+    return data.id as string;
   }
-  const total = line.amount;
   const { data, error } = await sb.from('estimates').insert({
-    customer_id: prof.id, status: 'sent', sent_at: new Date().toISOString(), line_items: [line], subtotal: total, total, valid_until: valid,
+    customer_id: prof.id, status: 'sent', sent_at: new Date().toISOString(), line_items: lines, subtotal: total, total, valid_until: valid,
     customer_phone: req.customer_phone || null, appointment_id: opts.appointmentId || null,
     notes: `Auto-drafted from booking request (${req.vehicle_info || 'vehicle n/a'}). Labor times are estimates — verify hours and add parts. Sent to customer automatically.`,
   }).select('id, estimate_number, approval_token').single();
