@@ -9,8 +9,9 @@ const SITE = 'https://mikesmautorepair.com';
 export type LaborQuote = {
   kind: 'diagnosis' | 'labor' | 'none';
   rate: number;
-  minHours?: number;
-  maxHours?: number;
+  jobs?: { job: string; hours: number }[];
+  engine?: string;
+  engineMatched?: boolean;
   job?: string;
   vehicle?: string;
   results?: { engine: string; job: string; hours: number }[];
@@ -57,11 +58,38 @@ export async function buildLaborQuote(sb: any, req: any): Promise<LaborQuote> {
     const results: { engine: string; job: string; hours: number }[] = [];
     for (const e of d.engines ?? []) for (const t of e.laborTimes ?? []) if (typeof t.hours === 'number' && t.hours > 0) results.push({ engine: e.engine ?? '', job: t.job ?? svc, hours: t.hours });
     if (!results.length) return { kind: 'none', rate, job: svc };
-    // Narrow to the customer's engine (e.g. "1.4L", "2.0", "V6") when given.
-    const eng = (req.vehicle_info || '').match(/\b(\d\.\d)\s*l?\b/i)?.[1] || (req.vehicle_info || '').match(/\b(v6|v8|v10|i4|i6|4[- ]?cyl|6[- ]?cyl|8[- ]?cyl|hybrid|diesel)\b/i)?.[1];
-    const pick = eng ? results.filter((x) => x.engine.toLowerCase().replace(/[- ]/g, '').includes(eng.toLowerCase().replace(/[- ]/g, ''))) : [];
-    const hrs = (pick.length ? pick : results).map((x) => x.hours);
-    return { kind: 'labor', rate, job: svc, vehicle: `${veh.year} ${veh.make} ${veh.model}`, results, minHours: Math.min(...hrs), maxHours: Math.max(...hrs) };
+    // Narrow to the customer's engine: liters (1.4, 1.4L, 1.4T, 1400cc) or cylinders (V6, I4, 4 cyl).
+    const vtxt = `${req.engine || ''} ${req.vehicle_info || ''} ${req.description || ''}`;
+    const cc = vtxt.match(/\b(\d{4})\s*cc\b/i)?.[1];
+    const liters = vtxt.match(/\b(\d\.\d)\s*(?:l|t|liter|litre)?\b/i)?.[1] || (cc ? (Number(cc) / 1000).toFixed(1) : undefined);
+    const cylM = vtxt.match(/\b(?:v|i|l)(4|5|6|8|10)\b|\b(4|5|6|8|10)[- ]?cyl/i);
+    const cyl = cylM?.[1] || cylM?.[2];
+    const engines = [...new Set(results.map((x) => x.engine))];
+    let pick = results;
+    if (liters) pick = results.filter((x) => x.engine.toLowerCase().startsWith(`${liters}l`) || x.engine.includes(liters));
+    if (cyl && pick.length && [...new Set(pick.map((x) => x.engine))].length > 1) {
+      const byCyl = pick.filter((x) => new RegExp(`\\b[vil]${cyl}\\b`, 'i').test(x.engine));
+      if (byCyl.length) pick = byCyl;
+    }
+    if (!pick.length) pick = results;
+    const engineMatched = engines.length === 1 || new Set(pick.map((x) => x.engine)).size === 1;
+    // One line per job version (e.g. "Rear Shocks - Pair" vs "one side"), never a spread.
+    const byJob = new Map<string, number>();
+    for (const x of pick) byJob.set(x.job, Math.max(byJob.get(x.job) ?? 0, x.hours));
+    let jobs = [...byJob].map(([job, hours]) => ({ job, hours }));
+    if (jobs.length > 1) {
+      const wantsPair = /\b(pair|both|all|set|front and rear|2|two)\b/i.test(text);
+      const wantsOne = /\b(one|single|1|left|right|driver|passenger)\b/i.test(text);
+      const wantsFront = /\bfront\b/i.test(text), wantsRear = /\b(rear|back)\b/i.test(text);
+      let f = jobs;
+      if (wantsFront && !wantsRear) f = f.filter((j) => /front/i.test(j.job) || !/rear/i.test(j.job));
+      if (wantsRear && !wantsFront) f = f.filter((j) => /rear/i.test(j.job) || !/front/i.test(j.job));
+      if (wantsPair && !wantsOne) { const p = f.filter((j) => /pair|both|set/i.test(j.job)); if (p.length) f = p; }
+      else if (wantsOne && !wantsPair) { const o = f.filter((j) => /one side|single|each/i.test(j.job)); if (o.length) f = o; }
+      if (f.length) jobs = f;
+    }
+    const engine = engineMatched ? pick[0].engine : undefined;
+    return { kind: 'labor', rate, job: svc, vehicle: `${veh.year} ${veh.make} ${veh.model}`, results, jobs, engine, engineMatched };
   } catch (e) { console.error('olp', e); return { kind: 'none', rate, job: svc }; }
 }
 
