@@ -26,6 +26,27 @@ Deno.serve(async (req) => {
       { onConflict: 'twilio_call_sid' },
     );
 
+    // Transcripts only: once the transcript is saved, delete the voicemail audio from Twilio.
+    if (status === 'completed') {
+      try {
+        const LOVABLE_KEY = Deno.env.get('LOVABLE_API_KEY');
+        const TWILIO_KEY = Deno.env.get('TWILIO_API_KEY');
+        if (LOVABLE_KEY && TWILIO_KEY) {
+          const gw = 'https://connector-gateway.lovable.dev/twilio';
+          const gwHeaders = { 'Authorization': `Bearer ${LOVABLE_KEY}`, 'X-Connection-Api-Key': TWILIO_KEY };
+          const list = await fetch(`${gw}/Calls/${sid}/Recordings.json`, { headers: gwHeaders });
+          if (list.ok) {
+            const recs = (await list.json()).recordings || [];
+            for (const r of recs) {
+              await fetch(`${gw}/Recordings/${r.sid}.json`, { method: 'DELETE', headers: gwHeaders });
+            }
+          }
+        }
+      } catch (e) {
+        console.error('recording cleanup error', e);
+      }
+    }
+
     return new Response('ok', { headers: corsHeaders });
   } catch (e) {
     console.error('voice-transcription error', e);
