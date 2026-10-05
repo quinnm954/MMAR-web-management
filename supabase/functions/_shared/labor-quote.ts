@@ -15,6 +15,7 @@ export type LaborQuote = {
   job?: string;
   vehicle?: string;
   results?: { engine: string; job: string; hours: number }[];
+  vague?: boolean;
   lo?: number; // lowest hours across engines (for the range)
   hi?: number; // highest hours across engines
 };
@@ -127,7 +128,9 @@ const usd = (n: number) => `$${Math.round(n)}`;
 const hr = (n: number) => `${Math.round(n * 10) / 10}`;
 
 export function quoteSentence(q: LaborQuote) {
-  if (q.kind === 'diagnosis') return 'Diagnosis is $100, and $50 of that goes toward the repair labor.';
+  if (q.kind === 'diagnosis') return (q as any).vague
+    ? "What's it doing (noises, pulling, loose steering), or is there a specific part you want replaced? If you're not sure, diagnosis is $100 and $50 of that goes toward the repair labor."
+    : 'Diagnosis is $100, and $50 of that goes toward the repair labor.';
   if (q.kind !== 'labor' || !q.jobs?.length) return '';
   const h = q.jobs[0].hours;
   // Engine unknown: quote cheapest to most expensive across engines.
