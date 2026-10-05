@@ -13,7 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { LogOut, FileText, ShieldCheck, Users, CreditCard, Calendar, CalendarCheck, ClipboardList, Receipt, Wrench, Mail, FileSpreadsheet, ClipboardCheck, Package, Settings, KanbanSquare, Clock, BarChart3, Share2, Car, AlertTriangle, FileDown, Activity, History, UserCog, DollarSign, RefreshCw, Phone, PhoneCall, ChevronDown, LayoutDashboard, Bell, MessageSquare } from 'lucide-react';
+import { LogOut, FileText, ShieldCheck, Users, CreditCard, Calendar, CalendarCheck, ClipboardList, Receipt, Wrench, Mail, FileSpreadsheet, ClipboardCheck, Package, Settings, Clock, BarChart3, Share2, Car, AlertTriangle, FileDown, Activity, History, UserCog, DollarSign, RefreshCw, Phone, PhoneCall, ChevronDown, LayoutDashboard, Bell, MessageSquare } from 'lucide-react';
 import AdminCalls from '@/components/admin/AdminCalls';
 import Softphone from '@/components/admin/Softphone';
 import AdminSMS from '@/components/admin/AdminSMS';
@@ -37,7 +37,6 @@ import AdminEstimates from '@/components/admin/AdminEstimates';
 import AdminInspections from '@/components/admin/AdminInspections';
 import AdminCatalog from '@/components/admin/AdminCatalog';
 import AdminShopSettings from '@/components/admin/AdminShopSettings';
-import AdminKanban from '@/components/admin/AdminKanban';
 import AdminReports from '@/components/admin/AdminReports';
 import AdminSalesDashboard from '@/components/admin/AdminSalesDashboard';
 import AdminCustomerShare from '@/components/admin/AdminCustomerShare';
@@ -155,7 +154,6 @@ const AdminDashboard = () => {
           const tabs: TabDef[] = [
             { value: 'dashboard', label: 'Sales Dashboard', icon: LayoutDashboard, roles: ADMIN_ONLY, content: <AdminSalesDashboard /> },
             { value: 'reports', label: 'Reports', icon: BarChart3, roles: ADMIN_ONLY, content: <AdminReports /> },
-            { value: 'kanban', label: 'Job Board', icon: KanbanSquare, roles: ALL, content: <AdminKanban /> },
             { value: 'calendar', label: 'Calendar', icon: Calendar, roles: ALL, content: <AdminCalendar /> },
             { value: 'ros', label: 'Repair Orders', icon: Wrench, roles: ALL, content: <AdminRepairOrders /> },
             { value: 'customers', label: 'Customers', icon: Users, roles: ADVISOR, content: <AdminCustomers /> },
@@ -211,7 +209,7 @@ const AdminDashboard = () => {
           };
 
           const groups = [
-            { label: 'Workshop', values: ['kanban','calendar','ros','service','inspections','checklists','estimates','invoices','time','shifts','productivity'] },
+            { label: 'Workshop', values: ['calendar','ros','service','inspections','checklists','estimates','invoices','time','shifts','productivity'] },
             { label: 'Front Desk', values: ['customers','garage','memberships','bookings','share','declined','fleet-accounts','calls','texts','prospecting'] },
             { label: 'Admin', values: ['dashboard','reports','catalog','laborpay','quickbooks','financing','warranty','emails','audit','employees','roles','phone-settings','tracking','settings'] },
           ];
