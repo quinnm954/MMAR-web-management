@@ -101,6 +101,18 @@ Deno.serve(async (req) => {
   const EL_KEY = Deno.env.get('ELEVENLABS_API_KEY');
 
   try {
+    // ---------- Transfer screening (Twilio hits these when Mike's cell answers) ----------
+    if (action === 'whisper' || action === 'whisper_ack') {
+      const twiml = (x: string) => new Response(`<?xml version="1.0" encoding="UTF-8"?><Response>${x}</Response>`, { headers: { 'Content-Type': 'text/xml' } });
+      if (url.searchParams.get('token') !== TOKEN) return twiml('<Hangup/>');
+      if (action === 'whisper') {
+        const ack = `${supabaseUrl}/functions/v1/ai-receptionist?action=whisper_ack&amp;token=${TOKEN}`;
+        return twiml(`<Gather numDigits="1" timeout="8" action="${ack}"><Say voice="alice">Mike's Mobile Auto Repair customer asking for you. Press 1 to take the call.</Say></Gather><Hangup/>`);
+      }
+      const form = await req.formData().catch(() => null);
+      return twiml(form?.get('Digits') === '1' ? '' : '<Hangup/>');
+    }
+
     // ---------- Admin setup ----------
     if (action === 'setup') {
       const auth = req.headers.get('Authorization')?.replace('Bearer ', '') || '';
@@ -307,7 +319,7 @@ Deno.serve(async (req) => {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
         body: new URLSearchParams({
-          Twiml: `<Response><Say voice="alice">Connecting you to Mike now.</Say><Dial timeout="25">${fwd}</Dial><Say voice="alice">Sorry, Mike is unavailable. He will call you back shortly.</Say></Response>`,
+          Twiml: `<Response><Say voice="alice">Connecting you to Mike now.</Say><Dial timeout="25" callerId="+18135017572"><Number url="${supabaseUrl}/functions/v1/ai-receptionist?action=whisper&amp;token=${TOKEN}">${fwd}</Number></Dial><Say voice="alice">Sorry, Mike could not pick up right now. He has your details and will call you back shortly.</Say></Response>`,
         }),
       });
       if (!r.ok) {
