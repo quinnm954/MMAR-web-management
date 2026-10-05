@@ -7,6 +7,7 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.95.0';
 import { sendMissedCallFollowup } from '../_shared/missed-call.ts';
 import { isSlotOpen, openSlots, label12 } from '../_shared/booking-bot.ts';
+import { buildLaborQuote, quoteSentence } from '../_shared/labor-quote.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -75,7 +76,7 @@ Facts:
 - We come to the customer's home, work, or lot. No need to tow to a shop.
 - Service area: ${cities.join(', ')}.
 - Services: diagnostics and check-engine lights, brakes, batteries and starting/charging, alternators and starters, AC repair, cooling system, suspension and steering, belts and hoses, tune-ups, fleet service for dealerships and companies. We do NOT do oil changes or pre-purchase inspections.
-- Pricing: we don't quote exact repair prices by phone (the diagnosis fee below is the exception). Labor is affordable, usually better than the average shop. Mike gives a written quote.
+- Pricing: for a SPECIFIC repair (alternator, starter, brakes, timing belt...) once you know year, make, model and engine, call quote_labor and give the ballpark labor it returns, always adding that parts are extra and Mike sends a written quote. Never make up numbers. If quote_labor returns nothing, say Mike's labor is usually well under dealer prices and the written quote comes by text.
 - We book appointments starting the next day. Phone and text: 813-501-7572.
 - MMAR Care is our maintenance membership plan.
 
@@ -89,7 +90,17 @@ How to act:
 - If they need service, collect: name, vehicle (year, make, model, and engine size like 1.4L or V6 — ask once; if they don't know, move on), what's wrong, service address or city, and the day and time they want. Turn the day into a real date (YYYY-MM-DD) and the time into 24-hour HH:MM. Confirm it back, then call create_booking_request. If the tool says the time is invalid, offer another time in the window. Tell them the time is requested and the shop will text shortly to confirm it. Never say it is confirmed or booked.
 - You are NOT Mike and never claim to be him. If a caller asks whether they're speaking with Mike, say you're the shop's receptionist and Mike is the owner.
 - Handle everything yourself. Only call transfer_to_mike when the caller specifically asks to speak with Mike (or the owner) by name. Do not transfer for general questions, bookings, or urgent jobs; take the details and tell them Mike will text right away. If someone just asks for "a person", offer to help first and transfer only if they insist on Mike.
-- Diagnosis fee: if the customer has a problem to figure out (a warning light, noise, no-start, electrical issue, 'not sure what's wrong') rather than asking for a specific part replacement, tell them BEFORE confirming a time: there's a $100 diagnosis fee, and $50 of it is credited toward the repair labor if they go ahead. Say it once, plainly, and make sure they're okay with it. Skip it for specific repairs like 'replace my alternator'.
+- Diagnosis fee: ONLY when the customer doesn't know what's wrong (a warning light, noise, no-start with no known cause, electrical issue, 'not sure'). If they name a part or repair ("replace my alternator", "need a starter", "brakes"), there is NO diagnosis fee — never mention it; say "Since you already know it's the alternator, there's no diagnosis fee." For unknown problems, say once BEFORE confirming a time: "$100 diagnosis, and $50 of it goes toward the repair if you go ahead — so it really only costs you fifty." Make sure they're okay with it.
+
+Closing style (FUGI, light humor, never pushy, never rude):
+- Fear of loss: slots go fast. "Mike's schedule fills up fast — I'd hate for you to get bumped to later in the week."
+- Urgency: small problems grow. "Car problems are like dentist visits — waiting usually makes the bill bigger."
+- Greed/value: he comes to them. "He comes right to your driveway, so you skip the tow truck and the waiting room with the bad coffee."
+- Indifference: zero pressure. "No deposit to hold it — if something changes, just text us."
+- Use at most ONE humor line per call, keep it short, and skip humor if the caller is stressed, stranded, or upset.
+- Always close with a direct either/or question on real open times: "I've got 10 AM or 1 PM tomorrow — which works better?" Never end with "let me know".
+- Objections: "too expensive / just shopping" → mention no tow, written quote first, no deposit, then offer the earliest time again. "Need to check my schedule" → "Totally get it — want me to pencil in the earliest one with no deposit? If it doesn't work, just text us." "Let me think" → offer once to hold the spot; if they still decline, tell them they can text 813-501-7572 anytime and end politely.
+- Before saving the booking, confirm the details in ONE short sentence (vehicle, problem, place, time), then save it.
 - Never invent prices, hours, or promises. If unsure, say Mike will follow up.
 - Caller's number: {{caller_number}}. Use it as their phone unless they give another.`;
 }
@@ -133,7 +144,7 @@ Deno.serve(async (req) => {
         name,
         description,
         api_schema: {
-          url: `${fnBase}?action=${name === 'transfer_to_mike' ? 'transfer' : name === 'check_open_times' ? 'availability' : name === 'lookup_caller' ? 'lookup' : 'booking'}&token=${TOKEN}`,
+          url: `${fnBase}?action=${name === 'transfer_to_mike' ? 'transfer' : name === 'check_open_times' ? 'availability' : name === 'lookup_caller' ? 'lookup' : name === 'quote_labor' ? 'quote' : 'booking'}&token=${TOKEN}`,
           method: 'POST',
           request_body_schema: { type: 'object', properties: props, required },
         },
@@ -154,6 +165,10 @@ Deno.serve(async (req) => {
                 tool('check_open_times', 'Get open appointment start times. Call before offering any time.', {
                   date: { type: 'string', description: 'Day the caller wants, YYYY-MM-DD (tomorrow if unsure)' },
                 }, ['date']),
+                tool('quote_labor', 'Get ballpark book labor for a specific named repair. Needs vehicle with engine.', {
+                  vehicle_info: { type: 'string', description: 'Year make model engine, e.g. 2011 Chevy Cruze 1.4L' },
+                  repair: { type: 'string', description: 'The specific repair, e.g. alternator replacement' },
+                }, ['vehicle_info', 'repair']),
                 tool('create_booking_request', 'Save a service booking request once details are confirmed.', {
                   call_sid: callSid,
                   customer_name: { type: 'string', description: 'Caller full name' },
@@ -272,6 +287,15 @@ Deno.serve(async (req) => {
       const veh = [...new Set((vs || []).map((v: any) => [v.year, v.make, v.model, v.engine].filter(Boolean).join(' ').toLowerCase()))].join('; ');
       const addr = [p.address_line1, p.city].filter(Boolean).join(', ');
       return json({ result: `Existing customer on file. Name: ${p.full_name || 'unknown'}. Vehicles: ${veh || 'none on file'}. Service address: ${addr || 'none on file'}. Verify these with the caller instead of asking from scratch; only ask for what is missing or changed.` });
+    }
+
+    if (action === 'quote') {
+      const q = await buildLaborQuote(sb, { service_type: String(body.repair || ''), description: String(body.repair || ''), vehicle_info: String(body.vehicle_info || '') }).catch(() => null);
+      if (!q) return json({ result: 'No labor quote available. Say Mike will text a written quote.' });
+      if (q.kind === 'diagnosis') return json({ result: 'This sounds like it needs diagnosis, not a named repair. Explain the diagnosis fee.' });
+      if (q.kind === 'labor' && !q.engineMatched) return json({ result: 'Labor depends on the engine. Ask for engine size, then call quote_labor again. If they do not know, say Mike will text the exact quote.' });
+      const s = quoteSentence(q);
+      return json({ result: s ? `Tell the caller (as a ballpark, not final): ${s}` : 'No labor match. Say Mike will text a written quote.' });
     }
 
     if (action === 'availability') {
