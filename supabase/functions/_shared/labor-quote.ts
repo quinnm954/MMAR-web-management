@@ -57,7 +57,10 @@ export async function buildLaborQuote(sb: any, req: any): Promise<LaborQuote> {
     const results: { engine: string; job: string; hours: number }[] = [];
     for (const e of d.engines ?? []) for (const t of e.laborTimes ?? []) if (typeof t.hours === 'number' && t.hours > 0) results.push({ engine: e.engine ?? '', job: t.job ?? svc, hours: t.hours });
     if (!results.length) return { kind: 'none', rate, job: svc };
-    const hrs = results.map((x) => x.hours);
+    // Narrow to the customer's engine (e.g. "1.4L", "2.0", "V6") when given.
+    const eng = (req.vehicle_info || '').match(/\b(\d\.\d)\s*l?\b/i)?.[1] || (req.vehicle_info || '').match(/\b(v6|v8|v10|i4|i6|4[- ]?cyl|6[- ]?cyl|8[- ]?cyl|hybrid|diesel)\b/i)?.[1];
+    const pick = eng ? results.filter((x) => x.engine.toLowerCase().replace(/[- ]/g, '').includes(eng.toLowerCase().replace(/[- ]/g, ''))) : [];
+    const hrs = (pick.length ? pick : results).map((x) => x.hours);
     return { kind: 'labor', rate, job: svc, vehicle: `${veh.year} ${veh.make} ${veh.model}`, results, minHours: Math.min(...hrs), maxHours: Math.max(...hrs) };
   } catch (e) { console.error('olp', e); return { kind: 'none', rate, job: svc }; }
 }

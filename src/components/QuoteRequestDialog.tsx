@@ -54,6 +54,7 @@ const QuoteRequestDialog = ({
   const [year, setYear] = useState("");
   const [make, setMake] = useState("");
   const [model, setModel] = useState("");
+  const [engine, setEngine] = useState("");
   const [mileage, setMileage] = useState("");
   const [location, setLocation] = useState("");
   const [notes, setNotes] = useState("");
@@ -140,7 +141,7 @@ const QuoteRequestDialog = ({
       return;
     }
 
-    const vehicle = [year, make, model].filter(Boolean).join(" ").trim();
+    const vehicle = [year, make, model, engine.trim().slice(0, 30)].filter(Boolean).join(" ").trim();
     const description = [
       mileage ? `Mileage: ${mileage}` : "",
       notes ? notes : "",
@@ -381,6 +382,10 @@ const QuoteRequestDialog = ({
               <Label htmlFor="model">Model</Label>
               <Input id="model" placeholder="Camry" value={model} onChange={(e) => setModel(e.target.value)} />
             </div>
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="engine">Engine size (helps us quote right)</Label>
+            <Input id="engine" placeholder="e.g. 1.4L, 2.0L, V6 — not sure? leave blank" maxLength={30} value={engine} onChange={(e) => setEngine(e.target.value)} />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
