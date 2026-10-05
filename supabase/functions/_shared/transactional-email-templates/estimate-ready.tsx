@@ -5,9 +5,9 @@ import { BrandHeader, BrandCard, BrandFooter } from './_brand.tsx'
 
 const SITE_NAME = "Mike's Mobile Auto Repair"
 
-interface Props { name?: string; estimateNumber?: string; total?: string; approvalUrl?: string }
+interface Props { name?: string; estimateNumber?: string; total?: string; approvalUrl?: string; accountUrl?: string }
 
-const EstimateReadyEmail = ({ name, estimateNumber, total, approvalUrl }: Props) => (
+const EstimateReadyEmail = ({ name, estimateNumber, total, approvalUrl, accountUrl }: Props) => (
   <Html lang="en">
     <Head />
     <Preview>Your estimate is ready — review and approve online</Preview>
@@ -26,6 +26,12 @@ const EstimateReadyEmail = ({ name, estimateNumber, total, approvalUrl }: Props)
         {approvalUrl && (
           <Section style={{ textAlign: 'center', margin: '24px 0' }}>
             <Button href={approvalUrl} style={button}>Review & Approve</Button>
+          </Section>
+        )}
+        {accountUrl && (
+          <Section style={{ textAlign: 'center', margin: '0 0 24px' }}>
+            <Button href={accountUrl} style={button}>Open My Account</Button>
+            <Text style={detail}>We set up an account for you — this button signs you in, no password needed.</Text>
           </Section>
         )}
         <Text style={text}>Questions? Call or text <strong>813-501-7572</strong>.</Text>
