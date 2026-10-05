@@ -6,6 +6,7 @@
 //   postcall  – ElevenLabs post-call webhook: save transcript + text summaries
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.95.0';
 import { sendMissedCallFollowup } from '../_shared/missed-call.ts';
+import { isSlotOpen, openSlots, label12 } from '../_shared/booking-bot.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
