@@ -191,7 +191,7 @@ const EstimateApproval = () => {
               <div className="flex justify-between text-sm gap-3">
                 <div className="flex-1">
                   <div className="font-medium">{l.description}</div>
-                  <div className="text-xs text-muted-foreground">{l.quantity} × ${Number(l.unit_price).toFixed(2)}</div>
+                  <div className="text-xs text-muted-foreground">{l.kind === 'labor' && Number(l.labor_hours) > 0 ? `${Number(l.labor_hours)} hrs × $${Number(l.unit_price).toFixed(2)}` : `${l.quantity} × $${Number(l.unit_price).toFixed(2)}`}</div>
                   {locked && <Badge variant={approved ? 'default' : 'secondary'} className="mt-1 text-[10px]">{decisions[i]}</Badge>}
                 </div>
                 <div className={approved ? 'font-medium' : 'line-through text-muted-foreground'}>${Number(l.amount).toFixed(2)}</div>

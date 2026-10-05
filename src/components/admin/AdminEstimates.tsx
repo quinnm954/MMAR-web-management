@@ -147,24 +147,24 @@ const AdminEstimates = () => {
         }
 
         if (kind === 'labor') {
-          // Normalize: quantity = hours, unit_price = hourly rate, labor_hours mirrors qty.
-          if (laborHrs <= 0 && qty > 0) laborHrs = qty;
+          // Normalize: quantity = 1, unit_price = hourly rate, labor_hours = billable hours.
+          if (laborHrs <= 0 && qty > 1) laborHrs = qty;
           if (laborHrs <= 0 && lineTotal > 0 && fallbackLaborRate > 0) {
             laborHrs = +(lineTotal / fallbackLaborRate).toFixed(2);
           }
-          if (qty <= 0) qty = laborHrs;
+          if (laborHrs <= 0) laborHrs = 1;
+          qty = 1;
           if (price <= 0) {
-            if (lineTotal > 0 && qty > 0) price = +(lineTotal / qty).toFixed(2);
+            if (lineTotal > 0 && laborHrs > 0) price = +(lineTotal / laborHrs).toFixed(2);
             else price = fallbackLaborRate;
           }
-          if (qty <= 0 && lineTotal > 0 && price > 0) qty = +(lineTotal / price).toFixed(2);
         } else {
           if (qty <= 0) qty = 1;
           if (price <= 0 && lineTotal > 0 && qty > 0) price = +(lineTotal / qty).toFixed(2);
           laborHrs = 0;
         }
 
-        const amount = +(qty * price).toFixed(2);
+        const amount = +(kind === 'labor' ? laborHrs * price : qty * price).toFixed(2);
         const unit_cost = kind === 'part' ? +(price / PARTS_MARKUP).toFixed(2) : 0;
         return {
           description: desc,
@@ -256,8 +256,9 @@ const AdminEstimates = () => {
 
   const recalc = (li: LineItem[]) => {
     // Only parts are taxable / accrue shop supplies. Labor and fees never do.
-    const taxableSubtotal = li.reduce((s, i) => (i.kind ?? 'part') === 'part' ? s + (Number(i.quantity) * Number(i.unit_price)) : s, 0);
-    const nonTaxableSubtotal = li.reduce((s, i) => (i.kind ?? 'part') === 'part' ? s : s + (Number(i.quantity) * Number(i.unit_price)), 0);
+      const lineTotal = (i: LineItem) => (i.kind ?? 'part') === 'labor' ? Number(i.labor_hours || 0) * Number(i.unit_price) : Number(i.quantity) * Number(i.unit_price);
+      const taxableSubtotal = li.reduce((s, i) => (i.kind ?? 'part') === 'part' ? s + lineTotal(i) : s, 0);
+      const nonTaxableSubtotal = li.reduce((s, i) => (i.kind ?? 'part') === 'part' ? s : s + lineTotal(i), 0);
     const subtotal = taxableSubtotal + nonTaxableSubtotal;
     const shop = Math.min(taxableSubtotal * (settings?.shop_supplies_pct ?? 0.05), settings?.shop_supplies_max ?? 50);
     const tax = (taxableSubtotal + shop) * (settings?.tax_rate ?? 0.07);
@@ -311,7 +312,7 @@ const AdminEstimates = () => {
   };
 
   const addBookLabor = (r: { engine: string; job: string; hours: number }) => {
-    const line: LineItem = { description: `${r.job} (book labor${r.engine ? `, ${r.engine}` : ''})`, quantity: r.hours, unit_price: defaultLaborRate || 0, amount: r.hours * (defaultLaborRate || 0), labor_hours: r.hours, kind: 'labor' };
+    const line: LineItem = { description: `${r.job} (book labor${r.engine ? `, ${r.engine}` : ''})`, quantity: 1, unit_price: defaultLaborRate || 0, amount: r.hours * (defaultLaborRate || 0), labor_hours: r.hours, kind: 'labor' };
     updateLines([...(editing.line_items || []), line]);
     toast.success(`Added ${r.hours} hrs`);
   };
@@ -394,7 +395,8 @@ const AdminEstimates = () => {
   const updateLine = (idx: number, patch: Partial<LineItem>) => {
     const lines = [...editing.line_items];
     lines[idx] = { ...lines[idx], ...patch };
-    lines[idx].amount = Number(lines[idx].quantity) * Number(lines[idx].unit_price);
+    const k = lines[idx].kind ?? 'part';
+    lines[idx].amount = +(k === 'labor' ? Number(lines[idx].labor_hours || 0) * Number(lines[idx].unit_price) : Number(lines[idx].quantity) * Number(lines[idx].unit_price)).toFixed(2);
     updateLines(lines);
   };
 

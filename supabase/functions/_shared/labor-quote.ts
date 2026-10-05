@@ -159,8 +159,8 @@ export async function createDraftEstimate(sb: any, req: any, q: LaborQuote, opts
     return data.id as string;
   }
   let lines: any[];
-  if (q.kind === 'diagnosis') lines = [{ description: 'Diagnosis fee ($50 credited to repair labor)', quantity: 1, unit_price: 100, amount: 100, kind: 'labor' }];
-  else lines = (q.jobs || []).map((j) => ({ description: `${j.job} (book labor)`, quantity: j.hours, unit_price: q.rate, amount: j.hours * q.rate, labor_hours: j.hours, kind: 'labor' }));
+  if (q.kind === 'diagnosis') lines = [{ description: 'Diagnosis fee ($50 credited to repair labor)', quantity: 1, unit_price: 100, amount: 100, kind: 'fee' }];
+  else lines = (q.jobs || []).map((j) => ({ description: `${j.job} (book labor)`, quantity: 1, unit_price: q.rate, amount: j.hours * q.rate, labor_hours: j.hours, kind: 'labor' }));
   const total = lines.reduce((s, l) => s + l.amount, 0);
   // Engine unknown and engines differ: leave an unsent draft for staff instead of guessing.
   if (q.kind === 'labor' && !q.engineMatched) {
