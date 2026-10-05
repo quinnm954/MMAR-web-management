@@ -121,7 +121,7 @@ export default function AdminSMS() {
         </CardContent>
       </Card>
 
-      <Card className="md:col-span-2 flex flex-col">
+      <Card className="md:col-span-2 flex flex-col max-h-[55vh] md:max-h-none">
         {!active ? (
           <CardContent className="flex-1 flex items-center justify-center text-muted-foreground">Select a conversation</CardContent>
         ) : (
