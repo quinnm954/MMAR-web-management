@@ -146,7 +146,7 @@ export default function AdminRoles() {
           </div>
         )}
         <p className="text-xs text-muted-foreground">
-          Roles: <strong>admin</strong> (full access), <strong>manager</strong> (admin-like + audit log), <strong>service_advisor</strong>, <strong>parts</strong>, <strong>technician</strong>, <strong>customer</strong>. New signups default to <strong>customer</strong>.
+          Roles: <strong>admin</strong> (full access), <strong>technician</strong> (assigned jobs), <strong>customer</strong> (includes fleet owners). New signups default to <strong>customer</strong>.
         </p>
       </CardContent>
     </Card>

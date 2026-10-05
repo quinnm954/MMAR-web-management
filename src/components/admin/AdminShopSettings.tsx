@@ -11,7 +11,7 @@ import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
 import AiCreditsBar from './AiCreditsBar';
 
-const TITLES = ['technician', 'service_advisor', 'manager', 'parts', 'admin', 'other'];
+const TITLES = ['technician', 'admin', 'other'];
 const PAY_BASIS = [
   { value: 'labor_hours', label: 'Per Labor Hour' },
   { value: 'hourly_clock', label: 'Hourly (clock in/out)' },
