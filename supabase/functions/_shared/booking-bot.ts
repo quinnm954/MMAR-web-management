@@ -234,7 +234,7 @@ Respond ONLY with JSON: {"reply": string, "confirmed": boolean, "date": "YYYY-MM
   catch (e) {
     console.error('booking bot ai', e);
     await sb.from('booking_requests').update({ bot_status: 'handoff', bot_history: history, bot_updated_at: new Date().toISOString() }).eq('id', req.id);
-    await sb.rpc('_notify_staff_customer_action', { _title: 'Booking bot needs you', _body: `${req.customer_name || from} replied; bot couldn't answer.`, _link: '/admin/dashboard?tab=bookings' }).catch(() => {});
+    await sb.rpc('_notify_staff_customer_action', { _title: 'Booking bot needs you', _body: `${req.customer_name || from} replied; bot couldn't answer.`, _link: '/admin/dashboard?tab=bookings' }).then(() => {}, () => {});
     return true;
   }
 
@@ -258,7 +258,7 @@ Respond ONLY with JSON: {"reply": string, "confirmed": boolean, "date": "YYYY-MM
       await sb.from('booking_requests').update({ requested_date: ai.date, requested_time_window: label }).eq('id', req.id);
       status = 'handoff'; requested = true;
       reply = `Got it — I've requested ${friendlyDate(ai.date)} at ${label} for you. We'll text you shortly to confirm.`;
-        await sb.rpc('_notify_staff_customer_action', { _title: 'Booking needs your OK', _body: `${req.customer_name || from} wants ${friendlyDate(ai.date)} at ${label}`, _link: '/admin/dashboard?tab=bookings' }).catch(() => {});
+        await sb.rpc('_notify_staff_customer_action', { _title: 'Booking needs your OK', _body: `${req.customer_name || from} wants ${friendlyDate(ai.date)} at ${label}`, _link: '/admin/dashboard?tab=bookings' }).then(() => {}, () => {});
       }
     }
   }
@@ -266,6 +266,6 @@ Respond ONLY with JSON: {"reply": string, "confirmed": boolean, "date": "YYYY-MM
   const update: Record<string, unknown> = { bot_history: [...history, { role: 'assistant', content: reply }], bot_updated_at: new Date().toISOString() };
   if (status !== 'confirmed') update.bot_status = status;
   await sb.from('booking_requests').update(update).eq('id', req.id);
-  if (status === 'handoff' && !requested) await sb.rpc('_notify_staff_customer_action', { _title: 'Customer wants Mike', _body: `${req.customer_name || from}: ${body.slice(0, 120)}`, _link: '/admin/dashboard?tab=frontdesk' }).catch(() => {});
+  if (status === 'handoff' && !requested) await sb.rpc('_notify_staff_customer_action', { _title: 'Customer wants Mike', _body: `${req.customer_name || from}: ${body.slice(0, 120)}`, _link: '/admin/dashboard?tab=frontdesk' }).then(() => {}, () => {});
   return true;
 }
