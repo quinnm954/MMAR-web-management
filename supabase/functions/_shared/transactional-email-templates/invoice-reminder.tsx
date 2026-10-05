@@ -1,0 +1,51 @@
+import * as React from 'npm:react@18.3.1'
+import { Body, Container, Head, Heading, Html, Preview, Text, Section, Hr, Button } from 'npm:@react-email/components@0.0.22'
+import type { TemplateEntry } from './registry.ts'
+import { BrandHeader, BrandCard, BrandFooter } from './_brand.tsx'
+
+const SITE_NAME = "Mike's Mobile Auto Repair"
+
+interface Props { customerName?: string; invoiceNumber?: string; amountDue?: string; payUrl?: string; reminder?: boolean }
+
+const InvoiceReminderEmail = ({ customerName, invoiceNumber, amountDue, payUrl, reminder }: Props) => (
+  <Html lang="en">
+    <Head />
+    <Preview>Your invoice from Mike's Mobile Auto Repair</Preview>
+    <Body style={main}>
+      <Container style={container}>
+        <BrandHeader />
+        <BrandCard>
+          <Heading style={h1}>{reminder ? 'Friendly payment reminder' : 'Your invoice is ready'}</Heading>
+          <Text style={text}>{customerName ? `Hi ${customerName},` : 'Hi there,'}</Text>
+          <Text style={text}>
+            {reminder
+              ? `Just a reminder that invoice ${invoiceNumber || ''}${amountDue ? ` for ${amountDue}` : ''} is still open. You can pay securely online in about a minute.`
+              : `Thanks for choosing us! Invoice ${invoiceNumber || ''}${amountDue ? ` for ${amountDue}` : ''} is ready. You can pay securely online with a card.`}
+          </Text>
+          <Section style={{ textAlign: 'center', margin: '24px 0' }}>
+            <Button href={payUrl || 'https://mikesmautorepair.com/portal/invoices'} style={button}>Pay now</Button>
+          </Section>
+          <Text style={text}>Questions? Call or text <strong>813-501-7572</strong>.</Text>
+          <Hr style={hr} />
+          <Text style={footer}>— The {SITE_NAME} Team</Text>
+        </BrandCard>
+        <BrandFooter />
+      </Container>
+    </Body>
+  </Html>
+)
+
+export const template = {
+  component: InvoiceReminderEmail,
+  subject: (d: Props) => d.reminder ? `Payment reminder — ${SITE_NAME}` : `Your invoice — ${SITE_NAME}`,
+  displayName: 'Invoice (auto send + reminders)',
+  previewData: { customerName: 'Alex', invoiceNumber: 'INV-20261005-ab12cd', amountDue: '$385.00', payUrl: 'https://mikesmautorepair.com/portal/invoices', reminder: false },
+} satisfies TemplateEntry
+
+const main = { backgroundColor: '#ffffff', fontFamily: 'Arial, sans-serif' }
+const container = { padding: '20px 24px', maxWidth: '560px' }
+const h1 = { fontSize: '22px', fontWeight: 'bold', color: '#0f172a', margin: '0 0 16px' }
+const text = { fontSize: '15px', color: '#334155', lineHeight: '1.6', margin: '0 0 14px' }
+const button = { backgroundColor: '#3ba7e6', color: '#ffffff', padding: '12px 22px', borderRadius: '8px', fontWeight: 'bold', textDecoration: 'none' }
+const hr = { borderColor: '#e2e8f0', margin: '20px 0' }
+const footer = { fontSize: '13px', color: '#64748b' }
