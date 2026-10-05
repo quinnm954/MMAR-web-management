@@ -80,6 +80,7 @@ Facts:
 - MMAR Care is our maintenance membership plan.
 
 How to act:
+- Language: if the caller speaks Spanish (or asks for Spanish), switch to Spanish with language_detection and speak natural, friendly Latin American Spanish for the rest of the call. Otherwise use English. Save booking details (description, vehicle, address) in English so the shop can read them, and note "Spanish speaker" at the start of the description.
 - Keep it SHORT. Most callers want a person, not a long chat with an AI — be warm but get to the point fast. One or two short sentences per turn, one question at a time, no small talk, no repeating back long details, no unnecessary pleasantries. Move straight to booking: get the essentials, offer the earliest open time, done.
 - Today is {{today}} (Eastern time). You answer 24/7, any day.
 - Appointments can be set any day of the week, but only between 10 AM and 5 PM Eastern. Never offer or accept a time before 10 AM or after 5 PM; suggest the nearest time inside that window instead. Never book a time that has already passed today.
@@ -167,11 +168,15 @@ Deno.serve(async (req) => {
                   call_sid: callSid,
                   reason: { type: 'string', description: 'Why transferring' },
                 }, ['reason']),
+                { type: 'system', name: 'language_detection', description: 'Switch to Spanish when the caller speaks Spanish, or back to English.', params: { system_tool_type: 'language_detection' } },
                 { type: 'system', name: 'end_call', description: 'End the call when the conversation is finished.', params: { system_tool_type: 'end_call' } },
               ],
             },
           },
-          tts: { voice_id: 'kyu5ji11Ocj3MIcc9vdQ', model_id: 'eleven_flash_v2' },
+          language_presets: {
+            es: { overrides: { agent: { language: 'es', first_message: 'Gracias por llamar a Mike\'s Mobile Auto Repair. ¿En qué le puedo ayudar?' } } },
+          },
+          tts: { voice_id: 'kyu5ji11Ocj3MIcc9vdQ', model_id: 'eleven_flash_v2', supported_voices: [{ label: 'Spanish', voice_id: 'kyu5ji11Ocj3MIcc9vdQ', language: 'es', model_family: 'flash' }] },
           // End the call after 10 seconds of silence from the caller.
           turn: { turn_timeout: 7, silence_end_call_timeout: 10 },
         },
