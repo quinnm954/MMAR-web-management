@@ -87,8 +87,8 @@ const EstimateApproval = () => {
       _status: status,
       _signature: signature,
       _decline_reason: status === 'declined' || (status === 'partially_approved' && reason) ? (reason || null) : null,
-      _requested_date: willApprove && requestedDate ? format(requestedDate, 'yyyy-MM-dd') : null,
-      _requested_time_window: willApprove ? timeWindow : null,
+      _requested_date: null,
+      _requested_time_window: null,
     });
     setWorking(false);
     if (error) return toast.error('Could not submit. Please contact us.');
@@ -244,46 +244,6 @@ const EstimateApproval = () => {
           {lines.some((_, i) => decisions[i] === 'declined') && (
             <Textarea placeholder="Reason for declined items (optional)" value={reason} onChange={(e) => setReason(e.target.value)} />
           )}
-
-          {!allDeclined && (
-            <div className="rounded-md border border-border bg-muted/20 p-3 space-y-3">
-              <div className="text-sm font-medium">Schedule the work</div>
-              <div className="grid sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="text-xs text-muted-foreground mb-1 block">Preferred date</label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button variant="outline" className={cn('w-full justify-start text-left font-normal', !requestedDate && 'text-muted-foreground')}>
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {requestedDate ? format(requestedDate, 'PPP') : 'Pick a date'}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={requestedDate}
-                        onSelect={setRequestedDate}
-                        disabled={(d) => d < new Date(new Date().setHours(0, 0, 0, 0))}
-                        initialFocus
-                        className={cn('p-3 pointer-events-auto')}
-                      />
-                    </PopoverContent>
-                  </Popover>
-                </div>
-                <div>
-                  <label className="text-xs text-muted-foreground mb-1 block">Preferred time window</label>
-                  <Select value={timeWindow} onValueChange={setTimeWindow}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      {TIME_WINDOWS.map((w) => <SelectItem key={w} value={w}>{w}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              <p className="text-[11px] text-muted-foreground">We'll confirm the exact arrival time by call or text.</p>
-            </div>
-          )}
-
 
           <div>
             <div className="text-sm font-medium mb-2">Authorization Signature</div>
