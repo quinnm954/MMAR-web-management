@@ -238,7 +238,7 @@ export default function AdminPhoneSettings() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Greetings & recording</CardTitle>
+          <CardTitle>Greetings & voicemail</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
@@ -258,13 +258,6 @@ export default function AdminPhoneSettings() {
               value={s.unavailable_greeting}
               onChange={(e) => setS({ ...s, unavailable_greeting: e.target.value })}
             />
-          </div>
-          <div className="flex items-center justify-between">
-            <div>
-              <Label className="text-base">Record answered calls</Label>
-              <p className="text-xs text-muted-foreground">Two-channel recording, available in the Calls tab.</p>
-            </div>
-            <Switch checked={s.record_calls} onCheckedChange={(v) => setS({ ...s, record_calls: v })} />
           </div>
           <div className="flex items-center justify-between">
             <div>
