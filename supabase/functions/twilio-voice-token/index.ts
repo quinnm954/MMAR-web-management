@@ -45,10 +45,10 @@ Deno.serve(async (req) => {
     ]);
     if (!isAdmin && !isOwner) return json({ error: 'Forbidden' }, 403);
 
-    const acct = Deno.env.get('TWILIO_ACCOUNT_SID')!;
-    const keySid = Deno.env.get('TWILIO_VOICE_KEY_SID')!;
-    const keySecret = Deno.env.get('TWILIO_VOICE_KEY_SECRET')!;
-    const appSid = Deno.env.get('TWILIO_TWIML_APP_SID')!;
+    const acct = (Deno.env.get('TWILIO_SOFTPHONE_ACCOUNT_SID') || Deno.env.get('TWILIO_ACCOUNT_SID'))!;
+    const keySid = (Deno.env.get('TWILIO_SOFTPHONE_KEY_SID') || Deno.env.get('TWILIO_VOICE_KEY_SID'))!;
+    const keySecret = (Deno.env.get('TWILIO_SOFTPHONE_KEY_SECRET') || Deno.env.get('TWILIO_VOICE_KEY_SECRET'))!;
+    const appSid = (Deno.env.get('TWILIO_SOFTPHONE_APP_SID') || Deno.env.get('TWILIO_TWIML_APP_SID'))!;
     if (!acct || !keySid || !keySecret || !appSid) return json({ error: 'Voice not configured' }, 500);
     await ensureTwimlApp(appSid);
 
