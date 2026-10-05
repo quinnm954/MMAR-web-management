@@ -1562,6 +1562,7 @@ export type Database = {
       invoices: {
         Row: {
           amount_paid: number
+          appointment_id: string | null
           auto_sent_at: string | null
           created_at: string
           customer_id: string
@@ -1594,6 +1595,7 @@ export type Database = {
         }
         Insert: {
           amount_paid?: number
+          appointment_id?: string | null
           auto_sent_at?: string | null
           created_at?: string
           customer_id: string
@@ -1626,6 +1628,7 @@ export type Database = {
         }
         Update: {
           amount_paid?: number
+          appointment_id?: string | null
           auto_sent_at?: string | null
           created_at?: string
           customer_id?: string
@@ -1657,6 +1660,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "invoices_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "invoices_customer_id_fkey"
             columns: ["customer_id"]
@@ -3755,6 +3765,10 @@ export type Database = {
           _title_override?: string
           _vehicle_id?: string
         }
+        Returns: string
+      }
+      create_invoice_for_appointment: {
+        Args: { _appointment_id: string }
         Returns: string
       }
       create_notification: {

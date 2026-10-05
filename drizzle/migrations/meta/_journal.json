@@ -50,6 +50,27 @@
       "when": 1791216134065,
       "tag": "0006_allow_ai_phone_source",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1791217134263,
+      "tag": "0007_invoice_at_appointment_time",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1791217161711,
+      "tag": "0008_invoice_at_appointment_time_fix",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1791217204725,
+      "tag": "0009_skip_duplicate_invoice_for_appointment",
+      "breakpoints": true
     }
   ]
 }
