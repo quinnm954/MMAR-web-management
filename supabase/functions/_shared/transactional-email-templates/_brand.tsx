@@ -1,10 +1,14 @@
 import * as React from 'npm:react@18.3.1'
-import { Link, Section, Text } from 'npm:@react-email/components@0.0.22'
+import { Link, Section, Text, Img } from 'npm:@react-email/components@0.0.22'
 
-export const BrandHeader = ({ tag = 'Mobile Auto Repair · Fort Myers & Lehigh Acres' }: { tag?: string }) => (
+const LOGO_URL = 'https://mikesmautorepair.com/mmar-logo.jpeg'
+
+export const BrandHeader = ({ tag = 'MOBILE AUTO REPAIR' }: { tag?: string }) => (
   <Section style={header}>
-    <Text style={brand}>Mike's Mobile Auto Repair</Text>
-    <Text style={pill}>{tag}</Text>
+    <Img src={LOGO_URL} width="104" alt="MMAR" style={logo} />
+    <Text style={brand}>MMAR</Text>
+    <Text style={name}>Mike's Mobile Auto Repair</Text>
+    <Text style={tagline}>{tag}</Text>
   </Section>
 )
 
@@ -12,10 +16,12 @@ export const BrandCard = ({ children }: { children: React.ReactNode }) => (
   <Section style={card}>{children}</Section>
 )
 
-const header = { backgroundColor: '#0f172a', borderRadius: '12px 12px 0 0', padding: '20px 24px' }
-const brand = { color: '#ffffff', fontSize: '20px', fontWeight: 700, margin: '0 0 8px' }
-const pill = { display: 'inline-block', backgroundColor: '#f5b82e', color: '#0f172a', fontSize: '12px', fontWeight: 700, borderRadius: '999px', padding: '4px 12px', margin: 0 }
-const card = { border: '1px solid #e2e8f0', borderTop: 'none', borderRadius: '0 0 12px 12px', padding: '24px' }
+const header = { backgroundColor: '#0f172a', borderTop: '4px solid #38aee8', padding: '22px 28px 20px', textAlign: 'center' as const }
+const logo = { display: 'block', width: '104px', height: '60px', objectFit: 'cover' as const, margin: '0 auto 12px', borderRadius: '4px' }
+const brand = { color: '#ffffff', fontSize: '28px', lineHeight: '32px', fontWeight: 800, letterSpacing: '0', margin: '0' }
+const name = { color: '#cbd5e1', fontSize: '13px', lineHeight: '20px', fontWeight: 600, margin: '3px 0 0' }
+const tagline = { color: '#e5b72c', fontSize: '10px', lineHeight: '16px', fontWeight: 700, margin: '10px 0 0' }
+const card = { backgroundColor: '#ffffff', border: '1px solid #dbe3eb', borderTop: 'none', padding: '30px 28px 28px' }
 
 export const BrandFooter = () => (
   <Section style={footWrap}>
@@ -32,7 +38,7 @@ export const BrandFooter = () => (
   </Section>
 )
 
-const footWrap = { padding: '16px 8px 0', textAlign: 'center' as const }
-const footLine = { fontSize: '13px', color: '#475569', margin: '0 0 6px' }
-const footLink = { color: '#1d8fd0', textDecoration: 'underline', fontWeight: 600 }
-const footSmall = { fontSize: '11px', color: '#94a3b8', margin: '6px 0 0' }
+const footWrap = { backgroundColor: '#f8fafc', border: '1px solid #dbe3eb', borderTop: 'none', padding: '20px 20px 22px', textAlign: 'center' as const }
+const footLine = { fontSize: '13px', lineHeight: '20px', color: '#475569', margin: '0 0 6px' }
+const footLink = { color: '#167caf', textDecoration: 'underline', fontWeight: 700 }
+const footSmall = { fontSize: '11px', lineHeight: '18px', color: '#64748b', margin: '8px 0 0' }

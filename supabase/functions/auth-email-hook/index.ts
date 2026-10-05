@@ -1,6 +1,6 @@
 import * as React from 'npm:react@18.3.1'
 import { renderAsync } from 'npm:@react-email/components@0.0.22'
-import { createAuthEmailHandler } from 'npm:@lovable.dev/email-js@0.1.0'
+import { createAuthEmailHandler } from 'npm:@lovable.dev/email-js@0.3.1'
 import { SignupEmail } from '../_shared/email-templates/signup.tsx'
 import { InviteEmail } from '../_shared/email-templates/invite.tsx'
 import { MagicLinkEmail } from '../_shared/email-templates/magic-link.tsx'
@@ -15,7 +15,7 @@ const corsHeaders = {
 }
 
 // Configuration
-const SITE_NAME = "MMAR Website"
+const SITE_NAME = "MMAR"
 const SENDER_DOMAIN = "notify.mikesmautorepair.com"
 const ROOT_DOMAIN = "mikesmautorepair.com"
 const FROM_DOMAIN = "mikesmautorepair.com"
@@ -127,6 +127,7 @@ const handler = createAuthEmailHandler({
   from: `${SITE_NAME} <noreply@${FROM_DOMAIN}>`,
   senderDomain: SENDER_DOMAIN,
   sendUrl: Deno.env.get('LOVABLE_SEND_URL'),
+  replyTo: 'quinnm954@outlook.com',
   emails: {
     signup: {
       subject: 'Confirm your email',

@@ -1,7 +1,7 @@
 /// <reference types="npm:@types/react@18.3.1" />
 
 import * as React from 'npm:react@18.3.1'
-import { BrandFooter } from '../transactional-email-templates/_brand.tsx'
+import { BrandHeader, BrandCard, BrandFooter } from '../transactional-email-templates/_brand.tsx'
 
 import {
   Body,
@@ -30,6 +30,8 @@ export const RecoveryEmail = ({
     <Preview>Reset your password for {siteName}</Preview>
     <Body style={main}>
       <Container style={container}>
+        <BrandHeader tag="SECURE ACCOUNT ACCESS" />
+        <BrandCard>
         <Heading style={h1}>Reset your password</Heading>
         <Text style={text}>
           We received a request to reset your password for {siteName}. Click
@@ -42,6 +44,7 @@ export const RecoveryEmail = ({
           If you didn't request a password reset, you can safely ignore this
           email. Your password will not be changed.
         </Text>
+        </BrandCard>
       <BrandFooter />
       </Container>
     </Body>
@@ -51,26 +54,26 @@ export const RecoveryEmail = ({
 export default RecoveryEmail
 
 const main = { backgroundColor: '#ffffff', fontFamily: 'Arial, sans-serif' }
-const container = { padding: '20px 25px' }
+const container = { maxWidth: '600px', margin: '0 auto', padding: '24px 12px' }
 const h1 = {
   fontSize: '22px',
   fontWeight: 'bold' as const,
-  color: '#0a1628',
+  color: '#0f172a',
   margin: '0 0 20px',
 }
 const text = {
   fontSize: '14px',
-  color: '#55575d',
+  color: '#334155',
   lineHeight: '1.5',
   margin: '0 0 25px',
 }
 const button = {
-  backgroundColor: '#1ca3e0',
-  color: '#0a1628',
+  backgroundColor: '#168fca',
+  color: '#ffffff',
   fontSize: '14px',
-  border: '1px solid #000000',
-  borderRadius: '8px',
-  padding: '12px 20px',
+  borderRadius: '5px',
+  padding: '14px 22px',
+  fontWeight: 'bold' as const,
   textDecoration: 'none',
 }
 const footer = { fontSize: '12px', color: '#999999', margin: '30px 0 0' }
