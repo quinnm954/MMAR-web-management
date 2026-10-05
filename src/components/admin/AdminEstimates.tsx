@@ -684,6 +684,19 @@ const AdminEstimates = () => {
             <Button variant="outline" onClick={() => setEditing(null)}>Cancel</Button>
             <Button onClick={save}>Save</Button>
           </DialogFooter>
+          {fcOpen && (
+            <div className="sticky bottom-0 z-10 mt-2 flex items-center justify-between gap-2 rounded-md border bg-background/95 backdrop-blur px-3 py-2 shadow-lg">
+              <span className="text-sm text-muted-foreground">First Call is open in a side window — vehicle details are on your clipboard.</span>
+              <div className="flex gap-2 shrink-0">
+                <Button size="sm" variant="outline" onClick={() => fcWindowRef.current?.focus()}>
+                  <ExternalLink className="h-3 w-3 mr-1" /> Show First Call
+                </Button>
+                <Button size="sm" onClick={() => { fcWindowRef.current?.close(); fcWindowRef.current = null; setFcOpen(false); window.focus(); }}>
+                  Back to estimate
+                </Button>
+              </div>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
 
