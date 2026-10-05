@@ -178,7 +178,7 @@ const AdminBookingRequests = () => {
     setBusy(false);
     if (est.error) toast.warning("Booking confirmed, but the estimate couldn't be created. Make one from Estimates.");
     else if (est.data?.kind === 'none') toast.success("Booking confirmed. No labor match — finish the draft estimate in Estimates to send it.");
-    else toast.success("Booking confirmed and estimate sent to the customer.");
+    else toast.success("Booking confirmed. Draft estimate ready — review it in Estimates and press Send.");
     setConfirming(null);
     load();
   };
