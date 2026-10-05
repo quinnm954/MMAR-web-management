@@ -41,6 +41,7 @@ import PortalServiceHistory from "./pages/portal/PortalServiceHistory";
 import PortalInvoices from "./pages/portal/PortalInvoices";
 import PortalInvoiceDetail from "./pages/portal/PortalInvoiceDetail";
 import PortalEstimates from "./pages/portal/PortalEstimates";
+import FinishEnrollment from "./pages/FinishEnrollment";
 import PortalRepairOrders from "./pages/portal/PortalRepairOrders";
 import PortalFinancing from "./pages/portal/PortalFinancing";
 import CustomerProtectedRoute from "./components/portal/CustomerProtectedRoute";
@@ -177,6 +178,7 @@ const App = () => (
             <Route path="/portal/checklists" element={<CustomerProtectedRoute><PortalChecklists /></CustomerProtectedRoute>} />
             <Route path="/portal/checklists/:id" element={<CustomerProtectedRoute><PortalChecklists /></CustomerProtectedRoute>} />
             <Route path="/estimate/:token" element={<EstimateApproval />} />
+            <Route path="/enroll/:token" element={<FinishEnrollment />} />
             <Route path="/inspection/:token" element={<InspectionReport />} />
             <Route path="/staff/login" element={<Navigate to="/login" replace />} />
             <Route path="/login" element={<Login />} />
