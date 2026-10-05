@@ -37,52 +37,8 @@ Deno.serve(async (req) => {
   const sent: any[] = [];
   const errors: any[] = [];
 
-  // 1) Appointment reminders: scheduled in the next 24-48 hours
+  // Appointment reminders live only in send-appointment-reminders (24h + 2h) to avoid double texts.
   const now = new Date();
-  const in24 = new Date(now.getTime() + 24 * 60 * 60 * 1000);
-  const in48 = new Date(now.getTime() + 48 * 60 * 60 * 1000);
-
-  const { data: upcoming } = await sb
-    .from('appointments')
-    .select('id, customer_id, service_type, scheduled_at, vehicle_id')
-    .gte('scheduled_at', in24.toISOString())
-    .lt('scheduled_at', in48.toISOString())
-    .in('status', ['scheduled', 'confirmed']);
-
-  for (const appt of upcoming || []) {
-    const { data: existing } = await sb
-      .from('service_reminders_sent')
-      .select('id')
-      .eq('reminder_type', 'appointment_24h')
-      .eq('reference_id', appt.id)
-      .maybeSingle();
-    if (existing) continue;
-
-    // Find phone via sms_threads (most recent for this customer)
-    const { data: thread } = await sb
-      .from('sms_threads')
-      .select('phone')
-      .eq('customer_id', appt.customer_id)
-      .order('updated_at', { ascending: false })
-      .limit(1)
-      .maybeSingle();
-    if (!thread?.phone) continue;
-
-    const when = new Date(appt.scheduled_at!);
-    const msg = `Hi, this is Mike's Mobile Auto Repair! Just a reminder we'll see you ${when.toLocaleString('en-US', { timeZone: 'America/New_York', weekday: 'long', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}${appt.service_type ? ` for your ${String(appt.service_type).replace(/\s+(in|near)\s+[A-Z].*$/i, '').toLowerCase()}` : ''}. Need to change it? Just text us back. Reply STOP to opt out.${await enrollSuffix(sb, appt.customer_id)}`;
-
-    const res = await sendSms(thread.phone, msg);
-    await sb.from('service_reminders_sent').insert({
-      customer_id: appt.customer_id,
-      reminder_type: 'appointment_24h',
-      reference_id: appt.id,
-      phone: thread.phone,
-      message: msg,
-      status: res.ok ? 'sent' : 'failed',
-      error: res.error,
-    });
-    if (res.ok) sent.push({ type: 'appointment_24h', id: appt.id }); else errors.push({ id: appt.id, error: res.error });
-  }
 
   // 2) Service recommendations: due within next 14 days OR overdue mileage
   const in14 = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);

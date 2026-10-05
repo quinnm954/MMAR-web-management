@@ -381,7 +381,14 @@ Deno.serve(async (req) => {
       const owner = s?.ai_summary_to_number || s?.forward_to_number;
       if (owner) await sendSms(owner, `AI answered a call from ${caller || 'unknown'}:\n${summary || '(no summary)'}`, sb, fromNum);
       if (caller && transcript.length > 1) {
-        await sendSms(caller, `Thanks for calling Mike's Mobile Auto Repair! We've got your call details and will text you shortly. Questions in the meantime? Just reply here. Reply STOP to opt out.`, sb, fromNum);
+        // Only follow up when there's something pending (a booking request saved during the call).
+        const d10 = caller.replace(/\D/g, '').slice(-10);
+        const { data: pending } = d10.length === 10 ? await sb.from('booking_requests').select('id')
+          .ilike('customer_phone', `%${d10.slice(-4)}%`).eq('status', 'pending')
+          .gte('created_at', new Date(Date.now() - 2 * 3600000).toISOString()).limit(1) : { data: [] };
+        if (pending?.length) {
+          await sendSms(caller, `Thanks for calling Mike's Mobile Auto Repair! We've got your appointment request and will text you to confirm the time. Questions? Just reply here. Reply STOP to opt out.`, sb, fromNum);
+        }
       } else if (caller) {
         // Caller hung up before talking to the AI — treat as a missed call
         await sendMissedCallFollowup(sb, caller, fromNum);
