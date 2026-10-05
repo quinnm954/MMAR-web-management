@@ -94,7 +94,7 @@ export async function createDraftEstimate(sb: any, req: any, q: LaborQuote) {
   const { data, error } = await sb.from('estimates').insert({
     customer_id: prof.id, status: 'sent', sent_at: new Date().toISOString(), line_items: [line], subtotal: total, total, valid_until: valid,
     customer_phone: req.customer_phone || null,
-    notes: `Auto-drafted from booking request (${req.vehicle_info || 'vehicle n/a'}). Labor times are estimates — verify hours and add parts.' Sent to customer automatically.'`,
+    notes: `Auto-drafted from booking request (${req.vehicle_info || 'vehicle n/a'}). Labor times are estimates — verify hours and add parts. Sent to customer automatically.`,
   }).select('id, estimate_number, approval_token').single();
   if (error) { console.error('draft estimate', error); return null; }
   if (email) {
