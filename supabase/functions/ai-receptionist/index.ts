@@ -168,6 +168,8 @@ Deno.serve(async (req) => {
             },
           },
           tts: { voice_id: 'kyu5ji11Ocj3MIcc9vdQ', model_id: 'eleven_flash_v2' },
+          // End the call after 10 seconds of silence from the caller.
+          turn: { turn_timeout: 7, silence_end_call_timeout: 10 },
         },
         platform_settings: {
           overrides: { conversation_config_override: { agent: { first_message: true } } },
