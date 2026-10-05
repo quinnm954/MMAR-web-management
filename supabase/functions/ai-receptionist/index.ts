@@ -319,7 +319,7 @@ Deno.serve(async (req) => {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
         body: new URLSearchParams({
-          Twiml: `<Response><Say voice="alice">Connecting you to Mike now.</Say><Dial timeout="25">${fwd}</Dial><Say voice="alice">Sorry, Mike is unavailable. He will call you back shortly.</Say></Response>`,
+          Twiml: `<Response><Say voice="alice">Connecting you to Mike now.</Say><Dial timeout="25" callerId="+18135017572"><Number url="${supabaseUrl}/functions/v1/ai-receptionist?action=whisper&amp;token=${TOKEN}">${fwd}</Number></Dial><Say voice="alice">Sorry, Mike could not pick up right now. He has your details and will call you back shortly.</Say></Response>`,
         }),
       });
       if (!r.ok) {
