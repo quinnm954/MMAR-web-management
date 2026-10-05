@@ -164,7 +164,7 @@ const AdminEstimates = () => {
           laborHrs = 0;
         }
 
-        const amount = +(qty * price).toFixed(2);
+        const amount = +(kind === 'labor' ? laborHrs * price : qty * price).toFixed(2);
         const unit_cost = kind === 'part' ? +(price / PARTS_MARKUP).toFixed(2) : 0;
         return {
           description: desc,
@@ -394,7 +394,8 @@ const AdminEstimates = () => {
   const updateLine = (idx: number, patch: Partial<LineItem>) => {
     const lines = [...editing.line_items];
     lines[idx] = { ...lines[idx], ...patch };
-    lines[idx].amount = Number(lines[idx].quantity) * Number(lines[idx].unit_price);
+    const k = lines[idx].kind ?? 'part';
+    lines[idx].amount = +(k === 'labor' ? Number(lines[idx].labor_hours || 0) * Number(lines[idx].unit_price) : Number(lines[idx].quantity) * Number(lines[idx].unit_price)).toFixed(2);
     updateLines(lines);
   };
 
