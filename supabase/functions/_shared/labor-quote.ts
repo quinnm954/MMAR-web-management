@@ -1,6 +1,8 @@
 // Automatic labor quote for booking requests: Open Labor Project book times x shop rate.
 // Parts are never priced here — customer can supply their own or the shop sources them.
 import { cleanService } from './booking-bot.ts';
+import { sendAndLog } from './send-and-log.ts';
+const SITE = 'https://mikesmautorepair.com';
 
 export type LaborQuote = {
   kind: 'diagnosis' | 'labor' | 'none';
@@ -63,8 +65,16 @@ export async function createDraftEstimate(sb: any, req: any, q: LaborQuote) {
   const email = (req.customer_email || '').trim().toLowerCase();
   const phone = (req.customer_phone || '').replace(/\D/g, '').slice(-10);
   let prof: any = null;
+  let isNew = false;
   if (email) prof = (await sb.from('profiles').select('id').ilike('email', email).limit(1)).data?.[0];
   if (!prof && phone) prof = ((await sb.from('profiles').select('id, phone').not('phone', 'is', null)).data || []).find((p: any) => (p.phone || '').replace(/\D/g, '').slice(-10) === phone);
+  if (!prof && email) {
+    // Auto-create a login-by-link account for new customers.
+    const { data: c, error: ce } = await sb.auth.admin.createUser({ email, email_confirm: true, user_metadata: { full_name: req.customer_name || '', phone: req.customer_phone || '', source: 'auto_quote' } });
+    if (ce) { console.error('create user', ce); return null; }
+    await sb.from('profiles').upsert({ id: c.user.id, email, full_name: req.customer_name || null, phone: req.customer_phone || null });
+    prof = { id: c.user.id }; isNew = true;
+  }
   if (!prof) return null;
   let line;
   if (q.kind === 'diagnosis') line = { description: 'Diagnosis fee ($50 credited to repair labor)', quantity: 1, unit_price: 100, amount: 100, kind: 'labor' };
@@ -75,11 +85,23 @@ export async function createDraftEstimate(sb: any, req: any, q: LaborQuote) {
   const total = line.amount;
   const valid = new Date(Date.now() + 30 * 86400_000).toISOString().slice(0, 10);
   const { data, error } = await sb.from('estimates').insert({
-    customer_id: prof.id, status: 'draft', line_items: [line], subtotal: total, total, valid_until: valid,
+    customer_id: prof.id, status: email ? 'sent' : 'draft', sent_at: email ? new Date().toISOString() : null, line_items: [line], subtotal: total, total, valid_until: valid,
     customer_phone: req.customer_phone || null,
-    notes: `Auto-drafted from booking request (${req.vehicle_info || 'vehicle n/a'}). Labor times are estimates — verify hours and add parts before sending.`,
-  }).select('id').single();
+    notes: `Auto-drafted from booking request (${req.vehicle_info || 'vehicle n/a'}). Labor times are estimates — verify hours and add parts.${email ? ' Sent to customer automatically.' : ''}`,
+  }).select('id, estimate_number, approval_token').single();
   if (error) { console.error('draft estimate', error); return null; }
+  if (email) {
+    const { data: link } = await sb.auth.admin.generateLink({ type: 'magiclink', email, options: { redirectTo: `${SITE}/portal/estimates` } }).catch(() => ({ data: null }));
+    await sendAndLog({
+      templateName: 'estimate-ready', recipientEmail: email, idempotencyKey: `estimate-ready-${data.id}`,
+      templateData: {
+        name: (req.customer_name || '').split(' ')[0] || undefined, estimateNumber: data.estimate_number || '',
+        total: q.kind === 'diagnosis' ? '$100 diagnosis ($50 credited to repair labor)' : `$${Math.round(total)} labor (parts extra)`,
+        approvalUrl: `${SITE}/estimate/${data.approval_token}`, accountUrl: link?.properties?.action_link || `${SITE}/login`,
+      },
+      metadata: { auto_quote: true, new_account: isNew },
+    });
+  }
   return data.id as string;
 }
 
