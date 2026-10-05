@@ -5,6 +5,7 @@ import Stripe from 'npm:stripe@18.5.0';
 import { sendAndLog } from '../_shared/send-and-log.ts';
 import { sendSms } from '../_shared/booking-bot.ts';
 import { smsAllowed } from '../_shared/missed-call.ts';
+import { enrollSuffix } from '../_shared/enroll.ts';
 
 const SITE = 'https://mikesmautorepair.com';
 const H = 3600000, D = 24 * H;
@@ -50,9 +51,10 @@ Deno.serve(async () => {
       const phone = p?.phone || e.customer_phone;
       if (textsOk && phone) {
         const hi = first(p?.full_name) ? `Hi ${first(p?.full_name)}, ` : 'Hi, ';
-        await sendSms(sb, phone, final
+        const enr = await enrollSuffix(sb, e.customer_id);
+        await sendSms(sb, phone, (final
           ? `${hi}this is Mike's Mobile Auto Repair checking in one last time on your estimate (${money(e.total)}). Approve it here and we'll book the earliest open time: ${url} Reply STOP to opt out.`
-          : `${hi}this is Mike's Mobile Auto Repair. Your estimate (${money(e.total)}) is ready whenever you are. Approve all or part of it here: ${url} Reply STOP to opt out.`);
+          : `${hi}this is Mike's Mobile Auto Repair. Your estimate (${money(e.total)}) is ready whenever you are. Approve all or part of it here: ${url} Reply STOP to opt out.`) + enr);
       }
       await sb.from('estimates').update({ followup_count: step, followup_last_at: now.toISOString() }).eq('id', e.id);
       out.estimates++;
@@ -110,9 +112,10 @@ Deno.serve(async () => {
       }
       if (textsOk && p?.phone) {
         const hi = first(p.full_name) ? `Hi ${first(p.full_name)}, ` : 'Hi, ';
-        await sendSms(sb, p.phone, reminder
+        const enr = await enrollSuffix(sb, inv.customer_id);
+        await sendSms(sb, p.phone, (reminder
           ? `${hi}friendly reminder from Mike's Mobile Auto Repair: your invoice for ${money(dueAmt)} is still open. Pay securely here: ${url} Reply STOP to opt out.`
-          : `${hi}thanks for choosing Mike's Mobile Auto Repair! Your invoice for ${money(dueAmt)} is ready. Pay securely here: ${url} Reply STOP to opt out.`);
+          : `${hi}thanks for choosing Mike's Mobile Auto Repair! Your invoice for ${money(dueAmt)} is ready. Pay securely here: ${url} Reply STOP to opt out.`) + enr);
       }
       await sb.from('invoices').update(reminder
         ? { reminder_count: step, reminder_last_at: now.toISOString() }
