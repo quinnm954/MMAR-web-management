@@ -17,9 +17,10 @@ import { LogOut, FileText, ShieldCheck, Users, CreditCard, Calendar, CalendarChe
 import AdminCalls from '@/components/admin/AdminCalls';
 import Softphone from '@/components/admin/Softphone';
 import AdminSMS from '@/components/admin/AdminSMS';
+import AdminReviewFeedback from '@/components/admin/AdminReviewFeedback';
 import AdminProspecting from '@/components/admin/AdminProspecting';
 import AdminFleetAccounts from '@/components/admin/AdminFleetAccounts';
-import { Search } from 'lucide-react';
+import { Search, Star } from 'lucide-react';
 import AdminPhoneSettings from '@/components/admin/AdminPhoneSettings';
 import AdminTrackingSettings from '@/components/admin/AdminTrackingSettings';
 import AdminEmployees from '@/components/admin/AdminEmployees';
@@ -174,6 +175,7 @@ const AdminDashboard = () => {
             { value: 'roles', label: 'Roles', icon: ShieldCheck, roles: OWNER_ADMIN, content: <AdminRoles /> },
             { value: 'calls', label: 'Calls', icon: Phone, roles: ADVISOR, content: <AdminCalls /> },
             { value: 'texts', label: 'Texts', icon: MessageSquare, roles: ADVISOR, content: <AdminSMS /> },
+            { value: 'feedback', label: 'Feedback', icon: Star, roles: ADVISOR, content: <AdminReviewFeedback /> },
             { value: 'fleet-accounts', label: 'Fleet Accounts', icon: Car, roles: ADVISOR, content: <AdminFleetAccounts /> },
             { value: 'prospecting', label: 'Prospecting', icon: Search, roles: OWNER_ADMIN, content: <AdminProspecting /> },
             { value: 'phone-settings', label: 'Phone Setup', icon: PhoneCall, roles: OWNER_ADMIN, content: <AdminPhoneSettings /> },
@@ -206,7 +208,7 @@ const AdminDashboard = () => {
 
           const groups = [
             { label: 'Workshop', values: ['calendar','ros','service','inspections','estimates','invoices','time','shifts','productivity'] },
-            { label: 'Front Desk', values: ['customers','garage','memberships','bookings','share','declined','fleet-accounts','calls','texts','prospecting'] },
+            { label: 'Front Desk', values: ['customers','garage','memberships','bookings','share','declined','fleet-accounts','calls','texts','feedback','prospecting'] },
             { label: 'Admin', values: ['dashboard','reports','laborpay','quickbooks','financing','warranty','emails','audit','employees','roles','phone-settings','tracking','settings'] },
           ];
           const groupedValues = groups.flatMap(g => g.values);

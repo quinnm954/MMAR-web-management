@@ -2495,6 +2495,45 @@ export type Database = {
         }
         Relationships: []
       }
+      review_feedback: {
+        Row: {
+          admin_notes: string | null
+          comments: string | null
+          created_at: string
+          email: string | null
+          id: string
+          name: string | null
+          phone: string | null
+          rating: number
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          comments?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string | null
+          phone?: string | null
+          rating: number
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          admin_notes?: string | null
+          comments?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string | null
+          phone?: string | null
+          rating?: number
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       ro_attachments: {
         Row: {
           appointment_id: string
@@ -3823,6 +3862,16 @@ export type Database = {
           _yard_address: string
         }
         Returns: Json
+      }
+      submit_review_feedback: {
+        Args: {
+          _comments: string
+          _email: string
+          _name: string
+          _phone: string
+          _rating: number
+        }
+        Returns: string
       }
       unread_message_count: { Args: { _user_id: string }; Returns: number }
       window_start_time: { Args: { _w: string }; Returns: string }
