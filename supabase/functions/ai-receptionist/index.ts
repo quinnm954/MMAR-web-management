@@ -318,6 +318,7 @@ Deno.serve(async (req) => {
       const dateStr = String(body.requested_date || '').trim();
       const timeStr = String(body.requested_time || '').trim();
       let window: string | null = null;
+      let slotTime = '';
       if (dateStr || timeStr) {
         const dm = /^\d{4}-\d{2}-\d{2}$/.test(dateStr);
         const tm = timeStr.match(/^(\d{1,2}):(\d{2})$/);
@@ -336,6 +337,7 @@ Deno.serve(async (req) => {
         }
         const h = Number(tm[1]), label = `${((h + 11) % 12) + 1}:${tm[2]} ${h < 12 ? 'AM' : 'PM'}`;
         window = label;
+        slotTime = `${tm[1].padStart(2, '0')}:${tm[2]}`;
       }
       const notes = [window && `Requested appointment: ${dateStr} at ${window}`, 'Booked by AI receptionist']
         .filter(Boolean).join('\n');
@@ -356,7 +358,7 @@ Deno.serve(async (req) => {
         return json({ result: 'Could not save. Tell the caller Mike will call them back.' });
       }
       if (window && body.price_approved === true && ins?.id) {
-        const c = await autoConfirmBooking(sb, ins.id, dateStr, `${tm![1].padStart(2, '0')}:${tm![2]}`).catch(() => ({ ok: false }));
+        const c = await autoConfirmBooking(sb, ins.id, dateStr, slotTime).catch(() => ({ ok: false }));
         if (c.ok) return json({ result: `Booked and CONFIRMED for ${dateStr} at ${window}. Tell the caller they're all set, Mike will be there then, and the written estimate will come by text or email shortly.` });
       }
       return json({ result: window ? `Requested ${dateStr} at ${window}. Tell the caller it is requested (not confirmed yet) and the shop will text shortly to confirm.` : 'Booking request saved. Mike will text or call to confirm.' });

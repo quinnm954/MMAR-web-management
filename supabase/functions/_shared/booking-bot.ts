@@ -1,5 +1,6 @@
 // Booking follow-up bot: texts website bookers, agrees on a 10am–5pm slot, then converts to an appointment.
 const TWILIO_GW = 'https://connector-gateway.lovable.dev/twilio';
+import { autoConfirmBooking } from './auto-confirm.ts';
 import { buildLaborQuote, createDraftEstimate, quoteSentence, quoteNote } from './labor-quote.ts';
 const AI_URL = 'https://ai.gateway.lovable.dev/v1/responses';
 
@@ -199,7 +200,7 @@ async function askAi(system: string, history: { role: string; content: string }[
   }
   const m = out.match(/\{[\s\S]*\}/);
   if (!m) throw new Error('AI returned no JSON');
-  return JSON.parse(m[0]) as { reply: string; confirmed: boolean; date?: string; time?: string; handoff?: boolean };
+  return JSON.parse(m[0]) as { reply: string; confirmed: boolean; date?: string; time?: string; handoff?: boolean; price_ok?: boolean };
 }
 
 // Returns true if the text was handled by the bot.
@@ -225,8 +226,8 @@ Customer's requested date/window: ${req.requested_date || 'none'} ${req.requeste
 OPEN start times (already account for existing appointments, drive time, and at least ${LEAD_MIN} minutes notice):
 ${availText}
 Speed matters: customers who wait call someone else. Always lead with the EARLIEST open time (today if any), then their requested day if different. Don't ask open-ended 'what time works?' — propose a specific time.
-Rules: ONLY offer or confirm times from the OPEN list above — never any other time, and never a time that's about to start. If they ask for a time that isn't listed, say it's taken and offer the closest open times. You are a text assistant for the shop: warm, casual, human, and VERY brief — one short sentence when possible, two max. No small talk, no restating details, get straight to the time. Never claim to personally be Mike — you text on behalf of the shop; if the customer asks for Mike or the owner by name, set handoff=true and say Mike will reach out. If the vehicle above has no engine size (like 1.4L or V6) and they want a specific repair, ask for it once in the same message as the time offer; if they don't know, skip it. Never re-ask for info already given above or in the chat. Write dates like "Monday, Oct 5th" and times like "10:30 AM" — never raw formats like 2026-10-05 or 14:00. Never paste page titles or system wording. Never quote prices except the diagnosis fee and what's in the shop notes below. Diagnosis fee: if the customer has a problem to figure out (a warning light, noise, no-start, electrical issue, 'not sure what's wrong') rather than asking for a specific part replacement, tell them BEFORE confirming a time: there's a $100 diagnosis fee, and $50 of it is credited toward the repair labor if they go ahead. Say it once, plainly, and make sure they're okay with it. Skip it for specific repairs like 'replace my alternator'. Shop notes: ${req.notes || 'none'}. Parts are extra; the customer may supply their own or the shop sources them. Once the customer clearly agrees to one specific date and time, set confirmed=true. If they ask for a person, are upset, or it's urgent/unsafe, set handoff=true and say Mike will reach out.
-Respond ONLY with JSON: {"reply": string, "confirmed": boolean, "date": "YYYY-MM-DD" or null, "time": "HH:MM" 24h or null, "handoff": boolean}`;
+Rules: ONLY offer or confirm times from the OPEN list above — never any other time, and never a time that's about to start. If they ask for a time that isn't listed, say it's taken and offer the closest open times. You are a text assistant for the shop: warm, casual, human, and VERY brief — one short sentence when possible, two max. No small talk, no restating details, get straight to the time. Never claim to personally be Mike — you text on behalf of the shop; if the customer asks for Mike or the owner by name, set handoff=true and say Mike will reach out. If the vehicle above has no engine size (like 1.4L or V6) and they want a specific repair, ask for it once in the same message as the time offer; if they don't know, skip it. Never re-ask for info already given above or in the chat. Write dates like "Monday, Oct 5th" and times like "10:30 AM" — never raw formats like 2026-10-05 or 14:00. Never paste page titles or system wording. Never quote prices except the diagnosis fee and what's in the shop notes below. Diagnosis fee: if the customer has a problem to figure out (a warning light, noise, no-start, electrical issue, 'not sure what's wrong') rather than asking for a specific part replacement, tell them BEFORE confirming a time: there's a $100 diagnosis fee, and $50 of it is credited toward the repair labor if they go ahead. Say it once, plainly, and make sure they're okay with it. Skip it for specific repairs like 'replace my alternator'. Shop notes: ${req.notes || 'none'}. Parts are extra; the customer may supply their own or the shop sources them. Once the customer clearly agrees to one specific date and time, set confirmed=true. Set price_ok=true only if they clearly accepted the price quoted (labor quote in shop notes or the diagnosis fee); if there was no price to accept, price_ok=false. If they ask for a person, are upset, or it's urgent/unsafe, set handoff=true and say Mike will reach out.
+Respond ONLY with JSON: {"reply": string, "confirmed": boolean, "date": "YYYY-MM-DD" or null, "time": "HH:MM" 24h or null, "handoff": boolean, "price_ok": boolean}`;
 
   let ai;
   try { ai = await askAi(system, history); }
@@ -249,10 +250,16 @@ Respond ONLY with JSON: {"reply": string, "confirmed": boolean, "date": "YYYY-MM
       // Manual confirmation for now: save the requested time, staff approves it in Bookings.
       const h = Number(ai.time.split(':')[0]);
       const label = `${((h + 11) % 12) + 1}:${ai.time.split(':')[1]} ${h < 12 ? 'AM' : 'PM'}`;
+      const auto = ai.price_ok ? await autoConfirmBooking(sb, req.id, ai.date, ai.time).catch(() => ({ ok: false })) : { ok: false };
+      if (auto.ok) {
+        status = 'confirmed'; requested = true;
+        reply = `You're all set for ${friendlyDate(ai.date)} at ${label}! We'll send your written estimate shortly.`;
+      } else {
       await sb.from('booking_requests').update({ requested_date: ai.date, requested_time_window: label }).eq('id', req.id);
       status = 'handoff'; requested = true;
       reply = `Got it — I've requested ${friendlyDate(ai.date)} at ${label} for you. We'll text you shortly to confirm.`;
-      await sb.rpc('_notify_staff_customer_action', { _title: 'Booking needs your OK', _body: `${req.customer_name || from} wants ${friendlyDate(ai.date)} at ${label}`, _link: '/admin/dashboard?tab=bookings' }).catch(() => {});
+        await sb.rpc('_notify_staff_customer_action', { _title: 'Booking needs your OK', _body: `${req.customer_name || from} wants ${friendlyDate(ai.date)} at ${label}`, _link: '/admin/dashboard?tab=bookings' }).catch(() => {});
+      }
     }
   }
   await sendSms(sb, from, reply);
