@@ -49,7 +49,7 @@ export default function AdminFleetAccounts() {
   const shown = rows.filter((f) => !q || `${f.company_name} ${f.contact_name} ${f.email} ${f.city}`.toLowerCase().includes(q.toLowerCase()));
 
   return (
-    <Card>
+    <Card className="flex max-h-[65vh] min-h-[320px] flex-col overflow-hidden md:max-h-[calc(100dvh-220px)] md:min-h-0">
       <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-3 space-y-0">
         <div>
           <CardTitle className="flex items-center gap-2"><Truck className="h-5 w-5" />Fleet accounts ({rows.length})</CardTitle>
@@ -57,7 +57,7 @@ export default function AdminFleetAccounts() {
         </div>
         <Input className="max-w-xs" placeholder="Search company, contact, city" value={q} onChange={(e) => setQ(e.target.value)} />
       </CardHeader>
-      <CardContent className="divide-y p-0">
+      <CardContent className="flex-1 min-h-0 divide-y overflow-y-auto p-0">
         {shown.length === 0 && <p className="p-6 text-sm text-muted-foreground">No fleet sign-ups yet.</p>}
         {shown.map((f) => (
           <div key={f.id} className="p-4 grid gap-3 md:grid-cols-[2fr_1.2fr_1fr_auto] md:items-center">
