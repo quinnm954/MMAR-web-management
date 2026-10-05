@@ -176,7 +176,7 @@ Deno.serve(async (req) => {
           language_presets: {
             es: { overrides: { agent: { language: 'es', first_message: 'Gracias por llamar a Mike\'s Mobile Auto Repair. ¿En qué le puedo ayudar?' } } },
           },
-          tts: { voice_id: 'kyu5ji11Ocj3MIcc9vdQ', model_id: 'eleven_flash_v2_5' },
+          tts: { voice_id: 'kyu5ji11Ocj3MIcc9vdQ', model_id: 'eleven_flash_v2', supported_voices: [{ label: 'Spanish', voice_id: 'kyu5ji11Ocj3MIcc9vdQ', language: 'es', model_family: 'flash' }] },
           // End the call after 10 seconds of silence from the caller.
           turn: { turn_timeout: 7, silence_end_call_timeout: 10 },
         },
