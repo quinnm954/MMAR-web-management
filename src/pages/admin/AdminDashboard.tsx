@@ -119,19 +119,19 @@ const AdminDashboard = () => {
     <div className="min-h-screen bg-background">
       <Softphone />
       <header className="border-b border-border bg-card safe-pt">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
+        <div className="container mx-auto px-3 sm:px-4 py-2 sm:py-4 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 sm:gap-4 min-w-0">
             <Link to="/">
-              <img src={mmarLogo} alt="MMAR" className="h-12 w-12 rounded-full object-cover border border-primary" />
+              <img src={mmarLogo} alt="MMAR" className="h-9 w-9 sm:h-12 sm:w-12 rounded-full object-cover border border-primary shrink-0" />
             </Link>
             <div>
-              <h1 className="text-xl font-display flex items-center gap-2">
-                <Wrench className="h-5 w-5 text-primary" /> Garage Ace Admin
+              <h1 className="text-base sm:text-xl font-display flex items-center gap-2 truncate">
+                <Wrench className="h-5 w-5 text-primary hidden sm:block" /> Garage Ace
               </h1>
-              <p className="text-sm text-muted-foreground">{user?.email}</p>
+              <p className="text-sm text-muted-foreground hidden sm:block">{user?.email}</p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-0.5 sm:gap-2 shrink-0">
             <Button variant="ghost" size="sm" onClick={refreshAll} disabled={refreshing} title={`Last refreshed ${lastRefreshed.toLocaleTimeString()}`}>
               <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
             </Button>
@@ -140,14 +140,14 @@ const AdminDashboard = () => {
             <Button asChild variant="ghost" size="sm" title="Notification settings">
               <Link to="/settings/notifications"><Bell className="h-4 w-4" /></Link>
             </Button>
-            <Button variant="outline" onClick={() => signOut()}>
-              <LogOut className="mr-2 h-4 w-4" /> Sign Out
+            <Button variant="outline" size="sm" onClick={() => signOut()} aria-label="Sign out">
+              <LogOut className="h-4 w-4 sm:mr-2" /><span className="hidden sm:inline">Sign Out</span>
             </Button>
           </div>
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8 space-y-6 safe-pb">
+      <main className="container mx-auto px-2 sm:px-4 py-3 sm:py-8 space-y-4 sm:space-y-6 safe-pb">
         <PushNotificationCard />
         {(() => {
           const tabs: TabDef[] = [
@@ -270,7 +270,7 @@ const AdminDashboard = () => {
                   Current: <span className="font-medium text-foreground">{active.label}</span>
                 </div>
               </div>
-              <div className="border rounded-lg p-4 bg-card">
+              <div className="border rounded-lg p-2 sm:p-4 bg-card overflow-x-auto">
                 {active.content}
               </div>
             </div>

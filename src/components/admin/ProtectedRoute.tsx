@@ -40,6 +40,11 @@ const ProtectedRoute = ({ children, requireAdmin = true, allowedRoles }: Protect
       ? (isAdmin || isManager)
       : true;
 
+  if (!allowed && !allowedRoles) {
+    if (hasAnyRole(['technician'])) return <Navigate to="/tech" replace />;
+    if (hasAnyRole(['customer'])) return <Navigate to="/portal/dashboard" replace />;
+  }
+
   if (!allowed) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
