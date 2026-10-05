@@ -155,6 +155,14 @@ const AdminBookingRequests = () => {
   const submitConfirm = async () => {
     if (!confirming) return;
     setBusy(true);
+    const ensure = await supabase.functions.invoke("ensure-booking-customer", { body: { id: confirming.id } });
+    if (ensure.error) {
+      let msg = ensure.error.message;
+      try { msg = JSON.parse(await (ensure.error as any).context.text()).error || msg; } catch { /* keep */ }
+      setBusy(false);
+      toast.error(msg);
+      return;
+    }
     const { error } = await supabase.rpc("admin_confirm_booking_request", {
       _id: confirming.id,
       _requested_date: date || null,
