@@ -6,6 +6,7 @@
 //   postcall  – ElevenLabs post-call webhook: save transcript + text summaries
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.95.0';
 import { sendMissedCallFollowup } from '../_shared/missed-call.ts';
+import { isSlotOpen, openSlots, label12 } from '../_shared/booking-bot.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -252,6 +253,12 @@ Deno.serve(async (req) => {
         const todayEt = `${nowEt.getFullYear()}-${String(nowEt.getMonth() + 1).padStart(2, '0')}-${String(nowEt.getDate()).padStart(2, '0')}`;
         if (dateStr < todayEt || (dateStr === todayEt && mins <= nowEt.getHours() * 60 + nowEt.getMinutes()))
           return json({ result: 'That time has already passed. Offer a later time between 10 AM and 5 PM.' });
+        const ok = await isSlotOpen(sb, dateStr, `${tm[1].padStart(2, '0')}:${tm[2]}`).catch(() => true);
+        if (!ok) {
+          const av = await openSlots(sb, dateStr, 3).catch(() => []);
+          const alt = av.filter((d) => d.slots.length).slice(0, 2).map((d) => `${d.date}: ${d.slots.slice(0, 4).map(label12).join(', ')}`).join('; ');
+          return json({ result: `That time is already booked or too soon for Mike to drive there. Open times: ${alt || 'none in the next few days — take a message'}. Offer these instead.` });
+        }
         const h = Number(tm[1]), label = `${((h + 11) % 12) + 1}:${tm[2]} ${h < 12 ? 'AM' : 'PM'}`;
         window = label;
       }
