@@ -145,9 +145,9 @@ Deno.serve(async (req) => {
         const lead = win === "24h" ? "tomorrow" : "in about 2 hours";
         const title = `Mike's Mobile Auto Repair`;
         const svc = String(a.service_type || "").replace(/\s+(in|near)\s+[A-Z].*$/i, "").trim().toLowerCase();
-        const body = `Hi, this is Mike! Just a heads-up, I'll see you ${lead} (${when})${svc ? ` for your ${svc}` : ""}.${
-          a.service_address ? ` I'll meet you at ${a.service_address}.` : ""
-        } Anything change? Just text me back or call (813) 501-7572. Reply STOP to opt out.`;
+        const body = `Hi, this is Mike's Mobile Auto Repair! Just a heads-up, we'll see you ${lead} (${when})${svc ? ` for your ${svc}` : ""}.${
+          a.service_address ? ` We'll meet you at ${a.service_address}.` : ""
+        } Anything change? Just text us back or call (813) 501-7572. Reply STOP to opt out.`;
 
         // Push (best effort)
         if (!pref || pref.push_enabled !== false) {
