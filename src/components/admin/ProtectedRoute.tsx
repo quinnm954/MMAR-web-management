@@ -42,7 +42,7 @@ const ProtectedRoute = ({ children, requireAdmin = true, allowedRoles }: Protect
 
   if (!allowed && !allowedRoles) {
     if (hasAnyRole(['technician'])) return <Navigate to="/tech" replace />;
-    if (hasAnyRole(['customer'])) return <Navigate to="/portal" replace />;
+    if (hasAnyRole(['customer'])) return <Navigate to="/portal/dashboard" replace />;
   }
 
   if (!allowed) {
