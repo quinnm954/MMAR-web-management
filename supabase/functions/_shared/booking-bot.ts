@@ -1,5 +1,6 @@
 // Booking follow-up bot: texts website bookers, agrees on a 10am–5pm slot, then converts to an appointment.
 const TWILIO_GW = 'https://connector-gateway.lovable.dev/twilio';
+import { buildLaborQuote, createDraftEstimate, quoteSentence, quoteNote } from './labor-quote.ts';
 const AI_URL = 'https://ai.gateway.lovable.dev/v1/responses';
 
 export const digits = (p: string) => (p || '').replace(/\D/g, '').slice(-10);
@@ -128,7 +129,7 @@ function cityFrom(addr?: string | null) {
   return m ? m[1].trim().split(/\s{2,}/).pop() : null;
 }
 
-export function buildOpener(req: any, avail: { date: string; slots: number[] }[] = []) {
+export function buildOpener(req: any, avail: { date: string; slots: number[] }[] = [], quote = '') {
   const first = (req.customer_name || '').trim().split(/\s+/)[0];
   const svc = cleanService(req.service_type);
   const vehicle = (req.vehicle_info || '').trim();
@@ -150,7 +151,7 @@ export function buildOpener(req: any, avail: { date: string; slots: number[] }[]
   else if (day) ask = `I see you asked for ${day}. What time works best? We're out any time between 10am and 5pm.`;
   else if (nextOpen) ask = `Our next opening is ${friendlyDate(nextOpen.d)} at ${label12(nextOpen.m)} — would that work, or is another day better?`;
   else ask = `What day and time work best for you? We come out any day between 10am and 5pm.`;
-  return `Hi${first ? ` ${first}` : ''}, this is Mike's Mobile Auto Repair! Got ${what}${forCar}${where}. ${ask} Reply STOP to opt out.`;
+  return `Hi${first ? ` ${first}` : ''}, this is Mike's Mobile Auto Repair! Got ${what}${forCar}${where}. ${quote ? `${quote} ` : ''}${ask} Reply STOP to opt out.`;
 }
 
 export async function startBot(sb: any, id: string) {
@@ -161,9 +162,12 @@ export async function startBot(sb: any, id: string) {
     .select('*').maybeSingle();
   if (!req || !req.customer_phone) return { skipped: true };
   const avail = await openSlots(sb, req.requested_date ? String(req.requested_date).slice(0, 10) : null, 7).catch(() => []);
-  const text = buildOpener(req, avail);
+  const q = await buildLaborQuote(sb, req).catch((e) => { console.error('quote', e); return null; });
+  const estId = q ? await createDraftEstimate(sb, req, q).catch(() => null) : null;
+  const text = buildOpener(req, avail, q ? quoteSentence(q) : '');
   await sendSms(sb, req.customer_phone, text);
-  await sb.from('booking_requests').update({ bot_history: [{ role: 'assistant', content: text }] }).eq('id', id);
+  const note = q ? quoteNote(q, estId) : '';
+  await sb.from('booking_requests').update({ bot_history: [{ role: 'assistant', content: text }], ...(note ? { notes: [req.notes, note].filter(Boolean).join('\n') } : {}) }).eq('id', id);
   return { started: true };
 }
 
@@ -218,7 +222,7 @@ Customer's requested date/window: ${req.requested_date || 'none'} ${req.requeste
 OPEN start times (already account for existing appointments, drive time, and at least ${LEAD_MIN} minutes notice):
 ${availText}
 Speed matters: customers who wait call someone else. Always lead with the EARLIEST open time (today if any), then their requested day if different. Don't ask open-ended 'what time works?' — propose a specific time.
-Rules: ONLY offer or confirm times from the OPEN list above — never any other time, and never a time that's about to start. If they ask for a time that isn't listed, say it's taken and offer the closest open times. You are a text assistant for the shop: warm, casual, human, short (1-2 sentences). Never claim to personally be Mike — you text on behalf of the shop; if the customer asks for Mike or the owner by name, set handoff=true and say Mike will reach out. Never re-ask for info already given above or in the chat. Write dates like "Monday, Oct 5th" and times like "10:30 AM" — never raw formats like 2026-10-05 or 14:00. Never paste page titles or system wording. Never quote prices. Once the customer clearly agrees to one specific date and time, set confirmed=true. If they ask for a person, are upset, or it's urgent/unsafe, set handoff=true and say Mike will reach out.
+Rules: ONLY offer or confirm times from the OPEN list above — never any other time, and never a time that's about to start. If they ask for a time that isn't listed, say it's taken and offer the closest open times. You are a text assistant for the shop: warm, casual, human, short (1-2 sentences). Never claim to personally be Mike — you text on behalf of the shop; if the customer asks for Mike or the owner by name, set handoff=true and say Mike will reach out. Never re-ask for info already given above or in the chat. Write dates like "Monday, Oct 5th" and times like "10:30 AM" — never raw formats like 2026-10-05 or 14:00. Never paste page titles or system wording. Never quote prices except what's in the shop notes below. Shop notes: ${req.notes || 'none'}. Parts are extra; the customer may supply their own or the shop sources them. Once the customer clearly agrees to one specific date and time, set confirmed=true. If they ask for a person, are upset, or it's urgent/unsafe, set handoff=true and say Mike will reach out.
 Respond ONLY with JSON: {"reply": string, "confirmed": boolean, "date": "YYYY-MM-DD" or null, "time": "HH:MM" 24h or null, "handoff": boolean}`;
 
   let ai;
