@@ -14,9 +14,10 @@ import {
 import { Button } from "@/components/ui/button";
 import {
   Loader2, Search, Mail, Phone, Car, CreditCard, Calendar, FileText, Receipt, Download,
-  Plus, Pencil, Trash2,
+  Plus, Pencil, Trash2, HeartPulse,
 } from "lucide-react";
 import { toast } from "sonner";
+import VehicleMasterChecklist from "@/components/VehicleMasterChecklist";
 
 interface Customer {
   id: string;
@@ -45,6 +46,7 @@ const AdminCustomers = () => {
   const [selected, setSelected] = useState<Customer | null>(null);
   const [details, setDetails] = useState<any>(null);
   const [detailsLoading, setDetailsLoading] = useState(false);
+  const [healthVehicleId, setHealthVehicleId] = useState<string | null>(null);
 
   // add/edit dialog
   const [editOpen, setEditOpen] = useState(false);
@@ -89,6 +91,7 @@ const AdminCustomers = () => {
     setSelected(c);
     setDetails(null);
     setDetailsLoading(true);
+    setHealthVehicleId(null);
     const [vehicles, memberships, appts, estimates, invoices] = await Promise.all([
       supabase.from("vehicles").select("*").eq("owner_id", c.id).eq("is_active", true).order("created_at", { ascending: false }),
       supabase.from("memberships").select("*, membership_plans(name)").eq("customer_id", c.id).order("created_at", { ascending: false }),
@@ -342,10 +345,28 @@ const AdminCustomers = () => {
             <div className="space-y-5">
               <Section icon={Car} title={`Vehicles (${details.vehicles.length})`}>
                 {details.vehicles.length === 0 ? <Empty /> : details.vehicles.map((v: any) => (
-                  <Row key={v.id} primary={`${v.year} ${v.make} ${v.model}${v.trim ? ' ' + v.trim : ''}`}
-                       secondary={[v.license_plate, v.vin, v.current_mileage ? `${v.current_mileage.toLocaleString()} mi` : null].filter(Boolean).join(' • ')} />
+                  <div key={v.id} className="flex items-center gap-2">
+                    <div className="flex-1 min-w-0">
+                      <Row primary={`${v.year} ${v.make} ${v.model}${v.trim ? ' ' + v.trim : ''}`}
+                           secondary={[v.license_plate, v.vin, v.current_mileage ? `${v.current_mileage.toLocaleString()} mi` : null].filter(Boolean).join(' • ')} />
+                    </div>
+                    <Button
+                      size="sm"
+                      variant={healthVehicleId === v.id ? "default" : "outline"}
+                      className="gap-1.5 shrink-0"
+                      onClick={() => setHealthVehicleId(healthVehicleId === v.id ? null : v.id)}
+                    >
+                      <HeartPulse className="h-3.5 w-3.5" /> Health
+                    </Button>
+                  </div>
                 ))}
               </Section>
+
+              {healthVehicleId && selected && (
+                <Section icon={HeartPulse} title="Vehicle Health">
+                  <VehicleMasterChecklist vehicleId={healthVehicleId} mode="admin" customerId={selected.id} />
+                </Section>
+              )}
 
               <Section icon={CreditCard} title={`Memberships (${details.memberships.length})`}>
                 {details.memberships.length === 0 ? <Empty /> : details.memberships.map((m: any) => (

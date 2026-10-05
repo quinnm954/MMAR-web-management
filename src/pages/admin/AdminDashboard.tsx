@@ -45,7 +45,6 @@ import AdminRepairOrders from '@/components/admin/AdminRepairOrders';
 import AdminCalendar from '@/components/admin/AdminCalendar';
 import AdminTechLaborPay from '@/components/admin/AdminTechLaborPay';
 import AdminChecklists from '@/components/admin/AdminChecklists';
-import AdminVehicleHealth from '@/components/admin/AdminVehicleHealth';
 import { supabase } from '@/integrations/supabase/client';
 import mmarLogo from "@/assets/mmar-logo.png";
 import PushNotificationCard from '@/components/shell/PushNotificationCard';
@@ -161,7 +160,6 @@ const AdminDashboard = () => {
             { value: 'service', label: 'Service Records', icon: ClipboardList, roles: ADVISOR, content: <AdminServiceRecords /> },
             { value: 'estimates', label: 'Estimates', icon: FileSpreadsheet, roles: ADVISOR, content: <AdminEstimates /> },
             { value: 'inspections', label: 'Inspections', icon: ClipboardCheck, roles: SHOP_FLOOR, content: <AdminChecklists /> },
-            { value: 'vehicle-health', label: 'Vehicle Health', icon: ClipboardList, roles: ADVISOR, content: <AdminVehicleHealth /> },
             { value: 'invoices', label: 'Invoices', icon: Receipt, roles: ADVISOR, content: <AdminInvoices /> },
             { value: 'laborpay', label: 'Labor Pay', icon: DollarSign, roles: ADMIN_ONLY, content: <AdminTechLaborPay /> },
             { value: 'share', label: 'Share', icon: Share2, roles: ADVISOR, content: <AdminCustomerShare /> },
