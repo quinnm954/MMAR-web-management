@@ -91,6 +91,7 @@ const AdminCustomers = () => {
     setSelected(c);
     setDetails(null);
     setDetailsLoading(true);
+    setHealthVehicleId(null);
     const [vehicles, memberships, appts, estimates, invoices] = await Promise.all([
       supabase.from("vehicles").select("*").eq("owner_id", c.id).eq("is_active", true).order("created_at", { ascending: false }),
       supabase.from("memberships").select("*, membership_plans(name)").eq("customer_id", c.id).order("created_at", { ascending: false }),
