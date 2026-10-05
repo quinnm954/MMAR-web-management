@@ -3770,6 +3770,7 @@ export type Database = {
         Returns: Json
       }
       unread_message_count: { Args: { _user_id: string }; Returns: number }
+      window_start_time: { Args: { _w: string }; Returns: string }
     }
     Enums: {
       app_role:

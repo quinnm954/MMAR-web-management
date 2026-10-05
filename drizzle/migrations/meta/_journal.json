@@ -8,6 +8,13 @@
       "when": 1791209782189,
       "tag": "0000_migration",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1791210004000,
+      "tag": "0001_appointment_calendar_time_from_window",
+      "breakpoints": true
     }
   ]
 }
