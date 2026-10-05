@@ -27,7 +27,7 @@ type Employee = {
   notes: string | null;
 };
 
-const TYPES = ['technician', 'service_advisor', 'manager', 'parts', 'admin', 'other'];
+const TYPES = ['technician', 'admin', 'other'];
 // Maps employee_type -> app_role enum value. Types not in this map cannot
 // have a login account provisioned (no corresponding role exists).
 const TYPE_TO_ROLE: Record<string, string> = {
