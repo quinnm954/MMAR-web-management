@@ -49,3 +49,6 @@ verify_jwt = false
 
 [functions.notify-tech-job-assigned]
 verify_jwt = false
+
+[functions.followup-worker]
+verify_jwt = false
