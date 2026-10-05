@@ -34,7 +34,6 @@ import AdminServiceRecords from '@/components/admin/AdminServiceRecords';
 import AdminInvoices from '@/components/admin/AdminInvoices';
 import AdminEmails from '@/components/admin/AdminEmails';
 import AdminEstimates from '@/components/admin/AdminEstimates';
-import AdminCatalog from '@/components/admin/AdminCatalog';
 import AdminShopSettings from '@/components/admin/AdminShopSettings';
 import AdminReports from '@/components/admin/AdminReports';
 import AdminSalesDashboard from '@/components/admin/AdminSalesDashboard';
