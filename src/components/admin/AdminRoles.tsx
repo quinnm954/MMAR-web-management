@@ -9,7 +9,7 @@ import { Loader2, ShieldCheck, UserPlus, X, Search } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 
-const ALL_ROLES = ["owner", "admin", "manager", "service_advisor", "technician", "parts", "customer"] as const;
+const ALL_ROLES = ["owner", "admin", "technician", "customer"] as const;
 type Role = typeof ALL_ROLES[number];
 
 export default function AdminRoles() {
@@ -131,7 +131,7 @@ export default function AdminRoles() {
                   </div>
                   {available.length > 0 && (
                     <div className="flex items-center gap-2">
-                      <Select value={available.includes(selected) ? selected : available[0]} onValueChange={(v) => setPerUserRole(p => ({ ...p, [u.id]: v as Role }))}>
+                      <Select value={(available as string[]).includes(selected) ? selected : available[0]} onValueChange={(v) => setPerUserRole(p => ({ ...p, [u.id]: v as Role }))}>
                         <SelectTrigger className="w-[160px]"><SelectValue /></SelectTrigger>
                         <SelectContent>{available.map(r => <SelectItem key={r} value={r}>{r}</SelectItem>)}</SelectContent>
                       </Select>
@@ -146,7 +146,7 @@ export default function AdminRoles() {
           </div>
         )}
         <p className="text-xs text-muted-foreground">
-          Roles: <strong>admin</strong> (full access), <strong>manager</strong> (admin-like + audit log), <strong>service_advisor</strong>, <strong>parts</strong>, <strong>technician</strong>, <strong>customer</strong>. New signups default to <strong>customer</strong>.
+          Roles: <strong>admin</strong> (full access), <strong>technician</strong> (assigned jobs), <strong>customer</strong> (includes fleet owners). New signups default to <strong>customer</strong>.
         </p>
       </CardContent>
     </Card>
