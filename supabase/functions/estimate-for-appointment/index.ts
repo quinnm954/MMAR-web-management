@@ -23,27 +23,16 @@ Deno.serve(async (req) => {
     const { data: appt } = await sb.from('appointments').select('id, customer_id').eq('id', b.converted_appointment_id).maybeSingle();
     if (!appt) return json({ error: 'Appointment not found' }, 404);
 
-    // Auto-send any priced estimate that hasn't gone to the customer yet.
-    const autoSend = async (id: string) => {
-      const { data: e } = await sb.from('estimates').select('status, total').eq('id', id).maybeSingle();
-      if (!e || e.status !== 'draft' || !(Number(e.total) > 0)) return false;
-      await sb.from('estimates').update({ status: 'sent', sent_at: new Date().toISOString() }).eq('id', id);
-      const r = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/send-estimate`, {
-        method: 'POST', headers: { Authorization: `Bearer ${jwt}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ id }),
-      });
-      if (!r.ok) console.error('send-estimate', r.status, await r.text());
-      return r.ok;
-    };
-
+    // Estimates are never auto-sent; staff send them from Estimates.
     const { data: existing } = await sb.from('estimates').select('id').eq('appointment_id', appt.id).limit(1);
-    if (existing?.length) return json({ ok: true, estimateId: existing[0].id, existed: true, sent: await autoSend(existing[0].id) });
+    if (existing?.length) return json({ ok: true, estimateId: existing[0].id, existed: true });
 
     // Reuse an auto-quote the text bot already made for this customer recently.
     const { data: recent } = await sb.from('estimates').select('id').eq('customer_id', appt.customer_id).is('appointment_id', null)
       .gte('created_at', new Date(new Date(b.created_at).getTime() - 3600_000).toISOString()).ilike('notes', 'Auto-drafted%').limit(1);
     if (recent?.length) {
       await sb.from('estimates').update({ appointment_id: appt.id }).eq('id', recent[0].id);
-      return json({ ok: true, estimateId: recent[0].id, linked: true, sent: await autoSend(recent[0].id) });
+      return json({ ok: true, estimateId: recent[0].id, linked: true });
     }
 
     const q = await buildLaborQuote(sb, b);

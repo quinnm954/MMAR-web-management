@@ -172,30 +172,13 @@ export async function createDraftEstimate(sb: any, req: any, q: LaborQuote, opts
     if (error) { console.error('draft estimate', error); return null; }
     return data.id as string;
   }
+  // Never auto-send: staff review the draft and press Send in Estimates.
   const { data, error } = await sb.from('estimates').insert({
-    customer_id: prof.id, status: 'sent', sent_at: new Date().toISOString(), line_items: lines, subtotal: total, total, valid_until: valid,
+    customer_id: prof.id, status: 'draft', line_items: lines, subtotal: total, total, valid_until: valid,
     customer_phone: req.customer_phone || null, appointment_id: opts.appointmentId || null,
-    notes: `Auto-drafted from booking request (${req.vehicle_info || 'vehicle n/a'}). Labor times are estimates — verify hours and add parts. Sent to customer automatically.`,
-  }).select('id, estimate_number, approval_token').single();
+    notes: `Auto-drafted from booking request (${req.vehicle_info || 'vehicle n/a'}). Labor times are estimates — verify hours, add parts, then send.`,
+  }).select('id').single();
   if (error) { console.error('draft estimate', error); return null; }
-  // Texts once A2P texting is approved; email until then (falls back to the account's email).
-  const textOk = !!phone && await smsAllowed().catch(() => false);
-  const sendEmail = email || (!textOk ? (await sb.from('profiles').select('email').eq('id', prof.id).maybeSingle()).data?.email?.trim().toLowerCase() || '' : '');
-  if (textOk) {
-    const first = (req.customer_name || '').split(' ')[0];
-    await sendSms(sb, phone, `${first ? `${first}, your` : 'Your'} estimate from Mike's Mobile Auto Repair is ready: ${SITE}/estimate/${data.approval_token}${await enrollSuffix(sb, prof.id)}`);
-  } else if (sendEmail) {
-    const { data: link } = await sb.auth.admin.generateLink({ type: 'magiclink', email: sendEmail, options: { redirectTo: `${SITE}/portal/estimates` } }).catch(() => ({ data: null }));
-    await sendAndLog({
-      templateName: 'estimate-ready', recipientEmail: sendEmail, idempotencyKey: `estimate-ready-${data.id}`,
-      templateData: {
-        name: (req.customer_name || '').split(' ')[0] || undefined, estimateNumber: data.estimate_number || '',
-        total: q.kind === 'diagnosis' ? '$100 diagnosis ($50 credited to repair labor)' : lines.length > 1 ? `${lines.length} labor options from $${Math.round(Math.min(...lines.map((l) => l.amount)))} (parts extra)` : `$${Math.round(total)} labor (parts extra)`,
-        approvalUrl: `${SITE}/estimate/${data.approval_token}`, accountUrl: link?.properties?.action_link || `${SITE}/login`,
-      },
-      metadata: { auto_quote: true, new_account: isNew },
-    });
-  }
   return data.id as string;
 }
 
