@@ -165,7 +165,8 @@ export async function startBot(sb: any, id: string) {
   if (!req || !req.customer_phone) return { skipped: true };
   const avail = await openSlots(sb, req.requested_date ? String(req.requested_date).slice(0, 10) : null, 7).catch(() => []);
   const q = await buildLaborQuote(sb, req).catch((e) => { console.error('quote', e); return null; });
-  const estId = q ? await createDraftEstimate(sb, req, q).catch(() => null) : null;
+  // Estimates are only created once staff confirm the booking (estimate-for-appointment).
+  const estId = null;
   const text = buildOpener(req, avail, q ? quoteSentence(q) : '');
   await sendSms(sb, req.customer_phone, text);
   const note = q ? quoteNote(q, estId) : '';
