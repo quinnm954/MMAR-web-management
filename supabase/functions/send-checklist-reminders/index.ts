@@ -20,6 +20,10 @@ async function sendTxEmail(body: Record<string, unknown>): Promise<{ error?: str
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
+  // Retired: checklists are part of inspections, and the Friday maintenance email already covers this.
+  if (Deno.env.get('CHECKLIST_REMINDERS_ENABLED') !== 'true') {
+    return new Response(JSON.stringify({ skipped: 'retired' }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+  }
 
   const sb = createClient(SB_URL, SB_SERVICE_KEY);
   const sent: any[] = [];
