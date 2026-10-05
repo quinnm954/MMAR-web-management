@@ -293,6 +293,26 @@ const AdminEstimates = () => {
   const [laborJob, setLaborJob] = useState('');
   const [laborResults, setLaborResults] = useState<{ engine: string; job: string; hours: number }[]>([]);
   const [laborLoading, setLaborLoading] = useState(false);
+  const [fcOpen, setFcOpen] = useState(false);
+  const fcWindowRef = useRef<Window | null>(null);
+
+  const openFirstCall = async () => {
+    const v: any = vehicles.find(x => x.id === editing?.vehicle_id);
+    const text = v ? [v.year, v.make, v.model, v.engine || v.engine_size, v.vin ? `VIN: ${v.vin}` : ''].filter(Boolean).join(' ') : '';
+    const w = Math.min(1000, Math.floor(window.screen.availWidth / 2));
+    const win = window.open('https://www.firstcallonline.com', 'firstcall', `popup=yes,width=${w},height=${Math.min(900, window.screen.availHeight)},left=${window.screen.availWidth - w},top=0`);
+    if (win) {
+      fcWindowRef.current = win;
+      setFcOpen(true);
+      const timer = setInterval(() => { if (win.closed) { clearInterval(timer); setFcOpen(false); fcWindowRef.current = null; } }, 1000);
+    } else {
+      toast.error('Pop-up blocked — allow pop-ups for this site and try again');
+    }
+    if (text) {
+      try { await navigator.clipboard.writeText(text); toast.success(`Copied: ${text} — paste it into the First Call search`); }
+      catch { toast.info(text); }
+    } else toast.info('No vehicle selected — pick one to auto-copy its details');
+  };
 
   const searchLabor = async () => {
     const vehicle = vehicles.find(v => v.id === editing?.vehicle_id);
