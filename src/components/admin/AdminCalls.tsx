@@ -138,11 +138,6 @@ export default function AdminCalls() {
                         "{c.transcription}"
                       </p>
                     )}
-                    {c.recording_url && (
-                      <audio controls preload="none" className="mt-2 w-full max-w-md h-9">
-                        <source src={c.recording_url} type="audio/mpeg" />
-                      </audio>
-                    )}
                   </div>
                   <div className="flex flex-col gap-1.5 shrink-0">
                     {c.from_number && (

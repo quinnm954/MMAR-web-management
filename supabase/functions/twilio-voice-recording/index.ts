@@ -19,15 +19,11 @@ Deno.serve(async (req) => {
 
     const sb = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
 
-    // Twilio gives URL without extension; .mp3 is publicly downloadable
-    const fullUrl = `${recordingUrl}.mp3`;
-
-    const update: Record<string, unknown> = {
-      recording_url: fullUrl,
-      recording_sid: recordingSid,
-    };
+    // Audio is never stored — transcripts only. Keep duration/voicemail metadata.
+    const update: Record<string, unknown> = {};
     if (recordingDuration) update.duration_seconds = recordingDuration;
     if (source === 'RecordVerb') update.voicemail = true;
+    if (Object.keys(update).length === 0) return new Response('ok', { headers: corsHeaders });
 
     await sb.from('call_logs').upsert(
       { twilio_call_sid: sid, ...update },
