@@ -181,6 +181,21 @@ Deno.serve(async (req) => {
           token: t.token,
           notification: { title: body.title, body: body.body },
           data: body.data ?? {},
+          // Loud alerts: custom alarm sound, max priority, wakes the phone.
+          android: {
+            priority: "HIGH",
+            notification: {
+              channel_id: "mmar_alerts",
+              sound: "mmar_alert",
+              notification_priority: "PRIORITY_MAX",
+              default_vibrate_timings: true,
+              visibility: "PUBLIC",
+            },
+          },
+          apns: {
+            headers: { "apns-priority": "10", "apns-push-type": "alert" },
+            payload: { aps: { sound: "mmar_alert.caf", "interruption-level": "time-sensitive" } },
+          },
         },
       };
       const r = await fetch(sendUrl, {

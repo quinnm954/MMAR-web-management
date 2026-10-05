@@ -39,6 +39,14 @@ export const useNativePushRegistration = () => {
           return;
         }
 
+        // Loud alert channel (Android). Sound file lives in res/raw/mmar_alert.wav.
+        if (nativePlatform() === 'android') {
+          await PushNotifications.createChannel({
+            id: 'mmar_alerts', name: 'Shop alerts (loud)', description: 'Bookings, texts, calls',
+            importance: 5, visibility: 1, sound: 'mmar_alert', vibration: true, lights: true,
+          }).catch((e) => console.error('channel', e));
+        }
+
         const r1 = await PushNotifications.addListener('registration', async (token) => {
           const platform = nativePlatform();
           await supabase
@@ -64,6 +72,7 @@ export const useNativePushRegistration = () => {
           'pushNotificationReceived',
           (notification) => {
             console.log('Push received in foreground', notification);
+            try { const a = new Audio('/sounds/mmar_alert.wav'); a.volume = 1; void a.play(); } catch { /* ignore */ }
           },
         );
         removeReceived = () => r3.remove();

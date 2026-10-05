@@ -136,3 +136,9 @@ in Lovable shows up live in the simulator — no rebuild needed.
 - App Store / Play Store screenshots
 - Universal Links / App Links so SMS estimate links open in the app
 - Apple Sign-in / Google Sign-in inside the app
+
+## Loud alert sound (one-time native setup)
+After `npx cap sync`:
+- Android: copy `resources/sounds/mmar_alert.wav` to `android/app/src/main/res/raw/mmar_alert.wav`
+- iOS: drag `resources/sounds/mmar_alert.caf` into Xcode under App/App (check "Copy items if needed", target App)
+Then rebuild. If Android was installed before, uninstall/reinstall so the loud channel is created fresh.
