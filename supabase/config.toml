@@ -1,6 +1,8 @@
 project_id = "owgpxujfytskdfmrhjgk"
 
 [functions]
+  [functions.finish-enrollment]
+    verify_jwt = false
   [functions.ai-receptionist]
     verify_jwt = false
   [functions.auth-email-hook]
