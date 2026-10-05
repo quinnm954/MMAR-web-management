@@ -27,8 +27,6 @@ const EstimateApproval = () => {
   const [decisions, setDecisions] = useState<Record<number, 'approved' | 'declined'>>({});
   const [reason, setReason] = useState('');
   const [signature, setSignature] = useState<string | null>(null);
-  const [requestedDate, setRequestedDate] = useState<Date | undefined>();
-  const [timeWindow, setTimeWindow] = useState<string>(TIME_WINDOWS[0]);
   const [editing, setEditing] = useState(false);
   const [decisionLogs, setDecisionLogs] = useState<any[]>([]);
   const [financingChoice, setFinancingChoice] = useState<'yes' | 'no' | null>(null);
@@ -79,8 +77,6 @@ const EstimateApproval = () => {
     const nextAllDeclined = statusOverride === 'declined' || (lines.length > 0 && lines.every((_, i) => finalDecisions[i] === 'declined'));
     const nextAnyApproved = lines.some((_, i) => finalDecisions[i] === 'approved');
     const status = statusOverride ?? (nextAllDeclined ? 'declined' : nextAnyApproved && lines.some((_, i) => finalDecisions[i] === 'declined') ? 'partially_approved' : 'approved');
-    const willApprove = status !== 'declined';
-    if (willApprove && !requestedDate) return toast.error('Please select a preferred service date');
     setWorking(true);
 
     const updatedLines = lines.map((l, i) => ({ ...l, status: finalDecisions[i] ?? (status === 'declined' ? 'declined' : 'approved') }));
