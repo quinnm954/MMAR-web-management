@@ -3679,6 +3679,10 @@ export type Database = {
       get_estimate_by_token: { Args: { _token: string }; Returns: Json }
       get_public_tracking_settings: { Args: never; Returns: Json }
       get_shared_customer_summary: { Args: { _token: string }; Returns: Json }
+      guard_bot_slot: {
+        Args: { _date: string; _exclude: string; _time: string }
+        Returns: undefined
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
