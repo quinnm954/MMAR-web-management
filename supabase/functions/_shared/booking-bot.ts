@@ -92,7 +92,9 @@ export async function openSlots(sb: any, fromDate: string | null, days = 7, excl
   const out: { date: string; slots: number[] }[] = [];
   for (let i = 0; i < days; i++) {
     const date = addDays(start, i);
-    const earliest = date === now.date ? Math.ceil((now.mins + LEAD_MIN) / STEP) * STEP : OPEN_MIN;
+    // No same-day bookings: today is always treated as fully booked.
+    if (date <= now.date) { out.push({ date, slots: [] }); continue; }
+    const earliest = OPEN_MIN;
     const slots: number[] = [];
     for (let m = Math.max(OPEN_MIN, earliest); m <= CLOSE_MIN; m += STEP)
       if (!(busy[date] || []).some((b) => Math.abs(b - m) < BLOCK_MIN)) slots.push(m);
