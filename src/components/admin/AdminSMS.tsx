@@ -23,7 +23,33 @@ export default function AdminSMS() {
       .from('sms_threads')
       .select('*, profiles:customer_id(full_name, email), last_invoice:last_invoice_id(id, invoice_number, total, amount_paid, status)')
       .order('last_message_at', { ascending: false });
-    setThreads(data ?? []);
+    const list = data ?? [];
+    const key = (p?: string | null) => (p || '').replace(/\D/g, '').slice(-10);
+    const [{ data: profs }, { data: emps }, { data: roles }] = await Promise.all([
+      supabase.from('profiles').select('id, full_name, phone').not('phone', 'is', null),
+      supabase.from('employees').select('full_name, phone, user_id').not('phone', 'is', null),
+      supabase.from('user_roles').select('user_id, role'),
+    ]);
+    const roleOf: Record<string, string> = {};
+    const rank = ['owner', 'admin', 'manager', 'service_advisor', 'technician', 'parts'];
+    (roles ?? []).forEach((r: any) => {
+      const cur = roleOf[r.user_id];
+      if (rank.includes(r.role) && (!cur || rank.indexOf(r.role) < rank.indexOf(cur))) roleOf[r.user_id] = r.role;
+    });
+    const byPhone: Record<string, { name: string; tag?: string }> = {};
+    (profs ?? []).forEach((p: any) => {
+      const k = key(p.phone);
+      if (k.length === 10 && p.full_name) byPhone[k] = { name: p.full_name, tag: roleOf[p.id] ? roleOf[p.id].replace('_', ' ') : 'customer' };
+    });
+    (emps ?? []).forEach((e: any) => {
+      const k = key(e.phone);
+      if (k.length === 10 && e.full_name) byPhone[k] = { name: e.full_name, tag: (e.user_id && roleOf[e.user_id]?.replace('_', ' ')) || 'employee' };
+    });
+    setThreads(list.map((t: any) => {
+      const m = byPhone[key(t.phone)];
+      const name = t.profiles?.full_name || m?.name || null;
+      return { ...t, display_name: name, display_tag: name ? (m?.tag || 'customer') : null };
+    }));
   };
 
   useEffect(() => {
@@ -104,7 +130,7 @@ export default function AdminSMS() {
               className={`w-full text-left p-2 rounded ${active?.id === t.id ? 'bg-primary/10' : 'hover:bg-muted'}`}
             >
               <div className="flex justify-between items-center">
-                <span className="font-semibold text-sm">{t.profiles?.full_name || t.phone}</span>
+                <span className="font-semibold text-sm truncate">{t.display_name || t.phone}{t.display_tag && <span className="ml-1.5 text-[10px] font-normal uppercase text-muted-foreground">{t.display_tag}</span>}</span>
                 {t.unread_count > 0 && <Badge>{t.unread_count}</Badge>}
               </div>
               <div className="text-xs text-muted-foreground truncate">{t.last_message_preview}</div>
@@ -127,7 +153,7 @@ export default function AdminSMS() {
         ) : (
           <>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm">{active.profiles?.full_name || active.phone}</CardTitle>
+              <CardTitle className="text-sm">{active.display_name || active.phone}{active.display_tag && <span className="ml-2 text-[10px] font-normal uppercase text-muted-foreground">{active.display_tag}</span>}</CardTitle>
               <p className="text-xs text-muted-foreground">{active.phone}</p>
               {active.last_invoice && (
                 <Link to="/admin/dashboard?tab=invoices" className="inline-flex items-center gap-1 text-xs text-primary hover:underline mt-1">
