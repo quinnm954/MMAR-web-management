@@ -3798,6 +3798,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_office_staff: { Args: { _user_id: string }; Returns: boolean }
       is_staff: { Args: { _user_id: string }; Returns: boolean }
       recommend_checklist_item: {
         Args: {
@@ -3886,6 +3887,14 @@ export type Database = {
           _rating: number
         }
         Returns: string
+      }
+      tech_has_appointment: {
+        Args: { _appt: string; _user_id: string }
+        Returns: boolean
+      }
+      tech_has_vehicle: {
+        Args: { _user_id: string; _vehicle_id: string }
+        Returns: boolean
       }
       unread_message_count: { Args: { _user_id: string }; Returns: number }
       window_start_time: { Args: { _w: string }; Returns: string }
