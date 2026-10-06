@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowLeft, Copy, Plus, Printer, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import SignaturePad from "@/components/financing/SignaturePad";
@@ -14,29 +15,54 @@ import type { Tables } from "@/integrations/supabase/types";
 
 type Row = Tables<"technician_agreements">;
 
-const blank = { tech_name: "", tech_phone: "", tech_email: "", tech_address: "", cashapp_handle: "", hourly_rate: "40", effective_date: new Date().toISOString().slice(0, 10) };
+const blank = { tech_name: "", tech_phone: "", tech_email: "", tech_address: "", cashapp_handle: "", hourly_rate: "40", effective_date: new Date().toISOString().slice(0, 10), employee_id: "" };
+
+type Employee = { id: string; full_name: string; phone: string | null; email: string | null };
 
 export default function AdminTechAgreements() {
   const [rows, setRows] = useState<Row[]>([]);
+  const [employees, setEmployees] = useState<Employee[]>([]);
   const [form, setForm] = useState(blank);
   const [open, setOpen] = useState(false);
   const [view, setView] = useState<Row | null>(null);
   const [signer, setSigner] = useState("Michael Quinn");
+  const [searchParams] = useSearchParams();
 
   const load = async () => {
     const { data, error } = await supabase.from("technician_agreements").select("*").order("created_at", { ascending: false });
     if (error) toast.error(error.message);
     setRows(data ?? []);
   };
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+    supabase.from("employees" as any).select("id, full_name, phone, email").eq("is_active", true).order("full_name")
+      .then(({ data }) => {
+        const list = (data ?? []) as unknown as Employee[];
+        setEmployees(list);
+        const prefill = searchParams.get("employee");
+        if (prefill) {
+          const emp = list.find((e) => e.id === prefill);
+          if (emp) {
+            setForm({ ...blank, employee_id: emp.id, tech_name: emp.full_name, tech_phone: emp.phone ?? "", tech_email: emp.email ?? "" });
+            setOpen(true);
+          }
+        }
+      });
+  }, []);
 
   const link = (r: Row) => `${window.location.origin}/tech-agreement/${r.token}`;
+
+  const pickEmployee = (id: string) => {
+    const emp = employees.find((e) => e.id === id);
+    if (!emp) return setForm({ ...form, employee_id: "" });
+    setForm({ ...form, employee_id: id, tech_name: emp.full_name, tech_phone: emp.phone ?? "", tech_email: emp.email ?? "" });
+  };
 
   const create = async () => {
     if (!form.tech_name.trim()) return toast.error("Technician name is required");
     const { data: u } = await supabase.auth.getUser();
     const { data, error } = await supabase.from("technician_agreements").insert({
-      ...form, hourly_rate: Number(form.hourly_rate) || 40, created_by: u.user?.id,
+      ...form, employee_id: form.employee_id || null, hourly_rate: Number(form.hourly_rate) || 40, created_by: u.user?.id,
     }).select().single();
     if (error) return toast.error(error.message);
     setOpen(false); setForm(blank); await load(); setView(data);
@@ -118,6 +144,16 @@ export default function AdminTechAgreements() {
         <DialogContent>
           <DialogHeader><DialogTitle>New technician agreement</DialogTitle></DialogHeader>
           <div className="grid gap-3">
+            <div className="space-y-1">
+              <Label>Employee record</Label>
+              <Select value={form.employee_id} onValueChange={pickEmployee}>
+                <SelectTrigger><SelectValue placeholder="Link to an employee (optional)" /></SelectTrigger>
+                <SelectContent>
+                  {employees.map((e) => <SelectItem key={e.id} value={e.id}>{e.full_name}</SelectItem>)}
+                </SelectContent>
+              </Select>
+              <p className="text-[11px] text-muted-foreground">Fills name, phone, and email, and files the signed agreement under that employee.</p>
+            </div>
             {([
               ["tech_name", "Technician full name"], ["tech_phone", "Phone"], ["tech_email", "Email"],
               ["tech_address", "Address"], ["cashapp_handle", "Cash App $handle"], ["hourly_rate", "Flat rate per labor hour ($)"], ["effective_date", "Effective date"],
