@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +13,9 @@ import { INITIAL_LABELS } from "@/lib/techAgreement";
 
 export default function TechAgreementSign() {
   const { token = "" } = useParams();
+  const [sp] = useSearchParams();
+  const nav = useNavigate();
+  const ret = sp.get("return");
   const [a, setA] = useState<TechAgreementRecord | null>(null);
   const [loading, setLoading] = useState(true);
   const [initials, setInitials] = useState<Record<string, string>>({});
@@ -59,10 +62,13 @@ export default function TechAgreementSign() {
   return (
     <main className="min-h-screen bg-background py-6 px-3 sm:px-6">
       <div className="max-w-3xl mx-auto space-y-4">
+        {!signed && ret && (
+          <div className="rounded-lg border border-accent/40 bg-accent/10 p-3 text-sm print:hidden">Before using the technician app, please review and sign your agreement below.</div>
+        )}
         {signed && (
           <div className="flex items-center justify-between gap-3 rounded-lg border border-primary/40 bg-primary/10 p-3 print:hidden">
             <span className="flex items-center gap-2 text-sm"><CheckCircle2 className="h-4 w-4 text-primary" /> You signed this agreement.</span>
-            <Button size="sm" variant="outline" onClick={() => window.print()}><Printer className="h-4 w-4 mr-1" /> Save PDF</Button>
+            <div className="flex gap-2"><Button size="sm" variant="outline" onClick={() => window.print()}><Printer className="h-4 w-4 mr-1" /> Save PDF</Button>{ret && ret.startsWith("/tech") && <Button size="sm" onClick={() => nav(ret, { replace: true })}>Continue to app</Button>}</div>
           </div>
         )}
         <TechAgreementDocument

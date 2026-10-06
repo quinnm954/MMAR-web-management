@@ -3202,6 +3202,7 @@ export type Database = {
           tech_signed_at: string | null
           tech_signed_name: string | null
           tech_user_agent: string | null
+          tech_user_id: string | null
           token: string
           updated_at: string
         }
@@ -3226,6 +3227,7 @@ export type Database = {
           tech_signed_at?: string | null
           tech_signed_name?: string | null
           tech_user_agent?: string | null
+          tech_user_id?: string | null
           token?: string
           updated_at?: string
         }
@@ -3250,6 +3252,7 @@ export type Database = {
           tech_signed_at?: string | null
           tech_signed_name?: string | null
           tech_user_agent?: string | null
+          tech_user_id?: string | null
           token?: string
           updated_at?: string
         }
@@ -3903,6 +3906,7 @@ export type Database = {
       }
       is_office_staff: { Args: { _user_id: string }; Returns: boolean }
       is_staff: { Args: { _user_id: string }; Returns: boolean }
+      my_tech_agreement: { Args: never; Returns: Json }
       recommend_checklist_item: {
         Args: {
           _item_id: string
