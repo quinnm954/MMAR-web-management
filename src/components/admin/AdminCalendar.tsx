@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useLaborMinutes, endFromLabor } from "@/lib/useLaborMinutes";
 import { supabase } from "@/integrations/supabase/client";
-import { useLaborMinutes, endFromLabor } from "@/lib/useLaborMinutes";
 import { Loader2 } from "lucide-react";
 import { startOfDay } from "date-fns";
 import { toast } from "sonner";

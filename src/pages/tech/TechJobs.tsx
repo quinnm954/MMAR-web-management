@@ -3,7 +3,6 @@ import GCalView, { CalView } from "@/components/calendar/GCalView";
 import { useNavigate } from "react-router-dom";
 import { useLaborMinutes, endFromLabor } from "@/lib/useLaborMinutes";
 import { supabase } from "@/integrations/supabase/client";
-import { useLaborMinutes, endFromLabor } from "@/lib/useLaborMinutes";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";

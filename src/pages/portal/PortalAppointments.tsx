@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import GCalView, { CalView } from "@/components/calendar/GCalView";
 import { useLaborMinutes, endFromLabor } from "@/lib/useLaborMinutes";
 import { supabase } from "@/integrations/supabase/client";
-import { useLaborMinutes, endFromLabor } from "@/lib/useLaborMinutes";
 import { useAuth } from "@/hooks/useAuth";
 import PortalLayout from "@/components/portal/PortalLayout";
 import { Card, CardContent } from "@/components/ui/card";
