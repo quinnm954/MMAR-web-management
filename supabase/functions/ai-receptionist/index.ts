@@ -174,7 +174,6 @@ Deno.serve(async (req) => {
                   service_address: { type: 'string', description: 'Address or city for service' },
                   requested_date: { type: 'string', description: 'Appointment date YYYY-MM-DD' },
                   requested_time: { type: 'string', description: 'Appointment time HH:MM 24-hour, between 10:00 and 17:00 Eastern' },
-                  price_approved: { type: 'boolean', description: 'true only if the caller clearly said yes to the price you gave (labor ballpark or diagnosis fee)' },
                 }, ['customer_name', 'description']),
                 tool('transfer_to_mike', 'Transfer the caller to Mike for urgent issues or when they ask for a person.', {
                   call_sid: callSid,
