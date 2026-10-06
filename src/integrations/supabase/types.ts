@@ -3180,6 +3180,78 @@ export type Database = {
         }
         Relationships: []
       }
+      technician_agreements: {
+        Row: {
+          cashapp_handle: string | null
+          company_signature: string | null
+          company_signed_at: string | null
+          company_signer_name: string | null
+          created_at: string
+          created_by: string | null
+          effective_date: string
+          hourly_rate: number
+          id: string
+          status: string
+          tech_address: string | null
+          tech_email: string | null
+          tech_initials: Json
+          tech_name: string
+          tech_phone: string | null
+          tech_signature: string | null
+          tech_signed_at: string | null
+          tech_signed_name: string | null
+          tech_user_agent: string | null
+          token: string
+          updated_at: string
+        }
+        Insert: {
+          cashapp_handle?: string | null
+          company_signature?: string | null
+          company_signed_at?: string | null
+          company_signer_name?: string | null
+          created_at?: string
+          created_by?: string | null
+          effective_date?: string
+          hourly_rate?: number
+          id?: string
+          status?: string
+          tech_address?: string | null
+          tech_email?: string | null
+          tech_initials?: Json
+          tech_name: string
+          tech_phone?: string | null
+          tech_signature?: string | null
+          tech_signed_at?: string | null
+          tech_signed_name?: string | null
+          tech_user_agent?: string | null
+          token?: string
+          updated_at?: string
+        }
+        Update: {
+          cashapp_handle?: string | null
+          company_signature?: string | null
+          company_signed_at?: string | null
+          company_signer_name?: string | null
+          created_at?: string
+          created_by?: string | null
+          effective_date?: string
+          hourly_rate?: number
+          id?: string
+          status?: string
+          tech_address?: string | null
+          tech_email?: string | null
+          tech_initials?: Json
+          tech_name?: string
+          tech_phone?: string | null
+          tech_signature?: string | null
+          tech_signed_at?: string | null
+          tech_signed_name?: string | null
+          tech_user_agent?: string | null
+          token?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       tiktok_videos: {
         Row: {
           caption: string | null
@@ -3806,6 +3878,7 @@ export type Database = {
       get_estimate_by_token: { Args: { _token: string }; Returns: Json }
       get_public_tracking_settings: { Args: never; Returns: Json }
       get_shared_customer_summary: { Args: { _token: string }; Returns: Json }
+      get_technician_agreement: { Args: { _token: string }; Returns: Json }
       guard_bot_slot: {
         Args: { _date: string; _exclude: string; _time: string }
         Returns: undefined
@@ -3853,6 +3926,16 @@ export type Database = {
       set_booking_attribution: {
         Args: { _attribution: Json; _token: string }
         Returns: undefined
+      }
+      sign_technician_agreement: {
+        Args: {
+          _initials: Json
+          _signature: string
+          _signed_name: string
+          _token: string
+          _user_agent: string
+        }
+        Returns: Json
       }
       submit_booking_request: {
         Args: {
