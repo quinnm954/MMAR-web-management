@@ -346,6 +346,33 @@ export default function AdminEmployees() {
                 <Label>Notes</Label>
                 <Textarea value={form.notes ?? ''} onChange={(e) => setForm({ ...form, notes: e.target.value })} />
               </div>
+              {form.id && (
+                <div className="rounded-md border p-3 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label>Signed agreements</Label>
+                    <Button size="sm" variant="outline" asChild>
+                      <a href={`/admin/tech-agreements?employee=${form.id}`}>New agreement</a>
+                    </Button>
+                  </div>
+                  {agreements.length === 0 ? (
+                    <p className="text-[11px] text-muted-foreground">No agreements on file for this employee.</p>
+                  ) : (
+                    <ul className="space-y-1">
+                      {agreements.map((a) => (
+                        <li key={a.id} className="flex items-center justify-between text-xs">
+                          <span>Effective {a.effective_date}</span>
+                          <Badge variant={a.status === 'completed' ? 'default' : 'secondary'}>
+                            {a.tech_signed_at && a.company_signed_at ? 'Fully signed' : a.tech_signed_at ? 'Tech signed' : 'Pending'}
+                          </Badge>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                  <p className="text-[11px] text-muted-foreground">
+                    Open <a className="underline" href="/admin/tech-agreements">Technician Agreements</a> to view or download the signed document.
+                  </p>
+                </div>
+              )}
               <div className="flex items-center gap-2">
                 <Switch checked={form.is_active} onCheckedChange={(v) => setForm({ ...form, is_active: v })} />
                 <Label>Active</Label>
