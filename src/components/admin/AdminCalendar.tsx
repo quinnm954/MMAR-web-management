@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useLaborMinutes, endFromLabor } from "@/lib/useLaborMinutes";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 import { startOfDay } from "date-fns";
@@ -57,6 +58,7 @@ export default function AdminCalendar() {
       title: a.profiles?.full_name ? `${a.service_type} · ${a.profiles.full_name}` : a.service_type,
       subtitle: techs.find((t) => t.id === a.assigned_technician_id)?.full_name ?? "Unassigned",
       start: new Date(a.scheduled_at!),
+      end: endFromLabor(new Date(a.scheduled_at!), laborMins[a.id]),
       color: colorOf(a.assigned_technician_id),
       muted: a.status === "completed",
     })), [appts, techs, hiddenTechs]);

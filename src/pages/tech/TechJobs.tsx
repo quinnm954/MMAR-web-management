@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import GCalView, { CalView } from "@/components/calendar/GCalView";
 import { useNavigate } from "react-router-dom";
+import { useLaborMinutes, endFromLabor } from "@/lib/useLaborMinutes";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -281,6 +282,7 @@ const TechJobs = () => {
               title: `${r.service_type}${r.customer?.full_name ? " · " + r.customer.full_name : ""}`,
               subtitle: [r.vehicle && `${r.vehicle.year ?? ""} ${r.vehicle.make ?? ""} ${r.vehicle.model ?? ""}`.trim(), r.service_address].filter(Boolean).join(" · "),
               start: new Date(r.scheduled_at!),
+              end: endFromLabor(new Date(r.scheduled_at!), laborMins[r.id]),
               color: r.status === "in_progress" ? 1 : 0,
             }))}
             view={calView} onViewChange={setCalView} date={calDate} onDateChange={setCalDate}
