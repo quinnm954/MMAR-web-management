@@ -34,6 +34,21 @@ const PALETTE = [
 ];
 export const calColor = (i = 0) => PALETTE[((i % PALETTE.length) + PALETTE.length) % PALETTE.length];
 
+const TZ = "America/New_York";
+/** Shop wall-clock (Eastern) time represented as a local Date. */
+export function toShopTime(d: Date) {
+  const p = Object.fromEntries(new Intl.DateTimeFormat("en-US", { timeZone: TZ, hourCycle: "h23",
+    year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit" })
+    .formatToParts(d).map((x) => [x.type, x.value]));
+  return new Date(+p.year, +p.month - 1, +p.day, +p.hour, +p.minute, +p.second);
+}
+/** Inverse of toShopTime: shop wall-clock Date -> real instant. */
+export function fromShopTime(w: Date) {
+  let t = new Date(w.getTime() - (toShopTime(w).getTime() - w.getTime()));
+  t = new Date(t.getTime() + (w.getTime() - toShopTime(t).getTime()));
+  return t;
+}
+
 const endOf = (e: CalEvent) => e.end ?? new Date(e.start.getTime() + DEFAULT_MIN * 60000);
 
 /** Lay out overlapping events side by side, Google Calendar style. */
@@ -80,10 +95,12 @@ export function calRange(view: CalView, date: Date) {
 }
 
 export default function GCalView({
-  events, view, onViewChange, date, onDateChange, onEventClick, onEventDrop,
+  events: rawEvents, view, onViewChange, date, onDateChange, onEventClick, onEventDrop,
   views = ["day", "week", "month"], weekDays = 7, toolbarExtra,
 }: Props) {
-  const [now, setNow] = useState(new Date());
+  const [realNow, setNow] = useState(new Date());
+  const now = toShopTime(realNow);
+  const events = useMemo(() => rawEvents.map((e) => ({ ...e, start: toShopTime(e.start), end: e.end ? toShopTime(e.end) : undefined })), [rawEvents]);
   const [dragId, setDragId] = useState<string | null>(null);
   const scroller = useRef<HTMLDivElement>(null);
   useEffect(() => { const t = setInterval(() => setNow(new Date()), 60000); return () => clearInterval(t); }, []);
@@ -114,7 +131,7 @@ export default function GCalView({
     const hf = HOUR_START + (e.clientY - rect.top) / H;
     const hour = Math.max(HOUR_START, Math.min(HOUR_END - 1, Math.floor(hf)));
     const min = Math.min(45, Math.round(((hf - hour) * 60) / 15) * 15);
-    onEventDrop(dragId, setMinutes(setHours(day, hour), min));
+    onEventDrop(dragId, fromShopTime(setMinutes(setHours(day, hour), min)));
     setDragId(null);
   };
 
@@ -122,7 +139,7 @@ export default function GCalView({
     <div className="rounded-lg border border-border bg-card overflow-hidden">
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-2 px-3 py-2 border-b border-border">
-        <Button size="sm" variant="outline" onClick={() => onDateChange(startOfDay(new Date()))}>Today</Button>
+        <Button size="sm" variant="outline" onClick={() => onDateChange(startOfDay(toShopTime(new Date())))}>Today</Button>
         <Button size="icon" variant="ghost" className="h-8 w-8" aria-label="Previous" onClick={() => step(-1)}><ChevronLeft className="h-4 w-4" /></Button>
         <Button size="icon" variant="ghost" className="h-8 w-8" aria-label="Next" onClick={() => step(1)}><ChevronRight className="h-4 w-4" /></Button>
         <h2 className="text-base sm:text-lg font-semibold mr-auto">{title}</h2>
