@@ -138,8 +138,14 @@ const AdminDashboard = () => {
             </Button>
             <MessagesBellLink />
             <NotificationsBell />
-            <Button asChild variant="ghost" size="sm" title="Notification settings">
-              <Link to="/settings/notifications"><Bell className="h-4 w-4" /></Link>
+            <Button
+              variant="ghost"
+              size="sm"
+              title="Phone"
+              aria-label="Open Phone"
+              onClick={() => setSearchParams(prev => { const next = new URLSearchParams(prev); next.set('tab', 'phone'); return next; })}
+            >
+              <Phone className="h-4 w-4" />
             </Button>
             <Button variant="outline" size="sm" onClick={() => signOut()} aria-label="Sign out">
               <LogOut className="h-4 w-4 sm:mr-2" /><span className="hidden sm:inline">Sign Out</span>
@@ -149,7 +155,6 @@ const AdminDashboard = () => {
       </header>
 
       <main className="container mx-auto px-2 sm:px-4 py-3 sm:py-8 space-y-4 sm:space-y-6 safe-pb">
-        <PushNotificationCard />
         {(() => {
           const tabs: TabDef[] = [
             { value: 'dashboard', label: 'Sales Dashboard', icon: LayoutDashboard, roles: ADMIN_ONLY, content: <AdminSalesDashboard /> },
@@ -182,7 +187,7 @@ const AdminDashboard = () => {
             { value: 'prospecting', label: 'Prospecting', icon: Search, roles: OWNER_ADMIN, content: <AdminProspecting /> },
             { value: 'phone-settings', label: 'Phone Setup', icon: PhoneCall, roles: OWNER_ADMIN, content: <AdminPhoneSettings /> },
             { value: 'tracking', label: 'Tracking', icon: ShieldCheck, roles: OWNER_ADMIN, content: <AdminTrackingSettings /> },
-            { value: 'settings', label: 'Settings', icon: Settings, roles: OWNER_ADMIN, content: <div className="space-y-6"><CalendarFeedSettings /><AdminShopSettings /></div> },
+            { value: 'settings', label: 'Settings', icon: Settings, roles: OWNER_ADMIN, content: <div className="space-y-6"><PushNotificationCard /><CalendarFeedSettings /><AdminShopSettings /></div> },
           ];
           const visible = tabs.filter(t => hasAnyRole(t.roles));
           if (visible.length === 0) {
@@ -198,6 +203,10 @@ const AdminDashboard = () => {
           });
           const active = visible.find(t => t.value === activeTab) ?? visible[0];
 
+          useEffect(() => {
+            if (tabParam && visible.some(t => t.value === tabParam)) setActiveTab(tabParam);
+          }, [tabParam]);
+
           const selectTab = (value: string) => {
             setActiveTab(value);
             setSearchParams(prev => { const next = new URLSearchParams(prev); next.set('tab', value); return next; }, { replace: true });
@@ -211,7 +220,7 @@ const AdminDashboard = () => {
           const groups = [
             { label: 'Workshop', values: ['calendar','ros','service','inspections','estimates','invoices','time','shifts','productivity'] },
             { label: 'Front Desk', values: ['customers','garage','memberships','bookings','share','declined','fleet-accounts','calls','texts','feedback','prospecting'] },
-            { label: 'Admin', values: ['dashboard','phone','reports','laborpay','quickbooks','financing','warranty','emails','audit','employees','roles','phone-settings','tracking','settings'] },
+            { label: 'Admin', values: ['dashboard','reports','laborpay','quickbooks','financing','warranty','emails','audit','employees','roles','phone-settings','tracking','settings'] },
           ];
           const groupedValues = groups.flatMap(g => g.values);
           const ungrouped = visible.filter(t => !groupedValues.includes(t.value));
