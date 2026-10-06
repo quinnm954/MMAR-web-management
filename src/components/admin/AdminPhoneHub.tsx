@@ -115,7 +115,7 @@ export default function AdminPhoneHub() {
       supabase.from('call_logs').select('*').order('created_at', { ascending: false }).limit(200),
       supabase.from('sms_threads').select('*').order('last_message_at', { ascending: false }).limit(200),
       supabase.from('inbound_messages').select('*').order('received_at', { ascending: false }).limit(200),
-      supabase.from('email_send_log').select('*').order('created_at', { ascending: false }).limit(200),
+      supabase.from('email_send_log').select('*').order('created_at', { ascending: false }),
       supabase.from('email_drafts').select('*').order('updated_at', { ascending: false }).limit(100),
       supabase.from('profiles').select('id, full_name, phone').not('phone', 'is', null),
       supabase.from('employees').select('full_name, phone, user_id').not('phone', 'is', null),
@@ -166,6 +166,7 @@ export default function AdminPhoneHub() {
       .on('postgres_changes', { event: '*', schema: 'public', table: 'call_logs' }, load)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'sms_messages' }, load)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'inbound_messages' }, load)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'email_send_log' }, load)
       .subscribe();
     return () => { supabase.removeChannel(channel); };
   }, [load]);

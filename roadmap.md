@@ -20,3 +20,5 @@
 - [x] Preserve the existing Front Desk communication screens.
 - [x] Add a standalone phone-style Admin workspace for calls, texts, and email.
 - [x] Verify real records, replies, dialing, and responsive presentation in the preview.
+- [x] Move Phone to the header, move notification controls into Settings, and remove the floating phone button.
+- [x] Include the complete outbound email log and refresh it live on the Phone page.

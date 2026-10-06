@@ -114,16 +114,7 @@ export default function Softphone() {
   const fmt = `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}`;
 
   if (!open) {
-    return (
-      <button
-        onClick={() => { setOpen(true); ensureAudio(); }}
-        className="fixed bottom-24 right-4 z-50 h-14 w-14 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center md:bottom-6"
-        aria-label="Open phone"
-      >
-        <Phone className="h-6 w-6" />
-        <span className={`absolute top-1 right-1 h-3 w-3 rounded-full border-2 border-background ${status === 'offline' ? 'bg-muted-foreground' : 'bg-accent'}`} />
-      </button>
-    );
+    return null;
   }
 
   return (
