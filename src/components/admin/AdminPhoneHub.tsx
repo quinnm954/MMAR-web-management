@@ -202,7 +202,7 @@ export default function AdminPhoneHub() {
   const activeThread = selected?.kind === 'text' ? threads.find(thread => thread.id === selected.id) || null : null;
   const activeEmail = selected?.kind === 'email' ? emails.find(email => email.id === selected.id) || null : null;
 
-  const openItem = async (kind: Selected extends infer _T ? 'call' | 'text' | 'email' : never, id: string) => {
+  const openItem = async (kind: 'call' | 'text' | 'email', id: string) => {
     setSelected({ kind, id });
     if (kind === 'text') {
       const { data } = await supabase.from('sms_messages').select('*').eq('thread_id', id).order('created_at', { ascending: true });
