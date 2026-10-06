@@ -67,7 +67,7 @@ export default function TechAgreementSign() {
         )}
         {signed && (
           <div className="flex items-center justify-between gap-3 rounded-lg border border-primary/40 bg-primary/10 p-3 print:hidden">
-            <span className="flex items-center gap-2 text-sm"><CheckCircle2 className="h-4 w-4 text-primary" /> You signed this agreement.</span>
+            <span className="flex items-center gap-2 text-sm"><CheckCircle2 className="h-4 w-4 text-primary" /> You signed this agreement. <a href="/install" className="underline text-primary">Add the app to your phone</a></span>
             <div className="flex gap-2"><Button size="sm" variant="outline" onClick={() => window.print()}><Printer className="h-4 w-4 mr-1" /> Save PDF</Button>{ret && ret.startsWith("/tech") && <Button size="sm" onClick={() => nav(ret, { replace: true })}>Continue to app</Button>}</div>
           </div>
         )}
