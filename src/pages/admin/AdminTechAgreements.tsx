@@ -144,6 +144,16 @@ export default function AdminTechAgreements() {
         <DialogContent>
           <DialogHeader><DialogTitle>New technician agreement</DialogTitle></DialogHeader>
           <div className="grid gap-3">
+            <div className="space-y-1">
+              <Label>Employee record</Label>
+              <Select value={form.employee_id} onValueChange={pickEmployee}>
+                <SelectTrigger><SelectValue placeholder="Link to an employee (optional)" /></SelectTrigger>
+                <SelectContent>
+                  {employees.map((e) => <SelectItem key={e.id} value={e.id}>{e.full_name}</SelectItem>)}
+                </SelectContent>
+              </Select>
+              <p className="text-[11px] text-muted-foreground">Fills name, phone, and email, and files the signed agreement under that employee.</p>
+            </div>
             {([
               ["tech_name", "Technician full name"], ["tech_phone", "Phone"], ["tech_email", "Email"],
               ["tech_address", "Address"], ["cashapp_handle", "Cash App $handle"], ["hourly_rate", "Flat rate per labor hour ($)"], ["effective_date", "Effective date"],
