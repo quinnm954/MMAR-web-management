@@ -348,6 +348,7 @@ export default function AdminEmployees() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+        </div>
       </div>
 
       <Card>
