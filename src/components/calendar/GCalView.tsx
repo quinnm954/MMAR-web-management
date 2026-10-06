@@ -20,7 +20,7 @@ export interface CalEvent {
 }
 
 const HOUR_START = 7;
-const HOUR_END = 20;
+const HOUR_END = 22;
 const HOURS = Array.from({ length: HOUR_END - HOUR_START }, (_, i) => HOUR_START + i);
 const H = 52; // px per hour
 const DEFAULT_MIN = 120;
