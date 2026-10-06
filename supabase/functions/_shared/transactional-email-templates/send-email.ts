@@ -17,7 +17,7 @@ const SENDER_DOMAIN = "notify.mikesmautorepair.com"
 const FROM_DOMAIN = "mikesmautorepair.com"
 
 export type SendTemplateEmailResult =
-  | { sent: true }
+  | { sent: true; html?: string; subject?: string }
   | { sent: false; reason: 'recipient_suppressed' }
 
 export interface SendTemplateEmailOptions {
@@ -90,5 +90,5 @@ export async function sendTemplateEmail(
     throw error
   }
 
-  return { sent: true }
+  return { sent: true, html, subject }
 }
