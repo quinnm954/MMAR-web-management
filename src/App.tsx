@@ -8,6 +8,8 @@ import { GtagRouteTracker } from "@/components/GtagRouteTracker";
 import Index from "./pages/Index";
 
 import FinancingContract from "./pages/FinancingContract";
+import TechAgreementSign from "./pages/TechAgreementSign";
+import AdminTechAgreements from "./pages/admin/AdminTechAgreements";
 import WarrantyPolicy from "./pages/WarrantyPolicy";
 import { PrivacyPolicy, TermsOfService } from "./pages/LegalPage";
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -110,6 +112,8 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/financing-contract" element={<FinancingContract />} />
+            <Route path="/tech-agreement/:token" element={<TechAgreementSign />} />
+            <Route path="/admin/tech-agreements" element={<ProtectedRoute><AdminTechAgreements /></ProtectedRoute>} />
             <Route path="/warranty-policy" element={<WarrantyPolicy />} />
             <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="/terms" element={<TermsOfService />} />
