@@ -37,7 +37,7 @@ export default function AdminTechAgreements() {
     load();
     supabase.from("employees" as any).select("id, full_name, phone, email").eq("is_active", true).order("full_name")
       .then(({ data }) => {
-        const list = (data ?? []) as Employee[];
+        const list = (data ?? []) as unknown as Employee[];
         setEmployees(list);
         const prefill = searchParams.get("employee");
         if (prefill) {
