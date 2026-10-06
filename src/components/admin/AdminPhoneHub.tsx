@@ -302,8 +302,8 @@ export default function AdminPhoneHub() {
 
   return (
     <div className="min-h-[620px] lg:h-[calc(100dvh-230px)] lg:min-h-[680px] lg:max-h-[900px] flex items-center justify-center">
-      <div className="w-full h-[760px] lg:h-full grid lg:grid-cols-[400px_minmax(0,1fr)] overflow-hidden rounded-[2.75rem] border-[7px] border-secondary bg-card shadow-elevated ring-1 ring-border">
-        <section className={cn('relative min-w-0 flex flex-col bg-card overflow-hidden', hasDetail && 'hidden lg:flex')}>
+      <div className="w-full h-[min(760px,calc(100dvh-140px))] min-h-[520px] lg:h-full grid grid-rows-[minmax(0,1fr)] lg:grid-cols-[400px_minmax(0,1fr)] overflow-hidden rounded-[2.75rem] border-[7px] border-secondary bg-card shadow-elevated ring-1 ring-border">
+        <section className={cn('relative min-w-0 min-h-0 flex flex-col bg-card overflow-hidden', hasDetail && 'hidden lg:flex')}>
           <div className="absolute top-0 left-1/2 -translate-x-1/2 h-6 w-32 rounded-b-2xl bg-secondary z-20" />
           <div className="h-11 px-7 pt-4 flex items-center justify-between text-[11px] font-semibold z-10">
             <span>{format(new Date(), 'h:mm')}</span>
@@ -371,7 +371,7 @@ export default function AdminPhoneHub() {
           <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 h-1 w-24 rounded-full bg-muted-foreground/40" />
         </section>
 
-        <section className={cn('min-w-0 flex-col bg-background lg:border-l border-border', hasDetail ? 'flex' : 'hidden lg:flex')}>
+        <section className={cn('min-w-0 min-h-0 overflow-hidden flex-col bg-background lg:border-l border-border', hasDetail ? 'flex' : 'hidden lg:flex')}>
           {!selected ? (
             <div className="flex-1 grid place-items-center text-center text-muted-foreground p-8">
               <div><Phone className="h-12 w-12 mx-auto mb-4 text-primary/50" /><h3 className="text-xl font-display text-foreground">Your shop phone</h3><p className="text-sm mt-1">Open a call, text, or email to respond.</p></div>
@@ -429,7 +429,7 @@ function CallDetail({ call, name, tag, onBack, onCall, onText }: { call: CallRow
   return (
     <>
       <DetailHeader title={name} subtitle={tag || call.from_number || undefined} onBack={onBack} actions={<div className="flex gap-1"><Button size="icon" variant="outline" className="rounded-full" onClick={onText} title="Text"><MessageCircle className="h-4 w-4" /></Button><Button size="icon" className="rounded-full" onClick={onCall} title="Call"><Phone className="h-4 w-4" /></Button></div>} />
-      <div className="flex-1 overflow-y-auto p-5 sm:p-8 space-y-5">
+      <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-5 sm:p-8 space-y-5">
         <div className="text-center py-5">
           <div className={cn('h-20 w-20 mx-auto rounded-full grid place-items-center mb-4', missed ? 'bg-destructive/15 text-destructive' : 'bg-primary/15 text-primary')}>{missed ? <PhoneMissed className="h-9 w-9" /> : <PhoneIncoming className="h-9 w-9" />}</div>
           <h3 className="text-2xl font-display">{missed ? 'Missed call' : call.ai_handled ? 'AI answered' : 'Call completed'}</h3>
@@ -446,11 +446,11 @@ function TextDetail({ thread, name, tag, messages, reply, sending, onReply, onSe
   return (
     <>
       <DetailHeader title={name} subtitle={`${tag || 'text conversation'} · ${thread.phone}`} onBack={onBack} actions={<Button size="icon" className="rounded-full" onClick={onCall} title="Call"><Phone className="h-4 w-4" /></Button>} />
-      <div className="flex-1 min-h-0 overflow-y-auto p-4 sm:p-6 space-y-3">
-        {messages.map(message => <div key={message.id} className={cn('flex', message.direction === 'outbound' ? 'justify-end' : 'justify-start')}><div className={cn('max-w-[82%] rounded-2xl px-4 py-3 text-sm', message.direction === 'outbound' ? 'bg-primary text-primary-foreground rounded-br-sm' : 'bg-muted rounded-bl-sm')}><p className="whitespace-pre-wrap">{message.body}</p><p className="text-[10px] opacity-60 mt-1">{format(new Date(message.created_at), 'MMM d, h:mm a')}{message.status ? ` · ${message.status}` : ''}</p></div></div>)}
+      <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4 sm:p-6 space-y-3">
+        {messages.map(message => <div key={message.id} className={cn('flex', message.direction === 'outbound' ? 'justify-end' : 'justify-start')}><div className={cn('max-w-[82%] rounded-2xl px-4 py-3 text-sm', message.direction === 'outbound' ? 'bg-primary text-primary-foreground rounded-br-sm' : 'bg-muted rounded-bl-sm')}><p className="whitespace-pre-wrap break-words [overflow-wrap:anywhere]">{message.body}</p><p className="text-[10px] opacity-60 mt-1">{format(new Date(message.created_at), 'MMM d, h:mm a')}{message.status ? ` · ${message.status}` : ''}</p></div></div>)}
         {messages.length === 0 && <div className="h-full grid place-items-center text-sm text-muted-foreground">No messages yet.</div>}
       </div>
-      <div className="p-3 sm:p-4 border-t border-border bg-card/70 flex gap-2"><Textarea value={reply} onChange={event => onReply(event.target.value)} placeholder="Text message" className="min-h-11 max-h-28 resize-none rounded-2xl" /><Button size="icon" className="rounded-full shrink-0 mt-0.5" onClick={onSend} disabled={sending || !reply.trim()}><Send className="h-4 w-4" /></Button></div>
+      <div className="shrink-0 p-3 sm:p-4 border-t border-border bg-card/70 flex gap-2"><Textarea value={reply} onChange={event => onReply(event.target.value)} placeholder="Text message" rows={1} className="text-base min-h-11 max-h-28 resize-none rounded-2xl" /><Button size="icon" className="rounded-full shrink-0 mt-0.5" onClick={onSend} disabled={sending || !reply.trim()}><Send className="h-4 w-4" /></Button></div>
     </>
   );
 }
@@ -459,7 +459,7 @@ function EmailDetail({ email, onBack, onReply, onEdit }: { email: EmailItem; onB
   return (
     <>
       <DetailHeader title={email.kind === 'sent' ? email.to : email.from} subtitle={email.kind} onBack={onBack} actions={<Button size="sm" variant="outline" onClick={email.kind === 'draft' ? onEdit : onReply}>{email.kind === 'draft' ? <FileEdit className="h-4 w-4 mr-2" /> : <Reply className="h-4 w-4 mr-2" />}{email.kind === 'draft' ? 'Edit' : 'Reply'}</Button>} />
-      <div className="flex-1 overflow-y-auto p-5 sm:p-8">
+      <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-5 sm:p-8">
         <div className="pb-5 mb-5 border-b border-border"><div className="flex items-start justify-between gap-3"><h3 className="text-xl font-display leading-tight">{email.subject}</h3>{email.status && <Badge variant="outline" className="capitalize">{email.status}</Badge>}</div><p className="text-xs text-muted-foreground mt-3">{format(new Date(email.at), 'MMM d, yyyy · h:mm a')}</p><p className="text-xs text-muted-foreground mt-1">From: {email.from}</p>{email.to && <p className="text-xs text-muted-foreground">To: {email.to}</p>}</div>
         {email.bodyHtml ? <div className="prose prose-sm dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: email.bodyHtml }} /> : <div className="text-sm whitespace-pre-wrap leading-relaxed">{email.bodyText || email.snippet || 'No content available.'}</div>}
       </div>
