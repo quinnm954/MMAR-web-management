@@ -22,6 +22,7 @@ import AdminProspecting from '@/components/admin/AdminProspecting';
 import AdminFleetAccounts from '@/components/admin/AdminFleetAccounts';
 import { Search, Star } from 'lucide-react';
 import AdminPhoneSettings from '@/components/admin/AdminPhoneSettings';
+import AdminPhoneHub from '@/components/admin/AdminPhoneHub';
 import AdminTrackingSettings from '@/components/admin/AdminTrackingSettings';
 import AdminEmployees from '@/components/admin/AdminEmployees';
 import AdminAuditLog from '@/components/admin/AdminAuditLog';
@@ -169,6 +170,7 @@ const AdminDashboard = () => {
             { value: 'quickbooks', label: 'QuickBooks', icon: FileDown, roles: ADMIN_ONLY, content: <AdminQuickBooksExport /> },
             { value: 'financing', label: 'Financing', icon: FileText, roles: ADMIN_ONLY, content: <FinancingContractsTable data={contracts} onRefresh={reloadFinancing} /> },
             { value: 'warranty', label: 'Warranty', icon: ShieldCheck, roles: ADMIN_ONLY, content: <WarrantyTable data={warranties} onRefresh={reloadWarranty} /> },
+            { value: 'phone', label: 'Phone', icon: Phone, roles: ADMIN_ONLY, content: <AdminPhoneHub /> },
             { value: 'emails', label: 'Emails', icon: Mail, roles: ADMIN_ONLY, content: <AdminEmails /> },
             { value: 'audit', label: 'Audit Log', icon: History, roles: OWNER_ADMIN, content: <AdminAuditLog /> },
             { value: 'employees', label: 'Employees', icon: UserCog, roles: ADMIN_ONLY, content: <AdminEmployees /> },
@@ -209,7 +211,7 @@ const AdminDashboard = () => {
           const groups = [
             { label: 'Workshop', values: ['calendar','ros','service','inspections','estimates','invoices','time','shifts','productivity'] },
             { label: 'Front Desk', values: ['customers','garage','memberships','bookings','share','declined','fleet-accounts','calls','texts','feedback','prospecting'] },
-            { label: 'Admin', values: ['dashboard','reports','laborpay','quickbooks','financing','warranty','emails','audit','employees','roles','phone-settings','tracking','settings'] },
+            { label: 'Admin', values: ['dashboard','phone','reports','laborpay','quickbooks','financing','warranty','emails','audit','employees','roles','phone-settings','tracking','settings'] },
           ];
           const groupedValues = groups.flatMap(g => g.values);
           const ungrouped = visible.filter(t => !groupedValues.includes(t.value));
@@ -270,7 +272,7 @@ const AdminDashboard = () => {
                   Current: <span className="font-medium text-foreground">{active.label}</span>
                 </div>
               </div>
-              <div className="border rounded-lg p-2 sm:p-4 bg-card overflow-x-auto">
+              <div className={active.value === 'phone' ? '' : 'border rounded-lg p-2 sm:p-4 bg-card overflow-x-auto'}>
                 {active.content}
               </div>
             </div>
