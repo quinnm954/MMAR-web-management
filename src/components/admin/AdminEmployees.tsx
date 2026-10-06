@@ -105,10 +105,16 @@ export default function AdminEmployees() {
     setCreateLogin(false);
     setOpen(true);
   };
-  const openEdit = (e: Employee) => {
+  const openEdit = async (e: Employee) => {
     setForm(e);
     setCreateLogin(false);
     setOpen(true);
+    const { data } = await supabase
+      .from('technician_agreements' as any)
+      .select('id, status, effective_date, tech_signed_at, company_signed_at')
+      .eq('employee_id', e.id)
+      .order('created_at', { ascending: false });
+    setAgreements((data ?? []) as any);
   };
 
   const onTypeChange = (v: string) => {
