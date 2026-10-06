@@ -9,6 +9,7 @@ const TechProtectedRoute = ({ children }: { children: ReactNode }) => {
   const location = useLocation();
   const [checking, setChecking] = useState(true);
   const [isTech, setIsTech] = useState(false);
+  const [agreementToken, setAgreementToken] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) { setChecking(false); return; }
@@ -18,7 +19,13 @@ const TechProtectedRoute = ({ children }: { children: ReactNode }) => {
         .select("role")
         .eq("user_id", user.id)
         .in("role", ["owner", "technician", "service_advisor", "manager", "parts", "admin"]);
-      setIsTech((data ?? []).length > 0);
+      const ok = (data ?? []).length > 0;
+      setIsTech(ok);
+      if (ok) {
+        const { data: ag } = await supabase.rpc("my_tech_agreement" as any);
+        const r = ag as { required?: boolean; token?: string } | null;
+        if (r?.required && r.token) setAgreementToken(r.token);
+      }
       setChecking(false);
     })();
   }, [user]);
@@ -38,6 +45,7 @@ const TechProtectedRoute = ({ children }: { children: ReactNode }) => {
     return <Navigate to="/set-password" replace />;
   }
   if (!isTech) return <Navigate to="/" replace />;
+  if (agreementToken) return <Navigate to={`/tech-agreement/${agreementToken}?return=${encodeURIComponent(location.pathname)}`} replace />;
   return <>{children}</>;
 };
 
