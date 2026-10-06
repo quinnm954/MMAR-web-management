@@ -141,6 +141,13 @@
       "when": 1791320844793,
       "tag": "0019_tech_current_scope_and_earnings",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1791324048745,
+      "tag": "0020_repair_order_names_follow_estimate",
+      "breakpoints": true
     }
   ]
 }
