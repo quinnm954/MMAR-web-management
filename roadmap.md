@@ -22,3 +22,7 @@
 - [x] Verify real records, replies, dialing, and responsive presentation in the preview.
 - [x] Move Phone to the header, move notification controls into Settings, and remove the floating phone button.
 - [x] Include the complete outbound email log and refresh it live on the Phone page.
+
+## Repair Orders
+- [x] Name repair orders from the approved repair descriptions instead of “Approved Estimate.”
+- [x] Correct existing generic repair-order names.

@@ -13,16 +13,32 @@ export type LineItem = {
 /**
  * Move an approved estimate's appointment into active Repair Order state.
  */
-export async function startRepairOrderFromEstimate(estimate: { id: string; appointment_id: string | null; status: string }) {
+export async function startRepairOrderFromEstimate(estimate: {
+  id: string;
+  appointment_id: string | null;
+  status: string;
+  line_items?: LineItem[];
+  notes?: string | null;
+}) {
   if (!estimate.appointment_id) {
     throw new Error('This estimate is not linked to an appointment.');
   }
   if (estimate.status !== 'approved' && estimate.status !== 'partially_approved') {
     throw new Error('Only approved estimates can start a Repair Order.');
   }
+  const approvedLines = (estimate.line_items || []).filter((line: LineItem & { status?: string }) => !line.status || line.status === 'approved');
+  const preferredLines = approvedLines.some((line) => line.kind === 'labor')
+    ? approvedLines.filter((line) => line.kind === 'labor')
+    : approvedLines;
+  const repairNames = Array.from(new Set(preferredLines
+    .map((line) => line.description?.replace(/\s*\(book labor[^)]*\)\s*$/i, '').trim())
+    .filter((name): name is string => Boolean(name))))
+    .slice(0, 3);
+  const repairName = repairNames.join(' + ').slice(0, 160) || estimate.notes?.trim() || 'Repair';
+
   const { error: aErr } = await supabase
     .from('appointments')
-    .update({ status: 'in_progress', board_column: 'in_progress' })
+    .update({ status: 'in_progress', board_column: 'in_progress', service_type: repairName })
     .eq('id', estimate.appointment_id);
   if (aErr) throw aErr;
   const { error: eErr } = await supabase
