@@ -13,5 +13,5 @@ export async function enrollLink(sb: any, customerId?: string | null): Promise<s
 /** Text suffix, or '' when the customer already has a full account. */
 export async function enrollSuffix(sb: any, customerId?: string | null): Promise<string> {
   const url = await enrollLink(sb, customerId).catch(() => null);
-  return url ? `\nFinish your account to see estimates, approve work, pay invoices & view your maintenance history: ${url}` : '';
+  return url ? `\nFinish your account to see estimates, approve work, pay invoices & view your maintenance history: ${url}\nAdd the app to your phone: ${SITE}/install` : '';
 }

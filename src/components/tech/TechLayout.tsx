@@ -5,6 +5,8 @@ import MessagesBellLink from "@/components/messaging/MessagesBellLink";
 import NotificationsBell from "@/components/notifications/NotificationsBell";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
+import InstallAppBanner from "@/components/shell/InstallAppBanner";
+import PwaInstallTutorial from "@/components/shell/PwaInstallTutorial";
 import MobileBottomNav from "@/components/shell/MobileBottomNav";
 import { useSwipeTabNav } from "@/hooks/useSwipeTabNav";
 import { useNativePushRegistration } from "@/hooks/useNativePushRegistration";
@@ -67,6 +69,8 @@ const TechLayout = ({ children }: { children: ReactNode }) => {
           ))}
         </nav>
       </header>
+      <InstallAppBanner />
+      <PwaInstallTutorial variant="tech" />
       <div className="container mx-auto px-4 py-6 pb-mobile-nav lg:pb-6">{children}</div>
       <MobileBottomNav items={primary} moreItems={more} />
     </main>
