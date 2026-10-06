@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import GCalView, { CalView } from "@/components/calendar/GCalView";
 import { useLaborMinutes, endFromLabor } from "@/lib/useLaborMinutes";
 import { supabase } from "@/integrations/supabase/client";
+import { useLaborMinutes, endFromLabor } from "@/lib/useLaborMinutes";
 import { useAuth } from "@/hooks/useAuth";
 import PortalLayout from "@/components/portal/PortalLayout";
 import { Card, CardContent } from "@/components/ui/card";
@@ -42,6 +43,7 @@ const statusColor = (s: string) => {
 const PortalAppointments = () => {
   const { user } = useAuth();
   const [appts, setAppts] = useState<Appointment[]>([]);
+  const laborMins = useLaborMinutes(appts.map((x) => x.id));
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [loading, setLoading] = useState(true);
   const [calView, setCalView] = useState<CalView>("month");

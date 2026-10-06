@@ -3,6 +3,7 @@ import GCalView, { CalView } from "@/components/calendar/GCalView";
 import { useNavigate } from "react-router-dom";
 import { useLaborMinutes, endFromLabor } from "@/lib/useLaborMinutes";
 import { supabase } from "@/integrations/supabase/client";
+import { useLaborMinutes, endFromLabor } from "@/lib/useLaborMinutes";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -63,6 +64,7 @@ const TechJobs = () => {
   const [calView, setCalView] = useState<CalView>("day");
   const [calDate, setCalDate] = useState(new Date());
   const [rows, setRows] = useState<Appt[]>([]);
+  const laborMins = useLaborMinutes(rows.map((x) => x.id));
   const [historyRows, setHistoryRows] = useState<ServiceRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [opening, setOpening] = useState<string | null>(null);
