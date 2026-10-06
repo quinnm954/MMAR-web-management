@@ -19,4 +19,4 @@
 ## Admin Phone
 - [x] Preserve the existing Front Desk communication screens.
 - [x] Add a standalone phone-style Admin workspace for calls, texts, and email.
-- [ ] Verify real records, replies, dialing, and responsive presentation in the preview.
+- [x] Verify real records, replies, dialing, and responsive presentation in the preview.
