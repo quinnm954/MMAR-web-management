@@ -49,6 +49,7 @@ type TextThread = {
 type SmsMessage = {
   id: string;
   body: string;
+  media_urls?: unknown;
   direction: string;
   status: string | null;
   created_at: string;
@@ -447,7 +448,7 @@ function TextDetail({ thread, name, tag, messages, reply, sending, onReply, onSe
     <>
       <DetailHeader title={name} subtitle={`${tag || 'text conversation'} · ${thread.phone}`} onBack={onBack} actions={<Button size="icon" className="rounded-full" onClick={onCall} title="Call"><Phone className="h-4 w-4" /></Button>} />
       <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4 sm:p-6 space-y-3">
-        {messages.map(message => <div key={message.id} className={cn('flex', message.direction === 'outbound' ? 'justify-end' : 'justify-start')}><div className={cn('max-w-[82%] rounded-2xl px-4 py-3 text-sm', message.direction === 'outbound' ? 'bg-primary text-primary-foreground rounded-br-sm' : 'bg-muted rounded-bl-sm')}><p className="whitespace-pre-wrap break-words [overflow-wrap:anywhere]">{message.body}</p><p className="text-[10px] opacity-60 mt-1">{format(new Date(message.created_at), 'MMM d, h:mm a')}{message.status ? ` · ${message.status}` : ''}</p></div></div>)}
+        {messages.map(message => <div key={message.id} className={cn('flex', message.direction === 'outbound' ? 'justify-end' : 'justify-start')}><div className={cn('max-w-[82%] rounded-2xl px-4 py-3 text-sm', message.direction === 'outbound' ? 'bg-primary text-primary-foreground rounded-br-sm' : 'bg-muted rounded-bl-sm')}><MessageMedia media={message.media_urls} />{message.body && <p className="whitespace-pre-wrap break-words [overflow-wrap:anywhere]">{message.body}</p>}<p className="text-[10px] opacity-60 mt-1">{format(new Date(message.created_at), 'MMM d, h:mm a')}{message.status ? ` · ${message.status}` : ''}</p></div></div>)}
         {messages.length === 0 && <div className="h-full grid place-items-center text-sm text-muted-foreground">No messages yet.</div>}
       </div>
       <div className="shrink-0 p-3 sm:p-4 border-t border-border bg-card/70 flex gap-2"><Textarea value={reply} onChange={event => onReply(event.target.value)} placeholder="Text message" rows={1} className="text-base min-h-11 max-h-28 resize-none rounded-2xl" /><Button size="icon" className="rounded-full shrink-0 mt-0.5" onClick={onSend} disabled={sending || !reply.trim()}><Send className="h-4 w-4" /></Button></div>
@@ -461,8 +462,54 @@ function EmailDetail({ email, onBack, onReply, onEdit }: { email: EmailItem; onB
       <DetailHeader title={email.kind === 'sent' ? email.to : email.from} subtitle={email.kind} onBack={onBack} actions={<Button size="sm" variant="outline" onClick={email.kind === 'draft' ? onEdit : onReply}>{email.kind === 'draft' ? <FileEdit className="h-4 w-4 mr-2" /> : <Reply className="h-4 w-4 mr-2" />}{email.kind === 'draft' ? 'Edit' : 'Reply'}</Button>} />
       <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-5 sm:p-8">
         <div className="pb-5 mb-5 border-b border-border"><div className="flex items-start justify-between gap-3"><h3 className="text-xl font-display leading-tight">{email.subject}</h3>{email.status && <Badge variant="outline" className="capitalize">{email.status}</Badge>}</div><p className="text-xs text-muted-foreground mt-3">{format(new Date(email.at), 'MMM d, yyyy · h:mm a')}</p><p className="text-xs text-muted-foreground mt-1">From: {email.from}</p>{email.to && <p className="text-xs text-muted-foreground">To: {email.to}</p>}</div>
-        {email.bodyHtml ? <div className="prose prose-sm dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: email.bodyHtml }} /> : <div className="text-sm whitespace-pre-wrap leading-relaxed">{email.bodyText || email.snippet || 'No content available.'}</div>}
+        {email.bodyHtml ? <EmailFrame html={email.bodyHtml} /> : <div className="text-sm whitespace-pre-wrap leading-relaxed">{email.bodyText || email.snippet || 'No content available.'}</div>}
       </div>
     </>
+  );
+}
+type MediaItem = { path?: string; url?: string; type?: string };
+
+function MessageMedia({ media }: { media: unknown }) {
+  const items = (Array.isArray(media) ? media : []) as MediaItem[];
+  const [urls, setUrls] = useState<string[]>([]);
+  useEffect(() => {
+    let alive = true;
+    Promise.all(items.map(async item => {
+      if (item.url) return item.url;
+      if (!item.path) return '';
+      const { data } = await supabase.storage.from('sms-media').createSignedUrl(item.path, 3600);
+      return data?.signedUrl || '';
+    })).then(list => { if (alive) setUrls(list); });
+    return () => { alive = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(items)]);
+  if (!items.length) return null;
+  return (
+    <div className="grid gap-2 mb-2">
+      {items.map((item, i) => {
+        const url = urls[i];
+        if (!url) return <div key={i} className="h-40 w-56 max-w-full rounded-xl bg-background/30 animate-pulse" />;
+        if (item.type?.startsWith('video')) return <video key={i} src={url} controls playsInline className="max-h-80 w-full rounded-xl bg-background" />;
+        if (item.type?.startsWith('image')) return <a key={i} href={url} target="_blank" rel="noreferrer"><img src={url} alt="Attachment" className="max-h-80 w-full rounded-xl object-contain bg-background/30" /></a>;
+        return <a key={i} href={url} target="_blank" rel="noreferrer" className="underline text-xs">Open attachment</a>;
+      })}
+    </div>
+  );
+}
+
+function EmailFrame({ html }: { html: string }) {
+  const [height, setHeight] = useState(600);
+  return (
+    <iframe
+      title="Email preview"
+      srcDoc={`<base target="_blank">${html}`}
+      sandbox="allow-same-origin allow-popups allow-popups-to-escape-sandbox"
+      className="w-full rounded-xl border border-border bg-background"
+      style={{ height, colorScheme: 'light' }}
+      onLoad={event => {
+        const doc = (event.currentTarget as HTMLIFrameElement).contentDocument;
+        if (doc) setHeight(Math.max(400, doc.documentElement.scrollHeight + 16));
+      }}
+    />
   );
 }
