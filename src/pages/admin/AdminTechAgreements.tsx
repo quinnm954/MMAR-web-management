@@ -33,15 +33,36 @@ export default function AdminTechAgreements() {
     if (error) toast.error(error.message);
     setRows(data ?? []);
   };
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+    supabase.from("employees" as any).select("id, full_name, phone, email").eq("is_active", true).order("full_name")
+      .then(({ data }) => {
+        const list = (data ?? []) as Employee[];
+        setEmployees(list);
+        const prefill = searchParams.get("employee");
+        if (prefill) {
+          const emp = list.find((e) => e.id === prefill);
+          if (emp) {
+            setForm({ ...blank, employee_id: emp.id, tech_name: emp.full_name, tech_phone: emp.phone ?? "", tech_email: emp.email ?? "" });
+            setOpen(true);
+          }
+        }
+      });
+  }, []);
 
   const link = (r: Row) => `${window.location.origin}/tech-agreement/${r.token}`;
+
+  const pickEmployee = (id: string) => {
+    const emp = employees.find((e) => e.id === id);
+    if (!emp) return setForm({ ...form, employee_id: "" });
+    setForm({ ...form, employee_id: id, tech_name: emp.full_name, tech_phone: emp.phone ?? "", tech_email: emp.email ?? "" });
+  };
 
   const create = async () => {
     if (!form.tech_name.trim()) return toast.error("Technician name is required");
     const { data: u } = await supabase.auth.getUser();
     const { data, error } = await supabase.from("technician_agreements").insert({
-      ...form, hourly_rate: Number(form.hourly_rate) || 40, created_by: u.user?.id,
+      ...form, employee_id: form.employee_id || null, hourly_rate: Number(form.hourly_rate) || 40, created_by: u.user?.id,
     }).select().single();
     if (error) return toast.error(error.message);
     setOpen(false); setForm(blank); await load(); setView(data);
