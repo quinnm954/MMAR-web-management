@@ -19,8 +19,8 @@ export interface CalEvent {
   muted?: boolean;
 }
 
-const HOUR_START = 7;
-const HOUR_END = 22;
+const HOUR_START = 8;
+const HOUR_END = 20;
 const HOURS = Array.from({ length: HOUR_END - HOUR_START }, (_, i) => HOUR_START + i);
 const H = 52; // px per hour
 const DEFAULT_MIN = 120;
@@ -96,7 +96,7 @@ export function calRange(view: CalView, date: Date) {
 
 export default function GCalView({
   events: rawEvents, view, onViewChange, date, onDateChange, onEventClick, onEventDrop,
-  views = ["day", "week", "month"], weekDays = 7, toolbarExtra,
+  views = ["day", "week", "month"], weekDays = 6, toolbarExtra,
 }: Props) {
   const [realNow, setNow] = useState(new Date());
   const now = toShopTime(realNow);
