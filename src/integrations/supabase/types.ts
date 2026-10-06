@@ -3189,6 +3189,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           effective_date: string
+          employee_id: string | null
           hourly_rate: number
           id: string
           status: string
@@ -3212,6 +3213,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           effective_date?: string
+          employee_id?: string | null
           hourly_rate?: number
           id?: string
           status?: string
@@ -3235,6 +3237,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           effective_date?: string
+          employee_id?: string | null
           hourly_rate?: number
           id?: string
           status?: string
@@ -3250,7 +3253,15 @@ export type Database = {
           token?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "technician_agreements_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       tiktok_videos: {
         Row: {
