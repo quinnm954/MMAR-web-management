@@ -15,14 +15,18 @@ import type { Tables } from "@/integrations/supabase/types";
 
 type Row = Tables<"technician_agreements">;
 
-const blank = { tech_name: "", tech_phone: "", tech_email: "", tech_address: "", cashapp_handle: "", hourly_rate: "40", effective_date: new Date().toISOString().slice(0, 10) };
+const blank = { tech_name: "", tech_phone: "", tech_email: "", tech_address: "", cashapp_handle: "", hourly_rate: "40", effective_date: new Date().toISOString().slice(0, 10), employee_id: "" };
+
+type Employee = { id: string; full_name: string; phone: string | null; email: string | null };
 
 export default function AdminTechAgreements() {
   const [rows, setRows] = useState<Row[]>([]);
+  const [employees, setEmployees] = useState<Employee[]>([]);
   const [form, setForm] = useState(blank);
   const [open, setOpen] = useState(false);
   const [view, setView] = useState<Row | null>(null);
   const [signer, setSigner] = useState("Michael Quinn");
+  const [searchParams] = useSearchParams();
 
   const load = async () => {
     const { data, error } = await supabase.from("technician_agreements").select("*").order("created_at", { ascending: false });
