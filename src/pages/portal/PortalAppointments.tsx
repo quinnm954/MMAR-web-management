@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import GCalView, { CalView } from "@/components/calendar/GCalView";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import PortalLayout from "@/components/portal/PortalLayout";
@@ -42,6 +43,8 @@ const PortalAppointments = () => {
   const [appts, setAppts] = useState<Appointment[]>([]);
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [loading, setLoading] = useState(true);
+  const [calView, setCalView] = useState<CalView>("month");
+  const [calDate, setCalDate] = useState(new Date());
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
@@ -174,8 +177,19 @@ const PortalAppointments = () => {
         </Card>
       ) : (
         <div className="space-y-3">
+          <GCalView
+            events={appts.filter((a) => a.scheduled_at && !["cancelled", "canceled", "declined"].includes(a.status)).map((a) => ({
+              id: a.id,
+              title: a.service_type,
+              subtitle: a.vehicle ? `${a.vehicle.year ?? ""} ${a.vehicle.make ?? ""} ${a.vehicle.model ?? ""}`.trim() : null,
+              start: new Date(a.scheduled_at!),
+              muted: a.status === "completed",
+            }))}
+            view={calView} onViewChange={setCalView} date={calDate} onDateChange={setCalDate}
+            onEventClick={(id) => document.getElementById(`appt-${id}`)?.scrollIntoView({ behavior: "smooth", block: "center" })}
+          />
           {appts.map((a) => (
-            <Card key={a.id} className="border-border/50">
+            <Card key={a.id} id={`appt-${a.id}`} className="border-border/50">
               <CardContent className="p-5">
                 <div className="flex flex-wrap items-start justify-between gap-3 mb-2">
                   <div>

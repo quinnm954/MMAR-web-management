@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import GCalView, { CalView } from "@/components/calendar/GCalView";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
@@ -43,7 +44,7 @@ interface ServiceRecord {
   vehicle?: { year: number | null; make: string | null; model: string | null } | null;
 }
 
-type Tab = "active" | "history";
+type Tab = "active" | "history" | "calendar";
 
 const STATUSES = ["scheduled", "in_progress", "completed", "cancelled"];
 
@@ -58,6 +59,8 @@ const TechJobs = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [tab, setTab] = useState<Tab>("active");
+  const [calView, setCalView] = useState<CalView>("day");
+  const [calDate, setCalDate] = useState(new Date());
   const [rows, setRows] = useState<Appt[]>([]);
   const [historyRows, setHistoryRows] = useState<ServiceRecord[]>([]);
   const [loading, setLoading] = useState(true);
@@ -128,8 +131,8 @@ const TechJobs = () => {
   };
 
   useEffect(() => {
-    if (tab === "active") loadActive();
-    else loadHistory();
+    if (tab === "history") loadHistory();
+    else loadActive();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, tab]);
 
@@ -243,7 +246,7 @@ const TechJobs = () => {
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-bold">My Jobs</h2>
-          <Button variant="ghost" size="icon" onClick={() => tab === "active" ? loadActive() : loadHistory()} disabled={loading} aria-label="Refresh">
+          <Button variant="ghost" size="icon" onClick={() => tab === "history" ? loadHistory() : loadActive()} disabled={loading} aria-label="Refresh">
             <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
           </Button>
         </div>
@@ -261,10 +264,28 @@ const TechJobs = () => {
           >
             History
           </button>
+          <button
+            onClick={() => setTab("calendar")}
+            className={`flex-1 py-2 text-sm font-medium text-center transition-colors ${tab === "calendar" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+          >
+            Calendar
+          </button>
         </div>
 
         {loading ? (
           <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
+        ) : tab === "calendar" ? (
+          <GCalView
+            events={rows.filter((r) => r.scheduled_at).map((r) => ({
+              id: r.id,
+              title: `${r.service_type}${r.customer?.full_name ? " · " + r.customer.full_name : ""}`,
+              subtitle: [r.vehicle && `${r.vehicle.year ?? ""} ${r.vehicle.make ?? ""} ${r.vehicle.model ?? ""}`.trim(), r.service_address].filter(Boolean).join(" · "),
+              start: new Date(r.scheduled_at!),
+              color: r.status === "in_progress" ? 1 : 0,
+            }))}
+            view={calView} onViewChange={setCalView} date={calDate} onDateChange={setCalDate}
+            onEventClick={() => setTab("active")}
+          />
         ) : tab === "active" ? (
           rows.length === 0 ? (
             <Card><CardContent className="p-8 text-center text-muted-foreground">No active jobs assigned to you.</CardContent></Card>
