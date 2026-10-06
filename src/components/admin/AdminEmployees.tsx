@@ -58,6 +58,8 @@ const empty: Employee = {
   notes: '',
 };
 
+type Agreement = { id: string; status: string; effective_date: string; tech_signed_at: string | null; company_signed_at: string | null };
+
 export default function AdminEmployees() {
   const [rows, setRows] = useState<Employee[]>([]);
   const [open, setOpen] = useState(false);
@@ -65,6 +67,7 @@ export default function AdminEmployees() {
   const [createLogin, setCreateLogin] = useState(false);
   const [saving, setSaving] = useState(false);
   const [payDefaults, setPayDefaults] = useState<Record<string, any>>({});
+  const [agreements, setAgreements] = useState<Agreement[]>([]);
 
   const load = async () => {
     const [{ data, error }, defaults] = await Promise.all([
