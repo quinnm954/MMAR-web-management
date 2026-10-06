@@ -3800,6 +3800,7 @@ export type Database = {
         }
         Returns: string
       }
+      estimate_repair_name: { Args: { _line_items: Json }; Returns: string }
       get_appointment_confirmation: { Args: { _token: string }; Returns: Json }
       get_calendar_feed_token: { Args: { _rotate?: boolean }; Returns: string }
       get_estimate_by_token: { Args: { _token: string }; Returns: Json }
