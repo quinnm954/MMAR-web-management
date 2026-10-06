@@ -57,7 +57,13 @@ export async function sendAndLog(p: SendAndLogParams): Promise<SendAndLogResult>
       idempotencyKey: p.idempotencyKey,
     })
     if (r.sent) {
-      await log({ ...base, status: 'sent' })
+      const md = (base.metadata ?? {}) as Record<string, unknown>
+      await log({ ...base, status: 'sent', metadata: {
+        ...md,
+        subject: md.subject ?? r.subject,
+        body_html: md.body_html ?? r.html,
+        preview: md.preview ?? (p.templateData?.body ? String(p.templateData.body).slice(0, 140) : undefined),
+      } })
       return { sent: true }
     }
     await log({ ...base, status: 'suppressed' })
