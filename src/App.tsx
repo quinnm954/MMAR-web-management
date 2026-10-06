@@ -29,6 +29,7 @@ import AboutPage from "./pages/AboutPage";
 import Reviews from "./pages/Reviews";
 import ReviewLanding from "./pages/ReviewLanding";
 import ContactPage from "./pages/ContactPage";
+import AppLauncher from "./pages/AppLauncher";
 import InstallApp from "./pages/InstallApp";
 import PrePurchaseInspection from "./pages/PrePurchaseInspection";
 
@@ -127,6 +128,7 @@ const App = () => (
             <Route path="/reviews" element={<Reviews />} />
             <Route path="/review" element={<ReviewLanding />} />
             <Route path="/contact" element={<ContactPage />} />
+            <Route path="/app" element={<AppLauncher />} />
             <Route path="/install" element={<InstallApp />} />
             <Route path="/blog" element={<Blog />} />
             <Route path="/blog/tag/:tag" element={<BlogTag />} />
