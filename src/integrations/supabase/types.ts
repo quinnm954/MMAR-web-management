@@ -3907,6 +3907,7 @@ export type Database = {
       is_office_staff: { Args: { _user_id: string }; Returns: boolean }
       is_staff: { Args: { _user_id: string }; Returns: boolean }
       my_tech_agreement: { Args: never; Returns: Json }
+      my_tech_earnings: { Args: { _from: string; _to: string }; Returns: Json }
       recommend_checklist_item: {
         Args: {
           _item_id: string
@@ -4007,6 +4008,14 @@ export type Database = {
       }
       tech_has_appointment: {
         Args: { _appt: string; _user_id: string }
+        Returns: boolean
+      }
+      tech_has_current_customer: {
+        Args: { _customer: string; _user_id: string }
+        Returns: boolean
+      }
+      tech_has_current_vehicle: {
+        Args: { _user_id: string; _vehicle: string }
         Returns: boolean
       }
       tech_has_vehicle: {

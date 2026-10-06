@@ -17,6 +17,7 @@ import {
   MessageCircle,
   Bell,
 } from "lucide-react";
+import MyEarningsCard from "@/components/tech/MyEarningsCard";
 import PushNotificationCard from "@/components/shell/PushNotificationCard";
 import CalendarFeedSettings from "@/components/admin/CalendarFeedSettings";
 
@@ -148,6 +149,7 @@ const TechDashboard = () => {
   return (
     <TechLayout>
       <div className="space-y-6">
+        <MyEarningsCard />
         <PushNotificationCard />
         <CalendarFeedSettings variant="tech" />
         <div>
