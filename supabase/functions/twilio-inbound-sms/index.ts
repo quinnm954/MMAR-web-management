@@ -14,9 +14,34 @@ Deno.serve(async (req) => {
     const from = String(form.get('From') || '');
     const body = String(form.get('Body') || '');
     const sid = String(form.get('MessageSid') || '');
-    if (!from || !body) return new Response('ok', { headers: corsHeaders });
+    const numMedia = Math.min(Number(form.get('NumMedia') || 0) || 0, 10);
+    if (!from || (!body && numMedia === 0)) return new Response('ok', { headers: corsHeaders });
 
     const sb = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
+
+    // Copy MMS photos/videos into private storage so staff can view them.
+    const media: { path: string; type: string }[] = [];
+    for (let i = 0; i < numMedia; i++) {
+      const url = String(form.get(`MediaUrl${i}`) || '');
+      const type = String(form.get(`MediaContentType${i}`) || 'application/octet-stream');
+      if (!url) continue;
+      try {
+        let res = await fetch(url);
+        if (!res.ok) {
+          // Media auth enforced: fetch through the Twilio gateway instead.
+          const m = url.match(/\/Messages\/[^/]+\/Media\/[^/?]+/);
+          const lk = Deno.env.get('LOVABLE_API_KEY'), tk = Deno.env.get('TWILIO_API_KEY');
+          if (m && lk && tk) res = await fetch(`https://connector-gateway.lovable.dev/twilio${m[0]}`, { headers: { Authorization: `Bearer ${lk}`, 'X-Connection-Api-Key': tk } });
+        }
+        if (!res.ok) { console.error('media fetch failed', res.status); continue; }
+        const ext = (type.split('/')[1] || 'bin').split(';')[0].replace('jpeg', 'jpg');
+        const path = `${from.replace(/\D/g, '')}/${sid || crypto.randomUUID()}-${i}.${ext}`;
+        const up = await sb.storage.from('sms-media').upload(path, await res.arrayBuffer(), { contentType: type, upsert: true });
+        if (up.error) { console.error('media upload', up.error.message); continue; }
+        media.push({ path, type });
+      } catch (e) { console.error('media error', e); }
+    }
+    const preview = body || (media.some(m => m.type.startsWith('video')) ? '🎥 Video' : '📷 Photo');
 
     // Find or create thread
     let { data: thread } = await sb.from('sms_threads').select('*').eq('phone', from).maybeSingle();
