@@ -243,6 +243,10 @@ export default function AdminEmployees() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="font-display text-xl">Employees</h2>
+        <div className="flex gap-2">
+        <Button variant="outline" asChild>
+          <a href="/admin/tech-agreements">Technician Agreements</a>
+        </Button>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
             <Button onClick={openNew}>
