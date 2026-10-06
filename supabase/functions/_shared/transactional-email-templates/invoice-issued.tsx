@@ -34,6 +34,7 @@ const InvoiceIssuedEmail = ({ customerName, invoiceNumber, total, dueDate, invoi
             <Button href={invoiceUrl} style={button}>View & Pay Invoice</Button>
           </Section>
         )}
+        <Text style={{ fontSize: '14px', fontWeight: 700, color: '#b91c1c', backgroundColor: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', padding: '12px 14px', margin: '16px 0' }}>Cash is not accepted. Please pay the invoice online, not the technician.</Text>
         <Text style={text}>Questions? Call or text <strong>813-501-7572</strong>.</Text>
         <Hr style={hr} />
         <Text style={footer}>— The {SITE_NAME} Team</Text>

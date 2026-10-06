@@ -169,6 +169,9 @@ const EstimateApproval = () => {
           </div>
         )}
       </div>
+      <p className="mb-3 rounded border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm font-semibold text-destructive">
+        Cash is not accepted. Payment is made through your invoice — please do not pay the technician.
+      </p>
 
       {!locked && (
         <p className="text-sm text-muted-foreground mb-3">

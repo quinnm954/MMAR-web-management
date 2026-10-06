@@ -216,6 +216,9 @@ const PortalInvoiceDetail = () => {
               {paying ? <Loader2 className="h-4 w-4 animate-spin" /> : <><CreditCard className="h-4 w-4 mr-2" /> Pay ${due.toFixed(2)} Securely</>}
             </Button>
           ) : null}
+          <p className="mt-3 rounded border border-destructive/40 bg-destructive/10 px-3 py-2 text-center text-sm font-semibold text-destructive">
+            Cash is not accepted. Please pay the invoice, not the technician.
+          </p>
         </div>
 
         {isPaid && (

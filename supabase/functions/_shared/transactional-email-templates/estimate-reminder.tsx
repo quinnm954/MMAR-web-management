@@ -25,7 +25,8 @@ const EstimateReminderEmail = ({ customerName, estimateNumber, total, approvalUr
           <Section style={{ textAlign: 'center', margin: '24px 0' }}>
             <Button href={approvalUrl || 'https://mikesmautorepair.com/portal/estimates'} style={button}>Review & approve</Button>
           </Section>
-          <Text style={text}>Questions? Call or text <strong>813-501-7572</strong>.</Text>
+          <Text style={{ fontSize: '14px', fontWeight: 700, color: '#b91c1c', backgroundColor: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', padding: '12px 14px', margin: '16px 0' }}>Cash is not accepted. Please pay the invoice online, not the technician.</Text>
+        <Text style={text}>Questions? Call or text <strong>813-501-7572</strong>.</Text>
           <Hr style={hr} />
           <Text style={footer}>— The {SITE_NAME} Team</Text>
         </BrandCard>

@@ -37,6 +37,7 @@ const EstimateReadyEmail = ({ name, estimateNumber, total, approvalUrl, accountU
             <Button href={accountUrl} style={secondaryButton}>Open My Account</Button>
           </Section>
         )}
+        <Text style={{ fontSize: '14px', fontWeight: 700, color: '#b91c1c', backgroundColor: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', padding: '12px 14px', margin: '16px 0' }}>Cash is not accepted. Please pay the invoice online, not the technician.</Text>
         <Text style={help}>Questions about the estimate? Call or text us at <strong>813-501-7572</strong>.</Text>
       </BrandCard>
       <BrandFooter />

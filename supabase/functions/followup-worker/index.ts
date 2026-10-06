@@ -50,8 +50,8 @@ Deno.serve(async () => {
         const hi = first(p?.full_name) ? `Hi ${first(p?.full_name)}, ` : 'Hi, ';
         const enr = await enrollSuffix(sb, e.customer_id);
         await sendSms(sb, phone, (final
-          ? `${hi}this is Mike's Mobile Auto Repair checking in one last time on your estimate (${money(e.total)}). Approve it here and we'll book the earliest open time: ${url} Reply STOP to opt out.`
-          : `${hi}this is Mike's Mobile Auto Repair. Your estimate (${money(e.total)}) is ready whenever you are. Approve all or part of it here: ${url} Reply STOP to opt out.`) + enr);
+          ? `${hi}this is Mike's Mobile Auto Repair checking in one last time on your estimate (${money(e.total)}). Approve it here and we'll book the earliest open time: ${url} Cash is not accepted - please pay the invoice online, not the technician. Reply STOP to opt out.`
+          : `${hi}this is Mike's Mobile Auto Repair. Your estimate (${money(e.total)}) is ready whenever you are. Approve all or part of it here: ${url} Cash is not accepted - please pay the invoice online, not the technician. Reply STOP to opt out.`) + enr);
       } else if (p?.email) {
         await sendAndLog({ templateName: 'estimate-reminder', recipientEmail: p.email, idempotencyKey: `estimate-reminder-${e.id}-${step}`,
           templateData: { customerName: first(p.full_name), estimateNumber: e.estimate_number, total: money(e.total), approvalUrl: url, final } });
@@ -110,8 +110,8 @@ Deno.serve(async () => {
         const hi = first(p.full_name) ? `Hi ${first(p.full_name)}, ` : 'Hi, ';
         const enr = await enrollSuffix(sb, inv.customer_id);
         await sendSms(sb, p.phone, (reminder
-          ? `${hi}friendly reminder from Mike's Mobile Auto Repair: your invoice for ${money(dueAmt)} is still open. Pay securely here: ${url} Reply STOP to opt out.`
-          : `${hi}thanks for choosing Mike's Mobile Auto Repair! Your invoice for ${money(dueAmt)} is ready. Pay securely here: ${url} Reply STOP to opt out.`) + enr);
+          ? `${hi}friendly reminder from Mike's Mobile Auto Repair: your invoice for ${money(dueAmt)} is still open. Pay securely here: ${url} Cash is not accepted - please pay the invoice online, not the technician. Reply STOP to opt out.`
+          : `${hi}thanks for choosing Mike's Mobile Auto Repair! Your invoice for ${money(dueAmt)} is ready. Pay securely here: ${url} Cash is not accepted - please pay the invoice online, not the technician. Reply STOP to opt out.`) + enr);
       } else if (p?.email) {
         await sendAndLog({ templateName: 'invoice-reminder', recipientEmail: p.email, idempotencyKey: `invoice-auto-${inv.id}-${step}`,
           templateData: { customerName: first(p.full_name), invoiceNumber: inv.invoice_number, amountDue: money(dueAmt), payUrl: url, reminder } });
