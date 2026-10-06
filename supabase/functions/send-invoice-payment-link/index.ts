@@ -110,7 +110,7 @@ Deno.serve(async (req) => {
 
     // Build message preview
     const greeting = profile?.full_name ? `Hi ${profile.full_name.split(" ")[0]}, ` : "";
-    const msg = `${SHOP_NAME}: ${greeting}your invoice ${invoice.invoice_number || ""} for $${due.toFixed(2)} is ready. Pay securely: ${session.url}`;
+    const msg = `${SHOP_NAME}: ${greeting}your invoice ${invoice.invoice_number || ""} for $${due.toFixed(2)} is ready. Pay securely: ${session.url} Cash is not accepted - please pay the invoice online, not the technician.`;
 
     if (copyOnly) {
       return new Response(JSON.stringify({ ok: true, url: session.url, message: msg }), {

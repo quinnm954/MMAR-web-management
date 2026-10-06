@@ -25,7 +25,7 @@ Deno.serve(async (req) => {
     const url = `${SITE}/estimate/${est.approval_token}`;
     const total = `$${Number(est.total || 0).toFixed(2)}`;
     if (phone.length === 10 && await smsAllowed().catch(() => false)) {
-      await sendSms(sb, phone, `${first ? `${first}, your` : 'Your'} estimate from Mike's Mobile Auto Repair is ready (${total}): ${url}${await enrollSuffix(sb, est.customer_id)}`);
+      await sendSms(sb, phone, `${first ? `${first}, your` : 'Your'} estimate from Mike's Mobile Auto Repair is ready (${total}): ${url} Cash is not accepted - please pay the invoice online, not the technician.${await enrollSuffix(sb, est.customer_id)}`);
       return json({ ok: true, via: 'sms' });
     }
     if (!email) return json({ ok: true, via: 'none' });
