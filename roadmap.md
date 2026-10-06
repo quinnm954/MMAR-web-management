@@ -15,3 +15,8 @@
 ## Email
 - [x] Email sending update (ready to review; publish to finish)
 - [x] Email domain notify.mikesmautorepair.com set up (finishing verification)
+
+## Admin Phone
+- [x] Preserve the existing Front Desk communication screens.
+- [x] Add a standalone phone-style Admin workspace for calls, texts, and email.
+- [x] Verify real records, replies, dialing, and responsive presentation in the preview.
