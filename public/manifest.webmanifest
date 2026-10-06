@@ -3,7 +3,7 @@
   "name": "Garage Ace",
   "short_name": "Garage Ace",
   "description": "Garage Ace — sign in to manage your MMAR Care membership, vehicles, appointments, and invoices.",
-  "start_url": "/portal/dashboard?source=pwa",
+  "start_url": "/app?source=pwa",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",

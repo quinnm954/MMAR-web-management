@@ -30,7 +30,7 @@ const detectPlatform = (): Platform => {
   return "other";
 };
 
-const PwaInstallTutorial = () => {
+const PwaInstallTutorial = ({ variant = "customer" }: { variant?: "customer" | "tech" }) => {
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState(0);
@@ -107,8 +107,9 @@ const PwaInstallTutorial = () => {
       body: (
         <div className="space-y-3 text-sm text-muted-foreground">
           <p>
-            Install Garage Ace on your phone to get a one-tap app icon, faster loading, and push
-            reminders for appointments, estimates, and invoices.
+            {variant === "tech"
+              ? "Install Garage Ace on your phone for one-tap access to your assigned jobs, inspections, and your labor hours and pay, plus instant alerts when a job is assigned."
+              : "Install Garage Ace on your phone to get a one-tap app icon, faster loading, and push reminders for appointments, estimates, and invoices."}
           </p>
           <ul className="space-y-1.5">
             <li className="flex gap-2"><Check className="h-4 w-4 text-primary mt-0.5" /> Instant access from your home screen</li>
@@ -201,7 +202,7 @@ const PwaInstallTutorial = () => {
         ),
       },
     ];
-  }, [platform, prompt]);
+  }, [platform, prompt, variant]);
 
   const current = steps[Math.min(step, steps.length - 1)];
   const isLast = step >= steps.length - 1;
