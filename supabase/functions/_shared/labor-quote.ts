@@ -164,11 +164,12 @@ export async function createDraftEstimate(sb: any, req: any, q: LaborQuote, opts
     prof = { id: c.user.id }; isNew = true;
   }
   if (!prof) return null;
+  const vehicleId = await resolveVehicle(sb, prof.id, req).catch(() => null);
   const valid = new Date(Date.now() + 30 * 86400_000).toISOString().slice(0, 10);
   if (q.kind === 'none') {
     // No labor match: leave an unsent draft on the appointment for staff to fill in.
     const { data, error } = await sb.from('estimates').insert({
-      customer_id: prof.id, appointment_id: opts.appointmentId, status: 'draft', line_items: [], subtotal: 0, total: 0, valid_until: valid,
+      customer_id: prof.id, vehicle_id: vehicleId, appointment_id: opts.appointmentId, status: 'draft', line_items: [], subtotal: 0, total: 0, valid_until: valid,
       customer_phone: req.customer_phone || null,
       notes: `Auto-created for confirmed booking (${req.service_type || 'service'}, ${req.vehicle_info || 'vehicle n/a'}). No labor guide match — add labor and parts, then send.`,
     }).select('id').single();
@@ -182,7 +183,7 @@ export async function createDraftEstimate(sb: any, req: any, q: LaborQuote, opts
   // Engine unknown and engines differ: leave an unsent draft for staff instead of guessing.
   if (q.kind === 'labor' && !q.engineMatched) {
     const { data, error } = await sb.from('estimates').insert({
-      customer_id: prof.id, appointment_id: opts.appointmentId || null, status: 'draft', line_items: lines, subtotal: total, total, valid_until: valid,
+      customer_id: prof.id, vehicle_id: vehicleId, appointment_id: opts.appointmentId || null, status: 'draft', line_items: lines, subtotal: total, total, valid_until: valid,
       customer_phone: req.customer_phone || null,
       notes: `Auto-drafted (${req.vehicle_info || 'vehicle n/a'}). Engine size unknown — confirm engine, adjust hours, add parts, then send.`,
     }).select('id').single();
@@ -191,7 +192,7 @@ export async function createDraftEstimate(sb: any, req: any, q: LaborQuote, opts
   }
   // Never auto-send: staff review the draft and press Send in Estimates.
   const { data, error } = await sb.from('estimates').insert({
-    customer_id: prof.id, status: 'draft', line_items: lines, subtotal: total, total, valid_until: valid,
+    customer_id: prof.id, vehicle_id: vehicleId, status: 'draft', line_items: lines, subtotal: total, total, valid_until: valid,
     customer_phone: req.customer_phone || null, appointment_id: opts.appointmentId || null,
     notes: `Auto-drafted from booking request (${req.vehicle_info || 'vehicle n/a'}). Labor times are estimates — verify hours, add parts, then send.`,
   }).select('id').single();
@@ -203,4 +204,18 @@ export function quoteNote(q: LaborQuote, estimateId: string | null) {
   const s = quoteSentence(q);
   if (!s) return '';
   return `[Auto quote] ${s}${estimateId ? ' Draft estimate created.' : ''}`;
+}
+
+// Finds the customer's vehicle from "2016 Jeep Wrangler 3.6L"-style text in the request, or adds it.
+async function resolveVehicle(sb: any, ownerId: string, req: any): Promise<string | null> {
+  const text = `${req.vehicle_info || ''} ${req.description || ''}`;
+  const m = text.match(/\b(19[5-9]\d|20[0-4]\d)\s+([A-Za-z-]+)\s+([A-Za-z0-9-]+)/);
+  const { data: list } = await sb.from('vehicles').select('id, year, make, model').eq('owner_id', ownerId);
+  if (!m) return list?.length === 1 ? list[0].id : null;
+  const [, year, make, model] = m;
+  const hit = (list || []).find((v: any) => (v.make || '').toLowerCase() === make.toLowerCase() && (v.model || '').toLowerCase().startsWith(model.toLowerCase()));
+  if (hit) return hit.id;
+  const eng = text.match(/\b(\d\.\d)\s*L\b/i)?.[1];
+  const { data } = await sb.from('vehicles').insert({ owner_id: ownerId, year: Number(year), make, model, engine: eng ? `${eng}L` : null }).select('id').single();
+  return data?.id ?? null;
 }
