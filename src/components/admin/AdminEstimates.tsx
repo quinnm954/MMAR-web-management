@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Fragment } from 'react';
+import { ListControls, inRange, matches, groupHeader, GroupLabel, type Range } from './ListControls';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -44,6 +45,9 @@ const STATUS_COLORS: Record<string, string> = {
 
 const AdminEstimates = () => {
   const [estimates, setEstimates] = useState<Estimate[]>([]);
+  const [q, setQ] = useState('');
+  const [tab, setTab] = useState('all');
+  const [range, setRange] = useState<Range>('all');
   const [customers, setCustomers] = useState<any[]>([]);
   const [vehicles, setVehicles] = useState<any[]>([]);
   const [catalog, setCatalog] = useState<any[]>([]);
@@ -573,9 +577,10 @@ const AdminEstimates = () => {
                     </div>
                   </TableCell>
                 </TableRow>
-              ))}
-              {estimates.length === 0 && (
-                <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">No estimates yet</TableCell></TableRow>
+                </Fragment>);
+              })}
+              {shown.length === 0 && (
+                <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">No estimates match</TableCell></TableRow>
               )}
             </TableBody>
           </Table>
