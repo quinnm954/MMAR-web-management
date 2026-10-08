@@ -8,7 +8,7 @@
 ## Changes
 1. **Fix Email → Sent:** every sent email shows (estimates, invoices, reminders, fleet outreach), newest first, with full preview.
 2. **Email → Inbox:** it lists customer replies once they reach the app. Until then, it shows a short note: "Replies currently go to your Outlook". I'll ask whether you want replies routed into the app (see question below).
-3. **Add a 5th Phone tab, "Chat":** the in-app messages customers and techs send from their portal, with reply. This replaces the separate Messages page for admins.
+3. **In-app chat moves onto the Phone page:** a 5th tab, "Chat", sits next to Inbox, Calls, Texts and Email. It holds every in-app message customers and techs send from their portal, and you can read and reply right there. Admins no longer use a separate Messages page; new chats also show in the Phone page's Inbox and on the Phone icon's unread count.
 4. **Remove the separate screens:** Front Desk → Calls, Front Desk → Texts, Admin → Emails, and the admin Messages bell all go away, and old links open the Phone page instead. Customers and techs keep their own Messages page so they can still reach you.
 5. **Inbox tab:** shows calls, texts, emails and chats mixed together, newest first.
 
