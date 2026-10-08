@@ -196,6 +196,7 @@ export default function AdminPhoneHub() {
       .on('postgres_changes', { event: '*', schema: 'public', table: 'inbound_messages' }, load)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'email_send_log' }, load)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'message_threads' }, load)
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, load)
       .subscribe();
     return () => { supabase.removeChannel(channel); };
   }, [load]);

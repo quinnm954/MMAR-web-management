@@ -136,7 +136,6 @@ const AdminDashboard = () => {
             <Button variant="ghost" size="sm" onClick={refreshAll} disabled={refreshing} title={`Last refreshed ${lastRefreshed.toLocaleTimeString()}`}>
               <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
             </Button>
-            <MessagesBellLink />
             <NotificationsBell />
             <Button
               variant="ghost"
@@ -176,12 +175,9 @@ const AdminDashboard = () => {
             { value: 'financing', label: 'Financing', icon: FileText, roles: ADMIN_ONLY, content: <FinancingContractsTable data={contracts} onRefresh={reloadFinancing} /> },
             { value: 'warranty', label: 'Warranty', icon: ShieldCheck, roles: ADMIN_ONLY, content: <WarrantyTable data={warranties} onRefresh={reloadWarranty} /> },
             { value: 'phone', label: 'Phone', icon: Phone, roles: ADMIN_ONLY, content: <AdminPhoneHub /> },
-            { value: 'emails', label: 'Emails', icon: Mail, roles: ADMIN_ONLY, content: <AdminEmails /> },
             { value: 'audit', label: 'Audit Log', icon: History, roles: OWNER_ADMIN, content: <AdminAuditLog /> },
             { value: 'employees', label: 'Employees', icon: UserCog, roles: ADMIN_ONLY, content: <AdminEmployees /> },
             { value: 'roles', label: 'Roles', icon: ShieldCheck, roles: OWNER_ADMIN, content: <AdminRoles /> },
-            { value: 'calls', label: 'Calls', icon: Phone, roles: ADVISOR, content: <AdminCalls /> },
-            { value: 'texts', label: 'Texts', icon: MessageSquare, roles: ADVISOR, content: <AdminSMS /> },
             { value: 'feedback', label: 'Feedback', icon: Star, roles: ADVISOR, content: <AdminReviewFeedback /> },
             { value: 'fleet-accounts', label: 'Fleet Accounts', icon: Car, roles: ADVISOR, content: <AdminFleetAccounts /> },
             { value: 'prospecting', label: 'Prospecting', icon: Search, roles: OWNER_ADMIN, content: <AdminProspecting /> },
@@ -195,7 +191,7 @@ const AdminDashboard = () => {
           }
           const defaultTab = visible.find(t => t.value === 'dashboard')?.value ?? visible.find(t => t.value === 'customers')?.value ?? visible[0].value;
           const rawTab = searchParams.get('tab');
-          const tabParam = rawTab === 'checklists' ? 'inspections' : rawTab;
+          const tabParam = rawTab === 'checklists' ? 'inspections' : ['calls','texts','emails','messages'].includes(rawTab || '') ? 'phone' : rawTab;
           const initialTab = visible.find(t => t.value === tabParam)?.value ?? defaultTab;
           const [activeTab, setActiveTab] = useState(initialTab);
           const [usage, setUsage] = useState<Record<string, number>>(() => {
@@ -219,8 +215,8 @@ const AdminDashboard = () => {
 
           const groups = [
             { label: 'Workshop', values: ['calendar','ros','service','inspections','estimates','invoices','time','shifts','productivity'] },
-            { label: 'Front Desk', values: ['customers','garage','memberships','bookings','share','declined','fleet-accounts','calls','texts','feedback','prospecting'] },
-            { label: 'Admin', values: ['dashboard','reports','laborpay','quickbooks','financing','warranty','emails','audit','employees','roles','phone-settings','tracking','settings'] },
+            { label: 'Front Desk', values: ['customers','garage','memberships','bookings','share','declined','fleet-accounts','feedback','prospecting'] },
+            { label: 'Admin', values: ['dashboard','reports','laborpay','quickbooks','financing','warranty','audit','employees','roles','phone-settings','tracking','settings'] },
           ];
           const groupedValues = groups.flatMap(g => g.values);
           const ungrouped = visible.filter(t => !groupedValues.includes(t.value));
