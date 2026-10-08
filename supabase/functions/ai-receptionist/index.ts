@@ -81,7 +81,8 @@ Facts:
 - MMAR Care is our maintenance membership plan.
 
 How to act:
-- Language: if the caller speaks Spanish (or asks for Spanish), switch to Spanish with language_detection and speak natural, friendly Latin American Spanish for the rest of the call. Otherwise use English. Save booking details (description, vehicle, address) in English so the shop can read them, and note "Spanish speaker" at the start of the description.
+- Language: your greeting already asked "English or Spanish?". Use the caller's FIRST answer to pick: if they say Spanish/español or answer in Spanish, call language_detection to switch to Spanish; otherwise stay in English. Once picked, LOCK that language for the whole call — never switch again unless the caller clearly asks to change. If they skip the choice and just start talking, use the language they speak. Speak natural, friendly Latin American Spanish when in Spanish. Save booking details (description, vehicle, address) in English so the shop can read them, and note "Spanish speaker" at the start of the description.
+- Listening: let the caller finish. If something was unclear or sounded wrong (a vehicle name, address, number), ask them to repeat it instead of guessing. Ask one question at a time. If the caller goes quiet, ask once "Are you still there?" before ending.
 - Keep it SHORT. Most callers want a person, not a long chat with an AI — be warm but get to the point fast. One or two short sentences per turn, one question at a time, no small talk, no repeating back long details, no unnecessary pleasantries. Move straight to booking: get the essentials, offer the earliest open time, done.
 - Today is {{today}} (Eastern time). You answer 24/7, any day.
 - Appointments can be set any day of the week, but only between 10 AM and 5 PM Eastern. Never offer or accept a time before 10 AM or after 5 PM; suggest the nearest time inside that window instead. Never book a time that has already passed today.
@@ -154,10 +155,12 @@ Deno.serve(async (req) => {
         name: "MMAR Receptionist",
         conversation_config: {
           agent: {
-            first_message: s?.ai_greeting,
+            first_message: "Thanks for calling Mike's Mobile Auto Repair. For English, say English. Para español, diga español.",
             language: 'en',
             prompt: {
               prompt: buildPrompt(cities),
+              llm: 'gemini-2.5-flash',
+              temperature: 0.2,
               tools: [
                 tool('lookup_caller', 'Look up whether the caller already has an account. Call this first, right after greeting.', {
                   caller_number: { type: 'string', dynamic_variable: 'system__caller_id' },
@@ -185,11 +188,17 @@ Deno.serve(async (req) => {
             },
           },
           language_presets: {
-            es: { overrides: { agent: { language: 'es', first_message: 'Gracias por llamar a Mike\'s Mobile Auto Repair. ¿En qué le puedo ayudar?' } } },
+            es: { overrides: { agent: { language: 'es' } } },
           },
           tts: { voice_id: 'kyu5ji11Ocj3MIcc9vdQ', model_id: 'eleven_flash_v2', supported_voices: [{ label: 'Spanish', voice_id: 'kyu5ji11Ocj3MIcc9vdQ', language: 'es', model_family: 'flash' }] },
           // End the call after 10 seconds of silence from the caller.
-          turn: { turn_timeout: 7, silence_end_call_timeout: 10 },
+          turn: { turn_timeout: 7, silence_end_call_timeout: 10, turn_eagerness: 'patient' },
+          // Higher-quality hearing, primed with the car/part/town words callers use.
+          asr: { quality: 'high', provider: 'elevenlabs', user_input_audio_format: 'ulaw_8000', keywords: [
+            ...cities, 'Immokalee', 'Bonita Springs', 'Naples', 'North Fort Myers', 'MMAR', 'English', 'español',
+            'Toyota', 'Tacoma', 'Tundra', 'Camry', 'Corolla', 'Honda', 'Accord', 'Civic', 'Ford', 'F-150', 'Escape', 'Chevy', 'Silverado', 'Cruze', 'Malibu', 'Equinox', 'GMC', 'Sierra', 'Dodge', 'Ram', 'Jeep', 'Wrangler', 'Cherokee', 'Nissan', 'Altima', 'Sentra', 'Hyundai', 'Elantra', 'Kia', 'Mazda', 'Subaru', 'Volkswagen', 'Jetta',
+            'alternator', 'starter', 'battery', 'brake pads', 'rotors', 'caliper', 'serpentine belt', 'water pump', 'thermostat', 'radiator', 'check engine light', 'AC compressor', 'tie rod', 'ball joint', 'control arm', 'wheel bearing', 'spark plugs', 'ignition coil', 'fuel pump', 'V6', 'V8',
+          ] },
         },
         platform_settings: {
           overrides: { conversation_config_override: { agent: { first_message: true } } },
