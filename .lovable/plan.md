@@ -12,8 +12,9 @@
 3. **Natural timing:** let it wait a moment when a caller pauses mid-sentence ("my truck is... uh... making a noise") instead of cutting in. Callers can talk over it and it stops right away.
 4. **Shorter, clearer replies:** one or two sentences per turn, one question at a time. It repeats back the key details (name, vehicle, address, day) once before saving. If it didn't catch something, it asks again instead of guessing.
 5. **Pick up where it left off:** if the caller goes quiet, it gives one short "Are you still there?" before the existing 10-second hang-up.
+6. **Language choice up front:** every call opens with a short bilingual greeting: "Thanks for calling Mike's Mobile Auto Repair. For English, say English. Para español, diga español." It stays in the language picked for the whole call, so it no longer guesses partway through. If the caller just starts talking, it uses whichever language they speak. Returning customers are still recognized after the choice.
 
-Unchanged: voice, Spanish switching, no call recordings, transfer to Mike, $100 diagnosis fee rule.
+Unchanged: voice, no call recordings, transfer to Mike, $100 diagnosis fee rule.
 
 ## How we'll check it
 Redeploy, then you make 2–3 test calls: a mumbled vehicle name, an interruption, and asking for Mike. Afterwards I'll read the transcripts in Admin → Calls and fine-tune.
