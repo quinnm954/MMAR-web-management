@@ -13,7 +13,7 @@ Of the 208 drafts with no email, only 29 have been searched so far. The other 17
 5. **Nothing sends automatically.** Found leads move to "Ready to approve." You still approve them before any email goes out.
 
 ## Cost and limits
-Each lead uses a few web-search credits from your connected search service, roughly 600 to 1,000 credits for all 208. Searches run in small batches so none time out. Realistically, expect emails for about 40 to 60% of these businesses. Many small trades only list a phone number.
+These aren't your Lovable credits. The searching is done by Firecrawl, the web search service already connected to the app, and it has its own usage allowance. Each business takes a few searches and page loads there. To stay light, the app first reads each business's own website for free and only uses Firecrawl when nothing turns up. If your Firecrawl allowance runs out partway through, searching pauses and the leads already found are kept. Searches run in small batches so none time out. Realistically, expect emails for about 40 to 60% of these businesses. Many small trades only list a phone number.
 
 ## Technical details
 - Extend `prospecting` `action=enrich`: candidate paths `/contact`, `/contact-us`, `/about`, `/about-us`, `/quote`; use Firecrawl scrape for rendered HTML when a plain fetch finds nothing; decode `mailto:` and obfuscated `[at]` forms; two Firecrawl search queries (name+city+"email", name+"facebook"); rank same-domain addresses first.
