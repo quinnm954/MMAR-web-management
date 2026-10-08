@@ -272,12 +272,13 @@ export default function AdminProspecting() {
                   <Input defaultValue={open.email ?? ''} placeholder="No email found" onBlur={(e) => update(open.id, { email: e.target.value.trim() || null })} />
                 </div>
                 <div>
-                  <Label>Email subject</Label>
-                  <Input defaultValue={open.email_subject ?? ''} onBlur={(e) => update(open.id, { email_subject: e.target.value })} />
-                </div>
-                <div>
-                  <Label>Email body ({'{{name}}'} becomes the business name)</Label>
-                  <Textarea rows={8} defaultValue={open.email_body ?? ''} onBlur={(e) => update(open.id, { email_body: e.target.value })} />
+                  <Label>Email sequence ({open.category})</Label>
+                  {[1, 2, 3].map((n) => { const c = prospectEmail(open.category, open.name, n); return (
+                    <div key={n} className={`mt-2 rounded-md border p-3 ${open.email_step >= n ? 'opacity-60' : ''}`}>
+                      <div className="text-xs text-muted-foreground">{n === 1 ? 'Day 1' : n === 2 ? 'Day 4' : 'Day 10'}{open.email_step >= n ? ' · sent' : ''}</div>
+                      <div className="font-medium">{c.subject}</div>
+                      <p className="whitespace-pre-wrap text-muted-foreground">{c.body}</p>
+                    </div>); })}
                 </div>
                 {open.email_status === 'draft' && open.email && (
                   <Button onClick={() => update(open.id, { email_status: 'approved' })}><Mail className="h-4 w-4 mr-2" />Approve this email</Button>
