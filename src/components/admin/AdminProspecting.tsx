@@ -75,7 +75,7 @@ export default function AdminProspecting() {
   const draftsNoEmail = rows.filter((r) => r.email_status === 'draft' && !r.email && !r.do_not_contact);
   const cantSend = rows.filter((r) => r.email_status === 'approved' && !r.email);
   const emailLabel = (r: Prospect) =>
-    r.email_status === 'draft' ? (r.email ? 'Draft · ready' : 'Draft · needs email')
+    r.email_status === 'draft' ? (r.email ? `Draft · ready${(r as any).email_source ? ` · from ${(r as any).email_source}` : ''}` : (r as any).email_source === 'none found' ? 'Searched, none found' : 'Draft · needs email')
     : r.email_status === 'approved' ? (!r.email ? "Can't send" : r.email_step === 0 ? 'First email pending'
       : `Follow-up ${r.email_step + 1}/3${r.next_email_at ? ` · ${new Date(r.next_email_at).toLocaleDateString()}` : ''}`)
     : r.email_status === 'done' ? (r.email_step > 0 ? `Sent ${r.email_step}/3 · done` : 'Skipped') : r.email_status;
@@ -168,7 +168,7 @@ export default function AdminProspecting() {
           </div>
           <div className="flex flex-wrap gap-2">
             <Button onClick={search} disabled={!!busy || !cats.length || !cities.length}>{busy === 'search' ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Search className="h-4 w-4 mr-2" />}Search</Button>
-            <Button variant="secondary" onClick={enrich} disabled={!!busy}>{busy === 'enrich' ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Globe className="h-4 w-4 mr-2" />}Find emails (10 at a time)</Button>
+            <Button variant="secondary" onClick={enrich} disabled={!!busy}>{busy === 'enrich' ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Globe className="h-4 w-4 mr-2" />}{progress ?? 'Find emails'}</Button>
             <Button variant="secondary" onClick={writePitches} disabled={!!busy || !needPitch.length}>{busy === 'pitch' ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Sparkles className="h-4 w-4 mr-2" />}Write pitches ({needPitch.length})</Button>
           </div>
         </CardContent>
