@@ -63,6 +63,19 @@ export default function AdminProspecting() {
     return [...visible].sort((a, b) => rank(a) - rank(b));
   }, [rows, filter]);
   const drafts = rows.filter((r) => r.email_status === 'draft' && r.email && !r.do_not_contact);
+  const now = Date.now();
+  const firstPending = rows.filter((r) => r.email_status === 'approved' && r.email_step === 0 && r.email && !r.do_not_contact);
+  const followUps = rows.filter((r) => r.email_status === 'approved' && r.email_step > 0 && !r.do_not_contact);
+  const nextFollowUp = followUps.map((r) => r.next_email_at).filter(Boolean).sort()[0] as string | undefined;
+  const contacted = rows.filter((r) => r.email_step > 0);
+  const draftsNoEmail = rows.filter((r) => r.email_status === 'draft' && !r.email && !r.do_not_contact);
+  const cantSend = rows.filter((r) => r.email_status === 'approved' && !r.email);
+  const emailLabel = (r: Prospect) =>
+    r.email_status === 'draft' ? (r.email ? 'Draft · ready' : 'Draft · needs email')
+    : r.email_status === 'approved' ? (!r.email ? "Can't send" : r.email_step === 0 ? 'First email pending'
+      : `Follow-up ${r.email_step + 1}/3${r.next_email_at ? ` · ${new Date(r.next_email_at).toLocaleDateString()}` : ''}`)
+    : r.email_status === 'done' ? (r.email_step > 0 ? `Sent ${r.email_step}/3 · done` : 'Skipped') : r.email_status;
+  void now;
   const needPitch = rows.filter((r) => !r.email_body && !r.do_not_contact);
 
   const run = async (key: string, fn: () => Promise<void>) => {
@@ -167,8 +180,12 @@ export default function AdminProspecting() {
           {!state?.mailing_address && <p className="text-xs text-muted-foreground">Emails won't send until you add your mailing address.</p>}
           <div className="flex flex-wrap items-center gap-2 text-sm">
             <Badge variant="outline">Sent today: {sentToday}/{state?.daily_cap ?? 30}</Badge>
+            <Badge variant="outline">Sent: {contacted.length} businesses</Badge>
+            <Badge variant="outline">First email pending: {firstPending.length}</Badge>
+            <Badge variant="outline">Follow-ups scheduled: {followUps.length}{nextFollowUp ? ` · next ${new Date(nextFollowUp).toLocaleDateString()}` : ''}</Badge>
             <Badge variant="outline">Drafts ready: {drafts.length}</Badge>
-            <Badge variant="outline">Queued: {rows.filter((r) => r.email_status === 'approved').length}</Badge>
+            <Badge variant="outline">Drafts needing email: {draftsNoEmail.length}</Badge>
+            {cantSend.length > 0 && <Badge variant="destructive">Can't send: {cantSend.length}</Badge>}
             <Button size="sm" onClick={approveAll} disabled={!!busy || !drafts.length}>Approve all drafts</Button>
             <Button size="sm" variant="outline" onClick={() => saveState({ paused: !state?.paused })}>
               {state?.paused ? <><Play className="h-4 w-4 mr-1" />Resume</> : <><Pause className="h-4 w-4 mr-1" />Pause</>}
@@ -197,7 +214,7 @@ export default function AdminProspecting() {
                 <div className="text-xs text-muted-foreground">{p.category} · {p.city}{p.rating ? ` · ★${p.rating}` : ''}{p.email ? ` · ${p.email}` : ''}</div>
               </button>
               <Badge variant={p.stage === 'interested' || p.stage === 'won' ? 'default' : 'secondary'}>{STAGE_LABEL[p.stage] ?? p.stage}</Badge>
-              {p.email_status !== 'none' && <Badge variant="outline">Email: {p.email_status}{p.email_step ? ` (${p.email_step}/3)` : ''}</Badge>}
+              {p.email_status !== 'none' && <Badge variant="outline">{emailLabel(p)}</Badge>}
               {p.phone && !p.do_not_contact && (
                 <Button size="sm" variant="outline" onClick={() => { setOpen(p); dialInApp(p.phone!); }}><Phone className="h-4 w-4 mr-1" />Call</Button>
               )}

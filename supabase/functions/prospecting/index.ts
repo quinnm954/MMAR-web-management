@@ -125,7 +125,7 @@ Deno.serve(async (req) => {
     if (action === 'enrich') {
       const { data: list } = await sb.from('prospects').select('id,website,name,city')
         .is('enriched_at', null).limit(10);
-      const BAD = /example|sentry|wix|domain\.com|godaddy|filler|noreply|no-reply|\.(png|jpg|gif|webp)$/i;
+      const BAD = /example|sentry|wix|domain\.com|godaddy|myfloridalicense|\.gov$|\.fl\.us$|filler|noreply|no-reply|\.(png|jpg|gif|webp)$/i;
       const pick = (text: string) => {
         const all = [...text.matchAll(/(?:mailto:)?([A-Z0-9._%+-]+@[A-Z0-9.-]+\.(?:com|net|org|biz|us|co|info))\b/gi)].map((m) => m[1].toLowerCase());
         return all.find((e) => !BAD.test(e)) || null;
