@@ -36,7 +36,7 @@ Deno.serve(async (req) => {
       .order('created_at').limit(room);
 
     for (const p of due || []) {
-      if (/^(filler|noreply|no-reply|example|test|user|email|yourname|name)@|@(example\.|domain\.|godaddy\.com$|sentry|wixpress\.com$)/i.test(String(p.email))) {
+      if (/^(filler|noreply|no-reply|example|test|user|email|yourname|name)@|@(example\.|domain\.|godaddy\.com$|sentry|wixpress\.com$|myfloridalicense\.com$|lehighfd\.com$|.*\.gov$|.*\.fl\.us$)/i.test(String(p.email))) {
         await sb.from('prospects').update({ email_status: 'done', notes: `${p.notes ? p.notes + '\n' : ''}Skipped placeholder email ${p.email}` }).eq('id', p.id);
         continue;
       }
