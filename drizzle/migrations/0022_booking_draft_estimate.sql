@@ -1,0 +1,1 @@
+ALTER TABLE public.booking_requests ADD COLUMN IF NOT EXISTS draft_estimate_id uuid REFERENCES public.estimates(id) ON DELETE SET NULL;

@@ -315,6 +315,7 @@ export type Database = {
           customer_name: string
           customer_phone: string
           description: string | null
+          draft_estimate_id: string | null
           gbraid: string | null
           gclid: string | null
           id: string
@@ -347,6 +348,7 @@ export type Database = {
           customer_name: string
           customer_phone: string
           description?: string | null
+          draft_estimate_id?: string | null
           gbraid?: string | null
           gclid?: string | null
           id?: string
@@ -379,6 +381,7 @@ export type Database = {
           customer_name?: string
           customer_phone?: string
           description?: string | null
+          draft_estimate_id?: string | null
           gbraid?: string | null
           gclid?: string | null
           id?: string
@@ -400,7 +403,15 @@ export type Database = {
           vehicle_info?: string | null
           wbraid?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "booking_requests_draft_estimate_id_fkey"
+            columns: ["draft_estimate_id"]
+            isOneToOne: false
+            referencedRelation: "estimates"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       calendar_feed_tokens: {
         Row: {
