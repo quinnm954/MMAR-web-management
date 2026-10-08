@@ -201,7 +201,7 @@ export default function RepairOrderDetail({ appointmentId, open, onClose }: Prop
     const total = approvedLines.reduce((s: number, l: any) => s + Number(l.amount || (Number(l.quantity) * Number(l.unit_price))), 0);
     setIssuing(true);
     try {
-      await generateInvoiceForRepairOrder({
+      const srId = await generateInvoiceForRepairOrder({
         appointmentId: appt.id,
         customerId: appt.customer_id,
         vehicleId: appt.vehicle_id,
@@ -212,6 +212,18 @@ export default function RepairOrderDetail({ appointmentId, open, onClose }: Prop
         estimate: approvedEstimate,
       });
       toast.success('Invoice issued');
+      // Auto-text the payment link to the customer's phone
+      const { data: inv } = await supabase.from('invoices').select('id')
+        .or(`service_record_id.eq.${srId},appointment_id.eq.${appt.id}`)
+        .order('created_at', { ascending: false }).limit(1).maybeSingle();
+      if (inv?.id) {
+        const { data: sent, error: sErr } = await supabase.functions.invoke('send-invoice-payment-link', { body: { invoice_id: inv.id } });
+        const msg = (sent as any)?.error || sErr?.message;
+        if (msg) toast.error(`Invoice not texted: ${msg}`);
+        else toast.success(`Invoice texted to ${(sent as any)?.phone || 'customer'}`);
+      } else {
+        toast.error('Invoice created but could not be found to text');
+      }
       await reload();
     } catch (e: any) {
       toast.error(e.message || 'Could not issue invoice');
