@@ -221,7 +221,7 @@ const AdminInspections = () => {
           <DialogHeader><DialogTitle>{editing?.id ? 'Edit Inspection' : 'New Inspection'}</DialogTitle></DialogHeader>
           {editing && (
             <div className="space-y-4">
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
                   <Label>Customer</Label>
                   <Select value={editing.customer_id ?? ''} onValueChange={v => setEditing({ ...editing, customer_id: v, vehicle_id: null })}>

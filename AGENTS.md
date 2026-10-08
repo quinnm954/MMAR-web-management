@@ -8,3 +8,4 @@
 - The standalone Admin Phone workspace composes existing call, SMS, and email records and sending functions without replacing their individual Front Desk screens; why: staff need one phone-like command center while retaining specialized communication views.
 - Repair-order names derive from approved estimate repair lines, preferring labor descriptions; why: orders must identify the repair rather than the estimate workflow state.
 - Technician agreement: `technician_agreements` table (admin-only RLS) signed by techs via token link through `get_technician_agreement`/`sign_technician_agreement` RPCs; text lives in `src/lib/techAgreement.ts`; why: techs sign on phone without an account.
+- Website booking requests get an unsent draft estimate at submission (notify-booking-request → booking_requests.draft_estimate_id), which estimate-for-appointment reuses on confirmation; why: the shop sees a price before booking, without auto-sending or duplicating estimates.

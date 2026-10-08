@@ -27,6 +27,15 @@ Deno.serve(async (req) => {
     const { data: existing } = await sb.from('estimates').select('id').eq('appointment_id', appt.id).limit(1);
     if (existing?.length) return json({ ok: true, estimateId: existing[0].id, existed: true });
 
+    // Draft made when the online request came in: attach it instead of making a second one.
+    if (b.draft_estimate_id) {
+      const { data: d } = await sb.from('estimates').select('id').eq('id', b.draft_estimate_id).maybeSingle();
+      if (d) {
+        await sb.from('estimates').update({ appointment_id: appt.id, customer_id: appt.customer_id }).eq('id', d.id);
+        return json({ ok: true, estimateId: d.id, linked: true });
+      }
+    }
+
     // Reuse an auto-quote the text bot already made for this customer recently.
     const { data: recent } = await sb.from('estimates').select('id').eq('customer_id', appt.customer_id).is('appointment_id', null)
       .gte('created_at', new Date(new Date(b.created_at).getTime() - 3600_000).toISOString()).ilike('notes', 'Auto-drafted%').limit(1);
