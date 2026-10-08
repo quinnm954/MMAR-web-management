@@ -5,9 +5,9 @@ import { BrandHeader, BrandCard, BrandFooter } from './_brand.tsx'
 
 const SITE_NAME = "Mike's Mobile Auto Repair"
 
-interface Props { customerName?: string }
+interface Props { customerName?: string; customerId?: string }
 
-const ReviewRequestEmail = ({ customerName }: Props) => (
+const ReviewRequestEmail = ({ customerName, customerId }: Props) => (
   <Html lang="en">
     <Head />
     <Preview>How did we do?</Preview>
@@ -21,7 +21,7 @@ const ReviewRequestEmail = ({ customerName }: Props) => (
             Thanks for trusting {SITE_NAME} with your vehicle. If we did a good job, a quick Google review helps other drivers find a mechanic who comes to them. It takes about 30 seconds.
           </Text>
           <Section style={{ textAlign: 'center', margin: '24px 0' }}>
-            <Button href={'https://mikesmautorepair.com/review'} style={button}>Leave a review</Button>
+            <Button href={`https://mikesmautorepair.com/review${customerId ? `?c=${customerId}` : ''}`} style={button}>Leave a review</Button>
           </Section>
           <Text style={text}>Questions? Call or text <strong>813-501-7572</strong>.</Text>
           <Hr style={hr} />

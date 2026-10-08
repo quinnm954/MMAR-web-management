@@ -9,7 +9,7 @@ import { toast } from "sonner";
 
 type Row = {
   id: string; rating: number; comments: string | null; name: string | null; phone: string | null;
-  email: string | null; status: string; admin_notes: string | null; created_at: string;
+  email: string | null; customer_id: string | null; status: string; admin_notes: string | null; created_at: string;
 };
 
 export default function AdminReviewFeedback() {
@@ -62,12 +62,12 @@ export default function AdminReviewFeedback() {
               </div>
             </div>
             {r.comments && <p className="text-sm whitespace-pre-wrap">{r.comments}</p>}
-            {(r.name || r.phone || r.email) && (
-              <p className="text-xs text-muted-foreground">
-                {r.name}{r.phone && <> · <a className="underline" href={`tel:${r.phone}`}>{r.phone}</a></>}
+            {(r.name || r.phone || r.email) ? (
+              <p className="text-sm">
+                <span className="font-medium">{r.name || "Unnamed customer"}</span>{r.phone && <> · <a className="underline" href={`tel:${r.phone}`}>{r.phone}</a></>}
                 {r.email && <> · <a className="underline" href={`mailto:${r.email}`}>{r.email}</a></>}
               </p>
-            )}
+            ) : <p className="text-xs text-muted-foreground">Anonymous (left before review links identified customers)</p>}
             {r.rating < 5 && (
               <>
                 <Textarea rows={2} placeholder="Notes" value={notes[r.id] ?? r.admin_notes ?? ""}

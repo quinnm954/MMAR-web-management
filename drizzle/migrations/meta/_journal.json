@@ -169,6 +169,13 @@
       "when": 1791498370364,
       "tag": "0023_complete_ro_on_invoice_paid",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1791499627189,
+      "tag": "0024_migration",
+      "breakpoints": true
     }
   ]
 }

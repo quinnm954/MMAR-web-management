@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 
+const cid = () => { const c = new URLSearchParams(window.location.search).get("c"); return c && /^[0-9a-f-]{36}$/i.test(c) ? c : null; };
 const REVIEW_URL = "https://share.google/bx2Gb42dslCITJdS8";
 
 const ReviewLanding = () => {
@@ -32,7 +33,7 @@ const ReviewLanding = () => {
   const pick = (n: number) => {
     setRating(n);
     if (n === 5) {
-      supabase.rpc("submit_review_feedback", { _rating: 5, _comments: null, _name: null, _phone: null, _email: null }).then(() => {});
+      supabase.rpc("submit_review_feedback", { _rating: 5, _comments: null, _name: null, _phone: null, _email: null, _customer_id: cid() }).then(() => {});
       window.open(REVIEW_URL, "_blank", "noopener,noreferrer");
     }
   };
@@ -42,7 +43,7 @@ const ReviewLanding = () => {
     setSending(true);
     const { error } = await supabase.rpc("submit_review_feedback", {
       _rating: rating, _comments: comments.slice(0, 2000), _name: name.slice(0, 100),
-      _phone: phone.slice(0, 30), _email: email.slice(0, 255),
+      _phone: phone.slice(0, 30), _email: email.slice(0, 255), _customer_id: cid(),
     });
     setSending(false);
     if (error) { toast.error("Couldn't send — please try again."); return; }
