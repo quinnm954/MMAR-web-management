@@ -399,16 +399,7 @@ export default function AdminPhoneHub({ fullscreen = false }: { fullscreen?: boo
   };
   const dragging = dragX !== null;
 
-  const Wrap = fullscreen
-    ? ({ children }: { children: React.ReactNode }) => (
-        <div className="ios fixed inset-0 overflow-hidden pt-[env(safe-area-inset-top)]">{children}</div>
-      )
-    : ({ children }: { children: React.ReactNode }) => (
-        <div className="flex items-center justify-center lg:py-6"><IPhoneFrame>{children}</IPhoneFrame></div>
-      );
-
-  return (
-    <Wrap>
+  const screen = (
       <>
         {/* Screen stack: list (base) + detail (slides in) */}
         <div className="relative h-full w-full overflow-hidden">
@@ -526,7 +517,13 @@ export default function AdminPhoneHub({ fullscreen = false }: { fullscreen?: boo
             <button onClick={saveDraft} className="text-[15px] text-[hsl(var(--ios-blue))] mt-2">Save draft</button>
           </Sheet>
         </div>
-      </IPhoneFrame>
+      </>
+  );
+
+  if (fullscreen) return <div className="ios fixed inset-0 overflow-hidden pt-[env(safe-area-inset-top)]">{screen}</div>;
+  return (
+    <div className="flex items-center justify-center lg:py-6">
+      <IPhoneFrame>{screen}</IPhoneFrame>
     </div>
   );
 }
