@@ -142,7 +142,7 @@ const AdminDashboard = () => {
               size="sm"
               title="Phone"
               aria-label="Open Phone"
-              onClick={() => setSearchParams(prev => { const next = new URLSearchParams(prev); next.set('tab', 'phone'); return next; })}
+              onClick={() => { if (window.innerWidth < 1024) { window.location.assign('/admin/phone'); return; } setSearchParams(prev => { const next = new URLSearchParams(prev); next.set('tab', 'phone'); return next; }); }}
             >
               <Phone className="h-4 w-4" />
             </Button>

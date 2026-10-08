@@ -16,6 +16,7 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import Login from "./pages/Login";
 import { Navigate } from "react-router-dom";
 import ProtectedRoute from "./components/admin/ProtectedRoute";
+import AdminPhoneApp from "./pages/admin/AdminPhoneApp";
 import ServiceCategory from "./pages/ServiceCategory";
 import ServicesIndex from "./pages/ServicesIndex";
 import CityPage from "./pages/CityPage";
@@ -163,6 +164,7 @@ const App = () => (
             <Route path="/notifications" element={<NotificationsPage />} />
             <Route path="/messages" element={<Messages />} />
             <Route path="/admin" element={<AdminRedirect />} />
+            <Route path="/admin/phone" element={<ProtectedRoute><AdminPhoneApp /></ProtectedRoute>} />
             <Route
 
               path="/admin/dashboard"

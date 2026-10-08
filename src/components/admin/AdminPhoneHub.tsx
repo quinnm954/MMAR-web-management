@@ -92,7 +92,7 @@ const formatDuration = (seconds: number | null) => {
 };
 const relativeTime = (at: string) => formatDistanceToNow(new Date(at), { addSuffix: true });
 
-export default function AdminPhoneHub() {
+export default function AdminPhoneHub({ fullscreen = false }: { fullscreen?: boolean } = {}) {
   const [mode, setMode] = useState<Mode>('calls');
   const [emailFolder, setEmailFolder] = useState<EmailFolder>('inbox');
   const [calls, setCalls] = useState<CallRow[]>([]);
@@ -371,12 +371,39 @@ export default function AdminPhoneHub() {
   const [scrolled, setScrolled] = useState(false);
   const pressKey = (k: string) => setDialNumber(n => (n + k).slice(0, 20));
 
-  return (
-    <div className="flex items-center justify-center lg:py-6">
-      <IPhoneFrame>
+  // iOS-style edge swipe to go back
+  const [dragX, setDragX] = useState<number | null>(null);
+  const swipe = useRef<{ x: number; y: number; t: number; active: boolean; locked: boolean } | null>(null);
+  const onTouchStart = (e: React.TouchEvent) => {
+    const t = e.touches[0];
+    const left = (e.currentTarget as HTMLElement).getBoundingClientRect().left;
+    swipe.current = t.clientX - left <= 28 ? { x: t.clientX, y: t.clientY, t: Date.now(), active: false, locked: false } : null;
+  };
+  const onTouchMove = (e: React.TouchEvent) => {
+    const s = swipe.current; if (!s) return;
+    const t = e.touches[0]; const dx = t.clientX - s.x; const dy = t.clientY - s.y;
+    if (!s.active && !s.locked) {
+      if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
+      if (dx > 0 && Math.abs(dx) > Math.abs(dy)) s.active = true; else { s.locked = true; swipe.current = null; return; }
+    }
+    if (s.active) setDragX(Math.max(0, dx));
+  };
+  const onTouchEnd = (e: React.TouchEvent) => {
+    const s = swipe.current; swipe.current = null;
+    if (!s?.active) { setDragX(null); return; }
+    const w = (e.currentTarget as HTMLElement).clientWidth || 390;
+    const dx = (e.changedTouches[0]?.clientX ?? s.x) - s.x;
+    const fast = dx / Math.max(1, Date.now() - s.t) > 0.5;
+    setDragX(null);
+    if (dx > w * 0.35 || (fast && dx > 40)) setSelected(null);
+  };
+  const dragging = dragX !== null;
+
+  const screen = (
+      <>
         {/* Screen stack: list (base) + detail (slides in) */}
         <div className="relative h-full w-full overflow-hidden">
-          <section className={cn('absolute inset-0 flex flex-col transition-transform duration-300 ease-out', hasDetail && '-translate-x-1/4 opacity-60 pointer-events-none')}>
+          <section style={dragging ? { transform: `translateX(calc(-25% + ${dragX}px * 0.25))`, opacity: 0.6 + 0.4 * Math.min(1, dragX! / 390), transition: 'none' } : undefined} className={cn('absolute inset-0 flex flex-col transition-transform duration-300 ease-out', hasDetail && '-translate-x-1/4 opacity-60 pointer-events-none')}>
             <StatusBar />
             {/* Compact nav bar */}
             <div className="relative h-11 shrink-0 flex items-center justify-between px-4">
@@ -443,7 +470,7 @@ export default function AdminPhoneHub() {
             </nav>
           </section>
 
-          <section className={cn('absolute inset-0 flex flex-col bg-[hsl(var(--ios-bg))] transition-transform duration-300 ease-out', hasDetail ? 'translate-x-0' : 'translate-x-full')}>
+          <section onTouchStart={hasDetail ? onTouchStart : undefined} onTouchMove={hasDetail ? onTouchMove : undefined} onTouchEnd={hasDetail ? onTouchEnd : undefined} onTouchCancel={() => { swipe.current = null; setDragX(null); }} style={dragging ? { transform: `translateX(${dragX}px)`, transition: 'none', boxShadow: '-8px 0 24px hsl(var(--ios-bg) / 0.6)' } : undefined} className={cn('absolute inset-0 flex flex-col bg-[hsl(var(--ios-bg))] transition-transform duration-300 ease-out', hasDetail ? 'translate-x-0' : 'translate-x-full')}>
             {selected && <StatusBar />}
             {activeCall ? (
               <CallDetail call={activeCall} name={displayPhone(activeCall.direction === 'outbound' ? activeCall.to_number : activeCall.from_number)} tag={displayTag(activeCall.from_number)} onBack={() => setSelected(null)} onCall={() => activeCall.from_number && dialInApp(activeCall.from_number)} onText={() => activeCall.from_number && startText(activeCall.from_number)} />
@@ -490,7 +517,13 @@ export default function AdminPhoneHub() {
             <button onClick={saveDraft} className="text-[15px] text-[hsl(var(--ios-blue))] mt-2">Save draft</button>
           </Sheet>
         </div>
-      </IPhoneFrame>
+      </>
+  );
+
+  if (fullscreen) return <div className="ios fixed inset-0 overflow-hidden pt-[env(safe-area-inset-top)]">{screen}</div>;
+  return (
+    <div className="flex items-center justify-center lg:py-6">
+      <IPhoneFrame>{screen}</IPhoneFrame>
     </div>
   );
 }
