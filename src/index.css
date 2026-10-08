@@ -64,6 +64,32 @@
     --sidebar-accent-foreground: 0 0% 90%;
     --sidebar-border: 220 15% 20%;
     --sidebar-ring: 200 80% 55%;
+
+    /* iOS-style phone tokens (Phone page only) */
+    --ios-blue: 211 100% 52%;
+    --ios-green: 142 70% 49%;
+    --ios-red: 3 100% 61%;
+    --ios-bg: 0 0% 0%;
+    --ios-grouped: 240 6% 11%;
+    --ios-bubble: 240 4% 18%;
+    --ios-separator: 240 4% 22%;
+    --ios-label: 0 0% 100%;
+    --ios-label-2: 240 3% 60%;
+    --ios-fill: 240 4% 16%;
+    --ios-bezel: 220 6% 14%;
+  }
+
+  .ios {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    background: hsl(var(--ios-bg));
+    color: hsl(var(--ios-label));
+  }
+  .ios h1, .ios h2, .ios h3, .ios h4 { font-family: inherit; text-transform: none; }
+  .ios-frost {
+    background: hsl(var(--ios-grouped) / 0.82);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
   }
 
   .dark {
