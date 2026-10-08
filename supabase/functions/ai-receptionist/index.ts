@@ -360,6 +360,13 @@ Deno.serve(async (req) => {
         console.error('booking insert', error);
         return json({ result: 'Could not save. Tell the caller Mike will call them back.' });
       }
+      // Leave an unsent draft estimate from the job clues so Mike sees a price before booking.
+      try {
+        const { data: full } = await sb.from('booking_requests').select('*').eq('id', ins.id).single();
+        const q = await buildLaborQuote(sb, full);
+        const did = q.kind === 'none' ? null : await createDraftEstimate(sb, full, q);
+        if (did) await sb.from('booking_requests').update({ draft_estimate_id: did }).eq('id', ins.id);
+      } catch (e) { console.error('draft estimate', e); }
       return json({ result: window ? `Requested ${dateStr} at ${window}. Tell the caller it is requested (not confirmed yet) and the shop will text shortly to confirm.` : 'Booking request saved. Mike will text or call to confirm.' });
     }
 
