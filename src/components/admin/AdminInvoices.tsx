@@ -374,13 +374,13 @@ const AdminInvoices = () => {
                 </Select>
               </div>
               <div><Label>Invoice Number</Label><Input value={form.invoice_number} onChange={(e) => setForm({ ...form, invoice_number: e.target.value })} placeholder="auto-generated" /></div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div><Label>Subtotal *</Label><Input type="number" step="0.01" value={form.subtotal} onChange={(e) => setForm({ ...form, subtotal: e.target.value })} /></div>
                 <div><Label>Tax (auto if blank)</Label><Input type="number" step="0.01" value={form.tax} onChange={(e) => setForm({ ...form, tax: e.target.value })} /></div>
               </div>
               <div className="rounded-md border border-border/50 p-3 space-y-2 bg-muted/20">
                 <Label className="text-xs uppercase tracking-wide text-muted-foreground">Discount (optional)</Label>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <Select value={form.discount_type} onValueChange={(v) => setForm({ ...form, discount_type: v as "amount" | "percent" })}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
@@ -562,7 +562,7 @@ const AdminInvoices = () => {
         <DialogContent>
           <DialogHeader><DialogTitle>Apply Discount</DialogTitle></DialogHeader>
           <div className="space-y-3">
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <Label>Type</Label>
                 <Select value={discountForm.type} onValueChange={(v) => setDiscountForm({ ...discountForm, type: v as "amount" | "percent" })}>
@@ -615,7 +615,7 @@ const AdminInvoices = () => {
                 <span>Paid ${Number(payingInvoice.amount_paid || 0).toFixed(2)}</span>
                 <span className="font-semibold">Remaining ${Math.max(Number(payingInvoice.total) - Number(payingInvoice.amount_paid || 0), 0).toFixed(2)}</span>
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <Label>Amount *</Label>
                   <Input type="number" step="0.01" value={paymentForm.amount} onChange={(e) => setPaymentForm({ ...paymentForm, amount: e.target.value })} />
@@ -638,7 +638,7 @@ const AdminInvoices = () => {
                   </Select>
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <Label>Date</Label>
                   <Input type="date" value={paymentForm.paid_at} onChange={(e) => setPaymentForm({ ...paymentForm, paid_at: e.target.value })} />
