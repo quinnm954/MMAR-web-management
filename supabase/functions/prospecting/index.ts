@@ -123,54 +123,66 @@ Deno.serve(async (req) => {
     }
 
     if (action === 'enrich') {
-      const { data: list } = await sb.from('prospects').select('id,website,name,city')
-        .is('enriched_at', null).limit(10);
-      const BAD = /example|sentry|wix|domain\.com|godaddy|myfloridalicense|\.gov$|\.fl\.us$|filler|noreply|no-reply|\.(png|jpg|gif|webp)$/i;
-      const pick = (text: string) => {
-        const all = [...text.matchAll(/(?:mailto:)?([A-Z0-9._%+-]+@[A-Z0-9.-]+\.(?:com|net|org|biz|us|co|info))\b/gi)].map((m) => m[1].toLowerCase());
-        return all.find((e) => !BAD.test(e)) || null;
+      // force=true: re-search drafts searched before with no email (pass 2)
+      const force = body?.force === true;
+      let q = sb.from('prospects').select('id,website,name,city').is('email', null).eq('do_not_contact', false);
+      q = force ? q.eq('email_status', 'draft').not('enriched_at', 'is', null).is('email_source', null) : q.is('enriched_at', null);
+      const { data: list } = await q.limit(8);
+      const BAD = /example|sentry|wix|domain\.com|godaddy|myfloridalicense|\.gov$|\.fl\.us$|filler|noreply|no-reply|yourname|email@|user@|lehighfd|bbb\.org|yelp|facebook|google|squarespace|wordpress|\.(png|jpg|jpeg|gif|webp|svg)$/i;
+      const host = (u?: string | null) => { try { return new URL(String(u)).hostname.replace(/^www\./, '').toLowerCase(); } catch { return ''; } };
+      const pick = (raw: string, site: string) => {
+        const text = raw.replace(/\s*(\[|\()\s*at\s*(\]|\))\s*/gi, '@').replace(/\s*(\[|\()\s*dot\s*(\]|\))\s*/gi, '.').replace(/&#64;|%40/g, '@');
+        const all = [...new Set([...text.matchAll(/(?:mailto:)?([A-Z0-9._%+-]+@[A-Z0-9.-]+\.(?:com|net|org|biz|us|co|info))\b/gi)].map((m) => m[1].toLowerCase()))].filter((e) => !BAD.test(e));
+        return (site && all.find((e) => e.endsWith('@' + site))) || all[0] || null;
       };
       const fcKey = Deno.env.get('FIRECRAWL_API_KEY');
-      let emails = 0;
+      const fc = (path: string, payload: unknown, ms = 40000) => fetch(`https://api.firecrawl.dev/v2/${path}`, {
+        method: 'POST', headers: { Authorization: `Bearer ${fcKey}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload), signal: AbortSignal.timeout(ms),
+      });
+      let emails = 0, outOfCredits = false;
       await Promise.all((list || []).map(async (p) => {
-        let email: string | null = null;
+        let email: string | null = null, source: string | null = null;
+        const site = host(p.website);
         if (p.website) {
-          for (const path of ['', '/contact', '/contact-us']) {
+          for (const path of ['', '/contact', '/contact-us', '/about', '/about-us', '/quote']) {
             try {
               const url = new URL(path || '/', String(p.website)).toString();
               const r = await fetch(url, { signal: AbortSignal.timeout(6000), redirect: 'follow' });
               if (!r.ok) continue;
-              email = pick((await r.text()).slice(0, 400000));
-              if (email) break;
+              email = pick((await r.text()).slice(0, 400000), site);
+              if (email) { source = `website${path || ''}`; break; }
             } catch { /* skip */ }
           }
+          if (!email && fcKey && !outOfCredits) {
+            try {
+              const r = await fc('scrape', { url: String(p.website), formats: ['rawHtml'], waitFor: 1500 }, 30000);
+              if (r.status === 402) outOfCredits = true;
+              else if (r.ok) { const d = await r.json(); email = pick(String(d?.data?.rawHtml || d?.rawHtml || ''), site); if (email) source = 'website (full load)'; }
+            } catch (e) { console.error('fc scrape', e); }
+          }
         }
-        // Fall back to a full web search (Google-style) for the business's email
-        if (!email && fcKey) {
+        for (const query of [`"${p.name}" ${p.city || ''} FL email`, `"${p.name}" ${p.city || ''} facebook OR bbb OR yelp`]) {
+          if (email || !fcKey || outOfCredits) break;
           try {
-            const r = await fetch('https://api.firecrawl.dev/v2/search', {
-              method: 'POST',
-              headers: { Authorization: `Bearer ${fcKey}`, 'Content-Type': 'application/json' },
-              body: JSON.stringify({ query: `"${p.name}" ${p.city || ''} FL email contact`, limit: 5, country: 'US',
-                scrapeOptions: { formats: ['markdown'], onlyMainContent: true } }),
-              signal: AbortSignal.timeout(45000),
-            });
-            if (r.ok) {
-              const d = await r.json();
-              const items = Array.isArray(d?.data) ? d.data : (d?.data?.web || []);
-              for (const it of items) {
-                email = pick(`${it.description || ''} ${it.markdown || ''}`);
-                if (email) break;
-              }
-            } else console.error('firecrawl search', r.status, await r.text());
+            const r = await fc('search', { query, limit: 5, country: 'US', scrapeOptions: { formats: ['markdown'], onlyMainContent: true } });
+            if (r.status === 402) { outOfCredits = true; break; }
+            if (!r.ok) { console.error('firecrawl search', r.status, await r.text()); continue; }
+            const d = await r.json();
+            const items = Array.isArray(d?.data) ? d.data : (d?.data?.web || []);
+            for (const it of items) {
+              email = pick(`${it.description || ''} ${it.markdown || ''}`, site);
+              if (email) { source = host(it.url) || 'web search'; break; }
+            }
           } catch (e) { console.error('firecrawl error', e); }
         }
         if (email) emails++;
-        await sb.from('prospects').update({ email, enriched_at: new Date().toISOString() }).eq('id', p.id);
+        if (outOfCredits && !email) return; // leave for later
+        await sb.from('prospects').update({ email, email_source: source ?? (force ? 'none found' : null), enriched_at: new Date().toISOString() }).eq('id', p.id);
       }));
-      const { count } = await sb.from('prospects').select('id', { count: 'exact', head: true })
-        .is('enriched_at', null);
-      return json({ ok: true, checked: list?.length || 0, emails, remaining: count || 0 });
+      const { count: fresh } = await sb.from('prospects').select('id', { count: 'exact', head: true }).is('email', null).eq('do_not_contact', false).is('enriched_at', null);
+      const { count: retry } = await sb.from('prospects').select('id', { count: 'exact', head: true }).is('email', null).eq('do_not_contact', false).eq('email_status', 'draft').not('enriched_at', 'is', null).is('email_source', null);
+      return json({ ok: true, checked: list?.length || 0, emails, remaining: force ? (retry || 0) : (fresh || 0), retry: retry || 0, outOfCredits });
     }
 
     if (action === 'pitch') {

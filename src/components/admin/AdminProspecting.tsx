@@ -92,9 +92,20 @@ export default function AdminProspecting() {
     toast.success(`Found ${r.found}, added ${r.added} new businesses`);
   });
 
+  const [progress, setProgress] = useState<string | null>(null);
   const enrich = () => run('enrich', async () => {
-    const r = await invoke('enrich', {});
-    toast.success(`Checked ${r.checked} websites, found ${r.emails} emails. ${r.remaining} left.`);
+    let searched = 0, found = 0;
+    for (const force of [false, true]) {
+      for (let i = 0; i < 60; i++) {
+        const r = await invoke('enrich', { force });
+        searched += r.checked; found += r.emails;
+        setProgress(`Searched ${searched} · ${found} found · ${r.remaining} left${force ? ' (deep retry)' : ''}`);
+        if (r.outOfCredits) { toast.error('Web search allowance ran out — found emails were kept.'); setProgress(null); return; }
+        if (!r.checked || !r.remaining) break;
+      }
+    }
+    setProgress(null);
+    toast.success(`Searched ${searched} businesses, found ${found} emails.`);
   });
 
   const writePitches = () => run('pitch', async () => {
