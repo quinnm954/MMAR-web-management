@@ -155,7 +155,7 @@ Deno.serve(async (req) => {
         name: "MMAR Receptionist",
         conversation_config: {
           agent: {
-            first_message: "Thanks for calling Mike's Mobile Auto Repair. For English, say English. Para español, diga español.",
+            first_message: s?.ai_greeting,
             language: 'en',
             prompt: {
               prompt: buildPrompt(cities),
