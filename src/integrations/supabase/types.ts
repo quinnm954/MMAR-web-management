@@ -2539,6 +2539,7 @@ export type Database = {
           admin_notes: string | null
           comments: string | null
           created_at: string
+          customer_id: string | null
           email: string | null
           id: string
           name: string | null
@@ -2551,6 +2552,7 @@ export type Database = {
           admin_notes?: string | null
           comments?: string | null
           created_at?: string
+          customer_id?: string | null
           email?: string | null
           id?: string
           name?: string | null
@@ -2563,6 +2565,7 @@ export type Database = {
           admin_notes?: string | null
           comments?: string | null
           created_at?: string
+          customer_id?: string | null
           email?: string | null
           id?: string
           name?: string | null
@@ -4010,6 +4013,7 @@ export type Database = {
       submit_review_feedback: {
         Args: {
           _comments: string
+          _customer_id?: string
           _email: string
           _name: string
           _phone: string
