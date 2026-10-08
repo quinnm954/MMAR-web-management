@@ -177,6 +177,14 @@ const AdminEstimates = () => {
         };
       });
 
+      if (editing) {
+        // Inside an open estimate: add only the parts (and fees) from the PDF; labor stays manual.
+        const parts = lines.filter(l => l.kind !== 'labor');
+        if (!parts.length) throw new Error('No parts found in that PDF');
+        setEditing((p: any) => { const li = [...(p.line_items || []), ...parts]; return { ...p, line_items: li, ...recalc(li) }; });
+        toast.success(`Added ${parts.length} part${parts.length > 1 ? 's' : ''} from PDF`);
+        return;
+      }
       setPreview({ extracted: ex, matchedCustomer, matchedVehicle, lines });
     } catch (e: any) {
       toast.error(e.message || 'Could not parse PDF');
@@ -589,6 +597,9 @@ const AdminEstimates = () => {
                     <Button size="sm" variant="outline" onClick={addLaborLine}><Plus className="h-3 w-3 mr-1" /> Labor</Button>
                     <Button size="sm" variant="outline" onClick={() => { setLaborOpen(o => !o); setLaborResults([]); }}><Wrench className="h-3 w-3 mr-1" /> Labor Guide</Button>
                     <Button size="sm" variant="outline" onClick={addDiagnosisFee}><Plus className="h-3 w-3 mr-1" /> Diagnosis Fee</Button>
+                    <Button size="sm" variant="outline" onClick={() => fileRef.current?.click()} disabled={importing}>
+                      {importing ? <Loader2 className="h-3 w-3 mr-1 animate-spin" /> : <Upload className="h-3 w-3 mr-1" />} Parts from PDF
+                    </Button>
                     <Button size="sm" variant="outline" title="Copy vehicle info and open First Call Online" onClick={openFirstCall}>
                       <ExternalLink className="h-3 w-3 mr-1" /> First Call
                     </Button>
