@@ -9,3 +9,4 @@
 - Repair-order names derive from approved estimate repair lines, preferring labor descriptions; why: orders must identify the repair rather than the estimate workflow state.
 - Technician agreement: `technician_agreements` table (admin-only RLS) signed by techs via token link through `get_technician_agreement`/`sign_technician_agreement` RPCs; text lives in `src/lib/techAgreement.ts`; why: techs sign on phone without an account.
 - Website booking requests get an unsent draft estimate at submission (notify-booking-request → booking_requests.draft_estimate_id), which estimate-for-appointment reuses on confirmation; why: the shop sees a price before booking, without auto-sending or duplicating estimates.
+- Inbound customer email is pulled from the linked Outlook inbox by the 5-minute `outlook-inbox-sync` function into `inbound_messages` (deduped by Graph id); why: Outlook push isn't available via the connector and the Phone page reads that table.
