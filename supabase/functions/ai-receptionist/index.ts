@@ -194,7 +194,7 @@ Deno.serve(async (req) => {
           // End the call after 10 seconds of silence from the caller.
           turn: { turn_timeout: 7, silence_end_call_timeout: 10, turn_eagerness: 'patient' },
           // Higher-quality hearing, primed with the car/part/town words callers use.
-          asr: { quality: 'high', provider: 'elevenlabs', user_input_audio_format: 'ulaw_8000', keywords: [
+          asr: { quality: 'high', provider: 'scribe_realtime', user_input_audio_format: 'ulaw_8000', keywords: [
             ...cities, 'Immokalee', 'Bonita Springs', 'Naples', 'North Fort Myers', 'MMAR', 'English', 'español',
             'Toyota', 'Tacoma', 'Tundra', 'Camry', 'Corolla', 'Honda', 'Accord', 'Civic', 'Ford', 'F-150', 'Escape', 'Chevy', 'Silverado', 'Cruze', 'Malibu', 'Equinox', 'GMC', 'Sierra', 'Dodge', 'Ram', 'Jeep', 'Wrangler', 'Cherokee', 'Nissan', 'Altima', 'Sentra', 'Hyundai', 'Elantra', 'Kia', 'Mazda', 'Subaru', 'Volkswagen', 'Jetta',
             'alternator', 'starter', 'battery', 'brake pads', 'rotors', 'caliper', 'serpentine belt', 'water pump', 'thermostat', 'radiator', 'check engine light', 'AC compressor', 'tie rod', 'ball joint', 'control arm', 'wheel bearing', 'spark plugs', 'ignition coil', 'fuel pump', 'V6', 'V8',
