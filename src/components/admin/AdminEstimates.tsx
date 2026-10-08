@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Fragment } from 'react';
+import { ListControls, inRange, matches, groupHeader, GroupLabel, type Range } from './ListControls';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -44,6 +45,9 @@ const STATUS_COLORS: Record<string, string> = {
 
 const AdminEstimates = () => {
   const [estimates, setEstimates] = useState<Estimate[]>([]);
+  const [q, setQ] = useState('');
+  const [tab, setTab] = useState('all');
+  const [range, setRange] = useState<Range>('all');
   const [customers, setCustomers] = useState<any[]>([]);
   const [vehicles, setVehicles] = useState<any[]>([]);
   const [catalog, setCatalog] = useState<any[]>([]);
@@ -508,6 +512,20 @@ const AdminEstimates = () => {
 
   const customerVehicles = editing?.customer_id ? vehicles.filter(v => v.owner_id === editing.customer_id) : [];
 
+  const EST_TABS: { key: string; label: string; test: (s: string) => boolean }[] = [
+    { key: 'all', label: 'All', test: () => true },
+    { key: 'draft', label: 'Draft', test: s => s === 'draft' },
+    { key: 'sent', label: 'Sent', test: s => s === 'sent' || s === 'viewed' },
+    { key: 'approved', label: 'Approved', test: s => s === 'approved' || s === 'partially_approved' },
+    { key: 'converted', label: 'In repair', test: s => s === 'converted' },
+    { key: 'declined', label: 'Declined', test: s => s === 'declined' || s === 'expired' },
+  ];
+  const base = estimates
+    .filter(e => inRange(e.created_at, range) && matches(q, e.estimate_number, customerName(e.customer_id), e.notes, e.total))
+    .sort((a, b) => (b.created_at || '').localeCompare(a.created_at || ''));
+  const tabDef = EST_TABS.find(t => t.key === tab) || EST_TABS[0];
+  const shown = base.filter(e => tabDef.test(e.status));
+
   return (
     <div className="space-y-4">
       <div className="flex justify-end gap-2">
@@ -518,6 +536,9 @@ const AdminEstimates = () => {
         </Button>
         <Button onClick={newEstimate}><Plus className="h-4 w-4 mr-1" /> New Estimate</Button>
       </div>
+
+      <ListControls q={q} setQ={setQ} placeholder="Search estimate #, customer, notes..." range={range} setRange={setRange}
+        tab={tab} setTab={setTab} tabs={EST_TABS.map(t => ({ key: t.key, label: t.label, count: base.filter(e => t.test(e.status)).length }))} />
 
       <Card>
         <CardContent className="p-0 overflow-x-auto">
@@ -533,8 +554,11 @@ const AdminEstimates = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {estimates.map(e => (
-                <TableRow key={e.id}>
+              {shown.map((e, idx) => {
+                const hdr = groupHeader(shown, idx, r => r.created_at);
+                return (<Fragment key={e.id}>
+                {hdr && <TableRow className="hover:bg-transparent"><TableCell colSpan={6} className="py-1"><GroupLabel label={hdr} /></TableCell></TableRow>}
+                <TableRow>
                   <TableCell className="font-mono text-xs">{e.estimate_number}</TableCell>
                   <TableCell>{customerName(e.customer_id)}</TableCell>
                   <TableCell><Badge variant="outline" className={STATUS_COLORS[e.status]}>{e.status}</Badge></TableCell>
@@ -553,9 +577,10 @@ const AdminEstimates = () => {
                     </div>
                   </TableCell>
                 </TableRow>
-              ))}
-              {estimates.length === 0 && (
-                <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">No estimates yet</TableCell></TableRow>
+                </Fragment>);
+              })}
+              {shown.length === 0 && (
+                <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">No estimates match</TableCell></TableRow>
               )}
             </TableBody>
           </Table>

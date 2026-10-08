@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, Fragment } from "react";
+import { ListControls, inRange, matches, groupHeader, GroupLabel, type Range } from "./ListControls";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -46,6 +47,9 @@ const statusColor = (s: string) => {
 
 const AdminInvoices = () => {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [q, setQ] = useState("");
+  const [tab, setTab] = useState("all");
+  const [range, setRange] = useState<Range>("all");
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
@@ -373,6 +377,16 @@ const AdminInvoices = () => {
     }
   };
 
+  const INV_TABS: { key: string; label: string; test: (i: Invoice) => boolean }[] = [
+    { key: 'all', label: 'All', test: () => true },
+    { key: 'unpaid', label: 'Unpaid', test: i => !['paid', 'void', 'draft'].includes(i.status) },
+    { key: 'overdue', label: 'Overdue', test: i => i.status === 'overdue' || (!!i.due_date && i.status !== 'paid' && i.status !== 'void' && new Date(i.due_date) < new Date()) },
+    { key: 'paid', label: 'Paid', test: i => i.status === 'paid' },
+    { key: 'draft', label: 'Draft / Void', test: i => i.status === 'draft' || i.status === 'void' },
+  ];
+  const invBase = invoices.filter(i => inRange(i.created_at, range) && matches(q, i.invoice_number, i.customer?.full_name, i.customer?.email, i.total));
+  const invShown = invBase.filter((INV_TABS.find(t => t.key === tab) || INV_TABS[0]).test);
+
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -435,9 +449,14 @@ const AdminInvoices = () => {
         <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
       ) : (
         <div className="space-y-2">
-          {invoices.map((i) => {
+          <ListControls q={q} setQ={setQ} placeholder="Search invoice #, customer..." range={range} setRange={setRange}
+            tab={tab} setTab={setTab} tabs={INV_TABS.map(t => ({ key: t.key, label: t.label, count: invBase.filter(i => t.test(i)).length }))} />
+          {invShown.length === 0 && <div className="text-center text-sm text-muted-foreground py-8">No invoices match</div>}
+          {invShown.map((i, idx) => {
             const replies = repliesByInvoice[i.id] || [];
-            return (
+            const hdr = groupHeader(invShown, idx, r => r.created_at);
+            return (<Fragment key={i.id}>
+            {hdr && <GroupLabel label={hdr} />}
             <Card key={i.id} className="border-border/50">
               <CardContent className="p-4 space-y-3">
                 <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center sm:justify-between gap-3">
@@ -572,7 +591,7 @@ const AdminInvoices = () => {
               </CardContent>
 
             </Card>
-            );
+            </Fragment>);
           })}
         </div>
       )}
