@@ -26,8 +26,8 @@ Each email has:
 
 The three-email sequence changes too. Day 1 is the intro, day 4 a one-line follow-up ("Did this get buried?"), and day 10 a short "last note" with a real repair example. I'll regenerate all unsent drafts and future follow-ups with the new style. Emails already sent are not changed.
 
-### 3. Send from your own Outlook instead
-Prospecting emails send from your connected Outlook inbox as normal one-to-one emails from Mike. Replies land right in your Phone page's Email inbox. The daily limit stays (default 30 a day, spread across business hours) to protect your Outlook account.
+### 3. Keep sending from your domain, through a separate sales sender
+Prospecting emails keep going out from your mikesmautorepair.com domain, from a separate sales address on its own subdomain (for example mike@outreach.mikesmautorepair.com). They go through a dedicated email service such as Resend, which has a free tier. The app's built-in sender can't be used for sales emails, and keeping them separate protects your invoices and estimates from landing in spam. Replies go to your Outlook and show up in the Phone page's Email inbox. The daily limit stays (default 30 a day, spread across business hours). Setup needs a free account with the email service and a few domain records added where your domain is managed. I'll walk you through it.
 
 ## Things to confirm
 - The free fleet check for up to 3 vehicles is my suggestion. Tell me if you'd rather offer something else, or nothing.
