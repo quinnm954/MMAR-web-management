@@ -92,7 +92,7 @@ const formatDuration = (seconds: number | null) => {
 const relativeTime = (at: string) => formatDistanceToNow(new Date(at), { addSuffix: true });
 
 export default function AdminPhoneHub() {
-  const [mode, setMode] = useState<Mode>('inbox');
+  const [mode, setMode] = useState<Mode>('calls');
   const [emailFolder, setEmailFolder] = useState<EmailFolder>('inbox');
   const [calls, setCalls] = useState<CallRow[]>([]);
   const [threads, setThreads] = useState<TextThread[]>([]);
@@ -402,7 +402,7 @@ export default function AdminPhoneHub() {
           <div className="flex-1 min-h-0 overflow-y-auto">
             {listContent.length === 0 ? (
               <div className="h-full grid place-items-center text-center p-8 text-muted-foreground">
-                <div><Phone className="h-9 w-9 mx-auto mb-3 opacity-40" /><p className="text-sm">{loading ? 'Loading…' : mode === 'email' && emailFolder === 'inbox' ? 'No incoming email yet. Replies currently go to your Outlook until it is connected here.' : 'Nothing here yet'}</p></div>
+                <div><Phone className="h-9 w-9 mx-auto mb-3 opacity-40" /><p className="text-sm">{loading ? 'Loading…' : mode === 'email' && emailFolder === 'inbox' ? 'No incoming email yet.' : 'Nothing here yet'}</p></div>
               </div>
             ) : listContent.map((item, index) => {
               const missed = item.kind === 'call' && item.subtitle.toLowerCase().includes('missed');
@@ -426,7 +426,7 @@ export default function AdminPhoneHub() {
 
           <div className="h-20 border-t border-border/60 grid grid-cols-5 px-1 pb-3 bg-card/95">
             {([
-              ['inbox', Inbox, 'Inbox'], ['calls', PhoneCall, 'Calls'], ['texts', MessageCircle, 'Texts'], ['chat', MessagesSquare, 'Chat'], ['email', Mail, 'Email'],
+              ['calls', PhoneCall, 'Calls'], ['texts', MessageCircle, 'Texts'], ['chat', MessagesSquare, 'Chat'], ['email', Mail, 'Email'],
             ] as const).map(([value, Icon, label]) => (
               <Button key={value} variant="ghost" className={cn('h-full flex-col gap-1 rounded-xl text-[10px]', mode === value ? 'text-primary' : 'text-muted-foreground')} onClick={() => switchMode(value)}>
                 <Icon className="h-5 w-5" /><span>{label}</span>
