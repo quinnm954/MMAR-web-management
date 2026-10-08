@@ -287,7 +287,7 @@ const AdminBookingRequests = () => {
                 {r.description && (
                   <div className="text-muted-foreground text-xs">"{r.description}"</div>
                 )}
-                {r.source === "website" && (
+                {(r.draft_estimate_id || ["website","in_app"].includes(r.source)) && (
                   r.draft_estimate_id && drafts[r.draft_estimate_id] ? (
                     <div className="rounded-md border border-primary/30 bg-primary/5 px-2 py-1 text-xs">
                       <span className="font-medium">Draft price: ${Number(drafts[r.draft_estimate_id].total || 0).toFixed(2)}</span>
