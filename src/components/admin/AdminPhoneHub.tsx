@@ -3,6 +3,7 @@ import { format, formatDistanceToNow } from 'date-fns';
 import {
   ArrowLeft, Bot, FileEdit, Inbox, Mail, MessageCircle, Phone, PhoneCall,
   PhoneIncoming, PhoneMissed, Plus, MessagesSquare, RefreshCw, Reply, Search, Send,
+  ChevronLeft, ChevronRight, ArrowUp, Delete, Signal, Wifi, BatteryFull, User,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { dialInApp } from '@/components/admin/Softphone';
@@ -494,78 +495,224 @@ export default function AdminPhoneHub() {
   );
 }
 
-function DetailHeader({ title, subtitle, onBack, actions }: { title: string; subtitle?: string; onBack: () => void; actions?: React.ReactNode }) {
+function IPhoneFrame({ children }: { children: React.ReactNode }) {
   return (
-    <div className="h-20 px-4 sm:px-6 flex items-center gap-3 border-b border-border bg-card/70">
-      <Button variant="ghost" size="icon" className="lg:hidden rounded-full" onClick={onBack}><ArrowLeft className="h-5 w-5" /></Button>
-      <div className="h-11 w-11 rounded-full bg-primary/15 text-primary grid place-items-center font-bold shrink-0">{initials(title)}</div>
-      <div className="min-w-0 flex-1"><h3 className="font-semibold truncate">{title}</h3>{subtitle && <p className="text-xs text-muted-foreground truncate capitalize">{subtitle}</p>}</div>
-      {actions}
+    <div className="relative w-full lg:w-auto">
+      {/* side buttons (desktop only) */}
+      <span className="hidden lg:block absolute -left-[3px] top-[120px] h-8 w-[3px] rounded-l bg-[hsl(var(--ios-bezel))]" />
+      <span className="hidden lg:block absolute -left-[3px] top-[180px] h-14 w-[3px] rounded-l bg-[hsl(var(--ios-bezel))]" />
+      <span className="hidden lg:block absolute -left-[3px] top-[250px] h-14 w-[3px] rounded-l bg-[hsl(var(--ios-bezel))]" />
+      <span className="hidden lg:block absolute -right-[3px] top-[200px] h-20 w-[3px] rounded-r bg-[hsl(var(--ios-bezel))]" />
+      <div className="ios relative overflow-hidden h-[calc(100dvh-120px)] min-h-[560px] w-full lg:h-[852px] lg:max-h-[calc(100dvh-140px)] lg:w-[393px] lg:rounded-[55px] lg:border-[11px] lg:border-[hsl(var(--ios-bezel))] lg:shadow-[0_30px_80px_-20px_hsl(var(--ios-bg)/0.9)] lg:ring-1 lg:ring-[hsl(var(--ios-separator))]">
+        {/* Dynamic Island */}
+        <div className="hidden lg:block absolute top-[11px] left-1/2 -translate-x-1/2 h-[34px] w-[122px] rounded-full bg-[hsl(var(--ios-bg))] z-50" />
+        {children}
+        <div className="hidden lg:block absolute bottom-2 left-1/2 -translate-x-1/2 h-[5px] w-[134px] rounded-full bg-[hsl(var(--ios-label))] z-50 pointer-events-none" />
+      </div>
     </div>
   );
 }
 
+function StatusBar() {
+  const [now, setNow] = useState(new Date());
+  useEffect(() => { const t = setInterval(() => setNow(new Date()), 30000); return () => clearInterval(t); }, []);
+  return (
+    <div className="hidden lg:flex h-[54px] shrink-0 items-center justify-between px-8 pt-1 text-[16px] font-semibold">
+      <span className="w-[60px] text-center">{format(now, 'h:mm')}</span>
+      <span className="flex items-center gap-1.5"><Signal className="h-4 w-4" /><Wifi className="h-4 w-4" /><BatteryFull className="h-5 w-6" /></span>
+    </div>
+  );
+}
+
+function Sheet({ open, onClose, tall, children }: { open: boolean; onClose: () => void; tall?: boolean; children: React.ReactNode }) {
+  return (
+    <div className={cn('absolute inset-0 z-40 transition-opacity', open ? 'opacity-100' : 'opacity-0 pointer-events-none')}>
+      <div className="absolute inset-0 bg-[hsl(var(--ios-bg)/0.5)]" onClick={onClose} />
+      <div className={cn('absolute inset-x-0 bottom-0 flex flex-col rounded-t-[12px] bg-[hsl(var(--ios-grouped))] px-4 pt-2 pb-10 transition-transform duration-300', tall ? 'top-12' : '', open ? 'translate-y-0' : 'translate-y-full')}>
+        <div className="mx-auto mb-3 h-[5px] w-9 rounded-full bg-[hsl(var(--ios-separator))]" />
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function Avatar({ name, size = 40 }: { name: string; size?: number }) {
+  return (
+    <span className="shrink-0 rounded-full grid place-items-center font-semibold text-[hsl(var(--ios-label))] bg-gradient-to-b from-[hsl(var(--ios-label-2))] to-[hsl(var(--ios-separator))]" style={{ height: size, width: size, fontSize: size * 0.4 }}>
+      {/[a-z]/i.test(name) ? initials(name) : <User className="h-1/2 w-1/2" fill="currentColor" />}
+    </span>
+  );
+}
+
+const shortTime = (at: string) => {
+  const d = new Date(at), now = new Date();
+  if (d.toDateString() === now.toDateString()) return format(d, 'h:mm a');
+  const y = new Date(now); y.setDate(now.getDate() - 1);
+  if (d.toDateString() === y.toDateString()) return 'Yesterday';
+  if (now.getTime() - d.getTime() < 6 * 864e5) return format(d, 'EEEE');
+  return format(d, 'M/d/yy');
+};
+
+function NavBar({ onBack, back = 'Back', children, right }: { onBack: () => void; back?: string; children?: React.ReactNode; right?: React.ReactNode }) {
+  return (
+    <div className="ios-frost shrink-0 border-b border-[hsl(var(--ios-separator))] px-2 pb-2 pt-1 relative z-10">
+      <div className="flex items-start justify-between min-h-11">
+        <button onClick={onBack} className="flex items-center text-[17px] text-[hsl(var(--ios-blue))] h-11 pr-2"><ChevronLeft className="h-7 w-7 -mr-1" />{back}</button>
+        <div className="flex items-center gap-1 h-11 pr-2 text-[hsl(var(--ios-blue))]">{right}</div>
+      </div>
+      {children}
+    </div>
+  );
+}
+
+function ContactHead({ name, sub }: { name: string; sub?: string }) {
+  return <div className="-mt-9 flex flex-col items-center gap-1 pointer-events-none"><Avatar name={name} size={52} /><span className="text-[12px] flex items-center max-w-[220px]"><span className="truncate">{name}</span><ChevronRight className="h-3 w-3 opacity-60" /></span>{sub && <span className="text-[11px] text-[hsl(var(--ios-label-2))] truncate max-w-[240px] capitalize">{sub}</span>}</div>;
+}
+
+function Bubbles<T extends { id: string; created_at: string }>({ items, mine, render, boxRef }: { items: T[]; mine: (m: T) => boolean; render: (m: T) => React.ReactNode; boxRef: React.RefObject<HTMLDivElement> }) {
+  return (
+    <div ref={boxRef} className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-3 py-3">
+      {items.map((m, i) => {
+        const prev = items[i - 1], next = items[i + 1];
+        const gap = !prev || new Date(m.created_at).getTime() - new Date(prev.created_at).getTime() > 60 * 60000;
+        const out = mine(m);
+        const last = !next || mine(next) !== out || new Date(next.created_at).getTime() - new Date(m.created_at).getTime() > 60 * 60000;
+        return (
+          <div key={m.id}>
+            {gap && <p className="text-center text-[11px] text-[hsl(var(--ios-label-2))] my-3"><span className="font-semibold">{shortTime(m.created_at)}</span>{shortTime(m.created_at).includes(':') ? '' : ` ${format(new Date(m.created_at), 'h:mm a')}`}</p>}
+            <div className={cn('flex', out ? 'justify-end' : 'justify-start', last ? 'mb-2' : 'mb-0.5')}>
+              <div className={cn('max-w-[75%] px-3 py-[7px] text-[17px] leading-[22px] rounded-[18px]', out ? 'bg-[hsl(var(--ios-blue))] text-[hsl(var(--ios-label))]' : 'bg-[hsl(var(--ios-bubble))]', last && (out ? 'rounded-br-[5px]' : 'rounded-bl-[5px]'))}>
+                {render(m)}
+              </div>
+            </div>
+          </div>
+        );
+      })}
+      {items.length === 0 && <div className="h-full grid place-items-center text-[15px] text-[hsl(var(--ios-label-2))]">No messages yet.</div>}
+    </div>
+  );
+}
+
+function Composer({ value, onChange, onSend, sending, placeholder }: { value: string; onChange: (v: string) => void; onSend: () => void; sending: boolean; placeholder: string }) {
+  return (
+    <div className="shrink-0 px-2 pt-1.5 pb-3 lg:pb-8 flex items-end gap-2 bg-[hsl(var(--ios-bg))]">
+      <span className="h-9 w-9 shrink-0 rounded-full bg-[hsl(var(--ios-fill))] grid place-items-center text-[hsl(var(--ios-label-2))]"><Plus className="h-5 w-5" /></span>
+      <div className="flex-1 flex items-end rounded-[20px] border border-[hsl(var(--ios-separator))] pl-3 pr-1 py-1 min-h-9">
+        <textarea value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} rows={1} onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); if (value.trim()) onSend(); } }} className="flex-1 bg-transparent outline-none resize-none text-[17px] leading-[22px] py-0.5 max-h-28 placeholder:text-[hsl(var(--ios-label-2))]" />
+        {value.trim() && <button onClick={onSend} disabled={sending} className="h-7 w-7 shrink-0 rounded-full bg-[hsl(var(--ios-blue))] grid place-items-center disabled:opacity-50" title="Send"><ArrowUp className="h-[18px] w-[18px]" strokeWidth={3} /></button>}
+      </div>
+    </div>
+  );
+}
+
+function useBottom(dep: unknown[]) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = ref.current; if (!el) return;
+    el.scrollTop = el.scrollHeight;
+    const t = setTimeout(() => { el.scrollTop = el.scrollHeight; }, 300);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, dep);
+  return ref;
+}
+
+function Group({ children }: { children: React.ReactNode }) {
+  return <div className="rounded-[10px] bg-[hsl(var(--ios-grouped))] overflow-hidden">{children}</div>;
+}
+
 function CallDetail({ call, name, tag, onBack, onCall, onText }: { call: CallRow; name: string; tag?: string; onBack: () => void; onCall: () => void; onText: () => void }) {
   const missed = call.status === 'missed' || call.status === 'no-answer';
+  const number = call.direction === 'outbound' ? call.to_number : call.from_number;
   return (
     <>
-      <DetailHeader title={name} subtitle={tag || call.from_number || undefined} onBack={onBack} actions={<div className="flex gap-1"><Button size="icon" variant="outline" className="rounded-full" onClick={onText} title="Text"><MessageCircle className="h-4 w-4" /></Button><Button size="icon" className="rounded-full" onClick={onCall} title="Call"><Phone className="h-4 w-4" /></Button></div>} />
-      <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-5 sm:p-8 space-y-5">
-        <div className="text-center py-5">
-          <div className={cn('h-20 w-20 mx-auto rounded-full grid place-items-center mb-4', missed ? 'bg-destructive/15 text-destructive' : 'bg-primary/15 text-primary')}>{missed ? <PhoneMissed className="h-9 w-9" /> : <PhoneIncoming className="h-9 w-9" />}</div>
-          <h3 className="text-2xl font-display">{missed ? 'Missed call' : call.ai_handled ? 'AI answered' : 'Call completed'}</h3>
-          <p className="text-sm text-muted-foreground mt-1">{format(new Date(call.created_at), 'MMM d, yyyy · h:mm a')} · {formatDuration(call.duration_seconds)}</p>
+      <NavBar onBack={onBack} back="Recents" />
+      <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-4 pb-10 space-y-5">
+        <div className="text-center pt-4">
+          <div className="flex justify-center"><Avatar name={name} size={96} /></div>
+          <h3 className="text-[28px] font-semibold mt-3 leading-tight">{name}</h3>
+          {tag && <p className="text-[15px] text-[hsl(var(--ios-label-2))]">{tag}</p>}
+          <div className="grid grid-cols-3 gap-2 mt-5">
+            {([[MessageCircle, 'message', onText], [Phone, 'call', onCall], [Mail, 'mail', undefined]] as const).map(([Icon, label, fn]) => (
+              <button key={label} onClick={fn} disabled={!fn} className="rounded-[10px] bg-[hsl(var(--ios-grouped))] py-2.5 flex flex-col items-center gap-1 text-[hsl(var(--ios-blue))] disabled:opacity-40"><Icon className="h-5 w-5" fill="currentColor" /><span className="text-[12px]">{label}</span></button>
+            ))}
+          </div>
         </div>
-        {call.ai_summary && <div className="rounded-2xl border border-accent/30 bg-accent/5 p-4"><div className="flex items-center gap-2 text-accent text-xs font-bold uppercase mb-2"><Bot className="h-4 w-4" />AI summary</div><p className="text-sm leading-relaxed">{call.ai_summary}</p></div>}
-        {(call.ai_transcript?.length || call.transcription) && <div><h4 className="font-display text-lg mb-3">Transcript</h4><div className="space-y-3">{call.ai_transcript?.map((line, index) => <div key={index} className={cn('flex', line.role === 'agent' ? 'justify-end' : 'justify-start')}><div className={cn('max-w-[82%] rounded-2xl px-4 py-3 text-sm', line.role === 'agent' ? 'bg-primary text-primary-foreground rounded-br-sm' : 'bg-muted rounded-bl-sm')}><p className="text-[10px] uppercase font-bold opacity-60 mb-1">{line.role === 'agent' ? 'Receptionist' : 'Caller'}</p>{line.message}</div></div>)}{call.transcription && <div className="rounded-2xl bg-muted p-4 text-sm whitespace-pre-wrap">{call.transcription}</div>}</div></div>}
+        <Group>
+          <div className="px-4 py-3">
+            <p className="text-[15px] font-semibold">{format(new Date(call.created_at), 'EEEE, MMM d')}</p>
+            <div className="flex justify-between text-[15px] mt-1"><span className="text-[hsl(var(--ios-label-2))]">{format(new Date(call.created_at), 'h:mm a')}</span><span className={missed ? 'text-[hsl(var(--ios-red))]' : ''}>{missed ? 'Missed Call' : call.direction === 'outbound' ? 'Outgoing Call' : call.ai_handled ? 'Answered by AI' : 'Incoming Call'}</span><span className="text-[hsl(var(--ios-label-2))]">{formatDuration(call.duration_seconds)}</span></div>
+          </div>
+          {number && <div className="px-4 py-3 border-t border-[hsl(var(--ios-separator))]"><p className="text-[13px]">phone</p><p className="text-[17px] text-[hsl(var(--ios-blue))]">{number}</p></div>}
+        </Group>
+        {call.ai_summary && <div><p className="px-4 pb-1.5 text-[13px] uppercase text-[hsl(var(--ios-label-2))] flex items-center gap-1"><Bot className="h-3.5 w-3.5" />AI summary</p><Group><p className="px-4 py-3 text-[15px] leading-relaxed">{call.ai_summary}</p></Group></div>}
+        {(call.ai_transcript?.length || call.transcription) && (
+          <div>
+            <p className="px-4 pb-1.5 text-[13px] uppercase text-[hsl(var(--ios-label-2))]">Transcript</p>
+            <Group><div className="p-3 space-y-1.5">
+              {call.ai_transcript?.map((line, index) => (
+                <div key={index} className={cn('flex', line.role === 'agent' ? 'justify-end' : 'justify-start')}>
+                  <div className={cn('max-w-[82%] rounded-[16px] px-3 py-1.5 text-[15px]', line.role === 'agent' ? 'bg-[hsl(var(--ios-blue))]' : 'bg-[hsl(var(--ios-bubble))]')}>{line.message}</div>
+                </div>
+              ))}
+              {call.transcription && <p className="text-[15px] whitespace-pre-wrap">{call.transcription}</p>}
+            </div></Group>
+          </div>
+        )}
       </div>
     </>
   );
 }
 
 function TextDetail({ thread, name, tag, messages, reply, sending, onReply, onSend, onBack, onCall }: { thread: TextThread; name: string; tag?: string; messages: SmsMessage[]; reply: string; sending: boolean; onReply: (value: string) => void; onSend: () => void; onBack: () => void; onCall: () => void }) {
-  const boxRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const el = boxRef.current;
-    if (!el) return;
-    el.scrollTop = el.scrollHeight;
-    const t = setTimeout(() => { el.scrollTop = el.scrollHeight; }, 300); // after images load
-    return () => clearTimeout(t);
-  }, [messages, thread.id]);
+  const boxRef = useBottom([messages, thread.id]);
   return (
     <>
-      <DetailHeader title={name} subtitle={`${tag || 'text conversation'} · ${thread.phone}`} onBack={onBack} actions={<Button size="icon" className="rounded-full" onClick={onCall} title="Call"><Phone className="h-4 w-4" /></Button>} />
-      <div ref={boxRef} className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4 sm:p-6 space-y-3">
-        {messages.map(message => <div key={message.id} className={cn('flex', message.direction === 'outbound' ? 'justify-end' : 'justify-start')}><div className={cn('max-w-[82%] rounded-2xl px-4 py-3 text-sm', message.direction === 'outbound' ? 'bg-primary text-primary-foreground rounded-br-sm' : 'bg-muted rounded-bl-sm')}><MessageMedia media={message.media_urls} />{message.body && <p className="whitespace-pre-wrap break-words [overflow-wrap:anywhere]">{message.body}</p>}<p className="text-[10px] opacity-60 mt-1">{format(new Date(message.created_at), 'MMM d, h:mm a')}{message.status ? ` · ${message.status}` : ''}</p></div></div>)}
-        {messages.length === 0 && <div className="h-full grid place-items-center text-sm text-muted-foreground">No messages yet.</div>}
-      </div>
-      <div className="shrink-0 p-3 sm:p-4 border-t border-border bg-card/70 flex gap-2"><Textarea value={reply} onChange={event => onReply(event.target.value)} placeholder="Text message" rows={1} className="text-base min-h-11 max-h-28 resize-none rounded-2xl" /><Button size="icon" className="rounded-full shrink-0 mt-0.5" onClick={onSend} disabled={sending || !reply.trim()}><Send className="h-4 w-4" /></Button></div>
+      <NavBar onBack={onBack} right={<button onClick={onCall} title="Call" className="p-1"><Phone className="h-5 w-5" /></button>}><ContactHead name={name} sub={tag || thread.phone} /></NavBar>
+      <Bubbles items={messages} boxRef={boxRef} mine={m => m.direction === 'outbound'} render={m => (
+        <>
+          <MessageMedia media={m.media_urls} />
+          {m.body && <p className="whitespace-pre-wrap break-words [overflow-wrap:anywhere]">{m.body}</p>}
+          {m.direction === 'outbound' && m.status && m.status !== 'delivered' && m.status !== 'sent' && <p className="text-[10px] opacity-70 mt-0.5 capitalize">{m.status}</p>}
+        </>
+      )} />
+      <Composer value={reply} onChange={onReply} onSend={onSend} sending={sending} placeholder="Text Message" />
     </>
   );
 }
 
 function ChatDetail({ title, subtitle, me, messages, names, reply, sending, onReply, onSend, onBack }: { title: string; subtitle: string; me: string | null; messages: ChatMessage[]; names: Record<string, string>; reply: string; sending: boolean; onReply: (v: string) => void; onSend: () => void; onBack: () => void }) {
-  const boxRef = useRef<HTMLDivElement>(null);
-  useEffect(() => { const el = boxRef.current; if (el) el.scrollTop = el.scrollHeight; }, [messages]);
+  const boxRef = useBottom([messages]);
   return (
     <>
-      <DetailHeader title={title} subtitle={subtitle} onBack={onBack} />
-      <div ref={boxRef} className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4 sm:p-6 space-y-3">
-        {messages.map(m => { const mine = m.sender_id === me; return <div key={m.id} className={cn('flex', mine ? 'justify-end' : 'justify-start')}><div className={cn('max-w-[82%] rounded-2xl px-4 py-3 text-sm', mine ? 'bg-primary text-primary-foreground rounded-br-sm' : 'bg-muted rounded-bl-sm')}>{!mine && <p className="text-[10px] uppercase font-bold opacity-60 mb-1">{names[m.sender_id] || 'Customer'}</p>}<p className="whitespace-pre-wrap break-words [overflow-wrap:anywhere]">{m.body}</p><p className="text-[10px] opacity-60 mt-1">{format(new Date(m.created_at), 'MMM d, h:mm a')}</p></div></div>; })}
-        {messages.length === 0 && <div className="h-full grid place-items-center text-sm text-muted-foreground">No messages yet.</div>}
-      </div>
-      <div className="shrink-0 p-3 sm:p-4 border-t border-border bg-card/70 flex gap-2"><Textarea value={reply} onChange={e => onReply(e.target.value)} placeholder="Message" rows={1} className="text-base min-h-11 max-h-28 resize-none rounded-2xl" /><Button size="icon" className="rounded-full shrink-0 mt-0.5" onClick={onSend} disabled={sending || !reply.trim()}><Send className="h-4 w-4" /></Button></div>
+      <NavBar onBack={onBack}><ContactHead name={title} sub={subtitle} /></NavBar>
+      <Bubbles items={messages} boxRef={boxRef} mine={m => m.sender_id === me} render={m => (
+        <>
+          {m.sender_id !== me && names[m.sender_id] && <p className="text-[11px] text-[hsl(var(--ios-label-2))] -mb-0.5">{names[m.sender_id]}</p>}
+          <p className="whitespace-pre-wrap break-words [overflow-wrap:anywhere]">{m.body}</p>
+        </>
+      )} />
+      <Composer value={reply} onChange={onReply} onSend={onSend} sending={sending} placeholder="iMessage" />
     </>
   );
 }
 
 function EmailDetail({ email, onBack, onReply, onEdit }: { email: EmailItem; onBack: () => void; onReply: () => void; onEdit: () => void }) {
+  const who = email.kind === 'sent' ? email.to : email.from;
   return (
     <>
-      <DetailHeader title={email.kind === 'sent' ? email.to : email.from} subtitle={email.kind} onBack={onBack} actions={<Button size="sm" variant="outline" onClick={email.kind === 'draft' ? onEdit : onReply}>{email.kind === 'draft' ? <FileEdit className="h-4 w-4 mr-2" /> : <Reply className="h-4 w-4 mr-2" />}{email.kind === 'draft' ? 'Edit' : 'Reply'}</Button>} />
-      <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-5 sm:p-8">
-        <div className="pb-5 mb-5 border-b border-border"><div className="flex items-start justify-between gap-3"><h3 className="text-xl font-display leading-tight">{email.subject}</h3>{email.status && <Badge variant="outline" className="capitalize">{email.status}</Badge>}</div><p className="text-xs text-muted-foreground mt-3">{format(new Date(email.at), 'MMM d, yyyy · h:mm a')}</p><p className="text-xs text-muted-foreground mt-1">From: {email.from}</p>{email.to && <p className="text-xs text-muted-foreground">To: {email.to}</p>}</div>
-        {email.bodyHtml ? <EmailFrame html={email.bodyHtml} /> : <div className="text-sm whitespace-pre-wrap leading-relaxed">{email.bodyText || email.snippet || 'No content available.'}</div>}
+      <NavBar onBack={onBack} back="Mail" right={<button onClick={email.kind === 'draft' ? onEdit : onReply} className="p-1" title={email.kind === 'draft' ? 'Edit' : 'Reply'}>{email.kind === 'draft' ? <FileEdit className="h-5 w-5" /> : <Reply className="h-5 w-5" />}</button>} />
+      <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-4 pb-10">
+        <div className="flex gap-3 py-3 border-b border-[hsl(var(--ios-separator))]">
+          <Avatar name={who} />
+          <div className="min-w-0 flex-1">
+            <div className="flex justify-between gap-2"><p className="text-[15px] font-semibold truncate">{email.from}</p><p className="text-[13px] text-[hsl(var(--ios-label-2))] shrink-0">{shortTime(email.at)}</p></div>
+            {email.to && <p className="text-[13px] text-[hsl(var(--ios-label-2))] truncate">To: {email.to}</p>}
+            {email.status && <p className="text-[12px] text-[hsl(var(--ios-label-2))] capitalize">{email.status}</p>}
+          </div>
+        </div>
+        <h3 className="text-[20px] font-semibold leading-tight py-3">{email.subject}</h3>
+        {email.bodyHtml ? <EmailFrame html={email.bodyHtml} /> : <div className="text-[16px] whitespace-pre-wrap leading-relaxed">{email.bodyText || email.snippet || 'No content available.'}</div>}
       </div>
     </>
   );
@@ -607,7 +754,7 @@ function EmailFrame({ html }: { html: string }) {
       title="Email preview"
       srcDoc={`<base target="_blank">${html}`}
       sandbox="allow-same-origin allow-popups allow-popups-to-escape-sandbox"
-      className="w-full rounded-xl border border-border bg-background"
+      className="w-full rounded-[10px] bg-[hsl(var(--ios-label))]"
       style={{ height, colorScheme: 'light' }}
       onLoad={event => {
         const doc = (event.currentTarget as HTMLIFrameElement).contentDocument;
