@@ -22,7 +22,7 @@ const ProtectedRoute = ({ children, requireAdmin = true, allowedRoles }: Protect
   }
 
   if (!user) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to={location.pathname === "/admin/phone" ? "/login?redirect=%2Fadmin%2Fphone" : "/login"} replace />;
   }
 
   if (isPasswordRecovery && location.pathname !== "/set-password") {
