@@ -13,6 +13,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sh
 import { toast } from 'sonner';
 import { Loader2, Mail, Phone, Search, Sparkles, Globe, Pause, Play } from 'lucide-react';
 import { dialInApp } from '@/components/admin/Softphone';
+import { prospectEmail } from '@/lib/prospectCopy';
 
 const CATEGORIES = ['Landscaping', 'HVAC', 'Plumbing', 'Pest control', 'Pool service', 'Roofing', 'Electrical', 'Cleaning service', 'Used car dealer', 'Towing', 'Construction', 'Lawn care'];
 const CITIES = ['Fort Myers', 'Lehigh Acres'] as const;
@@ -44,6 +45,7 @@ export default function AdminProspecting() {
   const [state, setState] = useState<EmailState | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [filter, setFilter] = useState('all');
+  const [trade, setTrade] = useState('all');
   const [open, setOpen] = useState<Prospect | null>(null);
 
   const load = async () => {
@@ -57,11 +59,14 @@ export default function AdminProspecting() {
   useEffect(() => { load(); }, []);
 
   const shown = useMemo(() => {
-    const visible = filter === 'all' ? rows : rows.filter((r) => r.stage === filter);
+    const visible = rows.filter((r) => (filter === 'all' || r.stage === filter) && (trade === 'all' || r.category === trade));
     // Businesses we can actually email float to the top of the list.
     const rank = (r: Prospect) => (r.email && !r.do_not_contact ? 0 : r.email ? 1 : 2);
     return [...visible].sort((a, b) => rank(a) - rank(b));
-  }, [rows, filter]);
+  }, [rows, filter, trade]);
+  const trades = useMemo(() => { const m = new Map<string, number>(); rows.forEach((r) => m.set(r.category, (m.get(r.category) ?? 0) + 1)); return [...m.entries()].sort((a, b) => b[1] - a[1]); }, [rows]);
+  const groupOf = (r: Prospect) => r.email_status === 'draft' ? (r.email ? 'Ready to approve' : 'Needs email') : r.email_status === 'approved' ? (!r.email ? 'Needs email' : r.email_step === 0 ? 'First email pending' : 'Follow-up scheduled') : r.email_status === 'done' ? 'Done' : 'Not started';
+  const GROUPS = ['Ready to approve', 'First email pending', 'Follow-up scheduled', 'Not started', 'Needs email', 'Done'];
   const drafts = rows.filter((r) => r.email_status === 'draft' && r.email && !r.do_not_contact);
   const firstPending = rows.filter((r) => r.email_status === 'approved' && r.email_step === 0 && r.email && !r.do_not_contact);
   const followUps = rows.filter((r) => r.email_status === 'approved' && r.email_step > 0 && !r.do_not_contact);
@@ -185,6 +190,7 @@ export default function AdminProspecting() {
             <Badge variant="outline">Drafts needing email: {draftsNoEmail.length}</Badge>
             {cantSend.length > 0 && <Badge variant="destructive">Can't send: {cantSend.length}</Badge>}
             <Button size="sm" onClick={approveAll} disabled={!!busy || !drafts.length}>Approve all drafts</Button>
+            {trade !== 'all' && <Button size="sm" variant="outline" disabled={!drafts.some((d) => d.category === trade)} onClick={async () => { const ids = drafts.filter((d) => d.category === trade).map((d) => d.id); await supabase.from('prospects').update({ email_status: 'approved' }).in('id', ids); toast.success(`${ids.length} ${trade} emails approved`); load(); }}>Approve {trade} drafts</Button>}
             <Button size="sm" variant="outline" onClick={() => saveState({ paused: !state?.paused })}>
               {state?.paused ? <><Play className="h-4 w-4 mr-1" />Resume</> : <><Pause className="h-4 w-4 mr-1" />Pause</>}
             </Button>
@@ -203,9 +209,18 @@ export default function AdminProspecting() {
             </SelectContent>
           </Select>
         </CardHeader>
-        <CardContent className="flex-1 min-h-0 divide-y overflow-y-auto">
+        <div className="flex gap-2 overflow-x-auto px-6 pb-3">
+          {[['all', rows.length] as [string, number], ...trades].map(([t, n]) => (
+            <Button key={t} size="sm" variant={trade === t ? 'default' : 'outline'} className="shrink-0" onClick={() => setTrade(t)}>{t === 'all' ? 'All' : t} ({n})</Button>
+          ))}
+        </div>
+        <CardContent className="flex-1 min-h-0 overflow-y-auto">
           {shown.length === 0 && <p className="text-sm text-muted-foreground py-4">No leads yet. Pick categories above and click Search.</p>}
-          {shown.map((p) => (
+          {GROUPS.map((g) => { const list = shown.filter((r) => groupOf(r) === g); if (!list.length) return null; return (
+          <div key={g} className="mb-2">
+            <div className="sticky top-0 z-10 bg-card py-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{g} · {list.length}</div>
+            <div className="divide-y">
+          {list.map((p) => (
             <div key={p.id} className="py-3 flex flex-wrap items-center gap-3">
               <button className="flex-1 min-w-[200px] text-left" onClick={() => setOpen(p)}>
                 <div className="font-medium">{p.name}</div>
@@ -218,6 +233,8 @@ export default function AdminProspecting() {
               )}
             </div>
           ))}
+            </div>
+          </div>); })}
         </CardContent>
       </Card>
 
