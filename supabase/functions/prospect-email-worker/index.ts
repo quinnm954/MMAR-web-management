@@ -50,9 +50,9 @@ Deno.serve(async (req) => {
       const c = prospectEmail(p.category, p.name, step);
       const subject = step === 1 && p.email_subject?.trim() && !/fleet partner/i.test(p.email_subject) ? p.email_subject : c.subject;
       const bodyText = `${c.body}\n\n--\n${st.mailing_address}\nReply STOP and I won't email you again.`;
-      const resp = await fetch('https://api.resend.com/emails', {
+      const resp = await fetch('https://connector-gateway.lovable.dev/resend/emails', {
         method: 'POST',
-        headers: { Authorization: `Bearer ${RESEND}`, 'Content-Type': 'application/json', 'Idempotency-Key': `prospect-${p.id}-${step}-${today}` },
+        headers: { Authorization: `Bearer ${Deno.env.get('LOVABLE_API_KEY')}`, 'X-Connection-Api-Key': RESEND, 'Content-Type': 'application/json', 'Idempotency-Key': `prospect-${p.id}-${step}-${today}` },
         body: JSON.stringify({ from: FROM, to: [p.email], reply_to: 'quinnm954@outlook.com', subject, text: bodyText }),
       });
       const rj = await resp.json().catch(() => ({}));
