@@ -1,4 +1,4 @@
-import { sendAndLog } from '../_shared/send-and-log.ts';
+import { prospectEmail } from '../_shared/prospect-copy.ts';
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
 
@@ -16,6 +16,10 @@ Deno.serve(async (req) => {
   const { data: st } = await sb.from('prospect_email_state').select('*').eq('id', 1).single();
   if (!st || st.paused) return json({ skipped: 'paused' });
   if (!st.mailing_address) return json({ skipped: 'no mailing address' });
+  // Sales outreach must not use the app (customer) email sender. Sends only via the separate sales sender.
+  const RESEND = Deno.env.get('RESEND_API_KEY');
+  const FROM = Deno.env.get('OUTREACH_FROM') || "Mike <mike@outreach.mikesmautorepair.com>";
+  if (!RESEND) return json({ skipped: 'sales sender not set up' });
 
   // single-flight lease
   const now = new Date();
@@ -43,22 +47,17 @@ Deno.serve(async (req) => {
       const { data: sup } = await sb.from('suppressed_emails').select('id').eq('email', p.email).maybeSingle();
       if (sup) { await sb.from('prospects').update({ email_status: 'done', do_not_contact: true, stage: 'do_not_contact' }).eq('id', p.id); continue; }
       const step = p.email_step + 1;
-      const trade = String(p.category || 'service').toLowerCase();
-      const subject = step === 1 ? (p.email_subject || 'Keeping your trucks on the road')
-        : step === 2 ? `The real cost of a truck at the shop`
-        : `A free 15-minute look at one of your vehicles?`;
-      const bodyText = step === 1
-        ? String(p.email_body || '').replaceAll('{{name}}', p.name)
-        : step === 2
-        ? `Hi ${p.name} team,\n\nQuick follow-up. When a work truck goes to a repair shop, it's rarely just the repair bill. It's the drive over, the wait, and often two of your crew sitting in a waiting room instead of on a ${trade} job.\n\nWe come to your lot instead, so your people keep working while we handle the vehicle.\n\nWorth a quick call?\n\n— Mike, Mike's Mobile Auto Repair`
-        : `Hi ${p.name} team,\n\nLast note from me. If it's easier, I can stop by your yard and take a 15-minute look at one truck or van, no commitment. You'll see exactly how mobile service works for your fleet.\n\nJust reply with a good day, or call/text 813-501-7572.\n\n— Mike, Mike's Mobile Auto Repair`;
-
-      const r = await sendAndLog({
-        templateName: 'fleet-outreach', recipientEmail: p.email,
-        // Per-day key: dedupes retries within a day, but a failed send can be retried the next day.
-        idempotencyKey: `prospect-${p.id}-${step}-${today}-${now.getUTCHours()}`,
-        templateData: { subject, body: bodyText, step, mailingAddress: st.mailing_address },
+      const c = prospectEmail(p.category, p.name, step);
+      const subject = step === 1 && p.email_subject?.trim() && !/fleet partner/i.test(p.email_subject) ? p.email_subject : c.subject;
+      const bodyText = `${c.body}\n\n--\n${st.mailing_address}\nReply STOP and I won't email you again.`;
+      const resp = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${RESEND}`, 'Content-Type': 'application/json', 'Idempotency-Key': `prospect-${p.id}-${step}-${today}` },
+        body: JSON.stringify({ from: FROM, to: [p.email], reply_to: 'quinnm954@outlook.com', subject, text: bodyText }),
       });
+      const rj = await resp.json().catch(() => ({}));
+      const r = { status: resp.status, sent: resp.ok, error: resp.ok ? null : { message: JSON.stringify(rj) } };
+      await sb.from('email_send_log').insert({ template_name: 'fleet-outreach', recipient_email: p.email, status: resp.ok ? 'sent' : 'failed', message_id: rj?.id ?? null, error_message: r.error?.message ?? null, metadata: { subject, body: bodyText, via: 'sales-sender' } });
       if (r.status === 402 || r.status === 403 || r.status === 429) {
         await sb.from('prospect_email_state').update({ paused: true, pause_reason: `Email service returned ${r.status}: ${(r.error?.message ?? '').slice(0, 300)}` }).eq('id', 1);
         break;
