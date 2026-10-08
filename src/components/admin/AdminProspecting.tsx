@@ -23,7 +23,7 @@ type Prospect = {
   id: string; name: string; category: string; city: string; phone: string | null; website: string | null;
   email: string | null; address: string | null; rating: number | null; stage: string; do_not_contact: boolean;
   notes: string | null; email_subject: string | null; email_body: string | null; call_script: string | null;
-  email_status: string; email_step: number; last_contacted_at: string | null;
+  email_status: string; email_step: number; next_email_at?: string | null; last_contacted_at: string | null;
 };
 type EmailState = { paused: boolean; pause_reason: string | null; sent_today: number; sent_day: string | null; daily_cap: number; mailing_address: string | null };
 
@@ -63,7 +63,6 @@ export default function AdminProspecting() {
     return [...visible].sort((a, b) => rank(a) - rank(b));
   }, [rows, filter]);
   const drafts = rows.filter((r) => r.email_status === 'draft' && r.email && !r.do_not_contact);
-  const now = Date.now();
   const firstPending = rows.filter((r) => r.email_status === 'approved' && r.email_step === 0 && r.email && !r.do_not_contact);
   const followUps = rows.filter((r) => r.email_status === 'approved' && r.email_step > 0 && !r.do_not_contact);
   const nextFollowUp = followUps.map((r) => r.next_email_at).filter(Boolean).sort()[0] as string | undefined;
@@ -75,7 +74,6 @@ export default function AdminProspecting() {
     : r.email_status === 'approved' ? (!r.email ? "Can't send" : r.email_step === 0 ? 'First email pending'
       : `Follow-up ${r.email_step + 1}/3${r.next_email_at ? ` · ${new Date(r.next_email_at).toLocaleDateString()}` : ''}`)
     : r.email_status === 'done' ? (r.email_step > 0 ? `Sent ${r.email_step}/3 · done` : 'Skipped') : r.email_status;
-  void now;
   const needPitch = rows.filter((r) => !r.email_body && !r.do_not_contact);
 
   const run = async (key: string, fn: () => Promise<void>) => {
