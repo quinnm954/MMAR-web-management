@@ -5,9 +5,9 @@ import { BrandHeader, BrandCard, BrandFooter } from './_brand.tsx'
 
 const SITE_NAME = "Mike's Mobile Auto Repair"
 
-interface Props { customerName?: string }
+interface Props { customerName?: string; customerId?: string }
 
-const ReviewRequestEmail = ({ customerName }: Props) => (
+const ReviewRequestEmail = ({ customerName, customerId }: Props) => (
   <Html lang="en">
     <Head />
     <Preview>How did we do?</Preview>
