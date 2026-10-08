@@ -23,3 +23,4 @@
 - New 'chat' mode reading `message_threads`/`messages` (same queries as src/pages/Messages.tsx), with realtime and reply. Included in the Inbox feed.
 - AdminDashboard: drop the calls/texts/emails tabs and the group entries. Map `?tab=calls|texts|emails` to `phone`. Remove MessagesBellLink from the admin header. The /messages route stays for customer/tech roles; admins are redirected to the Phone page.
 - Update AGENTS.md rule about the Phone workspace (it now replaces the Front Desk screens).
+- Inbound email: link the Microsoft Outlook connector (shop-owned). New edge function `outlook-inbox-sync`, run by cron every 5 min, reads `/me/mailFolders/inbox/messages` newer than the last sync and upserts into `inbound_messages` (dedupe on Graph message id; match from_email to profiles for customer link). Phone-page replies to inbound mail use Graph `/me/messages/{id}/reply`; other sends keep the existing managed sender.
