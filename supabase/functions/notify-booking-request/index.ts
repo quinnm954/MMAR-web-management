@@ -4,6 +4,7 @@
 import { createClient } from 'npm:@supabase/supabase-js@2'
 import { z } from 'npm:zod@3.23.8'
 import { sendAndLog } from '../_shared/send-and-log.ts'
+import { buildLaborQuote, createDraftEstimate } from '../_shared/labor-quote.ts'
 import { corsHeaders, json } from '../_shared/staff-auth.ts'
 
 const ADMIN_EMAIL = 'quinnm954@gmail.com'
@@ -51,5 +52,13 @@ Deno.serve(async (req) => {
     idempotencyKey: `booking-req-admin-${b.id}`,
     templateData: { ...shared, adminUrl: `${SITE_URL}/admin/bookings` },
   })
+  // Read the description for job clues and leave an unsent draft estimate so nothing is booked without a price.
+  if (!b.draft_estimate_id) {
+    try {
+      const q = await buildLaborQuote(sb, b)
+      const id = q.kind === 'none' ? null : await createDraftEstimate(sb, b, q)
+      if (id) await sb.from('booking_requests').update({ draft_estimate_id: id }).eq('id', b.id)
+    } catch (e) { console.error('draft estimate', e) }
+  }
   return json({ ok: true })
 })

@@ -35,6 +35,7 @@ interface BookingRequest {
   requested_time_window: string | null;
   notes: string | null;
   created_at: string;
+  draft_estimate_id?: string | null;
 }
 
 const STATUS_TONE: Record<string, string> = {
@@ -80,6 +81,7 @@ const AdminBookingRequests = () => {
   const [editing, setEditing] = useState<BookingRequest | null>(null);
   const [editForm, setEditForm] = useState(EMPTY_EDIT);
   const [savingEdit, setSavingEdit] = useState(false);
+  const [drafts, setDrafts] = useState<Record<string, { total: number; label: string }>>({});
 
   const load = async () => {
     setLoading(true);
@@ -89,7 +91,18 @@ const AdminBookingRequests = () => {
       .order("created_at", { ascending: false })
       .limit(200);
     if (error) toast.error(error.message);
-    setRows((data ?? []) as BookingRequest[]);
+    const list = (data ?? []) as BookingRequest[];
+    setRows(list);
+    const ids = list.map((r) => r.draft_estimate_id).filter(Boolean) as string[];
+    if (ids.length) {
+      const { data: est } = await supabase.from("estimates").select("id, total, line_items").in("id", ids);
+      const map: Record<string, { total: number; label: string }> = {};
+      (est ?? []).forEach((e: any) => {
+        const li = Array.isArray(e.line_items) ? e.line_items : [];
+        map[e.id] = { total: Number(e.total) || 0, label: li.length ? li.map((l: any) => l.description).join(", ") : "add labor & parts" };
+      });
+      setDrafts(map);
+    }
     setLoading(false);
   };
 
@@ -273,6 +286,16 @@ const AdminBookingRequests = () => {
                 <div><span className="text-muted-foreground">Service:</span> {r.service_type}</div>
                 {r.description && (
                   <div className="text-muted-foreground text-xs">"{r.description}"</div>
+                )}
+                {r.source === "website" && (
+                  r.draft_estimate_id && drafts[r.draft_estimate_id] ? (
+                    <div className="rounded-md border border-primary/30 bg-primary/5 px-2 py-1 text-xs">
+                      <span className="font-medium">Draft price: ${Number(drafts[r.draft_estimate_id].total || 0).toFixed(2)}</span>
+                      <span className="text-muted-foreground"> · {drafts[r.draft_estimate_id].label} · review in Estimates before sending</span>
+                    </div>
+                  ) : (
+                    <div className="rounded-md border border-accent/40 bg-accent/10 px-2 py-1 text-xs">Needs quote — no price could be read from the description</div>
+                  )
                 )}
                 {r.vehicle_info && <div><span className="text-muted-foreground">Vehicle:</span> {r.vehicle_info}</div>}
                 {r.service_address && <div><span className="text-muted-foreground">Address:</span> {r.service_address}</div>}
