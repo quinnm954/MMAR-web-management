@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { format, formatDistanceToNow } from 'date-fns';
 import {
   ArrowLeft, Bot, FileEdit, Inbox, Mail, MessageCircle, Phone, PhoneCall,
-  PhoneIncoming, PhoneMissed, Plus, RefreshCw, Reply, Search, Send,
+  PhoneIncoming, PhoneMissed, Plus, MessagesSquare, RefreshCw, Reply, Search, Send,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { dialInApp } from '@/components/admin/Softphone';
@@ -15,9 +15,12 @@ import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
-type Mode = 'inbox' | 'calls' | 'texts' | 'email';
+type Mode = 'inbox' | 'calls' | 'texts' | 'chat' | 'email';
 type EmailFolder = 'inbox' | 'sent' | 'drafts';
-type Selected = { kind: 'call' | 'text' | 'email'; id: string } | null;
+type Kind = 'call' | 'text' | 'chat' | 'email';
+type Selected = { kind: Kind; id: string } | null;
+type ChatThread = { id: string; subject: string | null; customer_id: string | null; tech_id: string | null; created_by: string; last_message_at: string; last_message_preview: string | null };
+type ChatMessage = { id: string; thread_id: string; sender_id: string; body: string; created_at: string };
 
 type NamedPhone = { name: string; tag: string };
 
@@ -71,7 +74,7 @@ type EmailItem = {
 };
 
 type FeedItem = {
-  kind: 'call' | 'text' | 'email';
+  kind: Kind;
   id: string;
   title: string;
   subtitle: string;
@@ -109,6 +112,11 @@ export default function AdminPhoneHub() {
   const [composeThreadId, setComposeThreadId] = useState<string | null>(null);
   const [composeDraftId, setComposeDraftId] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
+  const [chats, setChats] = useState<ChatThread[]>([]);
+  const [chatNames, setChatNames] = useState<Record<string, string>>({});
+  const [chatMsgs, setChatMsgs] = useState<ChatMessage[]>([]);
+  const [chatReads, setChatReads] = useState<Record<string, string>>({});
+  const [me, setMe] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -116,7 +124,7 @@ export default function AdminPhoneHub() {
       supabase.from('call_logs').select('*').order('created_at', { ascending: false }).limit(200),
       supabase.from('sms_threads').select('*').order('last_message_at', { ascending: false }).limit(200),
       supabase.from('inbound_messages').select('*').order('received_at', { ascending: false }).limit(200),
-      supabase.from('email_send_log').select('*').order('created_at', { ascending: false }),
+      supabase.from('email_send_log').select('*').order('created_at', { ascending: false }).limit(1000),
       supabase.from('email_drafts').select('*').order('updated_at', { ascending: false }).limit(100),
       supabase.from('profiles').select('id, full_name, phone').not('phone', 'is', null),
       supabase.from('employees').select('full_name, phone, user_id').not('phone', 'is', null),
@@ -157,6 +165,25 @@ export default function AdminPhoneHub() {
       threadId: row.thread_id, status: 'draft', at: row.updated_at,
     }));
     setEmails([...inbound, ...sent, ...drafts]);
+    const { data: auth } = await supabase.auth.getUser();
+    const uid = auth.user?.id || null;
+    setMe(uid);
+    const { data: ct } = await supabase.from('message_threads').select('*').order('last_message_at', { ascending: false }).limit(200);
+    const chatList = (ct ?? []) as ChatThread[];
+    setChats(chatList);
+    const ids = Array.from(new Set(chatList.flatMap(t => [t.customer_id, t.tech_id, t.created_by]).filter(Boolean))) as string[];
+    if (ids.length) {
+      const { data: ps } = await supabase.from('profiles').select('id, full_name, email').in('id', ids);
+      const map: Record<string, string> = {};
+      (ps ?? []).forEach((p: any) => { map[p.id] = p.full_name || p.email || 'Customer'; });
+      setChatNames(map);
+    }
+    if (uid) {
+      const { data: rd } = await supabase.from('message_reads').select('thread_id, last_read_at').eq('user_id', uid);
+      const rm: Record<string, string> = {};
+      (rd ?? []).forEach((x: any) => { rm[x.thread_id] = x.last_read_at; });
+      setChatReads(rm);
+    }
     setLoading(false);
   }, []);
 
@@ -168,12 +195,23 @@ export default function AdminPhoneHub() {
       .on('postgres_changes', { event: '*', schema: 'public', table: 'sms_messages' }, load)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'inbound_messages' }, load)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'email_send_log' }, load)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'message_threads' }, load)
       .subscribe();
     return () => { supabase.removeChannel(channel); };
   }, [load]);
 
   const displayPhone = (phone?: string | null) => names[phoneKey(phone)]?.name || phone || 'Unknown caller';
   const displayTag = (phone?: string | null) => names[phoneKey(phone)]?.tag;
+
+  const chatTitle = (t: ChatThread) => {
+    const who = t.customer_id ? chatNames[t.customer_id] : t.tech_id ? chatNames[t.tech_id] : chatNames[t.created_by];
+    return who || t.subject || 'In-app chat';
+  };
+  const chatFeed = (t: ChatThread): FeedItem => ({
+    kind: 'chat', id: t.id, title: chatTitle(t),
+    subtitle: `${t.tech_id ? 'Tech chat' : 'App chat'} · ${t.last_message_preview || t.subject || ''}`,
+    at: t.last_message_at, unread: !chatReads[t.id] || chatReads[t.id] < t.last_message_at,
+  });
 
   const feed = useMemo<FeedItem[]>(() => {
     const callItems: FeedItem[] = calls.map(call => ({
@@ -185,27 +223,39 @@ export default function AdminPhoneHub() {
       kind: 'text', id: thread.id, title: displayPhone(thread.phone), subtitle: thread.last_message_preview || 'Text conversation',
       at: thread.last_message_at, unread: thread.unread_count > 0,
     }));
+    const chatItems: FeedItem[] = chats.map(t => chatFeed(t));
     const emailItems: FeedItem[] = emails.filter(item => item.kind !== 'draft').map(item => ({
       kind: 'email', id: item.id, title: item.kind === 'sent' ? item.to : item.from,
       subtitle: `${item.subject} · ${item.snippet}`, at: item.at, unread: !!item.unread,
     }));
-    return [...callItems, ...textItems, ...emailItems].sort((a, b) => b.at.localeCompare(a.at));
-  }, [calls, threads, emails, names]);
+    return [...callItems, ...textItems, ...chatItems, ...emailItems].sort((a, b) => b.at.localeCompare(a.at));
+  }, [calls, threads, emails, names, chats, chatNames, chatReads]);
 
   const q = search.trim().toLowerCase();
   const visibleFeed = feed.filter(item => !q || `${item.title} ${item.subtitle}`.toLowerCase().includes(q));
   const visibleCalls = calls.filter(call => !q || `${displayPhone(call.from_number)} ${call.from_number} ${call.ai_summary || ''}`.toLowerCase().includes(q));
   const visibleThreads = threads.filter(thread => !q || `${displayPhone(thread.phone)} ${thread.phone} ${thread.last_message_preview || ''}`.toLowerCase().includes(q));
-  const visibleEmails = emails.filter(item => item.kind === emailFolder.slice(0, -1) || (emailFolder === 'inbox' && item.kind === 'inbound'))
+  const folderKind = { inbox: 'inbound', sent: 'sent', drafts: 'draft' } as const;
+  const visibleEmails = emails.filter(item => item.kind === folderKind[emailFolder])
     .filter(item => !q || `${item.from} ${item.to} ${item.subject} ${item.snippet}`.toLowerCase().includes(q))
     .sort((a, b) => b.at.localeCompare(a.at));
 
   const activeCall = selected?.kind === 'call' ? calls.find(call => call.id === selected.id) || null : null;
   const activeThread = selected?.kind === 'text' ? threads.find(thread => thread.id === selected.id) || null : null;
+  const activeChat = selected?.kind === 'chat' ? chats.find(t => t.id === selected.id) || null : null;
   const activeEmail = selected?.kind === 'email' ? emails.find(email => email.id === selected.id) || null : null;
 
-  const openItem = async (kind: 'call' | 'text' | 'email', id: string) => {
+  const openItem = async (kind: Kind, id: string) => {
     setSelected({ kind, id });
+    if (kind === 'chat') {
+      const { data } = await supabase.from('messages').select('*').eq('thread_id', id).order('created_at', { ascending: true });
+      setChatMsgs((data ?? []) as ChatMessage[]);
+      if (me) {
+        const now = new Date().toISOString();
+        await supabase.from('message_reads').upsert({ thread_id: id, user_id: me, last_read_at: now });
+        setChatReads(c => ({ ...c, [id]: now }));
+      }
+    }
     if (kind === 'text') {
       const { data } = await supabase.from('sms_messages').select('*').eq('thread_id', id).order('created_at', { ascending: true });
       setMessages((data ?? []) as SmsMessage[]);
@@ -224,6 +274,16 @@ export default function AdminPhoneHub() {
       await supabase.from('inbound_messages').update({ read_at: new Date().toISOString() }).eq('id', id.slice(3));
       setEmails(current => current.map(item => item.id === id ? { ...item, unread: false } : item));
     }
+  };
+
+  const sendChat = async () => {
+    if (!activeChat || !me || !reply.trim()) return;
+    setSending(true);
+    const { error } = await supabase.from('messages').insert({ thread_id: activeChat.id, sender_id: me, body: reply.trim() });
+    setSending(false);
+    if (error) return toast.error(error.message);
+    setReply('');
+    await openItem('chat', activeChat.id);
   };
 
   const sendText = async () => {
@@ -284,12 +344,13 @@ export default function AdminPhoneHub() {
     setTimeout(load, 2000);
   };
 
-  const switchMode = (next: Mode) => { setMode(next); setSelected(null); setMessages([]); };
+  const switchMode = (next: Mode) => { setMode(next); setSelected(null); setMessages([]); setReply(''); };
   const hasDetail = !!selected;
 
   const FeedIcon = ({ kind, missed }: { kind: FeedItem['kind']; missed?: boolean }) => {
     if (kind === 'text') return <MessageCircle className="h-5 w-5" />;
     if (kind === 'email') return <Mail className="h-5 w-5" />;
+    if (kind === 'chat') return <MessagesSquare className="h-5 w-5" />;
     return missed ? <PhoneMissed className="h-5 w-5" /> : <PhoneIncoming className="h-5 w-5" />;
   };
 
@@ -299,6 +360,8 @@ export default function AdminPhoneHub() {
       ? visibleCalls.map(call => ({ kind: 'call' as const, id: call.id, title: displayPhone(call.direction === 'outbound' ? call.to_number : call.from_number), subtitle: `${call.status === 'missed' || call.status === 'no-answer' ? 'Missed' : call.direction === 'outbound' ? 'Outgoing' : 'Incoming'} call · ${formatDuration(call.duration_seconds)}`, at: call.created_at, unread: !call.read_at }))
       : mode === 'texts'
         ? visibleThreads.map(thread => ({ kind: 'text' as const, id: thread.id, title: displayPhone(thread.phone), subtitle: thread.last_message_preview || 'New conversation', at: thread.last_message_at, unread: thread.unread_count > 0 }))
+        : mode === 'chat'
+        ? chats.map(chatFeed).filter(item => !q || `${item.title} ${item.subtitle}`.toLowerCase().includes(q))
         : visibleEmails.map(email => ({ kind: 'email' as const, id: email.id, title: email.kind === 'sent' ? email.to : email.from, subtitle: `${email.subject} · ${email.snippet}`, at: email.at, unread: !!email.unread }));
 
   return (
@@ -338,13 +401,13 @@ export default function AdminPhoneHub() {
           <div className="flex-1 min-h-0 overflow-y-auto">
             {listContent.length === 0 ? (
               <div className="h-full grid place-items-center text-center p-8 text-muted-foreground">
-                <div><Phone className="h-9 w-9 mx-auto mb-3 opacity-40" /><p className="text-sm">{loading ? 'Loading…' : 'Nothing here yet'}</p></div>
+                <div><Phone className="h-9 w-9 mx-auto mb-3 opacity-40" /><p className="text-sm">{loading ? 'Loading…' : mode === 'email' && emailFolder === 'inbox' ? 'No incoming email yet. Replies currently go to your Outlook until it is connected here.' : 'Nothing here yet'}</p></div>
               </div>
             ) : listContent.map((item, index) => {
               const missed = item.kind === 'call' && item.subtitle.toLowerCase().includes('missed');
               return (
                 <Button key={`${item.kind}:${item.id}`} variant="ghost" onClick={() => openItem(item.kind, item.id)} className="w-full h-auto rounded-none px-5 py-3.5 justify-start gap-3 border-b border-border/45 hover:bg-muted/45">
-                  <span className={cn('h-11 w-11 shrink-0 rounded-2xl grid place-items-center', item.kind === 'text' && 'bg-primary/15 text-primary', item.kind === 'email' && 'bg-accent/15 text-accent', item.kind === 'call' && !missed && 'bg-primary/15 text-primary', missed && 'bg-destructive/15 text-destructive')}>
+                  <span className={cn('h-11 w-11 shrink-0 rounded-2xl grid place-items-center', (item.kind === 'text' || item.kind === 'chat') && 'bg-primary/15 text-primary', item.kind === 'email' && 'bg-accent/15 text-accent', item.kind === 'call' && !missed && 'bg-primary/15 text-primary', missed && 'bg-destructive/15 text-destructive')}>
                     <FeedIcon kind={item.kind} missed={missed} />
                   </span>
                   <span className="min-w-0 flex-1 text-left">
@@ -360,9 +423,9 @@ export default function AdminPhoneHub() {
             })}
           </div>
 
-          <div className="h-20 border-t border-border/60 grid grid-cols-4 px-2 pb-3 bg-card/95">
+          <div className="h-20 border-t border-border/60 grid grid-cols-5 px-1 pb-3 bg-card/95">
             {([
-              ['inbox', Inbox, 'Inbox'], ['calls', PhoneCall, 'Calls'], ['texts', MessageCircle, 'Texts'], ['email', Mail, 'Email'],
+              ['inbox', Inbox, 'Inbox'], ['calls', PhoneCall, 'Calls'], ['texts', MessageCircle, 'Texts'], ['chat', MessagesSquare, 'Chat'], ['email', Mail, 'Email'],
             ] as const).map(([value, Icon, label]) => (
               <Button key={value} variant="ghost" className={cn('h-full flex-col gap-1 rounded-xl text-[10px]', mode === value ? 'text-primary' : 'text-muted-foreground')} onClick={() => switchMode(value)}>
                 <Icon className="h-5 w-5" /><span>{label}</span>
@@ -381,6 +444,8 @@ export default function AdminPhoneHub() {
             <CallDetail call={activeCall} name={displayPhone(activeCall.direction === 'outbound' ? activeCall.to_number : activeCall.from_number)} tag={displayTag(activeCall.from_number)} onBack={() => setSelected(null)} onCall={() => activeCall.from_number && dialInApp(activeCall.from_number)} onText={() => activeCall.from_number && startText(activeCall.from_number)} />
           ) : activeThread ? (
             <TextDetail thread={activeThread} name={displayPhone(activeThread.phone)} tag={displayTag(activeThread.phone)} messages={messages} reply={reply} sending={sending} onReply={setReply} onSend={sendText} onBack={() => setSelected(null)} onCall={() => dialInApp(activeThread.phone)} />
+          ) : activeChat ? (
+            <ChatDetail title={chatTitle(activeChat)} subtitle={activeChat.subject || (activeChat.tech_id ? 'tech chat' : 'app chat')} me={me} messages={chatMsgs} names={chatNames} reply={reply} sending={sending} onReply={setReply} onSend={sendChat} onBack={() => setSelected(null)} />
           ) : activeEmail ? (
             <EmailDetail email={activeEmail} onBack={() => setSelected(null)} onReply={() => openEmailCompose(activeEmail)} onEdit={() => openEmailCompose(activeEmail)} />
           ) : null}
@@ -460,6 +525,21 @@ function TextDetail({ thread, name, tag, messages, reply, sending, onReply, onSe
         {messages.length === 0 && <div className="h-full grid place-items-center text-sm text-muted-foreground">No messages yet.</div>}
       </div>
       <div className="shrink-0 p-3 sm:p-4 border-t border-border bg-card/70 flex gap-2"><Textarea value={reply} onChange={event => onReply(event.target.value)} placeholder="Text message" rows={1} className="text-base min-h-11 max-h-28 resize-none rounded-2xl" /><Button size="icon" className="rounded-full shrink-0 mt-0.5" onClick={onSend} disabled={sending || !reply.trim()}><Send className="h-4 w-4" /></Button></div>
+    </>
+  );
+}
+
+function ChatDetail({ title, subtitle, me, messages, names, reply, sending, onReply, onSend, onBack }: { title: string; subtitle: string; me: string | null; messages: ChatMessage[]; names: Record<string, string>; reply: string; sending: boolean; onReply: (v: string) => void; onSend: () => void; onBack: () => void }) {
+  const boxRef = useRef<HTMLDivElement>(null);
+  useEffect(() => { const el = boxRef.current; if (el) el.scrollTop = el.scrollHeight; }, [messages]);
+  return (
+    <>
+      <DetailHeader title={title} subtitle={subtitle} onBack={onBack} />
+      <div ref={boxRef} className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4 sm:p-6 space-y-3">
+        {messages.map(m => { const mine = m.sender_id === me; return <div key={m.id} className={cn('flex', mine ? 'justify-end' : 'justify-start')}><div className={cn('max-w-[82%] rounded-2xl px-4 py-3 text-sm', mine ? 'bg-primary text-primary-foreground rounded-br-sm' : 'bg-muted rounded-bl-sm')}>{!mine && <p className="text-[10px] uppercase font-bold opacity-60 mb-1">{names[m.sender_id] || 'Customer'}</p>}<p className="whitespace-pre-wrap break-words [overflow-wrap:anywhere]">{m.body}</p><p className="text-[10px] opacity-60 mt-1">{format(new Date(m.created_at), 'MMM d, h:mm a')}</p></div></div>; })}
+        {messages.length === 0 && <div className="h-full grid place-items-center text-sm text-muted-foreground">No messages yet.</div>}
+      </div>
+      <div className="shrink-0 p-3 sm:p-4 border-t border-border bg-card/70 flex gap-2"><Textarea value={reply} onChange={e => onReply(e.target.value)} placeholder="Message" rows={1} className="text-base min-h-11 max-h-28 resize-none rounded-2xl" /><Button size="icon" className="rounded-full shrink-0 mt-0.5" onClick={onSend} disabled={sending || !reply.trim()}><Send className="h-4 w-4" /></Button></div>
     </>
   );
 }
