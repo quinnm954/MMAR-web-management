@@ -621,7 +621,7 @@ const AdminEstimates = () => {
                 )}
                 <div className="border rounded overflow-x-auto">
                   <Table>
-                    <TableHeader>
+                    <TableHeader className="max-sm:hidden">
                       <TableRow>
                         <TableHead className="w-28">Type</TableHead>
                         <TableHead>Description</TableHead>
@@ -637,8 +637,8 @@ const AdminEstimates = () => {
                       {(editing.line_items || []).map((l: LineItem, i: number) => {
                         const kind = l.kind ?? 'part';
                         return (
-                          <TableRow key={i}>
-                            <TableCell>
+                          <TableRow key={i} className="max-sm:grid max-sm:grid-cols-2 max-sm:gap-2 max-sm:p-3 max-sm:border-b [&>td]:max-sm:p-0 [&>td]:max-sm:before:block [&>td]:max-sm:before:text-[10px] [&>td]:max-sm:before:uppercase [&>td]:max-sm:before:text-muted-foreground [&>td]:max-sm:before:content-[attr(data-label)]">
+                            <TableCell data-label="Type">
                               <Select value={kind} onValueChange={(v) => updateLine(i, { kind: v as 'part' | 'labor' | 'fee' })}>
                                 <SelectTrigger className="h-8"><SelectValue /></SelectTrigger>
                                 <SelectContent>
@@ -648,20 +648,20 @@ const AdminEstimates = () => {
                                 </SelectContent>
                               </Select>
                             </TableCell>
-                            <TableCell>
+                            <TableCell data-label="Description" className="max-sm:col-span-2">
                               <Input value={l.description} onChange={e => updateLine(i, { description: e.target.value })} />
                               {kind === 'fee' && <span className="text-[10px] text-muted-foreground ml-1">Flat fee · no tax/shop</span>}
                               {kind === 'labor' && <span className="text-[10px] text-muted-foreground ml-1">Labor · no tax/shop</span>}
                               {kind === 'part' && <span className="text-[10px] text-muted-foreground ml-1">Auto-saved to catalog</span>}
                             </TableCell>
-                            <TableCell><Input type="number" step="0.5" value={l.quantity} onChange={e => updateLine(i, { quantity: parseFloat(e.target.value) || 0 })} /></TableCell>
-                            <TableCell><Input type="number" step="0.1" value={l.labor_hours ?? 0} onChange={e => updateLine(i, { labor_hours: parseFloat(e.target.value) || 0 })} title="Billable labor hours" disabled={kind === 'part'} /></TableCell>
-                            <TableCell><Input type="number" step="0.01" value={l.unit_price} onChange={e => updateLine(i, { unit_price: parseFloat(e.target.value) || 0 })} /></TableCell>
-                            <TableCell>
+                            <TableCell data-label="Qty"><Input type="number" step="0.5" value={l.quantity} onChange={e => updateLine(i, { quantity: parseFloat(e.target.value) || 0 })} /></TableCell>
+                            <TableCell data-label="Hrs"><Input type="number" step="0.1" value={l.labor_hours ?? 0} onChange={e => updateLine(i, { labor_hours: parseFloat(e.target.value) || 0 })} title="Billable labor hours" disabled={kind === 'part'} /></TableCell>
+                            <TableCell data-label="Unit price"><Input type="number" step="0.01" value={l.unit_price} onChange={e => updateLine(i, { unit_price: parseFloat(e.target.value) || 0 })} /></TableCell>
+                            <TableCell data-label="Unit cost">
                               <Input type="number" step="0.01" value={l.unit_cost ?? 0} onChange={e => updateLine(i, { unit_cost: parseFloat(e.target.value) || 0 })} disabled={kind !== 'part'} title="Part cost (for margin & catalog)" />
                             </TableCell>
-                            <TableCell className="text-right">${l.amount.toFixed(2)}</TableCell>
-                            <TableCell><Button size="icon" variant="ghost" onClick={() => removeLine(i)}><Trash2 className="h-4 w-4" /></Button></TableCell>
+                            <TableCell data-label="Amount" className="text-right">${l.amount.toFixed(2)}</TableCell>
+                            <TableCell data-label=""><Button size="icon" variant="ghost" onClick={() => removeLine(i)}><Trash2 className="h-4 w-4" /></Button></TableCell>
                           </TableRow>
                         );
                       })}
