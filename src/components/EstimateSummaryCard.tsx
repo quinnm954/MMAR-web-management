@@ -169,7 +169,7 @@ const EstimateSummaryCard = ({ className = "" }: { className?: string }) => {
           </div>
           {data.status && (
             <Badge variant="outline" className="capitalize">
-              {data.status.replace(/_/g, " ")}
+              {data.status === "converted" ? "complete" : data.status.replace(/_/g, " ")}
             </Badge>
           )}
         </div>
