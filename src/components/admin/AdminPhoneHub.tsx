@@ -503,7 +503,7 @@ function IPhoneFrame({ children }: { children: React.ReactNode }) {
       <span className="hidden lg:block absolute -left-[3px] top-[180px] h-14 w-[3px] rounded-l bg-[hsl(var(--ios-bezel))]" />
       <span className="hidden lg:block absolute -left-[3px] top-[250px] h-14 w-[3px] rounded-l bg-[hsl(var(--ios-bezel))]" />
       <span className="hidden lg:block absolute -right-[3px] top-[200px] h-20 w-[3px] rounded-r bg-[hsl(var(--ios-bezel))]" />
-      <div className="ios relative overflow-hidden h-[calc(100dvh-120px)] min-h-[560px] w-full lg:h-[852px] lg:max-h-[calc(100dvh-140px)] lg:w-[393px] lg:rounded-[55px] lg:border-[11px] lg:border-[hsl(var(--ios-bezel))] lg:shadow-[0_30px_80px_-20px_hsl(var(--ios-bg)/0.9)] lg:ring-1 lg:ring-[hsl(var(--ios-separator))]">
+      <div className="ios relative overflow-hidden h-[calc(100dvh-190px)] min-h-[520px] w-full lg:h-[852px] lg:max-h-[calc(100dvh-140px)] lg:w-[393px] lg:rounded-[55px] lg:border-[11px] lg:border-[hsl(var(--ios-bezel))] lg:shadow-[0_30px_80px_-20px_hsl(var(--ios-bg)/0.9)] lg:ring-1 lg:ring-[hsl(var(--ios-separator))]">
         {/* Dynamic Island */}
         <div className="hidden lg:block absolute top-[11px] left-1/2 -translate-x-1/2 h-[34px] w-[122px] rounded-full bg-[hsl(var(--ios-bg))] z-50" />
         {children}
@@ -673,7 +673,7 @@ function TextDetail({ thread, name, tag, messages, reply, sending, onReply, onSe
         <>
           <MessageMedia media={m.media_urls} />
           {m.body && <p className="whitespace-pre-wrap break-words [overflow-wrap:anywhere]">{m.body}</p>}
-          {m.direction === 'outbound' && m.status && m.status !== 'delivered' && m.status !== 'sent' && <p className="text-[10px] opacity-70 mt-0.5 capitalize">{m.status}</p>}
+          {m.direction === 'outbound' && m.status && /fail|undeliver/i.test(m.status) && <p className="text-[10px] opacity-70 mt-0.5 capitalize">{m.status}</p>}
         </>
       )} />
       <Composer value={reply} onChange={onReply} onSend={onSend} sending={sending} placeholder="Text Message" />

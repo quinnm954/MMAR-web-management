@@ -85,6 +85,7 @@
     background: hsl(var(--ios-bg));
     color: hsl(var(--ios-label));
   }
+  .ios h1, .ios h2, .ios h3, .ios h4 { font-family: inherit; text-transform: none; }
   .ios-frost {
     background: hsl(var(--ios-grouped) / 0.82);
     backdrop-filter: saturate(180%) blur(20px);
