@@ -418,7 +418,7 @@ export default function AdminPhoneHub() {
                         <span className={cn('truncate text-[17px] font-semibold', missed && 'text-[hsl(var(--ios-red))]')}>{item.title}</span>
                         <span className="flex items-center gap-1 text-[15px] text-[hsl(var(--ios-label-2))] shrink-0">{shortTime(item.at)}<ChevronRight className="h-4 w-4 opacity-60" /></span>
                       </span>
-                      <span className="block text-[15px] leading-snug text-[hsl(var(--ios-label-2))] line-clamp-2">{item.kind === 'call' && <FeedIcon kind={item.kind} missed={missed} />}{item.subtitle}</span>
+                      <span className="block text-[15px] leading-snug text-[hsl(var(--ios-label-2))] line-clamp-2">{item.kind === 'call' && (missed ? <PhoneMissed className="inline h-3.5 w-3.5 mr-1 -mt-0.5" /> : <PhoneIncoming className="inline h-3.5 w-3.5 mr-1 -mt-0.5" />)}{item.subtitle}</span>
                     </span>
                   </button>
                 );
