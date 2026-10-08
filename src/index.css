@@ -64,7 +64,38 @@
     --sidebar-accent-foreground: 0 0% 90%;
     --sidebar-border: 220 15% 20%;
     --sidebar-ring: 200 80% 55%;
+
+    /* iOS-style phone tokens (Phone page only) */
+    --ios-blue: 211 100% 52%;
+    --ios-green: 142 70% 49%;
+    --ios-red: 3 100% 61%;
+    --ios-bg: 0 0% 0%;
+    --ios-grouped: 240 6% 11%;
+    --ios-bubble: 240 4% 18%;
+    --ios-separator: 240 4% 22%;
+    --ios-label: 0 0% 100%;
+    --ios-label-2: 240 3% 60%;
+    --ios-fill: 240 4% 16%;
+    --ios-bezel: 220 6% 14%;
   }
+
+  .ios {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    background: hsl(var(--ios-bg));
+    color: hsl(var(--ios-label));
+  }
+  .ios-frost {
+    background: hsl(var(--ios-grouped) / 0.82);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+  }
+  .ios-bubble-out, .ios-bubble-in { position: relative; }
+  .ios-bubble-out::after, .ios-bubble-in::after {
+    content: ""; position: absolute; bottom: 0; width: 12px; height: 16px;
+  }
+  .ios-bubble-out::after { right: -5px; background: radial-gradient(circle at 0 0, transparent 11px, hsl(var(--ios-blue)) 12px); border-bottom-left-radius: 14px; clip-path: inset(0 0 0 0); }
+  .ios-bubble-in::after { left: -5px; background: radial-gradient(circle at 100% 0, transparent 11px, hsl(var(--ios-bubble)) 12px); }
 
   .dark {
     --background: 220 15% 8%;
