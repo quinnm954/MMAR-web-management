@@ -2463,6 +2463,7 @@ export type Database = {
           do_not_contact: boolean
           email: string | null
           email_body: string | null
+          email_source: string | null
           email_status: string
           email_step: number
           email_subject: string | null
@@ -2489,6 +2490,7 @@ export type Database = {
           do_not_contact?: boolean
           email?: string | null
           email_body?: string | null
+          email_source?: string | null
           email_status?: string
           email_step?: number
           email_subject?: string | null
@@ -2515,6 +2517,7 @@ export type Database = {
           do_not_contact?: boolean
           email?: string | null
           email_body?: string | null
+          email_source?: string | null
           email_status?: string
           email_step?: number
           email_subject?: string | null
