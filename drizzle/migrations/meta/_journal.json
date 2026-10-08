@@ -162,6 +162,13 @@
       "when": 1791431838690,
       "tag": "0022_booking_draft_estimate",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1791498370364,
+      "tag": "0023_complete_ro_on_invoice_paid",
+      "breakpoints": true
     }
   ]
 }

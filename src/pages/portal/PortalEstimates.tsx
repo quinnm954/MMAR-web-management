@@ -150,7 +150,7 @@ const PortalEstimates = () => {
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="font-mono text-sm font-medium">{e.estimate_number || `EST-${e.id.slice(0, 6)}`}</span>
-                        <Badge className={`${estStatusColor(e.status)} uppercase border text-[10px]`}>{e.status.replace("_", " ")}</Badge>
+                        <Badge className={`${estStatusColor(e.status)} uppercase border text-[10px]`}>{e.status === "converted" ? "complete" : e.status.replace("_", " ")}</Badge>
                       </div>
                       <div className="text-xs text-muted-foreground mt-0.5">
                         {new Date(e.created_at).toLocaleDateString()}

@@ -40,7 +40,7 @@ const STATUS_COLORS: Record<string, string> = {
   approved: 'bg-green-500/15 text-green-600 border-green-500/30',
   declined: 'bg-red-500/15 text-red-600 border-red-500/30',
   expired: 'bg-yellow-500/15 text-yellow-700 border-yellow-500/30',
-  converted: 'bg-purple-500/15 text-purple-600 border-purple-500/30',
+  converted: 'bg-emerald-500/15 text-emerald-600 border-emerald-500/30',
 };
 
 const AdminEstimates = () => {
@@ -517,7 +517,7 @@ const AdminEstimates = () => {
     { key: 'draft', label: 'Draft', test: s => s === 'draft' },
     { key: 'sent', label: 'Sent', test: s => s === 'sent' || s === 'viewed' },
     { key: 'approved', label: 'Approved', test: s => s === 'approved' || s === 'partially_approved' },
-    { key: 'converted', label: 'In repair', test: s => s === 'converted' },
+    { key: 'converted', label: 'Complete', test: s => s === 'converted' },
     { key: 'declined', label: 'Declined', test: s => s === 'declined' || s === 'expired' },
   ];
   const base = estimates
@@ -561,7 +561,7 @@ const AdminEstimates = () => {
                 <TableRow>
                   <TableCell className="font-mono text-xs">{e.estimate_number}</TableCell>
                   <TableCell>{customerName(e.customer_id)}</TableCell>
-                  <TableCell><Badge variant="outline" className={STATUS_COLORS[e.status]}>{e.status}</Badge></TableCell>
+                  <TableCell><Badge variant="outline" className={STATUS_COLORS[e.status]}>{e.status === 'converted' ? 'complete' : e.status.replace('_', ' ')}</Badge></TableCell>
                   <TableCell className="text-right">${Number(e.total).toFixed(2)}</TableCell>
                   <TableCell className="text-xs text-muted-foreground">{e.valid_until || '—'}</TableCell>
                   <TableCell>
