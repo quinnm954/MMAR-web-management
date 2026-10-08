@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -17,6 +17,11 @@ export default function AdminSMS() {
   const [newPhone, setNewPhone] = useState('');
 
   const [invoicesById, setInvoicesById] = useState<Record<string, any>>({});
+  const boxRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = boxRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, [messages, active?.id]);
 
   const loadThreads = async () => {
     const { data } = await supabase
@@ -161,7 +166,7 @@ export default function AdminSMS() {
                 </Link>
               )}
             </CardHeader>
-            <CardContent className="flex-1 min-h-0 overflow-y-auto space-y-2">
+            <CardContent ref={boxRef} className="flex-1 min-h-0 overflow-y-auto space-y-2">
               {messages.map(m => {
                 const inv = m.invoice_id ? invoicesById[m.invoice_id] : null;
                 return (
