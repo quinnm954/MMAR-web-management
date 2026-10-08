@@ -380,7 +380,7 @@ export default function AdminPhoneHub() {
             <StatusBar />
             {/* Compact nav bar */}
             <div className="relative h-11 shrink-0 flex items-center justify-between px-4">
-              <button onClick={load} disabled={loading} className="text-[17px] text-[hsl(var(--ios-blue))]" title="Refresh">{loading ? <RefreshCw className="h-5 w-5 animate-spin" /> : 'Edit'}</button>
+              <button onClick={load} disabled={loading} className="text-[17px] text-[hsl(var(--ios-blue))]" title="Refresh"><RefreshCw className={cn('h-5 w-5', loading && 'animate-spin')} /></button>
               <span className={cn('absolute left-1/2 -translate-x-1/2 text-[17px] font-semibold transition-opacity', scrolled ? 'opacity-100' : 'opacity-0')}>{TITLES[mode]}</span>
               <button onClick={() => mode === 'email' ? openEmailCompose() : setDialOpen(true)} className="text-[hsl(var(--ios-blue))]" title={mode === 'email' ? 'Compose' : 'New'}>
                 {mode === 'email' || mode === 'texts' || mode === 'chat' ? <FileEdit className="h-[22px] w-[22px]" /> : <Plus className="h-6 w-6" />}
