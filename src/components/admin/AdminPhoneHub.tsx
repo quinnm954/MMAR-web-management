@@ -365,117 +365,131 @@ export default function AdminPhoneHub() {
         ? chats.map(chatFeed).filter(item => !q || `${item.title} ${item.subtitle}`.toLowerCase().includes(q))
         : visibleEmails.map(email => ({ kind: 'email' as const, id: email.id, title: email.kind === 'sent' ? email.to : email.from, subtitle: `${email.subject} · ${email.snippet}`, at: email.at, unread: !!email.unread }));
 
-  return (
-    <div className="min-h-[620px] lg:h-[calc(100dvh-230px)] lg:min-h-[680px] lg:max-h-[900px] flex items-center justify-center">
-      <div className="w-full h-[min(760px,calc(100dvh-140px))] min-h-[520px] lg:h-full grid grid-rows-[minmax(0,1fr)] lg:grid-cols-[400px_minmax(0,1fr)] overflow-hidden rounded-[2.75rem] border-[7px] border-secondary bg-card shadow-elevated ring-1 ring-border">
-        <section className={cn('relative min-w-0 min-h-0 flex flex-col bg-card overflow-hidden', hasDetail && 'hidden lg:flex')}>
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 h-6 w-32 rounded-b-2xl bg-secondary z-20" />
-          <div className="h-11 px-7 pt-4 flex items-center justify-between text-[11px] font-semibold z-10">
-            <span>{format(new Date(), 'h:mm')}</span>
-            <div className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-primary" /><span className="h-2.5 w-5 rounded-sm border border-muted-foreground p-px"><span className="block h-full w-3/4 rounded-[1px] bg-foreground" /></span></div>
-          </div>
+  const unreadBy = (k: Kind) => feed.filter(f => f.kind === k && f.unread).length;
+  const TITLES: Record<Mode, string> = { inbox: 'Recents', calls: 'Recents', texts: 'Messages', chat: 'Chat', email: emailFolder === 'inbox' ? 'Inbox' : emailFolder === 'sent' ? 'Sent' : 'Drafts' };
+  const [scrolled, setScrolled] = useState(false);
+  const pressKey = (k: string) => setDialNumber(n => (n + k).slice(0, 20));
 
-          <div className="px-5 pt-2 pb-4 border-b border-border/60">
-            <div className="flex items-center justify-between gap-3 mb-4">
-              <div>
-                <p className="text-[10px] uppercase tracking-[0.18em] text-primary font-bold">Garage Ace</p>
-                <h2 className="text-2xl font-display">Phone</h2>
-              </div>
-              <div className="flex gap-1">
-                <Button variant="ghost" size="icon" className="rounded-full" onClick={load} disabled={loading} title="Refresh"><RefreshCw className={cn('h-4 w-4', loading && 'animate-spin')} /></Button>
-                <Button size="icon" className="rounded-full" onClick={() => mode === 'email' ? openEmailCompose() : setDialOpen(true)} title={mode === 'email' ? 'Compose email' : 'Dial or text'}><Plus className="h-5 w-5" /></Button>
-              </div>
+  return (
+    <div className="flex items-center justify-center lg:py-6">
+      <IPhoneFrame>
+        {/* Screen stack: list (base) + detail (slides in) */}
+        <div className="relative h-full w-full overflow-hidden">
+          <section className={cn('absolute inset-0 flex flex-col transition-transform duration-300 ease-out', hasDetail && '-translate-x-1/4 opacity-60 pointer-events-none')}>
+            <StatusBar />
+            {/* Compact nav bar */}
+            <div className="relative h-11 shrink-0 flex items-center justify-between px-4">
+              <button onClick={load} disabled={loading} className="text-[17px] text-[hsl(var(--ios-blue))]" title="Refresh">{loading ? <RefreshCw className="h-5 w-5 animate-spin" /> : 'Edit'}</button>
+              <span className={cn('absolute left-1/2 -translate-x-1/2 text-[17px] font-semibold transition-opacity', scrolled ? 'opacity-100' : 'opacity-0')}>{TITLES[mode]}</span>
+              <button onClick={() => mode === 'email' ? openEmailCompose() : setDialOpen(true)} className="text-[hsl(var(--ios-blue))]" title={mode === 'email' ? 'Compose' : 'New'}>
+                {mode === 'email' || mode === 'texts' || mode === 'chat' ? <FileEdit className="h-[22px] w-[22px]" /> : <Plus className="h-6 w-6" />}
+              </button>
             </div>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input value={search} onChange={event => setSearch(event.target.value)} placeholder="Search names or numbers" className="pl-9 rounded-2xl bg-muted/60 border-border/60" />
+
+            <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain" onScroll={e => setScrolled(e.currentTarget.scrollTop > 30)}>
+              <h1 className="px-4 pt-1 pb-2 text-[34px] font-bold tracking-tight leading-tight">{TITLES[mode]}</h1>
+              <div className="px-4 pb-2">
+                <div className="relative">
+                  <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[hsl(var(--ios-label-2))]" />
+                  <input value={search} onChange={event => setSearch(event.target.value)} placeholder="Search" className="w-full h-9 rounded-[10px] bg-[hsl(var(--ios-fill))] pl-8 pr-3 text-[17px] placeholder:text-[hsl(var(--ios-label-2))] outline-none" />
+                </div>
+                {mode === 'email' && (
+                  <div className="grid grid-cols-3 mt-3 p-0.5 rounded-[9px] bg-[hsl(var(--ios-fill))]">
+                    {(['inbox', 'sent', 'drafts'] as EmailFolder[]).map(folder => (
+                      <button key={folder} onClick={() => setEmailFolder(folder)} className={cn('h-7 rounded-[7px] text-[13px] font-medium capitalize transition-colors', emailFolder === folder && 'bg-[hsl(var(--ios-bubble))] shadow')}>{folder}</button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {listContent.length === 0 ? (
+                <div className="py-24 text-center text-[hsl(var(--ios-label-2))]">
+                  <Phone className="h-9 w-9 mx-auto mb-3 opacity-40" /><p className="text-[15px]">{loading ? 'Loading…' : mode === 'email' && emailFolder === 'inbox' ? 'No incoming email yet.' : 'Nothing here yet'}</p>
+                </div>
+              ) : listContent.map(item => {
+                const missed = item.kind === 'call' && item.subtitle.toLowerCase().includes('missed');
+                return (
+                  <button key={`${item.kind}:${item.id}`} onClick={() => openItem(item.kind, item.id)} className="w-full flex items-center gap-3 pl-4 text-left active:bg-[hsl(var(--ios-fill))]">
+                    <span className="w-2.5 shrink-0 flex justify-center">{item.unread && <span className="h-2.5 w-2.5 rounded-full bg-[hsl(var(--ios-blue))]" />}</span>
+                    <Avatar name={item.title} />
+                    <span className="min-w-0 flex-1 py-2.5 pr-4 border-b border-[hsl(var(--ios-separator))]">
+                      <span className="flex items-baseline justify-between gap-2">
+                        <span className={cn('truncate text-[17px] font-semibold', missed && 'text-[hsl(var(--ios-red))]')}>{item.title}</span>
+                        <span className="flex items-center gap-1 text-[15px] text-[hsl(var(--ios-label-2))] shrink-0">{shortTime(item.at)}<ChevronRight className="h-4 w-4 opacity-60" /></span>
+                      </span>
+                      <span className="block text-[15px] leading-snug text-[hsl(var(--ios-label-2))] line-clamp-2">{item.kind === 'call' && <FeedIcon kind={item.kind} missed={missed} />}{item.subtitle}</span>
+                    </span>
+                  </button>
+                );
+              })}
+              <div className="h-24" />
             </div>
-            {mode === 'email' && (
-              <div className="grid grid-cols-3 gap-1 mt-3 p-1 rounded-xl bg-muted/60">
-                {(['inbox', 'sent', 'drafts'] as EmailFolder[]).map(folder => (
-                  <Button key={folder} size="sm" variant={emailFolder === folder ? 'secondary' : 'ghost'} className="h-8 capitalize rounded-lg" onClick={() => setEmailFolder(folder)}>{folder}</Button>
+
+            {/* Tab bar */}
+            <nav className="absolute bottom-0 inset-x-0 ios-frost border-t border-[hsl(var(--ios-separator))] grid grid-cols-4 pt-1.5 pb-7">
+              {([
+                ['calls', PhoneCall, 'Calls', 'call'], ['texts', MessageCircle, 'Texts', 'text'], ['chat', MessagesSquare, 'Chat', 'chat'], ['email', Mail, 'Email', 'email'],
+              ] as const).map(([value, Icon, label, kind]) => {
+                const n = unreadBy(kind);
+                return (
+                  <button key={value} onClick={() => switchMode(value)} className={cn('relative flex flex-col items-center gap-0.5 text-[10px] font-medium', mode === value ? 'text-[hsl(var(--ios-blue))]' : 'text-[hsl(var(--ios-label-2))]')}>
+                    <Icon className="h-6 w-6" fill={mode === value ? 'currentColor' : 'none'} strokeWidth={mode === value ? 1.5 : 2} />
+                    <span>{label}</span>
+                    {n > 0 && <span className="absolute -top-1 left-1/2 ml-1.5 min-w-[18px] h-[18px] px-1 rounded-full bg-[hsl(var(--ios-red))] text-[11px] leading-[18px] text-[hsl(var(--ios-label))] text-center">{n > 99 ? '99+' : n}</span>}
+                  </button>
+                );
+              })}
+            </nav>
+          </section>
+
+          <section className={cn('absolute inset-0 flex flex-col bg-[hsl(var(--ios-bg))] transition-transform duration-300 ease-out', hasDetail ? 'translate-x-0' : 'translate-x-full')}>
+            {selected && <StatusBar />}
+            {activeCall ? (
+              <CallDetail call={activeCall} name={displayPhone(activeCall.direction === 'outbound' ? activeCall.to_number : activeCall.from_number)} tag={displayTag(activeCall.from_number)} onBack={() => setSelected(null)} onCall={() => activeCall.from_number && dialInApp(activeCall.from_number)} onText={() => activeCall.from_number && startText(activeCall.from_number)} />
+            ) : activeThread ? (
+              <TextDetail thread={activeThread} name={displayPhone(activeThread.phone)} tag={displayTag(activeThread.phone)} messages={messages} reply={reply} sending={sending} onReply={setReply} onSend={sendText} onBack={() => setSelected(null)} onCall={() => dialInApp(activeThread.phone)} />
+            ) : activeChat ? (
+              <ChatDetail title={chatTitle(activeChat)} subtitle={activeChat.subject || (activeChat.tech_id ? 'tech chat' : 'app chat')} me={me} messages={chatMsgs} names={chatNames} reply={reply} sending={sending} onReply={setReply} onSend={sendChat} onBack={() => setSelected(null)} />
+            ) : activeEmail ? (
+              <EmailDetail email={activeEmail} onBack={() => setSelected(null)} onReply={() => openEmailCompose(activeEmail)} onEdit={() => openEmailCompose(activeEmail)} />
+            ) : null}
+          </section>
+
+          {/* Keypad sheet */}
+          <Sheet open={dialOpen} onClose={() => setDialOpen(false)}>
+            <div className="text-center pt-2">
+              <input value={dialNumber} onChange={e => setDialNumber(e.target.value)} inputMode="tel" placeholder="Enter number" className="w-full bg-transparent text-center text-[32px] font-light tracking-wide outline-none placeholder:text-[hsl(var(--ios-label-2))] placeholder:text-xl" />
+              <div className="grid grid-cols-3 gap-x-6 gap-y-3.5 w-fit mx-auto mt-5">
+                {[['1', ''], ['2', 'ABC'], ['3', 'DEF'], ['4', 'GHI'], ['5', 'JKL'], ['6', 'MNO'], ['7', 'PQRS'], ['8', 'TUV'], ['9', 'WXYZ'], ['*', ''], ['0', '+'], ['#', '']].map(([d, l]) => (
+                  <button key={d} onClick={() => pressKey(d)} className="h-[72px] w-[72px] rounded-full bg-[hsl(var(--ios-bubble))] active:bg-[hsl(var(--ios-separator))] flex flex-col items-center justify-center">
+                    <span className="text-[32px] leading-none font-normal">{d}</span>{l && <span className="text-[9px] tracking-[0.2em] font-semibold">{l}</span>}
+                  </button>
                 ))}
               </div>
-            )}
-          </div>
-
-          <div className="flex-1 min-h-0 overflow-y-auto">
-            {listContent.length === 0 ? (
-              <div className="h-full grid place-items-center text-center p-8 text-muted-foreground">
-                <div><Phone className="h-9 w-9 mx-auto mb-3 opacity-40" /><p className="text-sm">{loading ? 'Loading…' : mode === 'email' && emailFolder === 'inbox' ? 'No incoming email yet.' : 'Nothing here yet'}</p></div>
+              <div className="grid grid-cols-3 gap-x-6 w-fit mx-auto mt-4 items-center">
+                <button onClick={() => { setDialOpen(false); startText(dialNumber); }} disabled={!dialNumber} className="h-[72px] w-[72px] rounded-full grid place-items-center text-[hsl(var(--ios-blue))] disabled:opacity-40" title="Text"><MessageCircle className="h-7 w-7" /></button>
+                <button onClick={() => { setDialOpen(false); dialInApp(dialNumber); }} disabled={!dialNumber} className="h-[72px] w-[72px] rounded-full bg-[hsl(var(--ios-green))] grid place-items-center text-[hsl(var(--ios-label))] disabled:opacity-60" title="Call"><Phone className="h-8 w-8" fill="currentColor" /></button>
+                <button onClick={() => setDialNumber(n => n.slice(0, -1))} className="h-[72px] w-[72px] grid place-items-center text-[hsl(var(--ios-label-2))]" title="Delete"><Delete className="h-7 w-7" /></button>
               </div>
-            ) : listContent.map((item, index) => {
-              const missed = item.kind === 'call' && item.subtitle.toLowerCase().includes('missed');
-              return (
-                <Button key={`${item.kind}:${item.id}`} variant="ghost" onClick={() => openItem(item.kind, item.id)} className="w-full h-auto rounded-none px-5 py-3.5 justify-start gap-3 border-b border-border/45 hover:bg-muted/45">
-                  <span className={cn('h-11 w-11 shrink-0 rounded-2xl grid place-items-center', (item.kind === 'text' || item.kind === 'chat') && 'bg-primary/15 text-primary', item.kind === 'email' && 'bg-accent/15 text-accent', item.kind === 'call' && !missed && 'bg-primary/15 text-primary', missed && 'bg-destructive/15 text-destructive')}>
-                    <FeedIcon kind={item.kind} missed={missed} />
-                  </span>
-                  <span className="min-w-0 flex-1 text-left">
-                    <span className="flex items-baseline justify-between gap-2">
-                      <span className={cn('truncate text-sm', item.unread ? 'font-bold text-foreground' : 'font-semibold')}>{item.title}</span>
-                      <span className="text-[10px] text-muted-foreground shrink-0">{relativeTime(item.at)}</span>
-                    </span>
-                    <span className={cn('block truncate text-xs mt-1', missed ? 'text-destructive' : 'text-muted-foreground')}>{item.subtitle}</span>
-                  </span>
-                  {item.unread && <span className="h-2 w-2 rounded-full bg-primary shrink-0" />}
-                </Button>
-              );
-            })}
-          </div>
-
-          <div className="h-20 border-t border-border/60 grid grid-cols-5 px-1 pb-3 bg-card/95">
-            {([
-              ['calls', PhoneCall, 'Calls'], ['texts', MessageCircle, 'Texts'], ['chat', MessagesSquare, 'Chat'], ['email', Mail, 'Email'],
-            ] as const).map(([value, Icon, label]) => (
-              <Button key={value} variant="ghost" className={cn('h-full flex-col gap-1 rounded-xl text-[10px]', mode === value ? 'text-primary' : 'text-muted-foreground')} onClick={() => switchMode(value)}>
-                <Icon className="h-5 w-5" /><span>{label}</span>
-              </Button>
-            ))}
-          </div>
-          <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 h-1 w-24 rounded-full bg-muted-foreground/40" />
-        </section>
-
-        <section className={cn('min-w-0 min-h-0 overflow-hidden flex-col bg-background lg:border-l border-border', hasDetail ? 'flex' : 'hidden lg:flex')}>
-          {!selected ? (
-            <div className="flex-1 grid place-items-center text-center text-muted-foreground p-8">
-              <div><Phone className="h-12 w-12 mx-auto mb-4 text-primary/50" /><h3 className="text-xl font-display text-foreground">Your shop phone</h3><p className="text-sm mt-1">Open a call, text, or email to respond.</p></div>
             </div>
-          ) : activeCall ? (
-            <CallDetail call={activeCall} name={displayPhone(activeCall.direction === 'outbound' ? activeCall.to_number : activeCall.from_number)} tag={displayTag(activeCall.from_number)} onBack={() => setSelected(null)} onCall={() => activeCall.from_number && dialInApp(activeCall.from_number)} onText={() => activeCall.from_number && startText(activeCall.from_number)} />
-          ) : activeThread ? (
-            <TextDetail thread={activeThread} name={displayPhone(activeThread.phone)} tag={displayTag(activeThread.phone)} messages={messages} reply={reply} sending={sending} onReply={setReply} onSend={sendText} onBack={() => setSelected(null)} onCall={() => dialInApp(activeThread.phone)} />
-          ) : activeChat ? (
-            <ChatDetail title={chatTitle(activeChat)} subtitle={activeChat.subject || (activeChat.tech_id ? 'tech chat' : 'app chat')} me={me} messages={chatMsgs} names={chatNames} reply={reply} sending={sending} onReply={setReply} onSend={sendChat} onBack={() => setSelected(null)} />
-          ) : activeEmail ? (
-            <EmailDetail email={activeEmail} onBack={() => setSelected(null)} onReply={() => openEmailCompose(activeEmail)} onEdit={() => openEmailCompose(activeEmail)} />
-          ) : null}
-        </section>
-      </div>
+          </Sheet>
 
-      <Dialog open={dialOpen} onOpenChange={setDialOpen}>
-        <DialogContent className="sm:max-w-sm">
-          <DialogHeader><DialogTitle>New conversation</DialogTitle><DialogDescription>Enter a phone number to call or text.</DialogDescription></DialogHeader>
-          <Label htmlFor="phone-number">Phone number</Label>
-          <Input id="phone-number" type="tel" value={dialNumber} onChange={event => setDialNumber(event.target.value)} placeholder="(239) 555-1234" autoFocus />
-          <div className="grid grid-cols-2 gap-2">
-            <Button variant="outline" onClick={() => { setDialOpen(false); startText(dialNumber); }}><MessageCircle className="h-4 w-4 mr-2" />Text</Button>
-            <Button onClick={() => { setDialOpen(false); dialInApp(dialNumber); }}><Phone className="h-4 w-4 mr-2" />Call</Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={composeOpen} onOpenChange={setComposeOpen}>
-        <DialogContent className="sm:max-w-xl">
-          <DialogHeader><DialogTitle>{composeDraftId ? 'Edit draft' : composeThreadId ? 'Reply' : 'New email'}</DialogTitle><DialogDescription>Send from MMAR's verified mailbox.</DialogDescription></DialogHeader>
-          <div className="space-y-3">
-            <div className="space-y-1"><Label htmlFor="email-to">To</Label><Input id="email-to" type="email" value={composeTo} onChange={event => setComposeTo(event.target.value)} /></div>
-            <div className="space-y-1"><Label htmlFor="email-subject">Subject</Label><Input id="email-subject" value={composeSubject} onChange={event => setComposeSubject(event.target.value)} /></div>
-            <div className="space-y-1"><Label htmlFor="email-body">Message</Label><Textarea id="email-body" rows={10} value={composeBody} onChange={event => setComposeBody(event.target.value)} /></div>
-          </div>
-          <div className="flex justify-between gap-2"><Button variant="outline" onClick={saveDraft}>Save draft</Button><Button onClick={sendEmail} disabled={sending}><Send className="h-4 w-4 mr-2" />Send</Button></div>
-        </DialogContent>
-      </Dialog>
+          {/* Compose sheet */}
+          <Sheet open={composeOpen} onClose={() => setComposeOpen(false)} tall>
+            <div className="flex items-center justify-between -mt-1 mb-3">
+              <button onClick={() => setComposeOpen(false)} className="text-[17px] text-[hsl(var(--ios-blue))]">Cancel</button>
+              <span className="text-[17px] font-semibold">{composeDraftId ? 'Edit draft' : composeThreadId ? 'Reply' : 'New Message'}</span>
+              <button onClick={sendEmail} disabled={sending} className="h-8 w-8 rounded-full bg-[hsl(var(--ios-blue))] grid place-items-center disabled:opacity-50" title="Send"><ArrowUp className="h-5 w-5" /></button>
+            </div>
+            <div className="divide-y divide-[hsl(var(--ios-separator))] border-y border-[hsl(var(--ios-separator))] text-[15px]">
+              <label className="flex gap-2 py-2.5"><span className="text-[hsl(var(--ios-label-2))]">To:</span><input type="email" value={composeTo} onChange={e => setComposeTo(e.target.value)} className="flex-1 bg-transparent outline-none" /></label>
+              <label className="flex gap-2 py-2.5"><span className="text-[hsl(var(--ios-label-2))]">Subject:</span><input value={composeSubject} onChange={e => setComposeSubject(e.target.value)} className="flex-1 bg-transparent outline-none" /></label>
+            </div>
+            <textarea value={composeBody} onChange={e => setComposeBody(e.target.value)} className="w-full flex-1 min-h-[260px] bg-transparent outline-none text-[16px] pt-3 resize-none" />
+            <button onClick={saveDraft} className="text-[15px] text-[hsl(var(--ios-blue))] mt-2">Save draft</button>
+          </Sheet>
+        </div>
+      </IPhoneFrame>
     </div>
   );
 }
