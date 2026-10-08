@@ -578,13 +578,13 @@ const AdminEstimates = () => {
                     </SelectContent>
                   </Select>
                 </div>
-                <div><Label>Valid Until</Label><Input type="date" value={editing.valid_until ?? ''} onChange={e => setEditing({ ...editing, valid_until: e.target.value })} /></div>
+                <div><Label>Valid Until</Label><Input type="date" className="min-w-0 max-w-full appearance-none" value={editing.valid_until ?? ''} onChange={e => setEditing({ ...editing, valid_until: e.target.value })} /></div>
               </div>
 
               <div className="space-y-2">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <Label>Line Items</Label>
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2">
                     <Button size="sm" variant="outline" onClick={() => addLine()}><Plus className="h-3 w-3 mr-1" /> Part</Button>
                     <Button size="sm" variant="outline" onClick={addLaborLine}><Plus className="h-3 w-3 mr-1" /> Labor</Button>
                     <Button size="sm" variant="outline" onClick={() => { setLaborOpen(o => !o); setLaborResults([]); }}><Wrench className="h-3 w-3 mr-1" /> Labor Guide</Button>
