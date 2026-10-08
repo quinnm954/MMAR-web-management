@@ -212,6 +212,7 @@ const Messages = () => {
 
   if (isLoading) return <div className="p-8 text-muted-foreground">Loading…</div>;
   if (!user) return <Navigate to="/login" replace />;
+  if (isAdmin) return <Navigate to="/admin/dashboard?tab=phone" replace />;
 
   const isTech = hasAnyRole(["technician"]);
 
