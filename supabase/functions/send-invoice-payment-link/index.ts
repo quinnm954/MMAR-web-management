@@ -77,6 +77,12 @@ Deno.serve(async (req) => {
         }
       }
       if (!phone) {
+        const { data: prof } = await admin.from("profiles").select("phone").eq("id", invoice.customer_id).maybeSingle();
+        const digits = String(prof?.phone || "").replace(/\D/g, "");
+        if (digits.length === 10) phone = `+1${digits}`;
+        else if (digits.length === 11 && digits.startsWith("1")) phone = `+${digits}`;
+      }
+      if (!phone) {
         return new Response(JSON.stringify({ error: "No phone number on file. Please provide one." }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
       }
     }
