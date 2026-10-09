@@ -1,30 +1,33 @@
-# Move dashboard into Reports, then a new 3D "Shop Pulse" dashboard
+# Move dashboard into Reports, then a new 3D Florida dashboard
 
 ## 1. Reports gets everything the dashboard has
 Add to Reports what isn't there yet:
 - Today's to-do card (drafts, expiring estimates, unpaid over 7 days, booking requests, unanswered texts, stuck jobs)
 - Monthly goal with progress bar and "Set a goal"
-- Today / Last 7 days / Year to date with 14-day trend lines and pace for the month
+- Today / Last 7 days / Year to date with trend lines and month pace
 - Collected vs billed, returning-customer share, labor margin
-- Money owed (unpaid balance, days to get paid, 0–7 / 8–30 / 30+ aging)
+- Money owed with aging (0–7 / 8–30 / 30+ days)
 - Pipeline (open estimates, close rate, value won)
-- Shop card (jobs done week/month, revenue and hours per job, open appointments, customers, members)
-- 12-month chart, 30-day chart vs previous 30 days, sales mix (diagnosis / labor / parts)
+- Shop card (jobs done, revenue and hours per job, open appointments, customers, members)
+- 12-month chart, 30-day vs previous 30 days, sales mix (diagnosis / labor / parts)
 
-Same numbers and rules as today; live updates kept.
+Same numbers and live updates as today.
 
-## 2. New blank-slate 3D dashboard: "Shop Pulse"
-A full-screen 3D scene you can spin, pinch and tap. The 4th dimension is time: a slider and play button replay your shop day by day.
+## 2. New dashboard: 3D Southwest Florida
+A full-screen 3D map of your service area that you can spin, tilt and pinch.
 
-- **Time spiral:** every day of the last 12 months is a glowing bar wound into a spiral. Height = revenue, color = profit (blue to gold). Tap a bar for that day's total and jobs.
-- **Play button (time travel):** sweeps through the year; the spiral grows day by day while a counter shows running revenue.
-- **Floating orbs:** this month's revenue, goal progress (orb fills up), money owed and open estimates. Tap one to open its page.
-- **Live pulse:** when an invoice is paid, a gold ripple shoots out from today's bar.
-- Dark sky with brand blue and gold; works on phone with touch.
-- A small "Details" button opens Reports for the full numbers.
+- **Raised land:** Southwest Florida coastline lifted off a dark ocean, with the Gulf, bays and islands (Cape Coral, Fort Myers, Estero, Naples, Immokalee and the other towns you serve).
+- **Revenue towers:** each town rises as a glowing column. Height = money earned there, color goes blue to gold as it earns more.
+- **Today's jobs:** pins float above each job's address, pulsing by status (scheduled, in progress, done). Tap a pin for customer, car and time.
+- **Time slider (the 4th dimension):** drag or press play to watch towers grow week by week across the year.
+- **Live:** when an invoice is paid, a gold ripple spreads from that town.
+- **Small top bar:** this month's revenue, goal progress and the to-do count, plus a "Full report" button to Reports.
+- Works with touch on your phone.
+
+Towns are placed by name from each job's address or the customer's saved address. Jobs with no clear town are listed under "Other".
 
 ## Technical details
-- Extract dashboard sections from `AdminSalesDashboard.tsx` into reusable pieces and render them inside `AdminReports.tsx`.
-- New `ShopPulse3D` using `three`, `@react-three/fiber@^8.18`, `@react-three/drei@^9.122` (React 18). Instanced bars for performance, OrbitControls, Lightformer environment (no CDN presets), DOM overlay for slider/labels.
-- Data from the same paid-invoice queries plus realtime channel; dashboard tab renders `ShopPulse3D` instead of the old cards.
-- Verify with screenshots on desktop and 390px phone.
+- Move dashboard sections from `AdminSalesDashboard.tsx` into reusable parts and show them inside `AdminReports.tsx`.
+- New `FloridaMap3D` with `three`, `@react-three/fiber@^8.18`, `@react-three/drei@^9.122`. Coastline is a built-in, simplified outline extruded into land (no map service or key needed). Towns are mapped to fixed coordinates in a town lookup table. Instanced towers, OrbitControls, Lightformer environment (no CDN presets), DOM overlay for slider and labels.
+- Data: paid invoices joined to appointments/profiles for the town, plus today's appointments, with the existing realtime refresh.
+- The dashboard tab renders `FloridaMap3D` in place of the old cards. Check with screenshots on desktop and a 390px phone.
