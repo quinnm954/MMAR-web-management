@@ -2,8 +2,9 @@ import { useLayoutEffect, useMemo, useRef } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { Suspense } from 'react';
-import { useGLTF, Environment, Lightformer } from '@react-three/drei';
-import gt500 from '@/assets/gt500.glb.asset.json';
+import { useGLTF, Environment, Lightformer, MeshReflectorMaterial } from '@react-three/drei';
+import { EffectComposer, Bloom, Vignette, SMAA, ToneMapping, ChromaticAberration } from '@react-three/postprocessing';
+import { ToneMappingMode, BlendFunction } from 'postprocessing';
 
 // World scrolls toward the camera (+z). Camera sits in the driver's seat looking down -z.
 const LENGTH = 240;          // recycled stretch of street
@@ -13,13 +14,14 @@ const speedAt = (t: number) => 38 + Math.sin(t * 0.18) * 14 + Math.sin(t * 0.07)
 const wrap = (z: number) => (z > 8 ? z - LENGTH : z);
 
 function windowTexture() {
-  const c = document.createElement('canvas'); c.width = 64; c.height = 128;
+  const c = document.createElement('canvas'); c.width = 256; c.height = 512;
   const g = c.getContext('2d')!;
-  g.fillStyle = '#05070c'; g.fillRect(0, 0, 64, 128);
-  for (let y = 4; y < 128; y += 10) for (let x = 4; x < 64; x += 10) {
-    if (Math.random() < 0.45) { g.fillStyle = Math.random() < 0.7 ? '#ffd27a' : '#9fd4ff'; g.globalAlpha = 0.4 + Math.random() * 0.6; g.fillRect(x, y, 6, 6); }
+  g.fillStyle = '#05070c'; g.fillRect(0, 0, 256, 512);
+  for (let y = 8; y < 512; y += 28) for (let x = 8; x < 256; x += 24) {
+    if (Math.random() < 0.45) { g.fillStyle = Math.random() < 0.7 ? '#ffd27a' : '#9fd4ff'; g.globalAlpha = 0.4 + Math.random() * 0.6; const gr = g.createLinearGradient(x, y, x, y + 18); gr.addColorStop(0, g.fillStyle as string); gr.addColorStop(1, '#3a2a10'); g.fillStyle = gr; g.fillRect(x, y, 16, 18); }
+    g.globalAlpha = 1; g.fillStyle = '#11141c'; g.fillRect(x - 2, y + 19, 20, 3);
   }
-  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.magFilter = THREE.NearestFilter;
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8;
   return t;
 }
 
@@ -56,7 +58,11 @@ function Road() {
     <>
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, -LENGTH / 2]}>
         <planeGeometry args={[14, LENGTH + 20]} />
-        <meshStandardMaterial color="#0c0e13" roughness={0.25} metalness={0.6} />
+        <MeshReflectorMaterial
+          resolution={512} mirror={0.75} blur={[300, 80]} mixBlur={0.9} mixStrength={6}
+          depthScale={1} minDepthThreshold={0.6} maxDepthThreshold={1.2}
+          color="#0a0c11" metalness={0.6} roughness={0.55}
+        />
       </mesh>
       {/* sidewalks */}
       {[-9, 9].map((x) => (
@@ -65,7 +71,7 @@ function Road() {
           <meshStandardMaterial color="#1a1c22" roughness={0.9} />
         </mesh>
       ))}
-      <instancedMesh ref={lines} args={[undefined, undefined, N]}>
+      <instancedMesh ref={lines} args={[undefined, undefined, N]} frustumCulled={false}>
         <boxGeometry args={[0.18, 0.01, 2.4]} />
         <meshBasicMaterial color="#e8e2c8" toneMapped={false} />
       </instancedMesh>
@@ -92,9 +98,9 @@ function Buildings() {
     ref.current!.instanceMatrix.needsUpdate = true;
   });
   return (
-    <instancedMesh ref={ref} args={[undefined, undefined, N]}>
+    <instancedMesh ref={ref} args={[undefined, undefined, N]} frustumCulled={false}>
       <boxGeometry />
-      <meshStandardMaterial color="#0b0d14" emissive="#ffffff" emissiveMap={tex} emissiveIntensity={1.1} roughness={0.8} />
+      <meshStandardMaterial color="#0b0d14" emissive="#ffffff" emissiveMap={tex} emissiveIntensity={3} roughness={0.8} />
     </instancedMesh>
   );
 }
@@ -120,15 +126,15 @@ function StreetLights() {
   });
   return (
     <>
-      <instancedMesh ref={poles} args={[undefined, undefined, N]}>
+      <instancedMesh ref={poles} args={[undefined, undefined, N]} frustumCulled={false}>
         <cylinderGeometry args={[0.08, 0.1, 7, 6]} />
         <meshStandardMaterial color="#2a2d33" />
       </instancedMesh>
-      <instancedMesh ref={heads} args={[undefined, undefined, N]}>
+      <instancedMesh ref={heads} args={[undefined, undefined, N]} frustumCulled={false}>
         <boxGeometry args={[1.4, 0.15, 0.4]} />
         <meshBasicMaterial color="#ffe2a8" toneMapped={false} />
       </instancedMesh>
-      <instancedMesh ref={pools} args={[undefined, undefined, N]}>
+      <instancedMesh ref={pools} args={[undefined, undefined, N]} frustumCulled={false}>
         <circleGeometry args={[3.2, 24]} />
         <meshBasicMaterial color="#ffcf85" transparent opacity={0.13} depthWrite={false} />
       </instancedMesh>
@@ -193,7 +199,7 @@ function Cockpit() {
   const { camera, scene } = useThree();
   const rig = useRef<THREE.Group>(null);
   const sweep = useRef<THREE.PointLight>(null);
-  const { scene: car } = useGLTF(gt500.url);
+  const { scene: car } = useGLTF('/models/gt500.glb');
   const model = useMemo(() => {
     const m = car.clone(true);
     m.traverse((o: any) => {
@@ -217,21 +223,20 @@ function Cockpit() {
     const steer = Math.sin(t * 0.35) * 0.5 + Math.sin(t * 0.9) * 0.12;
     camera.position.set(Math.sin(t * 0.35) * 0.6, 1.15 + Math.sin(t * 7) * 0.004, 0);
     camera.rotation.set(-0.02, -steer * 0.06, -steer * 0.015);
-    if (sweep.current) sweep.current.intensity = 0.4 + Math.max(0, Math.sin(t * v * 0.13)) * 1.6;
+    if (sweep.current) sweep.current.intensity = 0.1 + Math.max(0, Math.sin(t * v * 0.13)) * 0.5;
   });
 
   return (
     <group ref={rig}>
       <pointLight ref={sweep} position={[0, 0.6, -0.6]} color="#ffd9a0" distance={3} intensity={1} />
-      <pointLight position={[0, -0.2, -0.5]} color="#9fc6ff" distance={1.2} intensity={0.25} />
-      <group rotation={[0, Math.PI, 0]} position={[0.37, -1.12, 2.05]}>
+      <group rotation={[0, Math.PI, 0]} position={[0.37, -1.14, 2.22]}>
         <primitive object={model} />
       </group>
     </group>
   );
 }
 
-useGLTF.preload(gt500.url);
+useGLTF.preload('/models/gt500.glb');
 
 const greeting = () => {
   const h = Number(new Date().toLocaleString('en-US', { hour: 'numeric', hour12: false, timeZone: 'America/New_York' }));
@@ -243,12 +248,13 @@ export default function StreetRun3D({ name = 'Mike' }: { name?: string }) {
   const today = new Date().toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric', timeZone: 'America/New_York' });
   return (
     <div className="relative h-[calc(100dvh-9rem)] min-h-[520px] w-full overflow-hidden rounded-xl border border-border bg-background">
-      <Canvas dpr={[1, 1.75]} camera={{ fov: narrow ? 78 : 62, near: 0.05, far: 260, position: [0, 1.15, 0] }}>
+      <Canvas dpr={[1, 1.75]} gl={{ antialias: false, powerPreference: 'high-performance' }} camera={{ fov: narrow ? 78 : 62, near: 0.05, far: 260, position: [0, 1.15, 0] }}>
         <color attach="background" args={['#05070d']} />
         <fog attach="fog" args={['#070a14', 30, 200]} />
-        <ambientLight intensity={0.35} />
+        <ambientLight intensity={0.6} />
         <hemisphereLight args={['#3a4a7a', '#0a0a0a', 0.6]} />
         <directionalLight position={[0, 20, -40]} intensity={0.5} color="#8fb8ff" />
+        <Suspense fallback={null}>
         <Road />
         <Buildings />
         <StreetLights />
@@ -259,7 +265,14 @@ export default function StreetRun3D({ name = 'Mike' }: { name?: string }) {
           <Lightformer intensity={0.8} position={[-8, 2, 0]} rotation-y={Math.PI / 2} scale={[30, 2, 1]} color="#6fa8ff" />
           <Lightformer intensity={0.8} position={[8, 2, 0]} rotation-y={-Math.PI / 2} scale={[30, 2, 1]} color="#ff7aa8" />
         </Environment>
-        <Suspense fallback={null}><Cockpit /></Suspense>
+        <Cockpit />
+        </Suspense>
+        <EffectComposer multisampling={0}>
+          <Bloom mipmapBlur intensity={1.4} luminanceThreshold={0.6} luminanceSmoothing={0.2} />
+          <Vignette eskil={false} offset={0.25} darkness={0.75} />
+          <ToneMapping mode={ToneMappingMode.ACES_FILMIC} />
+          <SMAA />
+        </EffectComposer>
       </Canvas>
       <div className="pointer-events-none absolute left-4 top-4">
         <p className="font-display text-2xl sm:text-3xl text-foreground drop-shadow">{greeting()}, {name}</p>
