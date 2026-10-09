@@ -152,9 +152,9 @@ const AdminDashboard = () => {
       <main className="container mx-auto px-2 sm:px-4 py-3 sm:py-8 space-y-4 sm:space-y-6 safe-pb">
         {(() => {
           const tabs: TabDef[] = [
-            { value: 'dashboard', label: 'Sales Dashboard', icon: LayoutDashboard, roles: ADMIN_ONLY, content: (
+            { value: 'dashboard', label: 'Home', icon: LayoutDashboard, roles: ADMIN_ONLY, content: (
               <Suspense fallback={<div className="h-[60vh] rounded-xl border border-border bg-card animate-pulse" />}>
-                <TimeSpiral3D onOpenReports={() => { window.location.search = '?tab=reports'; }} />
+                <TimeSpiral3D />
               </Suspense>
             ) },
             { value: 'reports', label: 'Reports', icon: BarChart3, roles: ADMIN_ONLY, content: (
