@@ -136,7 +136,7 @@ function StreetLights() {
       </instancedMesh>
       <instancedMesh ref={pools} args={[undefined, undefined, N]} frustumCulled={false}>
         <circleGeometry args={[3.2, 24]} />
-        <meshBasicMaterial color="#ff9a3c" transparent opacity={0.18} depthWrite={false} />
+        <meshBasicMaterial color="#ff9a3c" transparent opacity={0.07} depthWrite={false} />
       </instancedMesh>
     </>
   );
@@ -209,7 +209,7 @@ function useCar(paint: string) {
       }
       if (mat.name === 'tinted_glass') { mat.color = new THREE.Color('#05070a'); mat.transparent = true; mat.opacity = 0.85; mat.metalness = 1; mat.roughness = 0.05; }
       if (mat.name === 'rearlight') { mat.emissive = new THREE.Color('#ff1a1a'); mat.emissiveIntensity = 6; mat.toneMapped = false; }
-      if (mat.name === 'light') { mat.emissive = new THREE.Color('#e8f2ff'); mat.emissiveIntensity = 8; mat.toneMapped = false; }
+      if (mat.name === 'light') { mat.emissive = new THREE.Color('#e8f2ff'); mat.emissiveIntensity = 3; mat.toneMapped = false; }
       if (mat.name === 'plate' || mat.name === 'white_gloss') mat.color = new THREE.Color('#1a1a1a'); // no badges/plates
       o.material = mat;
     });
@@ -243,7 +243,7 @@ function HeroCar() {
       <primitive object={target} />
       <spotLight target={target} position={[0, 0.7, 4.6]} angle={0.5} penumbra={0.6} intensity={60} distance={45} color="#eaf3ff" />
       <pointLight position={[0, 0.5, -0.6]} color="#ff2020" intensity={2} distance={4} />
-      <pointLight position={[0, 2.5, 2]} color="#ffb070" intensity={3} distance={6} />
+      <pointLight position={[0, 3.5, -1]} color="#ffb070" intensity={0.8} distance={6} />
     </group>
   );
 }
