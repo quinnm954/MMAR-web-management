@@ -186,7 +186,7 @@ export default function TimeSpiral3D({ onOpenReports }: { onOpenReports?: () => 
 
   return (
     <div className="relative h-[calc(100dvh-9rem)] min-h-[520px] w-full overflow-hidden rounded-xl border border-border bg-background">
-      <Canvas shadows dpr={[1, 2]} camera={{ position: [0, 13, 15], fov: 45 }}>
+      <Canvas shadows dpr={[1, 2]} camera={{ position: [0, 16, typeof window !== 'undefined' && window.innerWidth < 640 ? 30 : 19], fov: 45 }}>
         <color attach="background" args={['#07111f']} />
         <fog attach="fog" args={['#07111f', 26, 55]} />
         <ambientLight intensity={0.45} />
@@ -204,8 +204,8 @@ export default function TimeSpiral3D({ onOpenReports }: { onOpenReports?: () => 
         </mesh>
         <gridHelper args={[60, 60, '#123a5c', '#0c2238']} position={[0, 0.01, 0]} />
         {days.length > 0 && <Bars days={days} upTo={upTo} picked={picked} onPick={setPicked} />}
-        <Orb position={[-6, 4.5, -6]} color={BLUE} fill={1} label="This month" value={money(stats.month)} />
-        <Orb position={[6, 4.5, -6]} color={GOLD} fill={goalFill} label="Goal" value={stats.goal ? `${Math.round(goalFill * 100)}% of ${money(stats.goal)}` : 'Not set'} />
+        <Orb position={[-8, 3, -7]} color={BLUE} fill={1} label="This month" value={money(stats.month)} />
+        <Orb position={[8, 3, -7]} color={GOLD} fill={goalFill} label="Goal" value={stats.goal ? `${Math.round(goalFill * 100)}% of ${money(stats.goal)}` : 'Not set'} />
         <Orb position={[-7, 3.5, 4]} color={new THREE.Color('hsl(0, 70%, 60%)')} fill={stats.owed > 0 ? 0.6 : 0} label="Money owed" value={money(stats.owed)} />
         <Orb position={[7, 3.5, 4]} color={new THREE.Color('hsl(160, 60%, 50%)')} fill={stats.openEst > 0 ? 0.5 : 0} label="Open estimates" value={`${stats.openEst} · ${money(stats.openEstValue)}`} />
         {ripple > 0 && <Ripple key={ripple} at={ripple} />}
