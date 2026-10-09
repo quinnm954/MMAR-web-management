@@ -3,8 +3,8 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { Suspense } from 'react';
 import { useGLTF, Environment, Lightformer, MeshReflectorMaterial } from '@react-three/drei';
-import { EffectComposer, Bloom, Vignette, SMAA, HueSaturation, BrightnessContrast, ToneMapping, ChromaticAberration } from '@react-three/postprocessing';
-import { ToneMappingMode, BlendFunction } from 'postprocessing';
+import { EffectComposer, Bloom, Vignette, SMAA, HueSaturation, BrightnessContrast, ToneMapping } from '@react-three/postprocessing';
+import { ToneMappingMode } from 'postprocessing';
 
 // World scrolls toward the camera (+z). Camera sits in the driver's seat looking down -z.
 const LENGTH = 240;          // recycled stretch of street
@@ -221,6 +221,7 @@ function HeroCar() {
   const { camera } = useThree();
   const car = useRef<THREE.Group>(null);
   const model = useCar('#ff6a00'); // signature orange
+  const target = useMemo(() => { const o = new THREE.Object3D(); o.position.set(0, 0, 30); return o; }, []);
   useFrame(({ clock }) => {
     const t = clock.elapsedTime, v = speedAt(t);
     const lane = Math.sin(t * 0.35) * 1.6 + Math.sin(t * 0.9) * 0.25;
@@ -239,7 +240,8 @@ function HeroCar() {
   return (
     <group ref={car}>
       <primitive object={model} />
-      <spotLight position={[0, 0.7, 4.6]} target-position={[0, 0, 30]} angle={0.5} penumbra={0.6} intensity={60} distance={45} color="#eaf3ff" />
+      <primitive object={target} />
+      <spotLight target={target} position={[0, 0.7, 4.6]} angle={0.5} penumbra={0.6} intensity={60} distance={45} color="#eaf3ff" />
       <pointLight position={[0, 0.5, -0.6]} color="#ff2020" intensity={2} distance={4} />
       <pointLight position={[0, 2.5, 2]} color="#ffb070" intensity={3} distance={6} />
     </group>
