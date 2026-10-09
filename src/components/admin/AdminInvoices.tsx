@@ -585,6 +585,16 @@ const AdminInvoices = () => {
         </div>
       )}
 
+      <Dialog open={!!linkDlg} onOpenChange={(o) => !o && setLinkDlg(null)}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>Payment link ready</DialogTitle></DialogHeader>
+          <Input id="invoice-link-field" readOnly value={linkDlg?.url ?? ""} onFocus={(e) => e.currentTarget.select()} className="font-mono text-xs" />
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={copyFromDialog}><Link2 className="h-4 w-4 mr-1" />Copy link</Button>
+            <Button onClick={() => linkDlg && shareLink({ url: linkDlg.url, title: linkDlg.title, text: linkDlg.text, copyToastMessage: "Payment link copied" })}><Share2 className="h-4 w-4 mr-1" />Share</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       <Dialog open={!!discountEditing} onOpenChange={(o) => !o && setDiscountEditing(null)}>
         <DialogContent>
           <DialogHeader><DialogTitle>Apply Discount</DialogTitle></DialogHeader>
