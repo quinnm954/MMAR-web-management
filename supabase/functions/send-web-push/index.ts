@@ -62,12 +62,22 @@ Deno.serve(async (req) => {
       return json({ skipped: `category_disabled:${payload.category}` });
     }
 
-    const { data: subs, error: subErr } = await admin
+    const { data: allSubs, error: subErr } = await admin
       .from("web_push_subscriptions")
-      .select("id, endpoint, p256dh, auth")
+      .select("id, endpoint, p256dh, auth, app")
       .eq("user_id", payload.user_id);
     if (subErr) throw subErr;
-    if (!subs || subs.length === 0) return json({ skipped: "no_subs" });
+    if (!allSubs || allSubs.length === 0) return json({ skipped: "no_subs" });
+
+    // Communication alerts go to the MMAR Phone app when installed; everything
+    // else stays in the main Garage Ace app. Fall back so nothing is missed.
+    const phoneSubs = allSubs.filter((s) => s.app === "phone");
+    const mainSubs = allSubs.filter((s) => s.app !== "phone");
+    let subs = mainSubs.length ? mainSubs : allSubs;
+    if (payload.category === "message_updates" && phoneSubs.length) {
+      subs = phoneSubs;
+      payload.url = "/admin/phone";
+    }
 
     const messageBody = JSON.stringify({
       title: payload.title,

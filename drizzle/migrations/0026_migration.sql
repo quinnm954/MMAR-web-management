@@ -1,0 +1,1 @@
+ALTER TABLE public.web_push_subscriptions ADD COLUMN IF NOT EXISTS app text NOT NULL DEFAULT 'main' CHECK (app IN ('main','phone'));

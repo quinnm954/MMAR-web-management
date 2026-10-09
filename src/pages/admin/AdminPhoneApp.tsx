@@ -21,6 +21,7 @@ export default function AdminPhoneApp() {
     if (isStandalone()) markPhoneApp();
     const undo = [
       setMeta('link[rel="manifest"]', 'href', '/phone.webmanifest'),
+      setMeta('link[rel="apple-touch-icon"]', 'href', '/icons/phone-icon-180.png'),
       ...Array.from(document.querySelectorAll('meta[name="apple-mobile-web-app-title"]')).map(() =>
         setMeta('meta[name="apple-mobile-web-app-title"]', 'content', 'MMAR Phone')),
     ];

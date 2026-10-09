@@ -2,11 +2,12 @@ import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { VAPID_PUBLIC_KEY } from "@/lib/webPushConfig";
+import { isPhoneApp } from "@/lib/phoneApp";
 
 const SW_PATH = "/sw.js";
 
 // Skip in Lovable preview/dev — service workers must not run there per project rules.
-function isRegistrationAllowed(): boolean {
+export function isRegistrationAllowed(): boolean {
   try {
     if (typeof window === "undefined") return false;
     if (!("serviceWorker" in navigator)) return false;
@@ -46,7 +47,7 @@ function bufToBase64Url(buf: ArrayBuffer | null): string {
   return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 }
 
-async function subscribeUser(userId: string): Promise<void> {
+export async function subscribeUser(userId: string): Promise<void> {
   const reg = await navigator.serviceWorker.register(SW_PATH, { scope: "/" });
   await navigator.serviceWorker.ready;
 
@@ -72,6 +73,7 @@ async function subscribeUser(userId: string): Promise<void> {
         endpoint,
         p256dh,
         auth,
+        app: isPhoneApp() ? "phone" : "main",
         user_agent: navigator.userAgent.slice(0, 500),
         last_seen_at: new Date().toISOString(),
       },
@@ -79,7 +81,7 @@ async function subscribeUser(userId: string): Promise<void> {
     );
 }
 
-async function ensureNotificationPermission(): Promise<NotificationPermission> {
+export async function ensureNotificationPermission(): Promise<NotificationPermission> {
   const NotificationApi = (window as any).Notification as typeof Notification | undefined;
   if (!NotificationApi) return "denied";
   if (NotificationApi.permission !== "default") return NotificationApi.permission;
