@@ -253,6 +253,13 @@
       "when": 1791575283338,
       "tag": "0035_tech_earnings_paid_invoice_hours",
       "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1791575329476,
+      "tag": "0036_tech_hours_prefer_billed_qty",
+      "breakpoints": true
     }
   ]
 }

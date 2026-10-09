@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { techHoursForInvoice, techHoursForLine, isDiagnosisLine } from '@/lib/techHours';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Progress } from '@/components/ui/progress';

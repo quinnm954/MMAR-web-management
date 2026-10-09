@@ -16,8 +16,11 @@ export function techHoursForLine(li: any): number {
   if (isDiagnosisLine(li)) return 1;
   const k = String(li?.kind ?? '').toLowerCase();
   if (k !== 'labor') return 0;
-  const explicit = Number(li?.labor_hours ?? 0);
-  if (explicit > 0) return explicit;
+  // Billed hours on the invoice line: hours, then quantity, then labor_hours, else amount / rate
+  for (const v of [li?.hours, li?.quantity, li?.labor_hours]) {
+    const n = Number(v ?? 0);
+    if (n > 0) return n;
+  }
   return amountOf(li) / SHOP_LABOR_RATE;
 }
 
