@@ -249,6 +249,7 @@ export default function StreetRun3D({ name = 'Mike' }: { name?: string }) {
         <ambientLight intensity={0.35} />
         <hemisphereLight args={['#3a4a7a', '#0a0a0a', 0.6]} />
         <directionalLight position={[0, 20, -40]} intensity={0.5} color="#8fb8ff" />
+        <Suspense fallback={null}>
         <Road />
         <Buildings />
         <StreetLights />
@@ -259,7 +260,8 @@ export default function StreetRun3D({ name = 'Mike' }: { name?: string }) {
           <Lightformer intensity={0.8} position={[-8, 2, 0]} rotation-y={Math.PI / 2} scale={[30, 2, 1]} color="#6fa8ff" />
           <Lightformer intensity={0.8} position={[8, 2, 0]} rotation-y={-Math.PI / 2} scale={[30, 2, 1]} color="#ff7aa8" />
         </Environment>
-        <Suspense fallback={null}><Cockpit /></Suspense>
+        <Cockpit />
+        </Suspense>
       </Canvas>
       <div className="pointer-events-none absolute left-4 top-4">
         <p className="font-display text-2xl sm:text-3xl text-foreground drop-shadow">{greeting()}, {name}</p>
