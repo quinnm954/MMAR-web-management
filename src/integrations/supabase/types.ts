@@ -2996,6 +2996,7 @@ export type Database = {
           estimate_valid_days: number
           id: number
           labor_cost_per_hour: number
+          monthly_revenue_goal: number | null
           parts_markup_pct: number
           partstech_enabled: boolean
           shop_supplies_max: number
@@ -3008,6 +3009,7 @@ export type Database = {
           estimate_valid_days?: number
           id?: number
           labor_cost_per_hour?: number
+          monthly_revenue_goal?: number | null
           parts_markup_pct?: number
           partstech_enabled?: boolean
           shop_supplies_max?: number
@@ -3020,6 +3022,7 @@ export type Database = {
           estimate_valid_days?: number
           id?: number
           labor_cost_per_hour?: number
+          monthly_revenue_goal?: number | null
           parts_markup_pct?: number
           partstech_enabled?: boolean
           shop_supplies_max?: number
