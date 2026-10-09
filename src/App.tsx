@@ -3,7 +3,9 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
-import { AuthProvider } from "@/hooks/useAuth";
+import { AuthProvider, useAuth } from "@/hooks/useAuth";
+import { isPhoneApp } from "@/lib/phoneApp";
+import { useNavigate } from "react-router-dom";
 import { GtagRouteTracker } from "@/components/GtagRouteTracker";
 import Index from "./pages/Index";
 
@@ -91,6 +93,18 @@ const AppBadgeSync = () => {
   return null;
 };
 
+// Keeps the MMAR Phone home-screen app on the Phone page after sign-in.
+const PhoneAppGuard = () => {
+  const { user, isAdmin, isLoading } = useAuth();
+  const { pathname } = useLocation();
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (isLoading || !user || !isAdmin || !isPhoneApp()) return;
+    if (['/', '/app', '/admin', '/admin/dashboard', '/login'].includes(pathname)) navigate('/admin/phone', { replace: true });
+  }, [isLoading, user, isAdmin, pathname, navigate]);
+  return null;
+};
+
 const AdminRedirect = () => {
   const { search, hash } = useLocation();
   return <Navigate to={`/admin/dashboard${search}${hash}`} replace />;
@@ -111,6 +125,7 @@ const App = () => (
           <PullToRefresh />
           <GtagRouteTracker />
           <AppBadgeSync />
+          <PhoneAppGuard />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/financing-contract" element={<FinancingContract />} />

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Share, X } from 'lucide-react';
 import AdminPhoneHub from '@/components/admin/AdminPhoneHub';
+import { markPhoneApp } from '@/lib/phoneApp';
 
 function setMeta(selector: string, attr: string, value: string) {
   const el = document.querySelector(selector);
@@ -17,6 +18,7 @@ export default function AdminPhoneApp() {
   const [showTip, setShowTip] = useState(false);
 
   useEffect(() => {
+    if (isStandalone()) markPhoneApp();
     const undo = [
       setMeta('link[rel="manifest"]', 'href', '/phone.webmanifest'),
       ...Array.from(document.querySelectorAll('meta[name="apple-mobile-web-app-title"]')).map(() =>

@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { Loader2, Wrench, ArrowLeft } from "lucide-react";
 import { PLATFORM_BRAND } from "@/lib/brand";
 import { z } from "zod";
+import { isPhoneApp } from "@/lib/phoneApp";
 
 const signupSchema = z.object({
   fullName: z.string().trim().min(2, "Name is too short").max(100),
@@ -65,6 +66,7 @@ const Login = () => {
         sessionStorage.removeItem("postLoginRedirect");
       }
     } catch {}
+    if (isAdmin && isPhoneApp()) target = "/admin/phone";
     navigate(target, { replace: true });
   }, [user, roles, isAdmin, isStaff, isLoading, isPasswordRecovery, navigate, params]);
 
