@@ -262,6 +262,7 @@ function HeroCar() {
     if (Math.abs(cam.fov - fov) > 0.05) { cam.fov = fov; cam.updateProjectionMatrix(); }
     camera.position.set(lane * 0.7, 1.35 + Math.sin(t * 13) * 0.01, -0.4);
     camera.lookAt(lane * 0.9, 0.85, -14);
+    camera.rotateZ(-yaw * 0.6 + Math.sin(t * 21) * 0.0015);
   });
   return (
     <group ref={car}>
@@ -320,6 +321,28 @@ function SpeedLines() {
   );
 }
 
+function Rain() {
+  const ref = useRef<THREE.InstancedMesh>(null);
+  const N = 500;
+  const pts = useMemo(() => Array.from({ length: N }, () => ({ x: (Math.random() - 0.5) * 24, y: Math.random() * 12, z: -Math.random() * 60 })), []);
+  const o = useMemo(() => new THREE.Object3D(), []);
+  useFrame(({ clock }, raw) => {
+    const dt = Math.min(raw, 0.05), v = speedAt(clock.elapsedTime);
+    pts.forEach((p, i) => {
+      p.y -= 14 * dt; p.z += v * dt;
+      if (p.y < 0 || p.z > 2) { p.y = 4 + Math.random() * 8; p.z = -Math.random() * 60; p.x = (Math.random() - 0.5) * 24; }
+      o.position.set(p.x, p.y, p.z); o.rotation.set(Math.atan2(v, 14), 0, 0); o.updateMatrix(); ref.current!.setMatrixAt(i, o.matrix);
+    });
+    ref.current!.instanceMatrix.needsUpdate = true;
+  });
+  return (
+    <instancedMesh ref={ref} args={[undefined, undefined, N]} frustumCulled={false}>
+      <boxGeometry args={[0.008, 0.6, 0.008]} />
+      <meshBasicMaterial color="#cfe6ff" transparent opacity={0.28} depthWrite={false} toneMapped={false} />
+    </instancedMesh>
+  );
+}
+
 useGLTF.preload('/models/gt500.glb');
 
 const greeting = () => {
@@ -345,6 +368,7 @@ export default function StreetRun3D({ name = 'Mike' }: { name?: string }) {
         <NeonSigns />
         <RivalCars />
         <SpeedLines />
+        <Rain />
         <Environment resolution={128}>
           <Lightformer intensity={1.5} position={[0, 6, -10]} scale={[20, 4, 1]} color="#ffe2b0" />
           <Lightformer intensity={0.8} position={[-8, 2, 0]} rotation-y={Math.PI / 2} scale={[30, 2, 1]} color="#6fa8ff" />
