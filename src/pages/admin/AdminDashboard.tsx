@@ -40,7 +40,7 @@ import CalendarFeedSettings from '@/components/admin/CalendarFeedSettings';
 import AdminReports from '@/components/admin/AdminReports';
 import AdminSalesDashboard from '@/components/admin/AdminSalesDashboard';
 import { lazy, Suspense } from 'react';
-const FloridaMap3D = lazy(() => import('@/components/admin/FloridaMap3D'));
+const TimeSpiral3D = lazy(() => import('@/components/admin/TimeSpiral3D'));
 import AdminCustomerShare from '@/components/admin/AdminCustomerShare';
 import AdminGarage from '@/components/admin/AdminGarage';
 import AdminDeclinedWork from '@/components/admin/AdminDeclinedWork';
@@ -154,7 +154,7 @@ const AdminDashboard = () => {
           const tabs: TabDef[] = [
             { value: 'dashboard', label: 'Sales Dashboard', icon: LayoutDashboard, roles: ADMIN_ONLY, content: (
               <Suspense fallback={<div className="h-[60vh] rounded-xl border border-border bg-card animate-pulse" />}>
-                <FloridaMap3D onOpenReports={() => { window.location.search = '?tab=reports'; }} />
+                <TimeSpiral3D onOpenReports={() => { window.location.search = '?tab=reports'; }} />
               </Suspense>
             ) },
             { value: 'reports', label: 'Reports', icon: BarChart3, roles: ADMIN_ONLY, content: (
