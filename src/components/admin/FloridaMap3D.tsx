@@ -63,7 +63,7 @@ function useMapData() {
       supabase.from('appointments').select('id,status,scheduled_at,service_type,service_address,customer_id,vehicle_id').gte('scheduled_at', start.toISOString()).lt('scheduled_at', end.toISOString()).neq('status', 'cancelled'),
       supabase.from('shop_settings').select('monthly_revenue_goal').limit(1).maybeSingle(),
       supabase.from('estimates').select('id', { count: 'exact', head: true }).eq('status', 'draft'),
-      supabase.from('booking_requests' as any).select('id', { count: 'exact', head: true }).eq('status', 'pending'),
+      supabase.from('booking_requests' as any).select('id', { count: 'exact', head: true }).eq('status', 'new'),
     ]);
     const invs = (inv.data ?? []) as any[];
     const ap = (today.data ?? []) as any[];
