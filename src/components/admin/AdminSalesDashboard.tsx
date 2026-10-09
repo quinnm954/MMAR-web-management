@@ -11,7 +11,7 @@ import { toast } from 'sonner';
 
 type Inv = {
   id: string; total: number | null; amount_paid: number | null; status: string; created_at: string;
-  paid_at: string | null; customer_id: string | null; line_items: any;
+  paid_at: string | null; customer_id: string | null; line_items: any; appointment_id?: string | null;
 };
 type Est = { id: string; total: number | null; status: string; sent_at: string | null; approved_at: string | null; created_at: string };
 
@@ -37,6 +37,7 @@ export default function AdminSalesDashboard() {
   const [invoices, setInvoices] = useState<Inv[]>([]);
   const [estimates, setEstimates] = useState<Est[]>([]);
   const [counts, setCounts] = useState({ customers: 0, memberships: 0, openAppts: 0, doneWeek: 0, doneMonth: 0 });
+  const [doneJobs, setDoneJobs] = useState<{ id: string; completed_at: string }[]>([]);
   const [names, setNames] = useState<Map<string, string>>(new Map());
   const [laborCost, setLaborCost] = useState(40);
   const [goal, setGoal] = useState<number | null>(null);
@@ -55,19 +56,20 @@ export default function AdminSalesDashboard() {
       const since = startOf(new Date(now.getFullYear(), now.getMonth() - 12, 1)).toISOString();
       const mondayish = addDays(todayStart, -6).toISOString();
       const [inv, est, cust, mem, appts, dw, dm, shop] = await Promise.all([
-        supabase.from('invoices').select('id,total,amount_paid,status,created_at,paid_at,customer_id,line_items').gte('created_at', since).order('created_at', { ascending: false }).limit(3000),
+        supabase.from('invoices').select('id,total,amount_paid,status,created_at,paid_at,customer_id,line_items,appointment_id').gte('created_at', since).order('created_at', { ascending: false }).limit(3000),
         supabase.from('estimates').select('id,total,status,sent_at,approved_at,created_at').gte('created_at', addDays(todayStart, -90).toISOString()).limit(2000),
         supabase.from('profiles').select('id', { count: 'exact', head: true }),
         supabase.from('memberships').select('id', { count: 'exact', head: true }).eq('status', 'active'),
         supabase.from('appointments').select('id', { count: 'exact', head: true }).in('status', ['requested', 'scheduled', 'in_progress']),
-        supabase.from('appointments').select('id', { count: 'exact', head: true }).eq('status', 'completed').gte('updated_at', mondayish),
-        supabase.from('appointments').select('id', { count: 'exact', head: true }).eq('status', 'completed').gte('updated_at', monthStart.toISOString()),
+        supabase.from('appointments').select('id, completed_at').eq('status', 'completed').gte('completed_at', mondayish < monthStart.toISOString() ? mondayish : monthStart.toISOString()).limit(2000),
+        Promise.resolve(null),
         supabase.from('shop_settings').select('labor_cost_per_hour, monthly_revenue_goal').limit(1).maybeSingle(),
       ]);
       const invs = (inv.data ?? []) as Inv[];
       setInvoices(invs);
       setEstimates((est.data ?? []) as Est[]);
-      setCounts({ customers: cust.count ?? 0, memberships: mem.count ?? 0, openAppts: appts.count ?? 0, doneWeek: dw.count ?? 0, doneMonth: dm.count ?? 0 });
+      setCounts({ customers: cust.count ?? 0, memberships: mem.count ?? 0, openAppts: appts.count ?? 0, doneWeek: 0, doneMonth: 0 });
+      setDoneJobs(((dw as any).data ?? []) as { id: string; completed_at: string }[]);
       const s: any = shop.data;
       if (s?.labor_cost_per_hour) setLaborCost(Number(s.labor_cost_per_hour));
       if (s?.monthly_revenue_goal) setGoal(Number(s.monthly_revenue_goal));
@@ -171,6 +173,20 @@ export default function AdminSalesDashboard() {
       laborBilled: acc.labor, laborHours: hrs,
     };
   }, [paid]);
+  const jobStats = useMemo(() => {
+    const week = doneJobs.filter(j => new Date(j.completed_at) >= weekStart);
+    const month = doneJobs.filter(j => new Date(j.completed_at) >= monthStart);
+    const ids = new Set(month.map(j => j.id));
+    let hrs = 0, rev = 0; const withInv = new Set<string>();
+    invoices.forEach(inv => {
+      if (!inv.appointment_id || !ids.has(inv.appointment_id) || inv.status === 'void') return;
+      withInv.add(inv.appointment_id); rev += Number(inv.total || 0);
+      (Array.isArray(inv.line_items) ? inv.line_items : []).forEach((li: any) => {
+        if (String(li.kind).toLowerCase() === 'labor') hrs += Number(li.amount ?? Number(li.quantity ?? 1) * Number(li.unit_price ?? 0)) / 125;
+      });
+    });
+    return { week: week.length, month: month.length, hrsPerJob: withInv.size ? hrs / withInv.size : null, revPerJob: withInv.size ? rev / withInv.size : null };
+  }, [doneJobs, invoices]);
   const laborCostMTD = laborHours * laborCost;
   const laborMargin = laborBilled > 0 ? ((laborBilled - laborCostMTD) / laborBilled) * 100 : null;
 
@@ -280,8 +296,9 @@ export default function AdminSalesDashboard() {
           <Row k="Value won" v={fmt0(pipe.wonValue)} />
         </Group>
         <Group icon={Wrench} title="Shop">
-          <Row k="Jobs done this week" v={String(counts.doneWeek)} strong />
-          <Row k="Jobs done this month" v={`${counts.doneMonth}${counts.doneMonth ? ` · ${fmt0(monthRev / counts.doneMonth)}/job` : ''}`} />
+          <Row k="Jobs done this week" v={String(jobStats.week)} strong />
+          <Row k="Jobs done this month" v={`${jobStats.month}${jobStats.revPerJob !== null ? ` · ${fmt0(jobStats.revPerJob)}/job` : ''}`} />
+          <Row k="Labor hours per job" v={jobStats.hrsPerJob === null ? '—' : `${jobStats.hrsPerJob.toFixed(1)} hrs`} />
           <Row k="Open appointments" v={String(counts.openAppts)} />
           <Row k="Customers · members" v={`${counts.customers} · ${counts.memberships}`} />
         </Group>
