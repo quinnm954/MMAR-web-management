@@ -94,7 +94,7 @@ Deno.serve(async () => {
           sb.from('estimates').select('id', { count: 'exact', head: true }).eq('status', 'draft'),
           sb.from('estimates').select('id', { count: 'exact', head: true }).eq('status', 'sent').gte('valid_until', todayStr).lte('valid_until', in3),
           sb.from('invoices').select('id', { count: 'exact', head: true }).in('status', ['unpaid', 'partial', 'overdue', 'sent']).lt('created_at', old7),
-          sb.from('booking_requests').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
+          sb.from('booking_requests').select('id', { count: 'exact', head: true }).in('status', ['new', 'pending']),
           sb.from('appointments').select('id', { count: 'exact', head: true }).eq('status', 'in_progress').lt('updated_at', new Date(now.getTime() - D).toISOString()),
         ]);
         const parts = [
@@ -102,7 +102,10 @@ Deno.serve(async () => {
           [br.count, 'booking request(s) to approve'], [ip.count, 'job(s) in progress over a day'],
         ].filter(([n]) => Number(n) > 0).map(([n, l]) => `${n} ${l}`);
         if (parts.length) {
-          await sb.rpc('_notify_staff_customer_action', { _title: 'Daily to-do', _body: parts.join(' · '), _link: '/admin?tab=dashboard' });
+          const { data: staff } = await sb.from('user_roles').select('user_id').in('role', ['owner', 'admin']);
+          for (const uid of new Set((staff || []).map((r: any) => r.user_id))) {
+            await sb.rpc('create_notification', { _user_id: uid, _title: 'Daily to-do', _body: parts.join(' · '), _category: 'appointment_updates', _link: '/admin?tab=dashboard', _data: {} });
+          }
         }
       }
     }
