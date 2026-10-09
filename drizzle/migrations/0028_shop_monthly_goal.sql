@@ -1,0 +1,1 @@
+ALTER TABLE public.shop_settings ADD COLUMN IF NOT EXISTS monthly_revenue_goal numeric;
