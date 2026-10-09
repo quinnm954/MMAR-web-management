@@ -117,6 +117,7 @@ export type Database = {
         Row: {
           assigned_technician_id: string | null
           board_column: string
+          completed_at: string | null
           confirmation_token: string
           created_at: string
           customer_id: string
@@ -142,6 +143,7 @@ export type Database = {
         Insert: {
           assigned_technician_id?: string | null
           board_column?: string
+          completed_at?: string | null
           confirmation_token?: string
           created_at?: string
           customer_id: string
@@ -167,6 +169,7 @@ export type Database = {
         Update: {
           assigned_technician_id?: string | null
           board_column?: string
+          completed_at?: string | null
           confirmation_token?: string
           created_at?: string
           customer_id?: string

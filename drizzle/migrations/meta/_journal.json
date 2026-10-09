@@ -204,6 +204,13 @@
       "when": 1791572883530,
       "tag": "0028_shop_monthly_goal",
       "breakpoints": true
+    },
+    {
+      "idx": 29,
+      "version": "7",
+      "when": 1791573600273,
+      "tag": "0029_appointments_completed_at",
+      "breakpoints": true
     }
   ]
 }
