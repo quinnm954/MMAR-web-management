@@ -2,6 +2,7 @@ import { ReactNode } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth, AppRole } from '@/hooks/useAuth';
 import { Loader2 } from 'lucide-react';
+import { markPhoneApp } from '@/lib/phoneApp';
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -22,6 +23,7 @@ const ProtectedRoute = ({ children, requireAdmin = true, allowedRoles }: Protect
   }
 
   if (!user) {
+    if (location.pathname === "/admin/phone") markPhoneApp();
     return <Navigate to={location.pathname === "/admin/phone" ? "/login?redirect=%2Fadmin%2Fphone" : "/login"} replace />;
   }
 
