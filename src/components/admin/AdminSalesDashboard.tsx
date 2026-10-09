@@ -381,7 +381,7 @@ function Stat({ label, value, sub }: { label: string; value: string; sub?: strin
     <Card className="border-border/50">
       <CardContent className="p-4">
         <div className="text-xs text-muted-foreground">{label}</div>
-        <div className="text-xl font-bold mt-1 tabular-nums truncate">{value}</div>
+        <div className="text-lg md:text-xl font-bold mt-1 tabular-nums break-words leading-tight">{value}</div>
         {sub && <div className="text-[11px] text-muted-foreground mt-0.5 truncate">{sub}</div>}
       </CardContent>
     </Card>
