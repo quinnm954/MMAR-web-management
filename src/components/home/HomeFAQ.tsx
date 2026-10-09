@@ -25,7 +25,7 @@ const faqs = [
   },
   {
     q: "How do payments work?",
-    a: "We accept all major credit and debit cards, ACH, and offer financing on qualifying repairs. Pricing is quoted up front — no surprise add-ons.",
+    a: "We accept all major credit and debit cards and ACH. Pricing is quoted up front — no surprise add-ons.",
   },
   {
     q: "Do you bring the parts with you?",

@@ -45,7 +45,7 @@ const FAQ_BASE = (cityName: string, state: string): CityFAQ[] => [
   },
   {
     question: `What payment methods do you accept?`,
-    answer: `We accept all major credit/debit cards, Apple Pay, Google Pay, Zelle, and cash. Financing is available on larger jobs — ask when you book.`,
+    answer: `We accept all major credit/debit cards, Apple Pay, Google Pay, Zelle, and cash.`,
   },
   {
     question: `Do you offer a warranty on mobile repairs in ${cityName}?`,
@@ -173,7 +173,7 @@ export const cities: City[] = [
       },
       {
         question: "Pricing and payment in Fort Myers?",
-        answer: "Pricing is at or below brick-and-mortar shop rates once tow and rental are factored in. We accept all major cards, Apple/Google Pay, Zelle, and cash, with financing available on larger jobs. Quotes are in writing before work starts.",
+        answer: "Pricing is at or below brick-and-mortar shop rates once tow and rental are factored in. We accept all major cards, Apple/Google Pay, Zelle, and cash.",
       },
       {
         question: "Warranty?",

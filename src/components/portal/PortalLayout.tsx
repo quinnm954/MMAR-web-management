@@ -42,7 +42,6 @@ const baseNavItems = [
   { to: "/portal/vehicle-health", label: "Vehicle Health", icon: ClipboardList },
   { to: "/portal/inspections", label: "Inspections", icon: ClipboardCheck },
   { to: "/portal/invoices", label: "Invoices", icon: Receipt },
-  { to: "/portal/financing", label: "Financing", icon: CreditCard },
   { to: "/messages", label: "Messages", icon: MessageCircle },
   { to: "/settings/notifications", label: "Notifications", icon: Bell },
 ];

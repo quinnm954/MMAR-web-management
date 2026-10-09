@@ -65,8 +65,7 @@ const VoiceSearchAnswers = () => {
             </dt>
             <dd className="speakable-answer text-muted-foreground mt-1">
               Call or text 813-501-7572, or book online at mikesmautorepair.com.
-              We accept all major credit cards and offer financing on qualifying
-              repairs.
+              We accept all major credit cards.
             </dd>
           </div>
         </dl>

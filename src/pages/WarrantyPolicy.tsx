@@ -238,12 +238,12 @@ const WarrantyPolicy = () => {
               10. PAYMENT TERMS
             </h2>
             <div className="text-sm text-muted-foreground space-y-2 leading-relaxed">
-              <p>10.1. Full payment is due upon completion of service unless prior financing arrangements have been made in writing.</p>
+              <p>10.1. Full payment is due upon completion of service.</p>
               <p>10.2. Vehicle will not be released until payment is received in full.</p>
               <p>10.3. <strong>Returned Payment Fee:</strong> A fee of Thirty-Five Dollars ($35.00) will be charged for any returned check, declined card, or reversed payment.</p>
               <p>10.4. <strong>Late Payment Interest:</strong> Past-due balances accrue interest at a rate of one and one-half percent (1.5%) per month (18% APR).</p>
               <p>10.5. Customer agrees to pay all collection costs, attorney fees, and court costs incurred in collecting unpaid balances.</p>
-              <p>10.6. Accepted payment methods: Cash, Credit Card, Debit Card, Approved Financing. Personal checks accepted at MMAR's discretion.</p>
+              <p>10.6. Accepted payment methods: Cash, Credit Card, Debit Card. Personal checks accepted at MMAR's discretion.</p>
             </div>
           </section>
 

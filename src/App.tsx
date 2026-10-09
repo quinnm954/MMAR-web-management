@@ -10,7 +10,6 @@ import { useNavigate } from "react-router-dom";
 import { GtagRouteTracker } from "@/components/GtagRouteTracker";
 import Index from "./pages/Index";
 
-import FinancingContract from "./pages/FinancingContract";
 import TechAgreementSign from "./pages/TechAgreementSign";
 import AdminTechAgreements from "./pages/admin/AdminTechAgreements";
 import WarrantyPolicy from "./pages/WarrantyPolicy";
@@ -50,7 +49,6 @@ import PortalInvoiceDetail from "./pages/portal/PortalInvoiceDetail";
 import PortalEstimates from "./pages/portal/PortalEstimates";
 import FinishEnrollment from "./pages/FinishEnrollment";
 import PortalRepairOrders from "./pages/portal/PortalRepairOrders";
-import PortalFinancing from "./pages/portal/PortalFinancing";
 import CustomerProtectedRoute from "./components/portal/CustomerProtectedRoute";
 import NotFound from "./pages/NotFound";
 import MileageUpdate from "./pages/MileageUpdate";
@@ -129,7 +127,6 @@ const App = () => (
           <PhoneAppGuard />
           <Routes>
             <Route path="/" element={<Index />} />
-            <Route path="/financing-contract" element={<FinancingContract />} />
             <Route path="/tech-agreement/:token" element={<TechAgreementSign />} />
             <Route path="/admin/tech-agreements" element={<ProtectedRoute><AdminTechAgreements /></ProtectedRoute>} />
             <Route path="/warranty-policy" element={<WarrantyPolicy />} />
@@ -173,7 +170,6 @@ const App = () => (
             <Route path="/portal/invoices/:id" element={<CustomerProtectedRoute><PortalInvoiceDetail /></CustomerProtectedRoute>} />
             <Route path="/portal/estimates" element={<CustomerProtectedRoute><PortalEstimates /></CustomerProtectedRoute>} />
             <Route path="/portal/repair-orders" element={<CustomerProtectedRoute><PortalRepairOrders /></CustomerProtectedRoute>} />
-            <Route path="/portal/financing" element={<CustomerProtectedRoute><PortalFinancing /></CustomerProtectedRoute>} />
             <Route path="/portal/vehicle-health" element={<CustomerProtectedRoute><PortalVehicleHealth /></CustomerProtectedRoute>} />
             <Route path="/portal/inspections" element={<CustomerProtectedRoute><PortalInspections /></CustomerProtectedRoute>} />
             <Route path="/settings/notifications" element={<NotificationSettings />} />

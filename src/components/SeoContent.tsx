@@ -36,7 +36,7 @@ const faqs = [
   },
   {
     q: "Do you accept walk-up payments at the truck?",
-    a: "We accept all major cards, Apple/Google Pay, and cash on completion. Financing is also available for larger repairs.",
+    a: "We accept all major cards, Apple/Google Pay, and cash on completion.",
   },
 ];
 
@@ -209,7 +209,6 @@ const SeoContent = () => {
               <li>✅ Same-day appointments usually available</li>
               <li>✅ Parts &amp; labor warranty on every job</li>
               <li>✅ 5-star rated on Google, Facebook, Yelp, Nextdoor</li>
-              <li>✅ Financing available for larger repairs</li>
             </ul>
           </div>
 

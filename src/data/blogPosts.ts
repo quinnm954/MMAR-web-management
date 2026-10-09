@@ -458,7 +458,7 @@ export const blogPosts: BlogPost[] = [
     slug: "introducing-mmar-care-membership-platform",
     title: "Introducing MMAR Care: The Easiest Way to Own a Car in Southwest Florida",
     excerpt:
-      "MMAR Care is the new membership and customer portal from Mike's Mobile Auto Repair — vehicles, appointments, estimates, invoices, financing, and warranty in one place.",
+      "MMAR Care is the new membership and customer portal from Mike's Mobile Auto Repair — vehicles, appointments, estimates, invoices, and warranty in one place.",
     dateISO: "2026-05-08",
     readMinutes: 5,
     tags: ["MMAR Care", "Membership", "Maintenance"],
@@ -466,14 +466,14 @@ export const blogPosts: BlogPost[] = [
       <p>Owning a car in Southwest Florida is hard on your wallet and your schedule. Heat kills batteries, humidity eats brake lines, and life rarely makes time for a shop visit. That's why we built <a href="/mmar-care"><strong>MMAR Care</strong></a> — a free customer portal and optional membership that makes owning a vehicle simpler, cheaper, and a lot less stressful.</p>
 
       <h2>What is MMAR Care?</h2>
-      <p>MMAR Care is the customer side of Mike's Mobile Auto Repair. It's where you (and every driver in your household) can manage every vehicle you own from your phone — service history, upcoming maintenance, estimates, invoices, financing, warranty, and appointments — without a single phone call if you don't want one.</p>
+      <p>MMAR Care is the customer side of Mike's Mobile Auto Repair. It's where you (and every driver in your household) can manage every vehicle you own from your phone — service history, upcoming maintenance, estimates, invoices, warranty, and appointments — without a single phone call if you don't want one.</p>
 
       <h2>Everything in one place</h2>
       <ul>
         <li><strong>Your vehicles, always up to date.</strong> Every car on your account, with mileage, service records, and recommended maintenance.</li>
         <li><strong>Effortless scheduling.</strong> Pick a window that works, members get priority booking.</li>
         <li><strong>Estimates, inspections & repair orders.</strong> Approve estimates online, see digital inspection photos, follow each repair in real time.</li>
-        <li><strong>Invoices and financing.</strong> Pay online, view receipts, manage in-house financing or your monthly membership.</li>
+        <li><strong>Invoices and membership.</strong> Pay online, view receipts, and manage your monthly membership.</li>
         <li><strong>Warranty & records on demand.</strong> Magnuson-Moss warranty coverage and service records you can pull up any time — perfect for resale or trade-in.</li>
         <li><strong>Member perks.</strong> Discounted labor, included oil changes on select plans, and special pricing on tires, brakes, and seasonal services.</li>
       </ul>

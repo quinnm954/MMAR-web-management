@@ -28,7 +28,7 @@ const FEATURES = [
   { icon: ClipboardList, title: "Repair orders & estimates", text: "Build estimates, get digital approvals, convert to ROs and invoices in one flow." },
   { icon: CalendarCheck, title: "Online booking & scheduling", text: "Customers book themselves. Dispatch board keeps techs and bays organized." },
   { icon: Car, title: "Vehicle & customer history", text: "VIN-decoded vehicles, full service history, and household-level customer profiles." },
-  { icon: Receipt, title: "Invoicing & payments", text: "Branded invoices, pay-by-link, Stripe + ACH, financing, and QuickBooks export." },
+  { icon: Receipt, title: "Invoicing & payments", text: "Branded invoices, pay-by-link, Stripe + ACH, and QuickBooks export." },
   { icon: MessageSquare, title: "2-way SMS & call tracking", text: "Twilio-powered texting and recorded calls, tied to the customer record." },
   { icon: CreditCard, title: "Memberships & subscriptions", text: "Sell recurring care plans with deposits, included services, and auto-billing." },
   { icon: Smartphone, title: "Customer portal + native app", text: "Branded iOS/Android app: vehicles, estimates, invoices, push notifications." },
