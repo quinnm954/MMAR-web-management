@@ -211,6 +211,13 @@
       "when": 1791573600273,
       "tag": "0029_appointments_completed_at",
       "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "7",
+      "when": 1791574022434,
+      "tag": "0030_finish_job_and_estimate_expiry",
+      "breakpoints": true
     }
   ]
 }
