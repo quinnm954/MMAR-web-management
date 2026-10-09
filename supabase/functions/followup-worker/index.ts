@@ -60,6 +60,53 @@ Deno.serve(async () => {
       out.estimates++;
     }
 
+    // 1a) Pre-expiry nudge (3 days before valid_until), then expire stale estimates.
+    const etToday = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }));
+    const ymd = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    const todayStr = ymd(etToday);
+    const in3 = ymd(new Date(etToday.getTime() + 3 * D));
+    const { data: soon } = await sb.from('estimates')
+      .select('id,customer_id,estimate_number,total,approval_token,customer_phone,valid_until')
+      .eq('status', 'sent').eq('followup_count', 2).gte('valid_until', todayStr).lte('valid_until', in3).limit(BATCH);
+    for (const e of soon || []) {
+      const p = await profile(e.customer_id);
+      const url = `${SITE}/estimate/${e.approval_token}`;
+      const phone = p?.phone || e.customer_phone;
+      if (textsOk && phone) {
+        const hi = first(p?.full_name) ? `Hi ${first(p?.full_name)}, ` : 'Hi, ';
+        await sendSms(sb, phone, `${hi}this is Mike's Mobile Auto Repair. Still interested? Your estimate (${money(e.total)}) expires ${e.valid_until}. Approve it here: ${url} Cash is not accepted - please pay the invoice online, not the technician. Reply STOP to opt out.`);
+      } else if (p?.email) {
+        await sendAndLog({ templateName: 'estimate-reminder', recipientEmail: p.email, idempotencyKey: `estimate-reminder-${e.id}-3`,
+          templateData: { customerName: first(p.full_name), estimateNumber: e.estimate_number, total: money(e.total), approvalUrl: url, final: true } });
+      }
+      await sb.from('estimates').update({ followup_count: 3, followup_last_at: now.toISOString() }).eq('id', e.id);
+      out.estimates++;
+    }
+    await sb.from('estimates').update({ status: 'expired' }).eq('status', 'sent').lt('valid_until', todayStr);
+
+    // 1a2) Once a day (first run at/after 9am ET): push a to-do summary to staff when something is waiting.
+    if (etHour === 9) {
+      const { count: already } = await sb.from('notifications').select('id', { count: 'exact', head: true })
+        .eq('title', 'Daily to-do').gte('created_at', new Date(now.getTime() - 20 * H).toISOString());
+      if (!already) {
+        const old7 = new Date(now.getTime() - 7 * D).toISOString();
+        const [dr, ex, up, br, ip] = await Promise.all([
+          sb.from('estimates').select('id', { count: 'exact', head: true }).eq('status', 'draft'),
+          sb.from('estimates').select('id', { count: 'exact', head: true }).eq('status', 'sent').gte('valid_until', todayStr).lte('valid_until', in3),
+          sb.from('invoices').select('id', { count: 'exact', head: true }).in('status', ['unpaid', 'partial', 'overdue', 'sent']).lt('created_at', old7),
+          sb.from('booking_requests').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
+          sb.from('appointments').select('id', { count: 'exact', head: true }).eq('status', 'in_progress').lt('updated_at', new Date(now.getTime() - D).toISOString()),
+        ]);
+        const parts = [
+          [dr.count, 'draft estimate(s) to send'], [ex.count, 'estimate(s) expiring soon'], [up.count, 'unpaid invoice(s) over 7 days'],
+          [br.count, 'booking request(s) to approve'], [ip.count, 'job(s) in progress over a day'],
+        ].filter(([n]) => Number(n) > 0).map(([n, l]) => `${n} ${l}`);
+        if (parts.length) {
+          await sb.rpc('_notify_staff_customer_action', { _title: 'Daily to-do', _body: parts.join(' · '), _link: '/admin?tab=dashboard' });
+        }
+      }
+    }
+
     // 1b) At appointment time: turn the approved estimate into an invoice so it is sent below
     //      and is paid/acknowledged by the time the repair is done.
     const { data: appts } = await sb.from('appointments').select('id')
