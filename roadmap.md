@@ -28,3 +28,7 @@
 - [x] Correct existing generic repair-order names.
 - [x] MMAR Phone red phone icon
 - [x] Route communication alerts to MMAR Phone, service alerts to Garage Ace
+- [x] Fix stuck app-icon badge
+- [x] Add to customers from text threads (AI prefill)
+- [x] Faster Phone refresh
+- [x] Publish latest version
