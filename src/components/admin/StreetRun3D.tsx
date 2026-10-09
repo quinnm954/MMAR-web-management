@@ -3,7 +3,6 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { Suspense } from 'react';
 import { useGLTF, Environment, Lightformer } from '@react-three/drei';
-import gt500 from '@/assets/gt500.glb.asset.json';
 
 // World scrolls toward the camera (+z). Camera sits in the driver's seat looking down -z.
 const LENGTH = 240;          // recycled stretch of street
@@ -193,7 +192,7 @@ function Cockpit() {
   const { camera, scene } = useThree();
   const rig = useRef<THREE.Group>(null);
   const sweep = useRef<THREE.PointLight>(null);
-  const { scene: car } = useGLTF(gt500.url);
+  const { scene: car } = useGLTF('/models/gt500.glb');
   const model = useMemo(() => {
     const m = car.clone(true);
     m.traverse((o: any) => {
@@ -231,7 +230,7 @@ function Cockpit() {
   );
 }
 
-useGLTF.preload(gt500.url);
+useGLTF.preload('/models/gt500.glb');
 
 const greeting = () => {
   const h = Number(new Date().toLocaleString('en-US', { hour: 'numeric', hour12: false, timeZone: 'America/New_York' }));
