@@ -125,7 +125,7 @@ export default function AdminPhoneHub({ fullscreen = false }: { fullscreen?: boo
       supabase.from('call_logs').select('*').order('created_at', { ascending: false }).limit(200),
       supabase.from('sms_threads').select('*').order('last_message_at', { ascending: false }).limit(200),
       supabase.from('inbound_messages').select('*').order('received_at', { ascending: false }).limit(200),
-      supabase.from('email_send_log').select('*').order('created_at', { ascending: false }).limit(1000),
+      supabase.from('email_send_log').select('*').order('created_at', { ascending: false }).limit(300),
       supabase.from('email_drafts').select('*').order('updated_at', { ascending: false }).limit(100),
       supabase.from('profiles').select('id, full_name, phone').not('phone', 'is', null),
       supabase.from('employees').select('full_name, phone, user_id').not('phone', 'is', null),
@@ -190,17 +190,69 @@ export default function AdminPhoneHub({ fullscreen = false }: { fullscreen?: boo
 
   useEffect(() => { load(); }, [load]);
 
-  useEffect(() => {
-    const channel = supabase.channel('admin-phone-hub')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'call_logs' }, load)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'sms_messages' }, load)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'inbound_messages' }, load)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'email_send_log' }, load)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'message_threads' }, load)
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, load)
-      .subscribe();
-    return () => { supabase.removeChannel(channel); };
+  // Fast refresh: debounced reloads, instant append to the open conversation,
+  // refetch on resume, reconnect on drop, and a light poll while visible.
+  const selectedRef = useRef<Selected>(null);
+  useEffect(() => { selectedRef.current = selected; }, [selected]);
+  const reloadTimer = useRef<number | null>(null);
+  const scheduleLoad = useCallback(() => {
+    if (reloadTimer.current) window.clearTimeout(reloadTimer.current);
+    reloadTimer.current = window.setTimeout(() => { load(); }, 300);
   }, [load]);
+
+  useEffect(() => {
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+    let stopped = false;
+    const subscribe = () => {
+      if (channel) supabase.removeChannel(channel);
+      channel = supabase.channel(`admin-phone-hub-${Date.now()}`)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'call_logs' }, scheduleLoad)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'sms_messages' }, (payload: any) => {
+          const row = payload.new;
+          const sel = selectedRef.current;
+          if (payload.eventType === 'INSERT' && row && sel?.kind === 'text' && row.thread_id === sel.id) {
+            setMessages(cur => cur.some(m => m.id === row.id) ? cur : [...cur, row as SmsMessage]);
+          } else if (payload.eventType === 'UPDATE' && row) {
+            setMessages(cur => cur.map(m => m.id === row.id ? { ...m, ...row } : m));
+          }
+          scheduleLoad();
+        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'sms_threads' }, scheduleLoad)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'inbound_messages' }, scheduleLoad)
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'email_send_log' }, scheduleLoad)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'message_threads' }, scheduleLoad)
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, (payload: any) => {
+          const row = payload.new; const sel = selectedRef.current;
+          if (row && sel?.kind === 'chat' && row.thread_id === sel.id) setChatMsgs(cur => cur.some(m => m.id === row.id) ? cur : [...cur, row as ChatMessage]);
+          scheduleLoad();
+        })
+        .subscribe(status => {
+          if (!stopped && (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED')) setTimeout(() => { if (!stopped) subscribe(); }, 2000);
+        });
+    };
+    subscribe();
+    const refreshOpen = async () => {
+      const sel = selectedRef.current;
+      if (sel?.kind === 'text') {
+        const { data } = await supabase.from('sms_messages').select('*').eq('thread_id', sel.id).order('created_at', { ascending: true });
+        if (data) setMessages(data as SmsMessage[]);
+      } else if (sel?.kind === 'chat') {
+        const { data } = await supabase.from('messages').select('*').eq('thread_id', sel.id).order('created_at', { ascending: true });
+        if (data) setChatMsgs(data as ChatMessage[]);
+      }
+    };
+    const onResume = () => { if (document.visibilityState === 'visible') { scheduleLoad(); refreshOpen(); subscribe(); } };
+    document.addEventListener('visibilitychange', onResume);
+    window.addEventListener('focus', onResume);
+    const poll = window.setInterval(() => { if (document.visibilityState === 'visible') { scheduleLoad(); refreshOpen(); } }, 15000);
+    return () => {
+      stopped = true;
+      document.removeEventListener('visibilitychange', onResume);
+      window.removeEventListener('focus', onResume);
+      window.clearInterval(poll);
+      if (channel) supabase.removeChannel(channel);
+    };
+  }, [scheduleLoad]);
 
   const displayPhone = (phone?: string | null) => names[phoneKey(phone)]?.name || phone || 'Unknown caller';
   const displayTag = (phone?: string | null) => names[phoneKey(phone)]?.tag;
@@ -249,6 +301,7 @@ export default function AdminPhoneHub({ fullscreen = false }: { fullscreen?: boo
 
   const openItem = async (kind: Kind, id: string) => {
     setSelected({ kind, id });
+    if (me) void supabase.from('notifications').update({ read_at: new Date().toISOString() }).eq('user_id', me).eq('category', 'message_updates').is('read_at', null);
     if (kind === 'chat') {
       const { data } = await supabase.from('messages').select('*').eq('thread_id', id).order('created_at', { ascending: true });
       setChatMsgs((data ?? []) as ChatMessage[]);
