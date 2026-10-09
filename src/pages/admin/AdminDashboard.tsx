@@ -40,7 +40,7 @@ import CalendarFeedSettings from '@/components/admin/CalendarFeedSettings';
 import AdminReports from '@/components/admin/AdminReports';
 import AdminSalesDashboard from '@/components/admin/AdminSalesDashboard';
 import { lazy, Suspense } from 'react';
-const TimeSpiral3D = lazy(() => import('@/components/admin/TimeSpiral3D'));
+const StreetRun3D = lazy(() => import('@/components/admin/StreetRun3D'));
 import AdminCustomerShare from '@/components/admin/AdminCustomerShare';
 import AdminGarage from '@/components/admin/AdminGarage';
 import AdminDeclinedWork from '@/components/admin/AdminDeclinedWork';
@@ -154,7 +154,7 @@ const AdminDashboard = () => {
           const tabs: TabDef[] = [
             { value: 'dashboard', label: 'Home', icon: LayoutDashboard, roles: ADMIN_ONLY, content: (
               <Suspense fallback={<div className="h-[60vh] rounded-xl border border-border bg-card animate-pulse" />}>
-                <TimeSpiral3D />
+                <StreetRun3D />
               </Suspense>
             ) },
             { value: 'reports', label: 'Reports', icon: BarChart3, roles: ADMIN_ONLY, content: (
