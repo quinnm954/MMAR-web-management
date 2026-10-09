@@ -3,7 +3,7 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { Suspense } from 'react';
 import { useGLTF, Environment, Lightformer, MeshReflectorMaterial } from '@react-three/drei';
-import { EffectComposer, Bloom, Vignette, SMAA, ToneMapping, ChromaticAberration } from '@react-three/postprocessing';
+import { EffectComposer, Bloom, Vignette, SMAA, HueSaturation, BrightnessContrast, ToneMapping, ChromaticAberration } from '@react-three/postprocessing';
 import { ToneMappingMode, BlendFunction } from 'postprocessing';
 
 // World scrolls toward the camera (+z). Camera sits in the driver's seat looking down -z.
@@ -132,11 +132,11 @@ function StreetLights() {
       </instancedMesh>
       <instancedMesh ref={heads} args={[undefined, undefined, N]} frustumCulled={false}>
         <boxGeometry args={[1.4, 0.15, 0.4]} />
-        <meshBasicMaterial color="#ffe2a8" toneMapped={false} />
+        <meshBasicMaterial color="#ffb25a" toneMapped={false} />
       </instancedMesh>
       <instancedMesh ref={pools} args={[undefined, undefined, N]} frustumCulled={false}>
         <circleGeometry args={[3.2, 24]} />
-        <meshBasicMaterial color="#ffcf85" transparent opacity={0.13} depthWrite={false} />
+        <meshBasicMaterial color="#ff9a3c" transparent opacity={0.18} depthWrite={false} />
       </instancedMesh>
     </>
   );
@@ -193,46 +193,102 @@ function Traffic() {
   );
 }
 
-// ---- Real GT500 (CC-BY 4.0, Jiaxing on Sketchfab) fixed to the camera ----
-// Model forward is +z; driver's eye sits at about (0.37, 1.12, 2.05) in model space.
-function Cockpit() {
-  const { camera, scene } = useThree();
-  const rig = useRef<THREE.Group>(null);
-  const sweep = useRef<THREE.PointLight>(null);
+// ---- Unbranded muscle-car model (CC-BY 4.0, Jiaxing on Sketchfab). Model forward is +z. ----
+function useCar(paint: string) {
   const { scene: car } = useGLTF('/models/gt500.glb');
-  const model = useMemo(() => {
+  return useMemo(() => {
     const m = car.clone(true);
     m.traverse((o: any) => {
       if (!o.isMesh) return;
       o.frustumCulled = false;
-      const mat = o.material as THREE.MeshStandardMaterial;
-      if (mat?.name === 'carpaint') { mat.color = new THREE.Color('#0d1b3d'); mat.metalness = 0.8; mat.roughness = 0.25; }
-      if (mat?.name === 'tinted_glass') { mat.transparent = true; mat.opacity = 0.12; mat.depthWrite = false; }
+      const src = o.material as THREE.MeshPhysicalMaterial;
+      const mat = src.clone() as THREE.MeshPhysicalMaterial;
+      if (mat.name === 'carpaint') {
+        mat.color = new THREE.Color(paint); mat.metalness = 0.85; mat.roughness = 0.22;
+        (mat as any).clearcoat = 1; (mat as any).clearcoatRoughness = 0.04; mat.envMapIntensity = 1.6;
+      }
+      if (mat.name === 'tinted_glass') { mat.color = new THREE.Color('#05070a'); mat.transparent = true; mat.opacity = 0.85; mat.metalness = 1; mat.roughness = 0.05; }
+      if (mat.name === 'rearlight') { mat.emissive = new THREE.Color('#ff1a1a'); mat.emissiveIntensity = 6; mat.toneMapped = false; }
+      if (mat.name === 'light') { mat.emissive = new THREE.Color('#e8f2ff'); mat.emissiveIntensity = 8; mat.toneMapped = false; }
+      if (mat.name === 'plate' || mat.name === 'white_gloss') mat.color = new THREE.Color('#1a1a1a'); // no badges/plates
+      o.material = mat;
     });
     return m;
-  }, [car]);
+  }, [car, paint]);
+}
 
-  useLayoutEffect(() => {
-    scene.add(camera);
-    if (rig.current) camera.add(rig.current);
-    return () => { if (rig.current) camera.remove(rig.current); scene.remove(camera); };
-  }, [camera, scene]);
-
+function HeroCar() {
+  const { camera } = useThree();
+  const car = useRef<THREE.Group>(null);
+  const model = useCar('#ff6a00'); // signature orange
   useFrame(({ clock }) => {
     const t = clock.elapsedTime, v = speedAt(t);
-    const steer = Math.sin(t * 0.35) * 0.5 + Math.sin(t * 0.9) * 0.12;
-    camera.position.set(Math.sin(t * 0.35) * 0.6, 1.15 + Math.sin(t * 7) * 0.004, 0);
-    camera.rotation.set(-0.02, -steer * 0.06, -steer * 0.015);
-    if (sweep.current) sweep.current.intensity = 0.1 + Math.max(0, Math.sin(t * v * 0.13)) * 0.5;
+    const lane = Math.sin(t * 0.35) * 1.6 + Math.sin(t * 0.9) * 0.25;
+    const yaw = Math.cos(t * 0.35) * 0.35 * 0.35;
+    if (car.current) {
+      car.current.position.set(lane, Math.sin(t * 9) * 0.006, -6);
+      car.current.rotation.set(0, Math.PI - yaw, -yaw * 0.25);
+    }
+    // low chase cam, lagging the car, widening with speed
+    const fov = 58 + (v - 24) * 0.35;
+    const cam = camera as THREE.PerspectiveCamera;
+    if (Math.abs(cam.fov - fov) > 0.05) { cam.fov = fov; cam.updateProjectionMatrix(); }
+    camera.position.set(lane * 0.7, 1.35 + Math.sin(t * 13) * 0.01, -0.4);
+    camera.lookAt(lane * 0.9, 0.85, -14);
   });
-
   return (
-    <group ref={rig}>
-      <pointLight ref={sweep} position={[0, 0.6, -0.6]} color="#ffd9a0" distance={3} intensity={1} />
-      <group rotation={[0, Math.PI, 0]} position={[0.37, -1.14, 2.22]}>
-        <primitive object={model} />
-      </group>
+    <group ref={car}>
+      <primitive object={model} />
+      <spotLight position={[0, 0.7, 4.6]} target-position={[0, 0, 30]} angle={0.5} penumbra={0.6} intensity={60} distance={45} color="#eaf3ff" />
+      <pointLight position={[0, 0.5, -0.6]} color="#ff2020" intensity={2} distance={4} />
+      <pointLight position={[0, 2.5, 2]} color="#ffb070" intensity={3} distance={6} />
     </group>
+  );
+}
+
+function RivalCars() {
+  const group = useRef<THREE.Group>(null);
+  const a = useCar('#0b3a8c'), b = useCar('#d9d9d9'), c = useCar('#141414');
+  const cars = useMemo(() => [
+    { m: a, x: -2.4, z: -40, v: 30 }, { m: b, x: 2.4, z: -110, v: 26 }, { m: c, x: -2.4, z: -180, v: 33 },
+  ], [a, b, c]);
+  useFrame(({ clock }, raw) => {
+    const dt = Math.min(raw, 0.05), v = speedAt(clock.elapsedTime);
+    group.current?.children.forEach((g, i) => {
+      const r = cars[i];
+      r.z += (v - r.v) * dt;
+      if (r.z > 6) { r.z = -LENGTH + Math.random() * 30; r.x = Math.random() < 0.5 ? -2.4 : 2.4; }
+      g.position.set(r.x, 0, r.z);
+    });
+  });
+  return (
+    <group ref={group}>
+      {cars.map((r, i) => <group key={i} rotation={[0, Math.PI, 0]}><primitive object={r.m} /></group>)}
+    </group>
+  );
+}
+
+// Speed streaks: thin glowing lines rushing past near the edges of view.
+function SpeedLines() {
+  const ref = useRef<THREE.InstancedMesh>(null);
+  const N = 60;
+  const pts = useMemo(() => Array.from({ length: N }, () => ({
+    x: (Math.random() < 0.5 ? -1 : 1) * (3 + Math.random() * 6), y: 0.3 + Math.random() * 5, z: -Math.random() * 120,
+  })), []);
+  const o = useMemo(() => new THREE.Object3D(), []);
+  useFrame(({ clock }, raw) => {
+    const dt = Math.min(raw, 0.05), v = speedAt(clock.elapsedTime) * 2.2;
+    pts.forEach((p, i) => {
+      p.z += v * dt; if (p.z > 4) p.z -= 124;
+      o.position.set(p.x, p.y, p.z); o.scale.set(1, 1, 1 + v * 0.08); o.updateMatrix(); ref.current!.setMatrixAt(i, o.matrix);
+    });
+    ref.current!.instanceMatrix.needsUpdate = true;
+  });
+  return (
+    <instancedMesh ref={ref} args={[undefined, undefined, N]} frustumCulled={false}>
+      <boxGeometry args={[0.012, 0.012, 1]} />
+      <meshBasicMaterial color="#ffd7a8" transparent opacity={0.35} toneMapped={false} depthWrite={false} />
+    </instancedMesh>
   );
 }
 
@@ -248,27 +304,30 @@ export default function StreetRun3D({ name = 'Mike' }: { name?: string }) {
   const today = new Date().toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric', timeZone: 'America/New_York' });
   return (
     <div className="relative h-[calc(100dvh-9rem)] min-h-[520px] w-full overflow-hidden rounded-xl border border-border bg-background">
-      <Canvas dpr={[1, 1.75]} gl={{ antialias: false, powerPreference: 'high-performance' }} camera={{ fov: narrow ? 78 : 62, near: 0.05, far: 260, position: [0, 1.15, 0] }}>
-        <color attach="background" args={['#05070d']} />
-        <fog attach="fog" args={['#070a14', 30, 200]} />
+      <Canvas dpr={[1, 1.75]} gl={{ antialias: false, powerPreference: 'high-performance' }} camera={{ fov: narrow ? 70 : 58, near: 0.1, far: 260, position: [0, 1.15, 0] }}>
+        <color attach="background" args={['#041014']} />
+        <fog attach="fog" args={['#06181c', 25, 170]} />
         <ambientLight intensity={0.6} />
-        <hemisphereLight args={['#3a4a7a', '#0a0a0a', 0.6]} />
+        <hemisphereLight args={['#2f6f78', '#140a04', 0.7]} />
         <directionalLight position={[0, 20, -40]} intensity={0.5} color="#8fb8ff" />
         <Suspense fallback={null}>
         <Road />
         <Buildings />
         <StreetLights />
         <NeonSigns />
-        <Traffic />
+        <RivalCars />
+        <SpeedLines />
         <Environment resolution={128}>
           <Lightformer intensity={1.5} position={[0, 6, -10]} scale={[20, 4, 1]} color="#ffe2b0" />
           <Lightformer intensity={0.8} position={[-8, 2, 0]} rotation-y={Math.PI / 2} scale={[30, 2, 1]} color="#6fa8ff" />
-          <Lightformer intensity={0.8} position={[8, 2, 0]} rotation-y={-Math.PI / 2} scale={[30, 2, 1]} color="#ff7aa8" />
+          <Lightformer intensity={1} position={[8, 2, 0]} rotation-y={-Math.PI / 2} scale={[30, 2, 1]} color="#ff8a2a" />
         </Environment>
-        <Cockpit />
+        <HeroCar />
         </Suspense>
         <EffectComposer multisampling={0}>
-          <Bloom mipmapBlur intensity={1.4} luminanceThreshold={0.6} luminanceSmoothing={0.2} />
+          <Bloom mipmapBlur intensity={1.8} luminanceThreshold={0.55} luminanceSmoothing={0.25} radius={0.8} />
+          <HueSaturation saturation={0.15} />
+          <BrightnessContrast brightness={0.02} contrast={0.18} />
           <Vignette eskil={false} offset={0.25} darkness={0.75} />
           <ToneMapping mode={ToneMappingMode.ACES_FILMIC} />
           <SMAA />
@@ -279,7 +338,7 @@ export default function StreetRun3D({ name = 'Mike' }: { name?: string }) {
         <p className="text-sm text-muted-foreground">{today}</p>
       </div>
       <a href="https://sketchfab.com/3d-models/ford-mustang-shelby-gt500-0eaa7a16796540f29461ddae05ecdeb3" target="_blank" rel="noreferrer" className="absolute bottom-2 right-3 text-[10px] text-muted-foreground/80 hover:text-foreground">
-        GT500 model by Jiaxing · CC BY 4.0
+        Car model by Jiaxing · CC BY 4.0
       </a>
     </div>
   );
