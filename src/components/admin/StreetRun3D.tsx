@@ -2,7 +2,9 @@ import { useLayoutEffect, useMemo, useRef } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { Suspense } from 'react';
-import { useGLTF, Environment, Lightformer } from '@react-three/drei';
+import { useGLTF, Environment, Lightformer, MeshReflectorMaterial } from '@react-three/drei';
+import { EffectComposer, Bloom, Vignette, SMAA, ToneMapping, ChromaticAberration } from '@react-three/postprocessing';
+import { ToneMappingMode, BlendFunction } from 'postprocessing';
 
 // World scrolls toward the camera (+z). Camera sits in the driver's seat looking down -z.
 const LENGTH = 240;          // recycled stretch of street
@@ -12,13 +14,14 @@ const speedAt = (t: number) => 38 + Math.sin(t * 0.18) * 14 + Math.sin(t * 0.07)
 const wrap = (z: number) => (z > 8 ? z - LENGTH : z);
 
 function windowTexture() {
-  const c = document.createElement('canvas'); c.width = 64; c.height = 128;
+  const c = document.createElement('canvas'); c.width = 256; c.height = 512;
   const g = c.getContext('2d')!;
-  g.fillStyle = '#05070c'; g.fillRect(0, 0, 64, 128);
-  for (let y = 4; y < 128; y += 10) for (let x = 4; x < 64; x += 10) {
-    if (Math.random() < 0.45) { g.fillStyle = Math.random() < 0.7 ? '#ffd27a' : '#9fd4ff'; g.globalAlpha = 0.4 + Math.random() * 0.6; g.fillRect(x, y, 6, 6); }
+  g.fillStyle = '#05070c'; g.fillRect(0, 0, 256, 512);
+  for (let y = 8; y < 512; y += 28) for (let x = 8; x < 256; x += 24) {
+    if (Math.random() < 0.45) { g.fillStyle = Math.random() < 0.7 ? '#ffd27a' : '#9fd4ff'; g.globalAlpha = 0.4 + Math.random() * 0.6; const gr = g.createLinearGradient(x, y, x, y + 18); gr.addColorStop(0, g.fillStyle as string); gr.addColorStop(1, '#3a2a10'); g.fillStyle = gr; g.fillRect(x, y, 16, 18); }
+    g.globalAlpha = 1; g.fillStyle = '#11141c'; g.fillRect(x - 2, y + 19, 20, 3);
   }
-  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.magFilter = THREE.NearestFilter;
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8;
   return t;
 }
 
@@ -55,7 +58,11 @@ function Road() {
     <>
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, -LENGTH / 2]}>
         <planeGeometry args={[14, LENGTH + 20]} />
-        <meshStandardMaterial color="#0c0e13" roughness={0.25} metalness={0.6} />
+        <MeshReflectorMaterial
+          resolution={512} mirror={0.75} blur={[300, 80]} mixBlur={0.9} mixStrength={6}
+          depthScale={1} minDepthThreshold={0.6} maxDepthThreshold={1.2}
+          color="#0a0c11" metalness={0.6} roughness={0.55}
+        />
       </mesh>
       {/* sidewalks */}
       {[-9, 9].map((x) => (
@@ -242,7 +249,7 @@ export default function StreetRun3D({ name = 'Mike' }: { name?: string }) {
   const today = new Date().toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric', timeZone: 'America/New_York' });
   return (
     <div className="relative h-[calc(100dvh-9rem)] min-h-[520px] w-full overflow-hidden rounded-xl border border-border bg-background">
-      <Canvas dpr={[1, 1.75]} camera={{ fov: narrow ? 78 : 62, near: 0.05, far: 260, position: [0, 1.15, 0] }}>
+      <Canvas dpr={[1, 1.75]} gl={{ antialias: false, powerPreference: 'high-performance' }} camera={{ fov: narrow ? 78 : 62, near: 0.05, far: 260, position: [0, 1.15, 0] }}>
         <color attach="background" args={['#05070d']} />
         <fog attach="fog" args={['#070a14', 30, 200]} />
         <ambientLight intensity={0.35} />
@@ -261,6 +268,13 @@ export default function StreetRun3D({ name = 'Mike' }: { name?: string }) {
         </Environment>
         <Cockpit />
         </Suspense>
+        <EffectComposer multisampling={0}>
+          <Bloom mipmapBlur intensity={1.1} luminanceThreshold={0.75} luminanceSmoothing={0.2} />
+          <ChromaticAberration blendFunction={BlendFunction.NORMAL} offset={new THREE.Vector2(0.0006, 0.0006)} radialModulation={false} modulationOffset={0} />
+          <Vignette eskil={false} offset={0.25} darkness={0.75} />
+          <ToneMapping mode={ToneMappingMode.ACES_FILMIC} />
+          <SMAA />
+        </EffectComposer>
       </Canvas>
       <div className="pointer-events-none absolute left-4 top-4">
         <p className="font-display text-2xl sm:text-3xl text-foreground drop-shadow">{greeting()}, {name}</p>
