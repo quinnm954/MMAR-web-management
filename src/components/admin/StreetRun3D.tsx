@@ -71,7 +71,7 @@ function Road() {
           <meshStandardMaterial color="#1a1c22" roughness={0.9} />
         </mesh>
       ))}
-      <instancedMesh ref={lines} args={[undefined, undefined, N]}>
+      <instancedMesh ref={lines} args={[undefined, undefined, N]} frustumCulled={false}>
         <boxGeometry args={[0.18, 0.01, 2.4]} />
         <meshBasicMaterial color="#e8e2c8" toneMapped={false} />
       </instancedMesh>
@@ -98,7 +98,7 @@ function Buildings() {
     ref.current!.instanceMatrix.needsUpdate = true;
   });
   return (
-    <instancedMesh ref={ref} args={[undefined, undefined, N]}>
+    <instancedMesh ref={ref} args={[undefined, undefined, N]} frustumCulled={false}>
       <boxGeometry />
       <meshStandardMaterial color="#0b0d14" emissive="#ffffff" emissiveMap={tex} emissiveIntensity={3} roughness={0.8} />
     </instancedMesh>
@@ -126,15 +126,15 @@ function StreetLights() {
   });
   return (
     <>
-      <instancedMesh ref={poles} args={[undefined, undefined, N]}>
+      <instancedMesh ref={poles} args={[undefined, undefined, N]} frustumCulled={false}>
         <cylinderGeometry args={[0.08, 0.1, 7, 6]} />
         <meshStandardMaterial color="#2a2d33" />
       </instancedMesh>
-      <instancedMesh ref={heads} args={[undefined, undefined, N]}>
+      <instancedMesh ref={heads} args={[undefined, undefined, N]} frustumCulled={false}>
         <boxGeometry args={[1.4, 0.15, 0.4]} />
         <meshBasicMaterial color="#ffe2a8" toneMapped={false} />
       </instancedMesh>
-      <instancedMesh ref={pools} args={[undefined, undefined, N]}>
+      <instancedMesh ref={pools} args={[undefined, undefined, N]} frustumCulled={false}>
         <circleGeometry args={[3.2, 24]} />
         <meshBasicMaterial color="#ffcf85" transparent opacity={0.13} depthWrite={false} />
       </instancedMesh>
@@ -223,14 +223,13 @@ function Cockpit() {
     const steer = Math.sin(t * 0.35) * 0.5 + Math.sin(t * 0.9) * 0.12;
     camera.position.set(Math.sin(t * 0.35) * 0.6, 1.15 + Math.sin(t * 7) * 0.004, 0);
     camera.rotation.set(-0.02, -steer * 0.06, -steer * 0.015);
-    if (sweep.current) sweep.current.intensity = 0.4 + Math.max(0, Math.sin(t * v * 0.13)) * 1.6;
+    if (sweep.current) sweep.current.intensity = 0.1 + Math.max(0, Math.sin(t * v * 0.13)) * 0.5;
   });
 
   return (
     <group ref={rig}>
       <pointLight ref={sweep} position={[0, 0.6, -0.6]} color="#ffd9a0" distance={3} intensity={1} />
-      <pointLight position={[0, -0.2, -0.5]} color="#9fc6ff" distance={1.2} intensity={0.25} />
-      <group rotation={[0, Math.PI, 0]} position={[0.37, -1.08, 2.22]}>
+      <group rotation={[0, Math.PI, 0]} position={[0.37, -1.14, 2.22]}>
         <primitive object={model} />
       </group>
     </group>
