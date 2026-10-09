@@ -1,3 +1,4 @@
+import AddCustomerFromThread from '@/components/admin/AddCustomerFromThread';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { format, formatDistanceToNow } from 'date-fns';
 import {
@@ -118,6 +119,7 @@ export default function AdminPhoneHub({ fullscreen = false }: { fullscreen?: boo
   const [chatMsgs, setChatMsgs] = useState<ChatMessage[]>([]);
   const [chatReads, setChatReads] = useState<Record<string, string>>({});
   const [me, setMe] = useState<string | null>(null);
+  const [addOpen, setAddOpen] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -528,7 +530,7 @@ export default function AdminPhoneHub({ fullscreen = false }: { fullscreen?: boo
             {activeCall ? (
               <CallDetail call={activeCall} name={displayPhone(activeCall.direction === 'outbound' ? activeCall.to_number : activeCall.from_number)} tag={displayTag(activeCall.from_number)} onBack={() => setSelected(null)} onCall={() => activeCall.from_number && dialInApp(activeCall.from_number)} onText={() => activeCall.from_number && startText(activeCall.from_number)} />
             ) : activeThread ? (
-              <TextDetail thread={activeThread} name={displayPhone(activeThread.phone)} tag={displayTag(activeThread.phone)} messages={messages} reply={reply} sending={sending} onReply={setReply} onSend={sendText} onBack={() => setSelected(null)} onCall={() => dialInApp(activeThread.phone)} />
+              <TextDetail thread={activeThread} name={displayPhone(activeThread.phone)} tag={displayTag(activeThread.phone)} messages={messages} reply={reply} sending={sending} onReply={setReply} onSend={sendText} onBack={() => setSelected(null)} onCall={() => dialInApp(activeThread.phone)} onAddCustomer={!activeThread.customer_id && !names[phoneKey(activeThread.phone)] ? () => setAddOpen(true) : undefined} />
             ) : activeChat ? (
               <ChatDetail title={chatTitle(activeChat)} subtitle={activeChat.subject || (activeChat.tech_id ? 'tech chat' : 'app chat')} me={me} messages={chatMsgs} names={chatNames} reply={reply} sending={sending} onReply={setReply} onSend={sendChat} onBack={() => setSelected(null)} />
             ) : activeEmail ? (
@@ -536,6 +538,7 @@ export default function AdminPhoneHub({ fullscreen = false }: { fullscreen?: boo
             ) : null}
           </section>
 
+          {activeThread && <AddCustomerFromThread open={addOpen} onOpenChange={setAddOpen} threadId={activeThread.id} phone={activeThread.phone} onSaved={load} />}
           {/* Keypad sheet */}
           <Sheet open={dialOpen} onClose={() => setDialOpen(false)}>
             <div className="text-center pt-2">
@@ -750,11 +753,14 @@ function CallDetail({ call, name, tag, onBack, onCall, onText }: { call: CallRow
   );
 }
 
-function TextDetail({ thread, name, tag, messages, reply, sending, onReply, onSend, onBack, onCall }: { thread: TextThread; name: string; tag?: string; messages: SmsMessage[]; reply: string; sending: boolean; onReply: (value: string) => void; onSend: () => void; onBack: () => void; onCall: () => void }) {
+function TextDetail({ thread, name, tag, messages, reply, sending, onReply, onSend, onBack, onCall, onAddCustomer }: { thread: TextThread; name: string; tag?: string; messages: SmsMessage[]; reply: string; sending: boolean; onReply: (value: string) => void; onSend: () => void; onBack: () => void; onCall: () => void; onAddCustomer?: () => void }) {
   const boxRef = useBottom([messages, thread.id]);
   return (
     <>
       <NavBar onBack={onBack} right={<button onClick={onCall} title="Call" className="p-1"><Phone className="h-5 w-5" /></button>}><ContactHead name={name} sub={tag || thread.phone} /></NavBar>
+      {onAddCustomer && (
+        <button onClick={onAddCustomer} className="mx-4 mt-1 mb-1 shrink-0 rounded-xl bg-[hsl(var(--ios-fill))] py-2 text-[15px] font-medium text-[hsl(var(--ios-blue))]">Add to customers</button>
+      )}
       <Bubbles items={messages} boxRef={boxRef} mine={m => m.direction === 'outbound'} render={m => (
         <>
           <MessageMedia media={m.media_urls} />
