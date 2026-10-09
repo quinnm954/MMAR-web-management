@@ -39,6 +39,8 @@ import AdminShopSettings from '@/components/admin/AdminShopSettings';
 import CalendarFeedSettings from '@/components/admin/CalendarFeedSettings';
 import AdminReports from '@/components/admin/AdminReports';
 import AdminSalesDashboard from '@/components/admin/AdminSalesDashboard';
+import { lazy, Suspense } from 'react';
+const FloridaMap3D = lazy(() => import('@/components/admin/FloridaMap3D'));
 import AdminCustomerShare from '@/components/admin/AdminCustomerShare';
 import AdminGarage from '@/components/admin/AdminGarage';
 import AdminDeclinedWork from '@/components/admin/AdminDeclinedWork';
@@ -150,8 +152,20 @@ const AdminDashboard = () => {
       <main className="container mx-auto px-2 sm:px-4 py-3 sm:py-8 space-y-4 sm:space-y-6 safe-pb">
         {(() => {
           const tabs: TabDef[] = [
-            { value: 'dashboard', label: 'Sales Dashboard', icon: LayoutDashboard, roles: ADMIN_ONLY, content: <AdminSalesDashboard /> },
-            { value: 'reports', label: 'Reports', icon: BarChart3, roles: ADMIN_ONLY, content: <AdminReports /> },
+            { value: 'dashboard', label: 'Sales Dashboard', icon: LayoutDashboard, roles: ADMIN_ONLY, content: (
+              <Suspense fallback={<div className="h-[60vh] rounded-xl border border-border bg-card animate-pulse" />}>
+                <FloridaMap3D onOpenReports={() => { window.location.search = '?tab=reports'; }} />
+              </Suspense>
+            ) },
+            { value: 'reports', label: 'Reports', icon: BarChart3, roles: ADMIN_ONLY, content: (
+              <div className="space-y-8">
+                <AdminSalesDashboard />
+                <div className="border-t border-border pt-6">
+                  <h2 className="font-display text-xl mb-3">Profit &amp; invoices</h2>
+                  <AdminReports />
+                </div>
+              </div>
+            ) },
             { value: 'calendar', label: 'Calendar', icon: Calendar, roles: ALL, content: <AdminCalendar /> },
             { value: 'ros', label: 'Repair Orders', icon: Wrench, roles: ALL, content: <AdminRepairOrders /> },
             { value: 'customers', label: 'Customers', icon: Users, roles: ADVISOR, content: <AdminCustomers /> },
