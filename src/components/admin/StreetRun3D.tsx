@@ -211,7 +211,7 @@ function Cockpit() {
     if (speedNeedle.current) speedNeedle.current.rotation.z = Math.PI * 0.75 - vn * Math.PI * 1.5 + Math.PI;
     const rpm = (((t * 0.25) % 1) * 0.6 + 0.3);
     if (tachNeedle.current) tachNeedle.current.rotation.z = Math.PI * 0.75 - rpm * Math.PI * 1.5 + Math.PI;
-    if (sweep.current) sweep.current.intensity = 2 + Math.max(0, Math.sin(t * v * 0.13)) * 6;
+    if (sweep.current) sweep.current.intensity = 0.15 + Math.max(0, Math.sin(t * v * 0.13)) * 0.6;
   });
 
   const needle = (ref: React.RefObject<THREE.Mesh>) => (
