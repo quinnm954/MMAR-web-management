@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { Share, X } from 'lucide-react';
 import AdminPhoneHub from '@/components/admin/AdminPhoneHub';
 import { markPhoneApp } from '@/lib/phoneApp';
+import { useAuth } from '@/hooks/useAuth';
+import { ensureNotificationPermission, isRegistrationAllowed, subscribeUser } from '@/hooks/useWebPushRegistration';
 
 function setMeta(selector: string, attr: string, value: string) {
   const el = document.querySelector(selector);
@@ -16,6 +18,16 @@ const isStandalone = () =>
 
 export default function AdminPhoneApp() {
   const [showTip, setShowTip] = useState(false);
+  const { user } = useAuth();
+  const [askPush, setAskPush] = useState(false);
+  useEffect(() => {
+    if (isStandalone() && isRegistrationAllowed() && (window as any).Notification?.permission !== 'granted' && (window as any).Notification?.permission !== 'denied') setAskPush(true);
+  }, []);
+  const enablePush = async () => {
+    const perm = await ensureNotificationPermission();
+    if (perm === 'granted' && user) { try { await subscribeUser(user.id); } catch {} }
+    setAskPush(false);
+  };
 
   useEffect(() => {
     if (isStandalone()) markPhoneApp();
@@ -42,6 +54,16 @@ export default function AdminPhoneApp() {
   return (
     <>
       <AdminPhoneHub fullscreen />
+      {askPush && (
+        <div className="ios fixed inset-x-3 bottom-[calc(env(safe-area-inset-bottom)+84px)] z-[60] rounded-2xl ios-frost border border-[hsl(var(--ios-separator))] p-4 text-[15px] shadow-lg">
+          <p className="font-semibold mb-1">Get call and text alerts here</p>
+          <p className="text-[hsl(var(--ios-label-2))] mb-3">Calls, texts, chat and email alerts will show up in MMAR Phone.</p>
+          <div className="flex gap-2">
+            <button onClick={enablePush} className="flex-1 rounded-xl bg-[hsl(var(--ios-blue))] py-2.5 font-semibold text-[hsl(var(--ios-label))]">Allow notifications</button>
+            <button onClick={() => setAskPush(false)} className="rounded-xl px-4 py-2.5 text-[hsl(var(--ios-label-2))]">Later</button>
+          </div>
+        </div>
+      )}
       {showTip && (
         <div className="ios fixed inset-x-3 bottom-[calc(env(safe-area-inset-bottom)+84px)] z-[60] rounded-2xl ios-frost border border-[hsl(var(--ios-separator))] p-4 text-[15px] shadow-lg">
           <button aria-label="Close" className="absolute right-2 top-2 p-1 text-[hsl(var(--ios-label-2))]" onClick={() => { localStorage.setItem('mmarPhoneTipDismissed', '1'); setShowTip(false); }}><X className="h-5 w-5" /></button>

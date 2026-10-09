@@ -26,3 +26,5 @@
 ## Repair Orders
 - [x] Name repair orders from the approved repair descriptions instead of “Approved Estimate.”
 - [x] Correct existing generic repair-order names.
+- [x] MMAR Phone red phone icon
+- [x] Route communication alerts to MMAR Phone, service alerts to Garage Ace
