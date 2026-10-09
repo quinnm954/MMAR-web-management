@@ -321,10 +321,6 @@ const EstimateApproval = () => {
       )}
 
       <DocReferences
-        financingHref={
-          financingChoice === 'yes' && est?.id ? `/financing-contract?estimate=${est.id}` : undefined
-        }
-        hideFinancing={est?.status === 'declined' || !locked || financingChoice !== 'yes'}
         estimateToken={token}
         estimateId={est?.id}
       />
