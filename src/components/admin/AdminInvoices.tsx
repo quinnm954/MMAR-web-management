@@ -325,55 +325,44 @@ const AdminInvoices = () => {
 
   const [textingId, setTextingId] = useState<string | null>(null);
 
+  const [linkDlg, setLinkDlg] = useState<{ url: string; title: string; text: string } | null>(null);
+  const fetchLink = async (invoice: Invoice) => {
+    const { data, error } = await supabase.functions.invoke("send-invoice-payment-link", { body: { invoice_id: invoice.id, copy_only: true } });
+    const respErr = (data as any)?.error || error?.message;
+    if (respErr) throw new Error(respErr);
+    const url = (data as any)?.url;
+    if (!url) throw new Error("No link returned");
+    return {
+      url: url as string,
+      title: `Invoice ${invoice.invoice_number ?? ''}`.trim(),
+      text: `${invoice.customer?.full_name || 'Customer'}, here is your invoice from MMAR for $${(invoice.total - invoice.amount_paid).toFixed(2)}. Cash is not accepted - please pay the invoice, not the technician:`,
+    };
+  };
   const sharePaymentLink = async (invoice: Invoice) => {
     setTextingId(invoice.id);
-    const { data, error } = await supabase.functions.invoke("send-invoice-payment-link", { body: { invoice_id: invoice.id, copy_only: true } });
-    setTextingId(null);
-    const respErr = (data as any)?.error || error?.message;
-    if (respErr) return toast.error(respErr);
-    const url = (data as any)?.url;
-    if (!url) return toast.error("No link returned");
-    // Phones block share/copy after a network wait, so offer a fresh tap.
-    const title = `Invoice ${invoice.invoice_number ?? ''}`.trim();
-    const text = `${invoice.customer?.full_name || 'Customer'}, here is your invoice from MMAR for $${(invoice.total - invoice.amount_paid).toFixed(2)}:`;
-    toast.success('Payment link ready', {
-      duration: 15000,
-      action: { label: 'Share', onClick: () => { shareLink({ url, title, text, copyToastMessage: 'Payment link copied' }); } },
-    });
+    try { setLinkDlg(await fetchLink(invoice)); }
+    catch (e: any) { toast.error(e?.message || "Could not get link"); }
+    finally { setTextingId(null); }
   };
 
   const [copyingId, setCopyingId] = useState<string | null>(null);
   const copyPaymentLink = async (invoiceId: string) => {
+    const inv = invoices.find((x) => x.id === invoiceId);
+    if (!inv) return;
     setCopyingId(invoiceId);
-    const fetchUrl = async () => {
-      const { data, error } = await supabase.functions.invoke("send-invoice-payment-link", { body: { invoice_id: invoiceId, copy_only: true } });
-      const respErr = (data as any)?.error || error?.message;
-      if (respErr) throw new Error(respErr);
-      const url = (data as any)?.url;
-      if (!url) throw new Error("No link returned");
-      return url as string;
-    };
-    try {
-      if (typeof ClipboardItem !== "undefined" && navigator.clipboard?.write) {
-        // Hand the clipboard a pending promise inside the tap so iPhone allows it
-        let got = "";
-        const p = fetchUrl().then((u) => { got = u; return new Blob([u], { type: "text/plain" }); });
-        try {
-          await navigator.clipboard.write([new ClipboardItem({ "text/plain": p })]);
-          toast.success("Payment link copied");
-        } catch {
-          const u = got || await fetchUrl();
-          window.prompt("Copy payment link:", u);
-        }
-      } else {
-        const u = await fetchUrl();
-        try { await navigator.clipboard.writeText(u); toast.success("Payment link copied"); }
-        catch { window.prompt("Copy payment link:", u); }
-      }
-    } catch (e: any) {
-      toast.error(e?.message || "Could not get link");
-    } finally {
-      setCopyingId(null);
+    try { setLinkDlg(await fetchLink(inv)); }
+    catch (e: any) { toast.error(e?.message || "Could not get link"); }
+    finally { setCopyingId(null); }
+  };
+  const copyFromDialog = async () => {
+    if (!linkDlg) return;
+    try { await navigator.clipboard.writeText(linkDlg.url); toast.success("Payment link copied"); return; } catch {}
+    const el = document.getElementById("invoice-link-field") as HTMLInputElement | null;
+    if (el) {
+      el.focus(); el.select(); el.setSelectionRange(0, el.value.length);
+      const ok = document.execCommand?.("copy");
+      if (ok) toast.success("Payment link copied");
+      else toast.info("Link selected — press and hold to copy");
     }
   };
 
