@@ -100,7 +100,7 @@ function Buildings() {
   return (
     <instancedMesh ref={ref} args={[undefined, undefined, N]}>
       <boxGeometry />
-      <meshStandardMaterial color="#0b0d14" emissive="#ffffff" emissiveMap={tex} emissiveIntensity={1.1} roughness={0.8} />
+      <meshStandardMaterial color="#0b0d14" emissive="#ffffff" emissiveMap={tex} emissiveIntensity={3} roughness={0.8} />
     </instancedMesh>
   );
 }
@@ -230,7 +230,7 @@ function Cockpit() {
     <group ref={rig}>
       <pointLight ref={sweep} position={[0, 0.6, -0.6]} color="#ffd9a0" distance={3} intensity={1} />
       <pointLight position={[0, -0.2, -0.5]} color="#9fc6ff" distance={1.2} intensity={0.25} />
-      <group rotation={[0, Math.PI, 0]} position={[0.37, -1.12, 2.05]}>
+      <group rotation={[0, Math.PI, 0]} position={[0.37, -1.08, 2.22]}>
         <primitive object={model} />
       </group>
     </group>
@@ -252,7 +252,7 @@ export default function StreetRun3D({ name = 'Mike' }: { name?: string }) {
       <Canvas dpr={[1, 1.75]} gl={{ antialias: false, powerPreference: 'high-performance' }} camera={{ fov: narrow ? 78 : 62, near: 0.05, far: 260, position: [0, 1.15, 0] }}>
         <color attach="background" args={['#05070d']} />
         <fog attach="fog" args={['#070a14', 30, 200]} />
-        <ambientLight intensity={0.35} />
+        <ambientLight intensity={0.6} />
         <hemisphereLight args={['#3a4a7a', '#0a0a0a', 0.6]} />
         <directionalLight position={[0, 20, -40]} intensity={0.5} color="#8fb8ff" />
         <Suspense fallback={null}>
@@ -269,8 +269,7 @@ export default function StreetRun3D({ name = 'Mike' }: { name?: string }) {
         <Cockpit />
         </Suspense>
         <EffectComposer multisampling={0}>
-          <Bloom mipmapBlur intensity={1.1} luminanceThreshold={0.75} luminanceSmoothing={0.2} />
-          <ChromaticAberration blendFunction={BlendFunction.NORMAL} offset={new THREE.Vector2(0.0006, 0.0006)} radialModulation={false} modulationOffset={0} />
+          <Bloom mipmapBlur intensity={1.4} luminanceThreshold={0.6} luminanceSmoothing={0.2} />
           <Vignette eskil={false} offset={0.25} darkness={0.75} />
           <ToneMapping mode={ToneMappingMode.ACES_FILMIC} />
           <SMAA />
