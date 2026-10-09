@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { techHoursForInvoice } from '@/lib/techHours';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
@@ -74,20 +75,7 @@ const partCost = (li: LineItem) => {
 
 const itemKind = (li: LineItem) => String(li.kind ?? (Number(li.labor_hours ?? 0) > 0 ? 'labor' : 'part')).toLowerCase();
 
-const laborHoursFromInvoice = (items: LineItem[], fallbackRate: number, fallbackSubtotal: number) => {
-  const hours = items.reduce((sum, li) => {
-    const kind = itemKind(li);
-    if (kind !== 'labor' && !(kind !== 'part' && Number(li.labor_hours) > 0)) return sum;
-    const explicit = Number(li.labor_hours ?? 0);
-    if (explicit > 0) return sum + explicit;
-    const qty = Number(li.quantity ?? 0);
-    if (qty > 0 && kind === 'labor') return sum + qty;
-    const unit = Number(li.unit_price ?? 0);
-    const amount = itemAmount(li);
-    return sum + (unit > 0 ? amount / unit : 0);
-  }, 0);
-  return hours > 0 ? hours : (items.length === 0 && fallbackRate > 0 && fallbackSubtotal > 0 ? fallbackSubtotal / fallbackRate : 0);
-};
+const laborHoursFromInvoice = (items: LineItem[], _fallbackRate: number, _fallbackSubtotal: number) => techHoursForInvoice(items);
 
 export default function AdminReports() {
   const [data, setData] = useState({

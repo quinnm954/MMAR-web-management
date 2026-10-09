@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { techHoursForInvoice, techHoursForLine, isDiagnosisLine } from '@/lib/techHours';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Progress } from '@/components/ui/progress';
@@ -180,15 +181,16 @@ export default function AdminSalesDashboard() {
         const qty = Number(li.quantity ?? 1), price = Number(li.unit_price ?? 0);
         const amt = Number(li.amount ?? qty * price);
         const k = String(li.kind || 'part').toLowerCase();
-        const desc = `${li.name ?? ''} ${li.description ?? ''}`.toLowerCase();
-        if (k === 'diagnosis' || k === 'diagnostic' || /diagnos|diag\b|inspection|scan/.test(desc)) acc.diagnosis += amt;
-        else if (k === 'labor') { acc.labor += amt; hrs += amt / 125; }
+        hrs += techHoursForLine(li);
+        if (isDiagnosisLine(li)) acc.diagnosis += amt;
+        else if (k === 'labor') acc.labor += amt;
         else if (k === 'part') acc.parts += amt;
       });
     });
     return {
       mix: [{ name: 'Diagnosis', value: Math.round(acc.diagnosis) }, { name: 'Labor', value: Math.round(acc.labor) }, { name: 'Parts', value: Math.round(acc.parts) }].filter(x => x.value > 0),
-      laborBilled: acc.labor, laborHours: hrs,
+      // Labor margin covers everything the tech is paid for (labor + diagnosis)
+      laborBilled: acc.labor + acc.diagnosis, laborHours: hrs,
     };
   }, [paid]);
   const jobStats = useMemo(() => {
@@ -197,11 +199,9 @@ export default function AdminSalesDashboard() {
     const ids = new Set(month.map(j => j.id));
     let hrs = 0, rev = 0; const withInv = new Set<string>();
     invoices.forEach(inv => {
-      if (!inv.appointment_id || !ids.has(inv.appointment_id) || inv.status === 'void') return;
+      if (!inv.appointment_id || !ids.has(inv.appointment_id) || inv.status !== 'paid') return;
       withInv.add(inv.appointment_id); rev += Number(inv.total || 0);
-      (Array.isArray(inv.line_items) ? inv.line_items : []).forEach((li: any) => {
-        if (String(li.kind).toLowerCase() === 'labor') hrs += Number(li.amount ?? Number(li.quantity ?? 1) * Number(li.unit_price ?? 0)) / 125;
-      });
+      hrs += techHoursForInvoice(inv.line_items);
     });
     return { week: week.length, month: month.length, hrsPerJob: withInv.size ? hrs / withInv.size : null, revPerJob: withInv.size ? rev / withInv.size : null };
   }, [doneJobs, invoices]);

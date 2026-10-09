@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { techHoursForInvoice } from "@/lib/techHours";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2, DollarSign } from "lucide-react";
@@ -23,20 +24,7 @@ const lineAmount = (li: any) => {
   return Number(li?.amount ?? qty * price) || 0;
 };
 
-const paidLaborHours = (items: any[], fallbackRate: number, fallbackSubtotal: number) => {
-  const hours = items.reduce((sum, li) => {
-    const kind = String(li?.kind ?? (Number(li?.labor_hours ?? 0) > 0 ? "labor" : "part")).toLowerCase();
-    if (kind !== "labor" && !(kind !== "part" && Number(li?.labor_hours) > 0)) return sum;
-    const explicit = Number(li?.labor_hours ?? 0);
-    if (explicit > 0) return sum + explicit;
-    const qty = Number(li?.quantity ?? 0);
-    if (qty > 0 && kind === "labor") return sum + qty;
-    const unit = Number(li?.unit_price ?? 0);
-    const amount = lineAmount(li);
-    return sum + (unit > 0 ? amount / unit : 0);
-  }, 0);
-  return hours > 0 ? hours : (items.length === 0 && fallbackRate > 0 && fallbackSubtotal > 0 ? fallbackSubtotal / fallbackRate : 0);
-};
+const paidLaborHours = (items: any[], _fallbackRate: number, _fallbackSubtotal: number) => techHoursForInvoice(items);
 
 const resolveTechId = (techId: string | null | undefined, employeeById: Map<string, any>) => {
   if (!techId) return null;
