@@ -1,0 +1,1 @@
+ALTER PUBLICATION supabase_realtime ADD TABLE public.invoices, public.invoice_payments, public.appointments, public.estimates;
