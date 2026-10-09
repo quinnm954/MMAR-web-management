@@ -199,6 +199,7 @@ function useCar(paint: string) {
   return useMemo(() => {
     const m = car.clone(true);
     m.traverse((o: any) => {
+      if (/Badge/i.test(o.name) || /Badge/i.test(o.parent?.name ?? '')) { o.visible = false; return; } // no branding
       if (!o.isMesh) return;
       o.frustumCulled = false;
       const src = o.material as THREE.MeshPhysicalMaterial;
@@ -210,7 +211,6 @@ function useCar(paint: string) {
       if (mat.name === 'tinted_glass') { mat.color = new THREE.Color('#05070a'); mat.transparent = true; mat.opacity = 0.85; mat.metalness = 1; mat.roughness = 0.05; }
       if (mat.name === 'rearlight') { mat.emissive = new THREE.Color('#ff1a1a'); mat.emissiveIntensity = 6; mat.toneMapped = false; }
       if (mat.name === 'light') { mat.emissive = new THREE.Color('#e8f2ff'); mat.emissiveIntensity = 3; mat.toneMapped = false; }
-      if (mat.name === 'plate' || mat.name === 'white_gloss') mat.color = new THREE.Color('#1a1a1a'); // no badges/plates
       o.material = mat;
     });
     return m;
