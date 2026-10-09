@@ -239,6 +239,13 @@
       "when": 1791574483266,
       "tag": "0033_block_delete_paid_jobs",
       "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1791574797561,
+      "tag": "0034_realtime_sales_tables",
+      "breakpoints": true
     }
   ]
 }
