@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 
-const GA_IDS = ["AW-17463969717", "AW-18160507059"];
+const GA_IDS = ["AW-18160507059"];
 
 /**
  * Fires a page_view to all configured Google tags on every SPA route change.
