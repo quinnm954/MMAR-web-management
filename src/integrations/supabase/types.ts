@@ -3749,6 +3749,7 @@ export type Database = {
       }
       web_push_subscriptions: {
         Row: {
+          app: string
           auth: string
           created_at: string
           endpoint: string
@@ -3759,6 +3760,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          app?: string
           auth: string
           created_at?: string
           endpoint: string
@@ -3769,6 +3771,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          app?: string
           auth?: string
           created_at?: string
           endpoint?: string
