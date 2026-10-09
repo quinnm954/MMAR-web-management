@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { TrendingUp, TrendingDown, Wallet, ClipboardList, Wrench, Target, Pencil, Check } from 'lucide-react';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid, BarChart, Bar, PieChart, Pie, Cell, Legend, Line, ComposedChart } from 'recharts';
 import { toast } from 'sonner';
+import DailyTodo from './DailyTodo';
 
 type Inv = {
   id: string; total: number | null; amount_paid: number | null; status: string; created_at: string;
@@ -226,6 +227,7 @@ export default function AdminSalesDashboard() {
 
   return (
     <div className="space-y-5 font-sans">
+      <DailyTodo />
       {/* Headline */}
       <Card className="overflow-hidden border-primary/30 bg-gradient-to-br from-primary/10 via-card to-card">
         <CardContent className="p-5 grid gap-5 lg:grid-cols-[1.3fr_1fr]">
