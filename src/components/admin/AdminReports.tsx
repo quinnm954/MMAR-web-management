@@ -118,17 +118,20 @@ export default function AdminReports() {
   const [techFilter, setTechFilter] = useState<string>('all');
 
   const [syncing, setSyncing] = useState(false);
+  const [prevRevenue, setPrevRevenue] = useState(0);
 
   const load = useCallback(async () => {
       const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
+      const prevSince = new Date(Date.now() - 2 * days * 24 * 60 * 60 * 1000).toISOString();
 
-      const [inv, completed, members, ests, settings, employeesRes, mpRes] = await Promise.all([
+      const [inv, completed, members, ests, settings, employeesRes, mpRes, prevInv] = await Promise.all([
         supabase
           .from('invoices')
-          .select('id, invoice_number, total, subtotal, status, created_at, customer_id, service_record_id, technician_id, line_items, stripe_session_id, stripe_payment_intent_id, stripe_fee, stripe_fee_synced_at')
-          .gte('created_at', since)
-          .order('created_at', { ascending: false }),
-        supabase.from('appointments').select('id', { count: 'exact', head: true }).eq('status', 'completed').gte('created_at', since),
+          .select('id, invoice_number, total, subtotal, status, created_at, paid_at, customer_id, service_record_id, technician_id, line_items, stripe_session_id, stripe_payment_intent_id, stripe_fee, stripe_fee_synced_at')
+          .eq('status', 'paid')
+          .gte('paid_at', since)
+          .order('paid_at', { ascending: false }),
+        supabase.from('appointments').select('id', { count: 'exact', head: true }).eq('status', 'completed').gte('completed_at', since),
         supabase.from('memberships').select('id', { count: 'exact', head: true }).eq('status', 'active'),
         supabase.from('estimates').select('id', { count: 'exact', head: true }).eq('status', 'sent'),
         supabase.from('shop_settings').select('labor_cost_per_hour').eq('id', 1).single(),
@@ -139,10 +142,12 @@ export default function AdminReports() {
           .eq('status', 'paid')
           .gte('paid_at', since)
           .order('paid_at', { ascending: false }),
+        supabase.from('invoices').select('total').eq('status', 'paid').gte('paid_at', prevSince).lt('paid_at', since),
       ]);
+      setPrevRevenue(((prevInv.data ?? []) as any[]).reduce((s, i) => s + Number(i.total || 0), 0));
 
-      const allInvoices = ((inv.data ?? []) as any[]) as InvoiceRow[];
-      const paid = allInvoices.filter((i) => i.status === 'paid');
+      const allInvoices = ((inv.data ?? []) as any[]).map((i) => ({ ...i, created_at: i.paid_at || i.created_at })) as InvoiceRow[];
+      const paid = allInvoices;
       const revenue = paid.reduce((s, i) => s + Number(i.total || 0), 0);
 
       const configuredRate = Number((settings.data as any)?.labor_cost_per_hour);
