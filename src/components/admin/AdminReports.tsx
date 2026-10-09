@@ -6,7 +6,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { Loader2, RefreshCw } from 'lucide-react';
+import { Loader2, RefreshCw, Download } from 'lucide-react';
+import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
@@ -118,17 +119,20 @@ export default function AdminReports() {
   const [techFilter, setTechFilter] = useState<string>('all');
 
   const [syncing, setSyncing] = useState(false);
+  const [prevRevenue, setPrevRevenue] = useState(0);
 
   const load = useCallback(async () => {
       const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
+      const prevSince = new Date(Date.now() - 2 * days * 24 * 60 * 60 * 1000).toISOString();
 
-      const [inv, completed, members, ests, settings, employeesRes, mpRes] = await Promise.all([
+      const [inv, completed, members, ests, settings, employeesRes, mpRes, prevInv] = await Promise.all([
         supabase
           .from('invoices')
-          .select('id, invoice_number, total, subtotal, status, created_at, customer_id, service_record_id, technician_id, line_items, stripe_session_id, stripe_payment_intent_id, stripe_fee, stripe_fee_synced_at')
-          .gte('created_at', since)
-          .order('created_at', { ascending: false }),
-        supabase.from('appointments').select('id', { count: 'exact', head: true }).eq('status', 'completed').gte('created_at', since),
+          .select('id, invoice_number, total, subtotal, status, created_at, paid_at, customer_id, service_record_id, technician_id, line_items, stripe_session_id, stripe_payment_intent_id, stripe_fee, stripe_fee_synced_at')
+          .eq('status', 'paid')
+          .gte('paid_at', since)
+          .order('paid_at', { ascending: false }),
+        supabase.from('appointments').select('id', { count: 'exact', head: true }).eq('status', 'completed').gte('completed_at', since),
         supabase.from('memberships').select('id', { count: 'exact', head: true }).eq('status', 'active'),
         supabase.from('estimates').select('id', { count: 'exact', head: true }).eq('status', 'sent'),
         supabase.from('shop_settings').select('labor_cost_per_hour').eq('id', 1).single(),
@@ -139,10 +143,12 @@ export default function AdminReports() {
           .eq('status', 'paid')
           .gte('paid_at', since)
           .order('paid_at', { ascending: false }),
+        supabase.from('invoices').select('total').eq('status', 'paid').gte('paid_at', prevSince).lt('paid_at', since),
       ]);
+      setPrevRevenue(((prevInv.data ?? []) as any[]).reduce((s, i) => s + Number(i.total || 0), 0));
 
-      const allInvoices = ((inv.data ?? []) as any[]) as InvoiceRow[];
-      const paid = allInvoices.filter((i) => i.status === 'paid');
+      const allInvoices = ((inv.data ?? []) as any[]).map((i) => ({ ...i, created_at: i.paid_at || i.created_at })) as InvoiceRow[];
+      const paid = allInvoices;
       const revenue = paid.reduce((s, i) => s + Number(i.total || 0), 0);
 
       const configuredRate = Number((settings.data as any)?.labor_cost_per_hour);
@@ -523,30 +529,71 @@ export default function AdminReports() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <KPI label="Revenue" value={fmt(data.revenue30)} />
-        <KPI label="Avg Repair Order" value={fmt(data.aro)} />
-        <KPI label="Paid Invoices" value={String(data.invoiceCount)} />
-        <KPI label="Completed Jobs" value={String(data.completedJobs)} />
-        <KPI label="Active Memberships" value={String(data.activeMembers)} />
-        <KPI label="Pending Estimates" value={String(data.pendingEstimates)} />
-        <KPI label="Billable Labor Hrs" value={String(data.techHours)} />
-      </div>
+      {(() => {
+        const change = prevRevenue > 0 ? ((data.revenue30 - prevRevenue) / prevRevenue) * 100 : null;
+        const margin = totals.revenue > 0 ? (totals.netProfit / totals.revenue) * 100 : 0;
+        const chartData = [...summaryRows].reverse().map((r) => ({ label: r.label, revenue: Math.round(r.revenue), profit: Math.round(r.netProfit) }));
+        const exportCsv = () => {
+          const head = ['Date', 'Invoice', 'Customer', 'Technician', 'Labor hrs', 'Revenue', 'Parts cost', 'Tech pay', 'Card fee', 'Net profit'];
+          const lines = filteredRows.map((r) => [r.date, r.invoice_number ?? '', r.customer, r.technician, r.paidLaborHours.toFixed(2), r.revenue.toFixed(2), r.cogs.toFixed(2), r.employeeCost.toFixed(2), r.stripeFee.toFixed(2), r.netProfit.toFixed(2)]);
+          memberRows.forEach((m) => lines.push([new Date(m.paid_at).toLocaleDateString(), 'Membership', m.member, '', '', m.amount.toFixed(2), '0', '0', m.stripeFee.toFixed(2), (m.amount - m.stripeFee).toFixed(2)]));
+          const csv = [head, ...lines].map((l) => l.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
+          const a = document.createElement('a');
+          a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+          a.download = `mmar-report-${new Date().toISOString().slice(0, 10)}.csv`;
+          a.click();
+        };
+        return (
+          <>
+            <Card className="overflow-hidden">
+              <CardContent className="p-5 grid gap-4 md:grid-cols-[1fr_2fr]">
+                <div>
+                  <p className="text-xs uppercase tracking-wide text-muted-foreground">Revenue · {PRESET_LABEL[preset]}</p>
+                  <p className="font-display text-4xl mt-1">{fmt(totals.revenue)}</p>
+                  {change != null && (
+                    <p className={`text-sm mt-1 ${change >= 0 ? 'text-primary' : 'text-destructive'}`}>
+                      {change >= 0 ? '▲' : '▼'} {Math.abs(change).toFixed(0)}% vs previous period
+                    </p>
+                  )}
+                  <p className="text-sm text-muted-foreground mt-3">Net profit <span className="text-foreground font-medium">{fmt(totals.netProfit)}</span> · {margin.toFixed(0)}% margin</p>
+                  <Button size="sm" variant="outline" className="mt-4" onClick={exportCsv}>
+                    <Download className="h-4 w-4 mr-2" /> Download for my books
+                  </Button>
+                </div>
+                <div className="h-48">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={chartData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                      <XAxis dataKey="label" tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} />
+                      <YAxis tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} width={44} />
+                      <Tooltip contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))' }} />
+                      <Area type="monotone" dataKey="revenue" name="Revenue" stroke="hsl(var(--primary))" fill="hsl(var(--primary) / 0.2)" />
+                      <Area type="monotone" dataKey="profit" name="Net profit" stroke="hsl(var(--accent))" fill="hsl(var(--accent) / 0.15)" />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
 
-      <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
-        <KPI label="Gross Revenue" value={fmt(totals.revenue)} />
-        <KPI label="Cost of Goods" value={fmt(totals.cogs)} />
-        <KPI label="Gross Profit" value={fmt(totals.grossProfit)} />
-        <KPI label="Cost of Employees" value={fmt(totals.employeeCost)} />
-        <KPI label="Stripe Fees" value={fmt(totals.stripeFee)} />
-        <KPI label="Net Profit" value={fmt(totals.netProfit)} />
-      </div>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <KPI label={`Paid Labor Hrs${techFilter !== 'all' ? ` · ${techFilter}` : ''}`} value={perfTotals.paidH.toFixed(2)} />
-        <KPI label="Membership Revenue" value={fmt(membershipTotals.revenue)} />
-        <KPI label="Membership Deposits" value={fmt(membershipTotals.deposits)} />
-        <KPI label="Membership Recurring" value={fmt(membershipTotals.recurring)} />
-      </div>
+            <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
+              <KPI label="Parts cost" value={fmt(totals.cogs)} />
+              <KPI label="Gross profit" value={fmt(totals.grossProfit)} />
+              <KPI label="Tech pay" value={fmt(totals.employeeCost)} />
+              <KPI label="Card fees" value={fmt(totals.stripeFee)} />
+              <KPI label="Net profit" value={fmt(totals.netProfit)} />
+              <KPI label="Profit margin" value={`${margin.toFixed(0)}%`} />
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
+              <KPI label="Jobs finished" value={String(data.completedJobs)} />
+              <KPI label="Paid invoices" value={String(data.invoiceCount)} />
+              <KPI label="Avg repair order" value={fmt(data.aro)} />
+              <KPI label={`Labor hrs${techFilter !== 'all' ? ` · ${techFilter}` : ''}`} value={perfTotals.paidH.toFixed(1)} />
+              <KPI label="Hrs per invoice" value={filteredRows.length ? (perfTotals.paidH / filteredRows.length).toFixed(1) : '0'} />
+              <KPI label="Membership revenue" value={fmt(membershipTotals.revenue)} />
+            </div>
+          </>
+        );
+      })()}
 
       <Tabs defaultValue="summary" className="w-full">
         <TabsList>

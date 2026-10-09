@@ -232,6 +232,13 @@
       "when": 1791574148526,
       "tag": "0032_finish_job_notify_category",
       "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1791574483266,
+      "tag": "0033_block_delete_paid_jobs",
+      "breakpoints": true
     }
   ]
 }
