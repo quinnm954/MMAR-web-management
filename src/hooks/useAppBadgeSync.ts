@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { setAppBadge, clearAppBadge } from "@/lib/appBadge";
+import { isPhoneApp } from "@/lib/phoneApp";
 
 /**
  * Global hook: keeps the installed PWA app-icon badge in sync with the
@@ -19,11 +20,14 @@ export function useAppBadgeSync() {
     let cancelled = false;
 
     const refresh = async () => {
-      const { count, error } = await supabase
+      let q = supabase
         .from("notifications" as any)
         .select("id", { count: "exact", head: true })
         .eq("user_id", user.id)
         .is("read_at", null);
+      // Each home-screen app badges only its own alerts.
+      q = isPhoneApp() ? q.eq("category", "message_updates") : q.or("category.is.null,category.neq.message_updates");
+      const { count, error } = await q;
       if (cancelled) return;
       if (error) {
         console.debug("[appBadge] unread count query failed", error);
@@ -46,8 +50,17 @@ export function useAppBadgeSync() {
       )
       .subscribe();
 
+    const onResume = () => { if (document.visibilityState === "visible") refresh(); };
+    document.addEventListener("visibilitychange", onResume);
+    window.addEventListener("focus", onResume);
+    const onSwMsg = (e: MessageEvent) => { if (e.data?.type === "badge-refresh") refresh(); };
+    navigator.serviceWorker?.addEventListener?.("message", onSwMsg);
+
     return () => {
       cancelled = true;
+      document.removeEventListener("visibilitychange", onResume);
+      window.removeEventListener("focus", onResume);
+      navigator.serviceWorker?.removeEventListener?.("message", onSwMsg);
       supabase.removeChannel(ch);
     };
   }, [user]);

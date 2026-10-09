@@ -3,6 +3,7 @@ import { Share, X } from 'lucide-react';
 import AdminPhoneHub from '@/components/admin/AdminPhoneHub';
 import { markPhoneApp } from '@/lib/phoneApp';
 import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 import { ensureNotificationPermission, isRegistrationAllowed, subscribeUser } from '@/hooks/useWebPushRegistration';
 
 function setMeta(selector: string, attr: string, value: string) {
@@ -23,6 +24,16 @@ export default function AdminPhoneApp() {
   useEffect(() => {
     if (isStandalone() && isRegistrationAllowed() && (window as any).Notification?.permission !== 'granted' && (window as any).Notification?.permission !== 'denied') setAskPush(true);
   }, []);
+  useEffect(() => {
+    if (!user) return;
+    const markRead = () => {
+      if (document.visibilityState !== 'visible') return;
+      void supabase.from('notifications').update({ read_at: new Date().toISOString() }).eq('user_id', user.id).eq('category', 'message_updates').is('read_at', null);
+    };
+    markRead();
+    document.addEventListener('visibilitychange', markRead);
+    return () => document.removeEventListener('visibilitychange', markRead);
+  }, [user]);
   const enablePush = async () => {
     const perm = await ensureNotificationPermission();
     if (perm === 'granted' && user) { try { await subscribeUser(user.id); } catch {} }

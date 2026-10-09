@@ -62,6 +62,7 @@ self.addEventListener("notificationclick", (event) => {
   event.waitUntil(
     (async () => {
       const clientsArr = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
+      clientsArr.forEach((c) => { try { c.postMessage({ type: "badge-refresh" }); } catch { /* ignore */ } });
       for (const client of clientsArr) {
         try {
           const url = new URL(client.url);

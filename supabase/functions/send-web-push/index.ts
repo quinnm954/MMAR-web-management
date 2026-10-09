@@ -79,6 +79,14 @@ Deno.serve(async (req) => {
       payload.url = "/admin/phone";
     }
 
+    // Badge = unread alerts belonging to the app receiving this push.
+    const toPhone = subs.length > 0 && subs.every((s) => s.app === "phone");
+    let bq = admin.from("notifications").select("id", { count: "exact", head: true })
+      .eq("user_id", payload.user_id).is("read_at", null);
+    bq = toPhone ? bq.eq("category", "message_updates") : bq.or("category.is.null,category.neq.message_updates");
+    const { count: appUnread } = await bq;
+    if (typeof appUnread === "number") payload.badge_count = appUnread;
+
     const messageBody = JSON.stringify({
       title: payload.title,
       body: payload.body,

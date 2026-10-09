@@ -1,3 +1,4 @@
+import AddCustomerFromThread from '@/components/admin/AddCustomerFromThread';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { format, formatDistanceToNow } from 'date-fns';
 import {
@@ -118,6 +119,7 @@ export default function AdminPhoneHub({ fullscreen = false }: { fullscreen?: boo
   const [chatMsgs, setChatMsgs] = useState<ChatMessage[]>([]);
   const [chatReads, setChatReads] = useState<Record<string, string>>({});
   const [me, setMe] = useState<string | null>(null);
+  const [addOpen, setAddOpen] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -125,7 +127,7 @@ export default function AdminPhoneHub({ fullscreen = false }: { fullscreen?: boo
       supabase.from('call_logs').select('*').order('created_at', { ascending: false }).limit(200),
       supabase.from('sms_threads').select('*').order('last_message_at', { ascending: false }).limit(200),
       supabase.from('inbound_messages').select('*').order('received_at', { ascending: false }).limit(200),
-      supabase.from('email_send_log').select('*').order('created_at', { ascending: false }).limit(1000),
+      supabase.from('email_send_log').select('*').order('created_at', { ascending: false }).limit(300),
       supabase.from('email_drafts').select('*').order('updated_at', { ascending: false }).limit(100),
       supabase.from('profiles').select('id, full_name, phone').not('phone', 'is', null),
       supabase.from('employees').select('full_name, phone, user_id').not('phone', 'is', null),
@@ -190,17 +192,69 @@ export default function AdminPhoneHub({ fullscreen = false }: { fullscreen?: boo
 
   useEffect(() => { load(); }, [load]);
 
-  useEffect(() => {
-    const channel = supabase.channel('admin-phone-hub')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'call_logs' }, load)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'sms_messages' }, load)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'inbound_messages' }, load)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'email_send_log' }, load)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'message_threads' }, load)
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, load)
-      .subscribe();
-    return () => { supabase.removeChannel(channel); };
+  // Fast refresh: debounced reloads, instant append to the open conversation,
+  // refetch on resume, reconnect on drop, and a light poll while visible.
+  const selectedRef = useRef<Selected>(null);
+  useEffect(() => { selectedRef.current = selected; }, [selected]);
+  const reloadTimer = useRef<number | null>(null);
+  const scheduleLoad = useCallback(() => {
+    if (reloadTimer.current) window.clearTimeout(reloadTimer.current);
+    reloadTimer.current = window.setTimeout(() => { load(); }, 300);
   }, [load]);
+
+  useEffect(() => {
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+    let stopped = false;
+    const subscribe = () => {
+      if (channel) supabase.removeChannel(channel);
+      channel = supabase.channel(`admin-phone-hub-${Date.now()}`)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'call_logs' }, scheduleLoad)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'sms_messages' }, (payload: any) => {
+          const row = payload.new;
+          const sel = selectedRef.current;
+          if (payload.eventType === 'INSERT' && row && sel?.kind === 'text' && row.thread_id === sel.id) {
+            setMessages(cur => cur.some(m => m.id === row.id) ? cur : [...cur, row as SmsMessage]);
+          } else if (payload.eventType === 'UPDATE' && row) {
+            setMessages(cur => cur.map(m => m.id === row.id ? { ...m, ...row } : m));
+          }
+          scheduleLoad();
+        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'sms_threads' }, scheduleLoad)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'inbound_messages' }, scheduleLoad)
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'email_send_log' }, scheduleLoad)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'message_threads' }, scheduleLoad)
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, (payload: any) => {
+          const row = payload.new; const sel = selectedRef.current;
+          if (row && sel?.kind === 'chat' && row.thread_id === sel.id) setChatMsgs(cur => cur.some(m => m.id === row.id) ? cur : [...cur, row as ChatMessage]);
+          scheduleLoad();
+        })
+        .subscribe(status => {
+          if (!stopped && (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED')) setTimeout(() => { if (!stopped) subscribe(); }, 2000);
+        });
+    };
+    subscribe();
+    const refreshOpen = async () => {
+      const sel = selectedRef.current;
+      if (sel?.kind === 'text') {
+        const { data } = await supabase.from('sms_messages').select('*').eq('thread_id', sel.id).order('created_at', { ascending: true });
+        if (data) setMessages(data as SmsMessage[]);
+      } else if (sel?.kind === 'chat') {
+        const { data } = await supabase.from('messages').select('*').eq('thread_id', sel.id).order('created_at', { ascending: true });
+        if (data) setChatMsgs(data as ChatMessage[]);
+      }
+    };
+    const onResume = () => { if (document.visibilityState === 'visible') { scheduleLoad(); refreshOpen(); subscribe(); } };
+    document.addEventListener('visibilitychange', onResume);
+    window.addEventListener('focus', onResume);
+    const poll = window.setInterval(() => { if (document.visibilityState === 'visible') { scheduleLoad(); refreshOpen(); } }, 15000);
+    return () => {
+      stopped = true;
+      document.removeEventListener('visibilitychange', onResume);
+      window.removeEventListener('focus', onResume);
+      window.clearInterval(poll);
+      if (channel) supabase.removeChannel(channel);
+    };
+  }, [scheduleLoad]);
 
   const displayPhone = (phone?: string | null) => names[phoneKey(phone)]?.name || phone || 'Unknown caller';
   const displayTag = (phone?: string | null) => names[phoneKey(phone)]?.tag;
@@ -249,6 +303,7 @@ export default function AdminPhoneHub({ fullscreen = false }: { fullscreen?: boo
 
   const openItem = async (kind: Kind, id: string) => {
     setSelected({ kind, id });
+    if (me) void supabase.from('notifications').update({ read_at: new Date().toISOString() }).eq('user_id', me).eq('category', 'message_updates').is('read_at', null);
     if (kind === 'chat') {
       const { data } = await supabase.from('messages').select('*').eq('thread_id', id).order('created_at', { ascending: true });
       setChatMsgs((data ?? []) as ChatMessage[]);
@@ -475,7 +530,7 @@ export default function AdminPhoneHub({ fullscreen = false }: { fullscreen?: boo
             {activeCall ? (
               <CallDetail call={activeCall} name={displayPhone(activeCall.direction === 'outbound' ? activeCall.to_number : activeCall.from_number)} tag={displayTag(activeCall.from_number)} onBack={() => setSelected(null)} onCall={() => activeCall.from_number && dialInApp(activeCall.from_number)} onText={() => activeCall.from_number && startText(activeCall.from_number)} />
             ) : activeThread ? (
-              <TextDetail thread={activeThread} name={displayPhone(activeThread.phone)} tag={displayTag(activeThread.phone)} messages={messages} reply={reply} sending={sending} onReply={setReply} onSend={sendText} onBack={() => setSelected(null)} onCall={() => dialInApp(activeThread.phone)} />
+              <TextDetail thread={activeThread} name={displayPhone(activeThread.phone)} tag={displayTag(activeThread.phone)} messages={messages} reply={reply} sending={sending} onReply={setReply} onSend={sendText} onBack={() => setSelected(null)} onCall={() => dialInApp(activeThread.phone)} onAddCustomer={!activeThread.customer_id && !names[phoneKey(activeThread.phone)] ? () => setAddOpen(true) : undefined} />
             ) : activeChat ? (
               <ChatDetail title={chatTitle(activeChat)} subtitle={activeChat.subject || (activeChat.tech_id ? 'tech chat' : 'app chat')} me={me} messages={chatMsgs} names={chatNames} reply={reply} sending={sending} onReply={setReply} onSend={sendChat} onBack={() => setSelected(null)} />
             ) : activeEmail ? (
@@ -483,6 +538,7 @@ export default function AdminPhoneHub({ fullscreen = false }: { fullscreen?: boo
             ) : null}
           </section>
 
+          {activeThread && <AddCustomerFromThread open={addOpen} onOpenChange={setAddOpen} threadId={activeThread.id} phone={activeThread.phone} onSaved={load} />}
           {/* Keypad sheet */}
           <Sheet open={dialOpen} onClose={() => setDialOpen(false)}>
             <div className="text-center pt-2">
@@ -697,11 +753,14 @@ function CallDetail({ call, name, tag, onBack, onCall, onText }: { call: CallRow
   );
 }
 
-function TextDetail({ thread, name, tag, messages, reply, sending, onReply, onSend, onBack, onCall }: { thread: TextThread; name: string; tag?: string; messages: SmsMessage[]; reply: string; sending: boolean; onReply: (value: string) => void; onSend: () => void; onBack: () => void; onCall: () => void }) {
+function TextDetail({ thread, name, tag, messages, reply, sending, onReply, onSend, onBack, onCall, onAddCustomer }: { thread: TextThread; name: string; tag?: string; messages: SmsMessage[]; reply: string; sending: boolean; onReply: (value: string) => void; onSend: () => void; onBack: () => void; onCall: () => void; onAddCustomer?: () => void }) {
   const boxRef = useBottom([messages, thread.id]);
   return (
     <>
       <NavBar onBack={onBack} right={<button onClick={onCall} title="Call" className="p-1"><Phone className="h-5 w-5" /></button>}><ContactHead name={name} sub={tag || thread.phone} /></NavBar>
+      {onAddCustomer && (
+        <button onClick={onAddCustomer} className="mx-4 mt-1 mb-1 shrink-0 rounded-xl bg-[hsl(var(--ios-fill))] py-2 text-[15px] font-medium text-[hsl(var(--ios-blue))]">Add to customers</button>
+      )}
       <Bubbles items={messages} boxRef={boxRef} mine={m => m.direction === 'outbound'} render={m => (
         <>
           <MessageMedia media={m.media_urls} />
