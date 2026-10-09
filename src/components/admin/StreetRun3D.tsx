@@ -46,7 +46,7 @@ function asphaltMaps() {
   const r = document.createElement('canvas'); r.width = r.height = S;
   const g = r.getContext('2d')!;
   g.fillStyle = '#9a9a9a'; g.fillRect(0, 0, S, S);
-  for (let i = 0; i < 9000; i++) { const v = 110 + Math.random() * 90; g.fillStyle = `rgb(${v},${v},${v})`; g.fillRect(Math.random() * S, Math.random() * S, 2, 2); }
+  for (let i = 0; i < 9000; i++) { const v = 135 + Math.random() * 40; g.fillStyle = `rgb(${v},${v},${v})`; g.fillRect(Math.random() * S, Math.random() * S, 2, 2); }
   for (let i = 0; i < 14; i++) {
     const x = Math.random() * S, y = Math.random() * S, rad = 20 + Math.random() * 70;
     const gr = g.createRadialGradient(x, y, 0, x, y, rad); gr.addColorStop(0, 'rgba(10,10,10,0.95)'); gr.addColorStop(1, 'rgba(10,10,10,0)');
@@ -56,7 +56,7 @@ function asphaltMaps() {
   [0.3, 0.42, 0.58, 0.7].forEach((f) => { g.fillStyle = 'rgba(30,30,30,0.35)'; g.fillRect(f * S - 10, 0, 20, S); });
   const n = document.createElement('canvas'); n.width = n.height = S;
   const ng = n.getContext('2d')!; const img = ng.createImageData(S, S);
-  for (let i = 0; i < S * S; i++) { img.data[i * 4] = 128 + (Math.random() - 0.5) * 60; img.data[i * 4 + 1] = 128 + (Math.random() - 0.5) * 60; img.data[i * 4 + 2] = 255; img.data[i * 4 + 3] = 255; }
+  for (let i = 0; i < S * S; i++) { img.data[i * 4] = 128 + (Math.random() - 0.5) * 14; img.data[i * 4 + 1] = 128 + (Math.random() - 0.5) * 14; img.data[i * 4 + 2] = 255; img.data[i * 4 + 3] = 255; }
   ng.putImageData(img, 0, 0);
   const mk = (c: HTMLCanvasElement) => { const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(2, 34); t.anisotropy = 8; return t; };
   return { rough: mk(r), normal: mk(n) };
@@ -86,7 +86,7 @@ function Road() {
           resolution={1024} mirror={0.85} blur={[200, 60]} mixBlur={0.8} mixStrength={8}
           depthScale={1.2} minDepthThreshold={0.5} maxDepthThreshold={1.3}
           color="#07090d" metalness={0.65} roughness={1} roughnessMap={maps.rough}
-          normalMap={maps.normal} normalScale={new THREE.Vector2(0.35, 0.35)}
+          normalMap={maps.normal} normalScale={new THREE.Vector2(0.15, 0.15)}
         />
       </mesh>
       {/* sidewalks */}
@@ -246,7 +246,7 @@ function useCar(paint: string) {
 function HeroCar() {
   const { camera } = useThree();
   const car = useRef<THREE.Group>(null);
-  const model = useCar('#ff6a00'); // signature orange
+  const model = useCar('#ff9a2a'); // signature orange
   const target = useMemo(() => { const o = new THREE.Object3D(); o.position.set(0, 0, 30); return o; }, []);
   useFrame(({ clock }) => {
     const t = clock.elapsedTime, v = speedAt(t);
