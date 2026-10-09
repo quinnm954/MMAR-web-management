@@ -40,7 +40,7 @@ function Bars() {
   return (
     <instancedMesh ref={ref} args={[undefined, undefined, BARS]} castShadow>
       <boxGeometry args={[0.16, 1, 0.16]} />
-      <meshStandardMaterial emissive="#ffffff" emissiveIntensity={0.12} metalness={0.3} roughness={0.4} />
+      <meshBasicMaterial toneMapped={false} />
     </instancedMesh>
   );
 }
