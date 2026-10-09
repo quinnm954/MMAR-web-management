@@ -40,14 +40,38 @@ function gaugeTexture(label: string) {
   return t;
 }
 
+// Wet asphalt: roughness map with puddles (dark = mirror-like) + grain normal map.
+function asphaltMaps() {
+  const S = 512;
+  const r = document.createElement('canvas'); r.width = r.height = S;
+  const g = r.getContext('2d')!;
+  g.fillStyle = '#9a9a9a'; g.fillRect(0, 0, S, S);
+  for (let i = 0; i < 9000; i++) { const v = 110 + Math.random() * 90; g.fillStyle = `rgb(${v},${v},${v})`; g.fillRect(Math.random() * S, Math.random() * S, 2, 2); }
+  for (let i = 0; i < 14; i++) {
+    const x = Math.random() * S, y = Math.random() * S, rad = 20 + Math.random() * 70;
+    const gr = g.createRadialGradient(x, y, 0, x, y, rad); gr.addColorStop(0, 'rgba(10,10,10,0.95)'); gr.addColorStop(1, 'rgba(10,10,10,0)');
+    g.fillStyle = gr; g.beginPath(); g.ellipse(x, y, rad, rad * 0.5, 0, 0, Math.PI * 2); g.fill();
+  }
+  // tire grooves stay wetter
+  [0.3, 0.42, 0.58, 0.7].forEach((f) => { g.fillStyle = 'rgba(30,30,30,0.35)'; g.fillRect(f * S - 10, 0, 20, S); });
+  const n = document.createElement('canvas'); n.width = n.height = S;
+  const ng = n.getContext('2d')!; const img = ng.createImageData(S, S);
+  for (let i = 0; i < S * S; i++) { img.data[i * 4] = 128 + (Math.random() - 0.5) * 60; img.data[i * 4 + 1] = 128 + (Math.random() - 0.5) * 60; img.data[i * 4 + 2] = 255; img.data[i * 4 + 3] = 255; }
+  ng.putImageData(img, 0, 0);
+  const mk = (c: HTMLCanvasElement) => { const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(2, 34); t.anisotropy = 8; return t; };
+  return { rough: mk(r), normal: mk(n) };
+}
+
 // ---- Street ----
 function Road() {
   const lines = useRef<THREE.InstancedMesh>(null);
   const N = 40;
   const z = useRef(Array.from({ length: N }, (_, i) => -i * (LENGTH / N)));
   const o = useMemo(() => new THREE.Object3D(), []);
+  const maps = useMemo(asphaltMaps, []);
   useFrame(({ clock }, raw) => {
     const dt = Math.min(raw, 0.05), v = speedAt(clock.elapsedTime);
+    maps.rough.offset.y += (v * dt / (LENGTH + 20)) * 34; maps.normal.offset.y = maps.rough.offset.y;
     for (let i = 0; i < N; i++) {
       z.current[i] = wrap(z.current[i] + v * dt);
       o.position.set(0, 0.01, z.current[i]); o.updateMatrix(); lines.current!.setMatrixAt(i, o.matrix);
@@ -59,9 +83,10 @@ function Road() {
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, -LENGTH / 2]}>
         <planeGeometry args={[14, LENGTH + 20]} />
         <MeshReflectorMaterial
-          resolution={512} mirror={0.75} blur={[300, 80]} mixBlur={0.9} mixStrength={6}
-          depthScale={1} minDepthThreshold={0.6} maxDepthThreshold={1.2}
-          color="#0a0c11" metalness={0.6} roughness={0.55}
+          resolution={1024} mirror={0.85} blur={[200, 60]} mixBlur={0.8} mixStrength={8}
+          depthScale={1.2} minDepthThreshold={0.5} maxDepthThreshold={1.3}
+          color="#07090d" metalness={0.65} roughness={1} roughnessMap={maps.rough}
+          normalMap={maps.normal} normalScale={new THREE.Vector2(0.35, 0.35)}
         />
       </mesh>
       {/* sidewalks */}
@@ -205,8 +230,9 @@ function useCar(paint: string) {
       const src = o.material as THREE.MeshPhysicalMaterial;
       const mat = src.clone() as THREE.MeshPhysicalMaterial;
       if (mat.name === 'carpaint') {
-        mat.color = new THREE.Color(paint); mat.metalness = 0.85; mat.roughness = 0.22;
-        (mat as any).clearcoat = 1; (mat as any).clearcoatRoughness = 0.04; mat.envMapIntensity = 1.6;
+        mat.map = null; // texture tint was turning orange into red
+        mat.color = new THREE.Color(paint); mat.metalness = 0.6; mat.roughness = 0.28;
+        (mat as any).clearcoat = 1; (mat as any).clearcoatRoughness = 0.03; mat.envMapIntensity = 2.2;
       }
       if (mat.name === 'tinted_glass') { mat.color = new THREE.Color('#05070a'); mat.transparent = true; mat.opacity = 0.85; mat.metalness = 1; mat.roughness = 0.05; }
       if (mat.name === 'rearlight') { mat.emissive = new THREE.Color('#ff1a1a'); mat.emissiveIntensity = 6; mat.toneMapped = false; }
