@@ -52,12 +52,29 @@ export default function AdminSalesDashboard() {
   const lastMonthStart = startOf(new Date(now.getFullYear(), now.getMonth() - 1, 1));
   const yearStart = startOf(new Date(now.getFullYear(), 0, 1));
 
+  const [tick, setTick] = useState(0);
+  useEffect(() => {
+    let t: ReturnType<typeof setTimeout> | undefined;
+    const kick = () => { clearTimeout(t); t = setTimeout(() => setTick((n) => n + 1), 600); };
+    const ch = supabase.channel('dashboard-live')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'invoices' }, kick)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'invoice_payments' }, kick)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'appointments' }, kick)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'estimates' }, kick)
+      .subscribe();
+    const vis = () => { if (document.visibilityState === 'visible') kick(); };
+    document.addEventListener('visibilitychange', vis);
+    const iv = setInterval(kick, 60000);
+    return () => { supabase.removeChannel(ch); document.removeEventListener('visibilitychange', vis); clearInterval(iv); clearTimeout(t); };
+  }, []);
+
   useEffect(() => {
     (async () => {
       const since = startOf(new Date(now.getFullYear(), now.getMonth() - 12, 1)).toISOString();
       const mondayish = addDays(todayStart, -6).toISOString();
       const [inv, est, cust, mem, appts, dw, dm, shop] = await Promise.all([
-        supabase.from('invoices').select('id,total,amount_paid,status,created_at,paid_at,customer_id,line_items,appointment_id').gte('created_at', since).order('created_at', { ascending: false }).limit(3000),
+        // Include invoices created OR paid in the window, so an old invoice paid today still counts today
+        supabase.from('invoices').select('id,total,amount_paid,status,created_at,paid_at,customer_id,line_items,appointment_id').or(`created_at.gte.${since},paid_at.gte.${since}`).order('created_at', { ascending: false }).limit(3000),
         supabase.from('estimates').select('id,total,status,sent_at,approved_at,created_at').gte('created_at', addDays(todayStart, -90).toISOString()).limit(2000),
         supabase.from('profiles').select('id', { count: 'exact', head: true }),
         supabase.from('memberships').select('id', { count: 'exact', head: true }).eq('status', 'active'),
@@ -82,7 +99,7 @@ export default function AdminSalesDashboard() {
       setLoading(false);
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [tick]);
 
   const saveGoal = async () => {
     const v = Number(goalDraft.replace(/[^0-9.]/g, ''));
