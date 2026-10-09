@@ -246,6 +246,13 @@
       "when": 1791574797561,
       "tag": "0034_realtime_sales_tables",
       "breakpoints": true
+    },
+    {
+      "idx": 35,
+      "version": "7",
+      "when": 1791575283338,
+      "tag": "0035_tech_earnings_paid_invoice_hours",
+      "breakpoints": true
     }
   ]
 }

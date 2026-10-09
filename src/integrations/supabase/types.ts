@@ -3930,6 +3930,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      invoice_tech_hours: { Args: { _items: Json }; Returns: number }
       is_office_staff: { Args: { _user_id: string }; Returns: boolean }
       is_staff: { Args: { _user_id: string }; Returns: boolean }
       my_tech_agreement: { Args: never; Returns: Json }
