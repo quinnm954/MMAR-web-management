@@ -162,7 +162,7 @@ export default function AdminSalesDashboard() {
         const k = String(li.kind || 'part').toLowerCase();
         const desc = `${li.name ?? ''} ${li.description ?? ''}`.toLowerCase();
         if (k === 'diagnosis' || k === 'diagnostic' || /diagnos|diag\b|inspection|scan/.test(desc)) acc.diagnosis += amt;
-        else if (k === 'labor') { acc.labor += amt; hrs += Number(li.hours ?? li.quantity ?? 1); }
+        else if (k === 'labor') { acc.labor += amt; hrs += amt / 125; }
         else if (k === 'part') acc.parts += amt;
       });
     });
