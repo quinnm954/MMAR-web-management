@@ -4033,6 +4033,10 @@ export type Database = {
         }
         Returns: string
       }
+      tech_finish_job: {
+        Args: { _appointment_id: string; _mileage?: number; _note?: string }
+        Returns: Json
+      }
       tech_has_appointment: {
         Args: { _appt: string; _user_id: string }
         Returns: boolean

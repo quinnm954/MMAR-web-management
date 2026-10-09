@@ -9,7 +9,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, Calendar, MapPin, ClipboardCheck, RefreshCw, History, Wrench } from "lucide-react";
+import { Loader2, Calendar, MapPin, ClipboardCheck, RefreshCw, History, Wrench, CheckCircle2 } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import TechLayout from "@/components/tech/TechLayout";
@@ -160,7 +162,30 @@ const TechJobs = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, tab]);
 
+  const [finishing, setFinishing] = useState<any | null>(null);
+  const [finMiles, setFinMiles] = useState("");
+  const [finNote, setFinNote] = useState("");
+  const [finBusy, setFinBusy] = useState(false);
+  const finishJob = async () => {
+    if (!finishing) return;
+    setFinBusy(true);
+    const { data, error } = await supabase.rpc("tech_finish_job" as any, {
+      _appointment_id: finishing.id,
+      _mileage: finMiles ? parseInt(finMiles.replace(/\D/g, ""), 10) || null : null,
+      _note: finNote || null,
+    });
+    if (error) { setFinBusy(false); return toast.error(error.message); }
+    const invId = (data as any)?.invoice_id;
+    if (invId) {
+      const { data: sent } = await supabase.functions.invoke("send-invoice-payment-link", { body: { invoice_id: invId } });
+      toast.success((sent as any)?.ok ? "Job finished — the customer got their invoice" : "Job finished — the shop will send the invoice");
+    } else toast.success("Job finished — the shop will send the invoice");
+    setFinBusy(false); setFinishing(null); setFinMiles(""); setFinNote("");
+    loadActive();
+  };
+
   const updateStatus = async (id: string, status: string) => {
+    if (status === "completed") { setFinishing(rows.find((x: any) => x.id === id) ?? { id }); return; }
     const { error } = await supabase.from("appointments").update({ status }).eq("id", id);
     if (error) return toast.error(error.message);
     toast.success("Status updated");
@@ -337,6 +362,11 @@ const TechJobs = () => {
                     </div>
                   </div>
 
+                  {r.status === "in_progress" && (
+                    <Button size="lg" className="w-full min-h-12 text-base" onClick={() => setFinishing(r)}>
+                      <CheckCircle2 className="h-5 w-5 mr-2" /> Finish job
+                    </Button>
+                  )}
                   <Button
                     variant="hero"
                     size="sm"
@@ -389,6 +419,22 @@ const TechJobs = () => {
           )
         )}
       </div>
+    <Dialog open={!!finishing} onOpenChange={(o) => !o && !finBusy && setFinishing(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Finish job</DialogTitle>
+            <DialogDescription>{finishing?.service_type || "This job"} will be marked done and the customer gets their invoice.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div><Label>Final mileage (optional)</Label><Input inputMode="numeric" value={finMiles} onChange={(e) => setFinMiles(e.target.value)} placeholder="e.g. 128450" /></div>
+            <div><Label>Work notes (optional)</Label><Textarea rows={3} value={finNote} onChange={(e) => setFinNote(e.target.value)} placeholder="What was done, anything the shop should know" /></div>
+          </div>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setFinishing(null)} disabled={finBusy}>Cancel</Button>
+            <Button onClick={finishJob} disabled={finBusy}>{finBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : <><CheckCircle2 className="h-4 w-4 mr-1" />Finish</>}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </TechLayout>
   );
 };
