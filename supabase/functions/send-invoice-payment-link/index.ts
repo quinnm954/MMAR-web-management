@@ -32,9 +32,7 @@ Deno.serve(async (req) => {
     // Admin check via has_role
     const admin = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
     const { data: roleRow } = await admin.from("user_roles").select("role").eq("user_id", userId).in("role", ["admin", "owner"]).limit(1).maybeSingle();
-    if (!roleRow) {
-      return new Response(JSON.stringify({ error: "Admin only" }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-    }
+    const isAdmin = !!roleRow;
 
     const body = await req.json().catch(() => ({}));
     const invoiceId: string | undefined = body?.invoice_id;
@@ -46,11 +44,20 @@ Deno.serve(async (req) => {
 
     const { data: invoice, error: iErr } = await admin
       .from("invoices")
-      .select("id, customer_id, total, amount_paid, status, invoice_number")
+      .select("id, customer_id, total, amount_paid, status, invoice_number, appointment_id")
       .eq("id", invoiceId)
       .maybeSingle();
     if (iErr || !invoice) {
       return new Response(JSON.stringify({ error: "Invoice not found" }), { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+    if (!isAdmin) {
+      // Assigned technician may trigger the send for their own finished job (never sees price/link).
+      const { data: appt } = invoice.appointment_id
+        ? await admin.from("appointments").select("assigned_technician_id").eq("id", invoice.appointment_id).maybeSingle()
+        : { data: null };
+      if (!appt || appt.assigned_technician_id !== userId || copyOnly) {
+        return new Response(JSON.stringify({ error: "Admin only" }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
     }
     if (invoice.status === "paid") {
       return new Response(JSON.stringify({ error: "Invoice already paid" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
@@ -178,7 +185,7 @@ Deno.serve(async (req) => {
       }).eq("id", threadId);
     }
 
-    return new Response(JSON.stringify({ ok: true, sid: twData.sid, url: session.url, phone }), {
+    return new Response(JSON.stringify(isAdmin ? { ok: true, sid: twData.sid, url: session.url, phone } : { ok: true }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
