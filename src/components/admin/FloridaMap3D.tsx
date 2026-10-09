@@ -238,7 +238,7 @@ export default function FloridaMap3D({ onOpenReports }: { onOpenReports?: () => 
 
   return (
     <div className="relative h-[calc(100dvh-9rem)] min-h-[520px] w-full overflow-hidden rounded-xl border border-border bg-background">
-      <Canvas shadows dpr={[1, 2]} camera={{ position: [6, 14, 16], fov: 45 }}>
+      <Canvas shadows dpr={[1, 2]} camera={{ position: [3, 12, 13], fov: 45 }}>
         <color attach="background" args={['#07111f']} />
         <fog attach="fog" args={['#07111f', 28, 60]} />
         <ambientLight intensity={0.35} />
