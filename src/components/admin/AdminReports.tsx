@@ -122,8 +122,18 @@ export default function AdminReports() {
   const [prevRevenue, setPrevRevenue] = useState(0);
 
   const load = useCallback(async () => {
-      const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
-      const prevSince = new Date(Date.now() - 2 * days * 24 * 60 * 60 * 1000).toISOString();
+      // Calendar periods so Reports matches the dashboard (today, last 7 days, this month, this year)
+      const now = new Date();
+      const today0 = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      let start: Date;
+      let prevStart: Date;
+      if (preset === 'd') { start = today0; prevStart = new Date(today0.getTime() - 86400000); }
+      else if (preset === 'w') { start = new Date(today0.getTime() - 6 * 86400000); prevStart = new Date(start.getTime() - 7 * 86400000); }
+      else if (preset === 'm') { start = new Date(now.getFullYear(), now.getMonth(), 1); prevStart = new Date(now.getFullYear(), now.getMonth() - 1, 1); }
+      else if (preset === 'y') { start = new Date(now.getFullYear(), 0, 1); prevStart = new Date(now.getFullYear() - 1, 0, 1); }
+      else { start = new Date(Date.now() - days * 86400000); prevStart = new Date(Date.now() - 2 * days * 86400000); }
+      const since = start.toISOString();
+      const prevSince = prevStart.toISOString();
 
       const [inv, completed, members, ests, settings, employeesRes, mpRes, prevInv] = await Promise.all([
         supabase
@@ -309,9 +319,24 @@ export default function AdminReports() {
         partsMargin,
         partsMarginPct,
       });
-  }, [days]);
+  }, [days, preset]);
 
   useEffect(() => { load(); }, [load]);
+
+  // Keep totals live: reload whenever invoices, payments or jobs change, and on refocus
+  useEffect(() => {
+    let t: ReturnType<typeof setTimeout> | undefined;
+    const kick = () => { clearTimeout(t); t = setTimeout(() => load(), 600); };
+    const ch = supabase.channel('reports-live')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'invoices' }, kick)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'invoice_payments' }, kick)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'appointments' }, kick)
+      .subscribe();
+    const vis = () => { if (document.visibilityState === 'visible') kick(); };
+    document.addEventListener('visibilitychange', vis);
+    const iv = setInterval(kick, 60000);
+    return () => { supabase.removeChannel(ch); document.removeEventListener('visibilitychange', vis); clearInterval(iv); clearTimeout(t); };
+  }, [load]);
 
   const syncStripeFees = async (force = false) => {
     setSyncing(true);
