@@ -31,7 +31,7 @@ Deno.serve(async (req) => {
       .from("user_roles")
       .select("role")
       .eq("user_id", user.id);
-    if (!roles?.some((r) => r.role === "admin")) throw new Error("Admin only");
+    if (!roles?.some((r) => r.role === "admin" || r.role === "owner")) throw new Error("Admin only");
 
     const body = await req.json().catch(() => ({}));
     const sinceDays = Math.max(1, Math.min(365, Number(body.days) || 90));

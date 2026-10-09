@@ -36,7 +36,7 @@ Deno.serve(async (req) => {
       .eq("user_id", userData.user.id);
     const roles = (roleRows ?? []).map((r: any) => r.role);
     const isStaff = roles.some((r: string) =>
-      ["admin", "manager", "service_advisor", "technician", "parts"].includes(r)
+      ["owner", "admin", "manager", "service_advisor", "technician", "parts"].includes(r)
     );
     if (!isStaff) {
       return new Response(JSON.stringify({ error: "Forbidden" }), {
