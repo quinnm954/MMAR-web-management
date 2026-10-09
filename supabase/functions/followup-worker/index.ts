@@ -104,7 +104,7 @@ Deno.serve(async () => {
         if (parts.length) {
           const { data: staff } = await sb.from('user_roles').select('user_id').in('role', ['owner', 'admin']);
           for (const uid of new Set((staff || []).map((r: any) => r.user_id))) {
-            await sb.rpc('create_notification', { _user_id: uid, _title: 'Daily to-do', _body: parts.join(' · '), _category: 'appointment_updates', _link: '/admin?tab=dashboard', _data: {} });
+            await sb.rpc('create_notification', { _user_id: uid, _title: 'Daily to-do', _body: parts.join(' · '), _category: 'repair_order_updates', _link: '/admin?tab=dashboard', _data: {} });
           }
         }
       }

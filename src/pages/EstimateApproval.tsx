@@ -136,6 +136,16 @@ const EstimateApproval = () => {
   if (loading) return <div className="min-h-screen flex items-center justify-center"><Loader2 className="animate-spin" /></div>;
   if (!est) return <div className="min-h-screen flex items-center justify-center text-muted-foreground">Estimate not found</div>;
 
+  const todayET = new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
+  const isExpired = est.status === 'expired' || (est.status === 'sent' && !!est.valid_until && est.valid_until < todayET);
+  if (isExpired) return (
+    <div className="min-h-screen flex items-center justify-center p-6">
+      <div className="max-w-md text-center space-y-3">
+        <h1 className="text-2xl font-bold">This estimate has expired</h1>
+        <p className="text-muted-foreground">Estimate {est.estimate_number} was valid until {est.valid_until}. Prices may have changed. Call or text <a className="text-primary underline" href="tel:8135017572">813-501-7572</a> for an updated quote.</p>
+      </div>
+    </div>
+  );
   const submitted = ['approved', 'declined', 'partially_approved'].includes(est.status);
   const locked = submitted && !editing;
 
