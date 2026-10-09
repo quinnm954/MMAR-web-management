@@ -458,7 +458,7 @@ export const blogPosts: BlogPost[] = [
     slug: "introducing-mmar-care-membership-platform",
     title: "Introducing MMAR Care: The Easiest Way to Own a Car in Southwest Florida",
     excerpt:
-      "MMAR Care is the new membership and customer portal from Mike's Mobile Auto Repair — vehicles, appointments, estimates, invoices, financing, and warranty in one place.",
+      "MMAR Care is the new membership and customer portal from Mike's Mobile Auto Repair — vehicles, appointments, estimates, invoices, and warranty in one place.",
     dateISO: "2026-05-08",
     readMinutes: 5,
     tags: ["MMAR Care", "Membership", "Maintenance"],
@@ -473,7 +473,7 @@ export const blogPosts: BlogPost[] = [
         <li><strong>Your vehicles, always up to date.</strong> Every car on your account, with mileage, service records, and recommended maintenance.</li>
         <li><strong>Effortless scheduling.</strong> Pick a window that works, members get priority booking.</li>
         <li><strong>Estimates, inspections & repair orders.</strong> Approve estimates online, see digital inspection photos, follow each repair in real time.</li>
-        <li><strong>Invoices and financing.</strong> Pay online, view receipts, manage in-house financing or your monthly membership.</li>
+        <li><strong>Invoices and membership.</strong> Pay online, view receipts, and manage your monthly membership.</li>
         <li><strong>Warranty & records on demand.</strong> Magnuson-Moss warranty coverage and service records you can pull up any time — perfect for resale or trade-in.</li>
         <li><strong>Member perks.</strong> Discounted labor, included oil changes on select plans, and special pricing on tires, brakes, and seasonal services.</li>
       </ul>

@@ -1,7 +1,5 @@
 // Admin-only: generate a Stripe payment link/checkout session for any of:
 //   - invoice (uses outstanding balance)
-//   - financing_down_payment (uses contract.down_payment)
-//   - financing_monthly (uses contract.monthly_payment)
 //   - membership_deposit (uses plan.deposit_amount or plan.total_at_signup)
 //   - membership_subscription (recurring subscription via plan.stripe_price_id)
 //   - custom (caller supplies amount + description)
@@ -21,8 +19,6 @@ const SHOP_NAME = "MMAR Care";
 
 type Kind =
   | "invoice"
-  | "financing_down_payment"
-  | "financing_monthly"
   | "membership_deposit"
   | "membership_subscription"
   | "custom";
@@ -96,25 +92,6 @@ Deno.serve(async (req) => {
       description = inv.invoice_number || `Invoice ${inv.id.slice(0, 8)}`;
       customerId = inv.customer_id;
       metadata.invoice_id = inv.id;
-    } else if (kind === "financing_down_payment" || kind === "financing_monthly") {
-      if (!referenceId) return json(400, { error: "reference_id (contract id) required" });
-      const { data: c } = await admin
-        .from("financing_contracts")
-        .select("id, customer_id, client_name, client_contact, down_payment, monthly_payment, total_service_price")
-        .eq("id", referenceId)
-        .maybeSingle();
-      if (!c) return json(404, { error: "Contract not found" });
-      const amt = kind === "financing_down_payment" ? Number(c.down_payment) : Number(c.monthly_payment);
-      if (!amt || amt <= 0) return json(400, { error: "No amount on contract" });
-      amountCents = Math.round((amountInput ?? amt) * 100);
-      description = kind === "financing_down_payment"
-        ? `Financing down payment — ${c.client_name}`
-        : `Financing monthly payment — ${c.client_name}`;
-      customerId = c.customer_id || undefined;
-      customerName = c.client_name;
-      // Phone may live on contract.client_contact (could be email or phone)
-      if (!phone && c.client_contact && /^[+\d().\-\s]+$/.test(c.client_contact)) phone = c.client_contact;
-      metadata.financing_contract_id = c.id;
     } else if (kind === "membership_deposit") {
       if (!referenceId) return json(400, { error: "reference_id (membership id) required" });
       const { data: m } = await admin

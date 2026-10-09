@@ -225,7 +225,7 @@ const PortalInvoiceDetail = () => {
           <ReviewPromptCard context={inv.invoice_number || `INV-${inv.id.slice(0, 6)}`} />
         )}
 
-        <DocReferences hideFinancing={isPaid} />
+        <DocReferences />
       </BrandedDocLayout>
     </>
   );

@@ -27,7 +27,6 @@ import AdminTrackingSettings from '@/components/admin/AdminTrackingSettings';
 import AdminEmployees from '@/components/admin/AdminEmployees';
 import AdminAuditLog from '@/components/admin/AdminAuditLog';
 import AdminRoles from '@/components/admin/AdminRoles';
-import FinancingContractsTable from '@/components/admin/FinancingContractsTable';
 import WarrantyTable from '@/components/admin/WarrantyTable';
 import AdminCustomers from '@/components/admin/AdminCustomers';
 import AdminMemberships from '@/components/admin/AdminMemberships';
@@ -70,15 +69,10 @@ const AdminDashboard = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   useNativePushRegistration();
   const [stats, setStats] = useState({ customers: 0, activeMemberships: 0, openAppointments: 0, unpaidInvoices: 0 });
-  const [contracts, setContracts] = useState<any[]>([]);
   const [warranties, setWarranties] = useState<any[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   const [lastRefreshed, setLastRefreshed] = useState<Date>(new Date());
 
-  const reloadFinancing = async () => {
-    const { data } = await supabase.from('financing_contracts').select('*').order('created_at', { ascending: false });
-    setContracts(data ?? []);
-  };
   const reloadWarranty = async () => {
     const { data } = await supabase.from('warranty_acknowledgments').select('*').order('created_at', { ascending: false });
     setWarranties(data ?? []);
@@ -98,7 +92,7 @@ const AdminDashboard = () => {
       openAppointments: a.count ?? 0,
       unpaidInvoices: i.count ?? 0,
     });
-    await Promise.all([reloadFinancing(), reloadWarranty()]);
+    await reloadWarranty();
     setLastRefreshed(new Date());
     setRefreshing(false);
   };
@@ -172,7 +166,6 @@ const AdminDashboard = () => {
             { value: 'share', label: 'Share', icon: Share2, roles: ADVISOR, content: <AdminCustomerShare /> },
             { value: 'declined', label: 'Declined', icon: AlertTriangle, roles: ADVISOR, content: <AdminDeclinedWork /> },
             { value: 'quickbooks', label: 'QuickBooks', icon: FileDown, roles: ADMIN_ONLY, content: <AdminQuickBooksExport /> },
-            { value: 'financing', label: 'Financing', icon: FileText, roles: ADMIN_ONLY, content: <FinancingContractsTable data={contracts} onRefresh={reloadFinancing} /> },
             { value: 'warranty', label: 'Warranty', icon: ShieldCheck, roles: ADMIN_ONLY, content: <WarrantyTable data={warranties} onRefresh={reloadWarranty} /> },
             { value: 'phone', label: 'Phone', icon: Phone, roles: ADMIN_ONLY, content: <AdminPhoneHub /> },
             { value: 'audit', label: 'Audit Log', icon: History, roles: OWNER_ADMIN, content: <AdminAuditLog /> },
@@ -216,7 +209,7 @@ const AdminDashboard = () => {
           const groups = [
             { label: 'Workshop', values: ['calendar','ros','service','inspections','estimates','invoices','time','shifts','productivity'] },
             { label: 'Front Desk', values: ['customers','garage','memberships','bookings','share','declined','fleet-accounts','feedback','prospecting'] },
-            { label: 'Admin', values: ['dashboard','reports','laborpay','quickbooks','financing','warranty','audit','employees','roles','phone-settings','tracking','settings'] },
+            { label: 'Admin', values: ['dashboard','reports','laborpay','quickbooks','warranty','audit','employees','roles','phone-settings','tracking','settings'] },
           ];
           const groupedValues = groups.flatMap(g => g.values);
           const ungrouped = visible.filter(t => !groupedValues.includes(t.value));

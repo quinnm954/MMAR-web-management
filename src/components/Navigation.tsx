@@ -36,7 +36,6 @@ const AREAS = [
 const RESOURCES = [
   { to: "/blog", label: "Blog" },
   { to: "/reviews", label: "Reviews" },
-  { to: "/financing-contract", label: "Financing Contract" },
   { to: "/warranty-policy", label: "Warranty Policy" },
 ];
 

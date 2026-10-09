@@ -250,8 +250,8 @@ const _allLocalLandingPages: LocalLandingPage[] = [
         a: "Ceramic: cleaner, quieter, stable to ~700°F, ideal for sedans and small SUVs. Semi-metallic: higher friction at high temperature (700–900°F), handles heavy loads better, more wheel dust. We pick by vehicle weight and use case.",
       },
       {
-        q: "Do you offer financing on big brake jobs?",
-        a: "Yes — financing is available on qualifying repairs across Lehigh Acres and Fort Myers. Ask when you book.",
+        q: "Do you take cards on big brake jobs?",
+        a: "Yes — we take all major cards and ACH across Lehigh Acres and Fort Myers, with a written quote before any work.",
       },
       {
         q: "Will my warranty be honored if you do the brakes?",
@@ -1715,7 +1715,7 @@ const _allLocalLandingPages: LocalLandingPage[] = [
       },
       {
         q: "How are payments handled?",
-        a: "Cards, ACH, and financing on qualifying repairs. Quotes always given in writing before work.",
+        a: "Cards and ACH accepted. Quotes always given in writing before work.",
       },
       {
         q: "Do you handle Lehigh Acres fleet maintenance?",
@@ -1840,7 +1840,7 @@ const _allLocalLandingPages: LocalLandingPage[] = [
       "Verified completion (test drive, scan, road check)",
       "Warranty comebacks handled by the same tech",
       "Local fleet maintenance contracts",
-      "Cards, ACH, and financing accepted",
+      "Cards and ACH accepted",
     ],
     faqs: [
       {

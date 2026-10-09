@@ -669,7 +669,6 @@ const AdminInvoices = () => {
                       <SelectItem value="zelle">Zelle</SelectItem>
                       <SelectItem value="venmo">Venmo</SelectItem>
                       <SelectItem value="cashapp">Cash App</SelectItem>
-                      <SelectItem value="financing">Financing</SelectItem>
                       <SelectItem value="other">Other</SelectItem>
                     </SelectContent>
                   </Select>
