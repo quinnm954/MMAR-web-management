@@ -1,6 +1,9 @@
 import { useLayoutEffect, useMemo, useRef } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
+import { Suspense } from 'react';
+import { useGLTF, Environment, Lightformer } from '@react-three/drei';
+import gt500 from '@/assets/gt500.glb.asset.json';
 
 // World scrolls toward the camera (+z). Camera sits in the driver's seat looking down -z.
 const LENGTH = 240;          // recycled stretch of street
@@ -184,16 +187,24 @@ function Traffic() {
   );
 }
 
-// ---- Cockpit (fixed to the camera) ----
+// ---- Real GT500 (CC-BY 4.0, Jiaxing on Sketchfab) fixed to the camera ----
+// Model forward is +z; driver's eye sits at about (0.37, 1.12, 2.05) in model space.
 function Cockpit() {
   const { camera, scene } = useThree();
   const rig = useRef<THREE.Group>(null);
-  const wheel = useRef<THREE.Group>(null);
-  const speedNeedle = useRef<THREE.Mesh>(null);
-  const tachNeedle = useRef<THREE.Mesh>(null);
   const sweep = useRef<THREE.PointLight>(null);
-  const speedTex = useMemo(() => gaugeTexture('MPH'), []);
-  const tachTex = useMemo(() => gaugeTexture('RPM x1000'), []);
+  const { scene: car } = useGLTF(gt500.url);
+  const model = useMemo(() => {
+    const m = car.clone(true);
+    m.traverse((o: any) => {
+      if (!o.isMesh) return;
+      o.frustumCulled = false;
+      const mat = o.material as THREE.MeshStandardMaterial;
+      if (mat?.name === 'carpaint') { mat.color = new THREE.Color('#0d1b3d'); mat.metalness = 0.8; mat.roughness = 0.25; }
+      if (mat?.name === 'tinted_glass') { mat.transparent = true; mat.opacity = 0.12; mat.depthWrite = false; }
+    });
+    return m;
+  }, [car]);
 
   useLayoutEffect(() => {
     scene.add(camera);
@@ -204,71 +215,23 @@ function Cockpit() {
   useFrame(({ clock }) => {
     const t = clock.elapsedTime, v = speedAt(t);
     const steer = Math.sin(t * 0.35) * 0.5 + Math.sin(t * 0.9) * 0.12;
-    camera.position.set(Math.sin(t * 0.35) * 0.6, 1.15 + Math.sin(t * 7) * 0.006, 0);
-    camera.rotation.set(-0.03, -steer * 0.08, -steer * 0.025);
-    if (wheel.current) wheel.current.rotation.z = -steer * 1.4;
-    const vn = (v - 18) / 44;
-    if (speedNeedle.current) speedNeedle.current.rotation.z = Math.PI * 0.75 - vn * Math.PI * 1.5 + Math.PI;
-    const rpm = (((t * 0.25) % 1) * 0.6 + 0.3);
-    if (tachNeedle.current) tachNeedle.current.rotation.z = Math.PI * 0.75 - rpm * Math.PI * 1.5 + Math.PI;
-    if (sweep.current) sweep.current.intensity = 0.15 + Math.max(0, Math.sin(t * v * 0.13)) * 0.6;
+    camera.position.set(Math.sin(t * 0.35) * 0.6, 1.15 + Math.sin(t * 7) * 0.004, 0);
+    camera.rotation.set(-0.02, -steer * 0.06, -steer * 0.015);
+    if (sweep.current) sweep.current.intensity = 0.4 + Math.max(0, Math.sin(t * v * 0.13)) * 1.6;
   });
-
-  const needle = (ref: React.RefObject<THREE.Mesh>) => (
-    <mesh ref={ref} position={[0, 0, 0.002]}>
-      <planeGeometry args={[0.004, 0.05]} />
-      <meshBasicMaterial color="#ff3b30" toneMapped={false} />
-    </mesh>
-  );
 
   return (
     <group ref={rig}>
-      <pointLight ref={sweep} position={[0, 0.3, -0.6]} color="#ffd9a0" distance={2} intensity={3} />
-      {/* hood with twin stripes */}
-      <mesh position={[0, -0.42, -1.6]} rotation={[-Math.PI / 2 + 0.08, 0, 0]}>
-        <planeGeometry args={[2.2, 2.2]} />
-        <meshStandardMaterial color="#0a0b0e" metalness={0.9} roughness={0.2} />
-      </mesh>
-      {[-0.13, 0.13].map((x) => (
-        <mesh key={x} position={[x, -0.415, -1.6]} rotation={[-Math.PI / 2 + 0.08, 0, 0]}>
-          <planeGeometry args={[0.14, 2.2]} />
-          <meshStandardMaterial color="#e9eef5" metalness={0.4} roughness={0.3} />
-        </mesh>
-      ))}
-      {/* dashboard */}
-      <mesh position={[0, -0.33, -0.55]}>
-        <boxGeometry args={[2.4, 0.16, 0.5]} />
-        <meshStandardMaterial color="#09090b" roughness={0.9} />
-      </mesh>
-      {/* gauge cluster */}
-      <group position={[0, -0.235, -0.5]} rotation={[-0.2, 0, 0]}>
-        <mesh position={[-0.07, 0, 0]}><circleGeometry args={[0.05, 32]} /><meshBasicMaterial map={speedTex} toneMapped={false} /></mesh>
-        <mesh position={[0.07, 0, 0]}><circleGeometry args={[0.05, 32]} /><meshBasicMaterial map={tachTex} toneMapped={false} /></mesh>
-        <group position={[-0.07, 0, 0]}><group position={[0, 0, 0]}>{needle(speedNeedle as any)}</group></group>
-        <group position={[0.07, 0, 0]}>{needle(tachNeedle as any)}</group>
+      <pointLight ref={sweep} position={[0, 0.6, -0.6]} color="#ffd9a0" distance={3} intensity={1} />
+      <pointLight position={[0, -0.2, -0.5]} color="#9fc6ff" distance={1.2} intensity={0.25} />
+      <group rotation={[0, Math.PI, 0]} position={[0.37, -1.12, 2.05]}>
+        <primitive object={model} />
       </group>
-      {/* steering wheel */}
-      <group ref={wheel} position={[0, -0.27, -0.38]} rotation={[0.35, 0, 0]}>
-        <mesh><torusGeometry args={[0.15, 0.017, 12, 48]} /><meshStandardMaterial color="#111114" roughness={0.6} /></mesh>
-        {[0, (2 * Math.PI) / 3, (4 * Math.PI) / 3].map((a) => (
-          <mesh key={a} rotation={[0, 0, a + Math.PI / 2]} position={[Math.cos(a - Math.PI / 2) * 0.075, Math.sin(a - Math.PI / 2) * 0.075, 0]}>
-            <boxGeometry args={[0.15, 0.02, 0.01]} /><meshStandardMaterial color="#1a1a1e" />
-          </mesh>
-        ))}
-        <mesh position={[0, 0, 0.01]}><circleGeometry args={[0.04, 32]} /><meshStandardMaterial color="#1c1c20" metalness={0.6} /></mesh>
-        <mesh position={[0, 0, 0.012]}><circleGeometry args={[0.02, 3]} /><meshBasicMaterial color="#c9302c" toneMapped={false} /></mesh>
-      </group>
-      {/* A-pillars and roof edge */}
-      {[-1, 1].map((s) => (
-        <mesh key={s} position={[s * 0.62, 0.05, -0.55]} rotation={[0.5, 0, s * -0.55]}>
-          <boxGeometry args={[0.08, 0.95, 0.06]} />
-          <meshStandardMaterial color="#060607" />
-        </mesh>
-      ))}
-      <mesh position={[0, 0.42, -0.4]}><boxGeometry args={[2, 0.12, 0.4]} /><meshStandardMaterial color="#060607" /></mesh>
     </group>
   );
 }
+
+useGLTF.preload(gt500.url);
 
 const greeting = () => {
   const h = Number(new Date().toLocaleString('en-US', { hour: 'numeric', hour12: false, timeZone: 'America/New_York' }));
@@ -291,12 +254,20 @@ export default function StreetRun3D({ name = 'Mike' }: { name?: string }) {
         <StreetLights />
         <NeonSigns />
         <Traffic />
-        <Cockpit />
+        <Environment resolution={128}>
+          <Lightformer intensity={1.5} position={[0, 6, -10]} scale={[20, 4, 1]} color="#ffe2b0" />
+          <Lightformer intensity={0.8} position={[-8, 2, 0]} rotation-y={Math.PI / 2} scale={[30, 2, 1]} color="#6fa8ff" />
+          <Lightformer intensity={0.8} position={[8, 2, 0]} rotation-y={-Math.PI / 2} scale={[30, 2, 1]} color="#ff7aa8" />
+        </Environment>
+        <Suspense fallback={null}><Cockpit /></Suspense>
       </Canvas>
       <div className="pointer-events-none absolute left-4 top-4">
         <p className="font-display text-2xl sm:text-3xl text-foreground drop-shadow">{greeting()}, {name}</p>
         <p className="text-sm text-muted-foreground">{today}</p>
       </div>
+      <a href="https://sketchfab.com/3d-models/ford-mustang-shelby-gt500-0eaa7a16796540f29461ddae05ecdeb3" target="_blank" rel="noreferrer" className="absolute bottom-2 right-3 text-[10px] text-muted-foreground/80 hover:text-foreground">
+        GT500 model by Jiaxing · CC BY 4.0
+      </a>
     </div>
   );
 }
