@@ -466,7 +466,7 @@ export const blogPosts: BlogPost[] = [
       <p>Owning a car in Southwest Florida is hard on your wallet and your schedule. Heat kills batteries, humidity eats brake lines, and life rarely makes time for a shop visit. That's why we built <a href="/mmar-care"><strong>MMAR Care</strong></a> — a free customer portal and optional membership that makes owning a vehicle simpler, cheaper, and a lot less stressful.</p>
 
       <h2>What is MMAR Care?</h2>
-      <p>MMAR Care is the customer side of Mike's Mobile Auto Repair. It's where you (and every driver in your household) can manage every vehicle you own from your phone — service history, upcoming maintenance, estimates, invoices, financing, warranty, and appointments — without a single phone call if you don't want one.</p>
+      <p>MMAR Care is the customer side of Mike's Mobile Auto Repair. It's where you (and every driver in your household) can manage every vehicle you own from your phone — service history, upcoming maintenance, estimates, invoices, warranty, and appointments — without a single phone call if you don't want one.</p>
 
       <h2>Everything in one place</h2>
       <ul>
