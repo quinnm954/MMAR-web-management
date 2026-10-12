@@ -14,9 +14,7 @@ import { cities } from "./cities";
 // Top 5 Lee County target cities (matrix scope).
 const MATRIX_CITY_SLUGS = new Set([
   "fort-myers",
-  "cape-coral",
   "lehigh-acres",
-  "estero",
 ]);
 
 // Maps a service category id to a URL-friendly service slug.
@@ -61,7 +59,7 @@ const SERVICE_OPENER: Record<string, string> = {
   suspension: "Mobile shocks, struts, control arms, ball joints, tie rods, and wheel-bearing service at your location",
   "tires-wheels": "Mobile flat-tire repair, rotation, TPMS service, and wheel-hub work in your driveway",
   "fuel-exhaust": "On-site fuel pump, injector, exhaust, oxygen sensor, and catalytic converter diagnostics",
-  inspections: "Mobile pre-purchase, multi-point, safety, and fleet inspections at your home or jobsite",
+  inspections: "Mobile multi-point, safety, and fleet inspections at your home or jobsite",
 };
 
 // Service-specific procedure paragraph (unique per service).
@@ -87,7 +85,7 @@ const SERVICE_PARAGRAPH: Record<string, string> = {
   "fuel-exhaust":
     "Fuel-system work starts with a pressure and volume test at the rail, not just a 'pump runs' check. Injector balance is verified with mode-six fuel-trim data. Exhaust leak diagnosis uses a smoke machine on the entire system, then a manifold leak-down check on suspect joints. Catalytic converters are condemned only after pre- and post-cat O2 waveform capture confirms catalyst inefficiency.",
   inspections:
-    "Inspections follow a documented checklist — brakes, suspension, steering, drivetrain, cooling, AC, electrical, tires, glass, lights, and a scan-tool report on stored and pending codes. Pre-purchase inspections include a road-test data capture and a written report you can share with the seller.",
+    "Inspections follow a documented checklist — brakes, suspension, steering, drivetrain, cooling, AC, electrical, tires, glass, lights, and a scan-tool report on stored and pending codes.",
 };
 
 // Common-included items per service.
@@ -174,7 +172,6 @@ const SERVICE_INCLUDED: Record<string, string[]> = {
   ],
   inspections: [
     "Documented multi-point checklist",
-    "Pre-purchase inspection with road test",
     "Scan tool report",
     "Photos of any defects found",
     "Fleet PM scheduling",

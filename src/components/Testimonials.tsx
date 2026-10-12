@@ -54,13 +54,13 @@ const testimonials = [
   },
   {
     name: "David Chen",
-    location: "Estero, FL",
+    location: "Fort Myers, FL",
     rating: 5,
     text: "Best mobile mechanic in Lehigh Acres and Fort Myers. Fair prices and he explains everything clearly. Been using him for all my vehicles.",
   },
   {
     name: "Jennifer Williams",
-    location: "Cape Coral, FL",
+    location: "Lehigh Acres, FL",
     rating: 5,
     text: "As a single mom, having a mechanic come to my home is a lifesaver. Mike is trustworthy and does excellent work every time.",
   },

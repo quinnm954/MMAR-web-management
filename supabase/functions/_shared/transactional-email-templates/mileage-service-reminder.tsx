@@ -151,7 +151,7 @@ export const template = {
     customerName: 'Alex',
     vehicle: '2018 Honda Civic',
     currentMileage: 92000,
-    priceRegionLabel: 'Fort Myers / Cape Coral, FL',
+    priceRegionLabel: 'Fort Myers / Lehigh Acres, FL',
     dueServices: [
       // Sample shows Fort Myers-area pricing (national base × 1.05, rounded to $5)
       { name: 'Oil & filter change', intervalMiles: 5000, lastServiceMiles: 85000, overdueBy: 2000, competitorPriceRange: [90, 170], importance: 'Fresh oil keeps moving engine parts lubricated and cool. Skipping it leads to sludge buildup, accelerated wear, and eventually catastrophic engine damage — by far the cheapest service that prevents the most expensive repair.' },

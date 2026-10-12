@@ -19,7 +19,7 @@ const Footer = () => {
               Mike's Mobile Auto Repair LLC
             </p>
             <p className="text-sm text-muted-foreground">
-              Mobile auto repair across Lee County, FL — Fort Myers, Cape Coral, Lehigh Acres, Estero, and Gateway.
+              Mobile auto repair across Fort Myers and Lehigh Acres, FL.
             </p>
             <a
               href="tel:8135017572"
@@ -44,7 +44,7 @@ const Footer = () => {
             </p>
             <p className="mt-3 text-xs text-muted-foreground leading-relaxed">
               <span className="block"><span className="font-semibold text-foreground/80">Hours:</span> 9am–5pm daily · By appointment only</span>
-              <span className="block mt-1"><span className="font-semibold text-foreground/80">Service area:</span> Lee County, FL — Fort Myers, Cape Coral, Lehigh Acres, Estero, Gateway</span>
+              <span className="block mt-1"><span className="font-semibold text-foreground/80">Service area:</span> Fort Myers and Lehigh Acres, FL</span>
             </p>
             <div className="mt-4">
               <p className="text-xs uppercase tracking-wider text-muted-foreground mb-2">Reviews &amp; Social</p>
