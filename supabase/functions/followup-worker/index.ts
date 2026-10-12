@@ -173,13 +173,19 @@ Deno.serve(async () => {
     }
 
     // 3) Review request 2h after payment, at most once per customer every 90 days
-    const { data: paid } = await sb.from('invoices').select('id,customer_id,paid_at')
+    const { data: paid } = await sb.from('invoices').select('id,customer_id,paid_at,appointment_id')
       .eq('status', 'paid').is('review_requested_at', null).not('paid_at', 'is', null)
       .lte('paid_at', new Date(now.getTime() - 2 * H).toISOString()).limit(BATCH);
     for (const inv of paid || []) {
+      // Never ask for a review on a job that was cancelled or a no-show
+      let skip = false;
+      if (inv.appointment_id) {
+        const { data: ap } = await sb.from('appointments').select('status').eq('id', inv.appointment_id).maybeSingle();
+        skip = ['cancelled', 'canceled', 'no_show', 'no-show'].includes(String(ap?.status || ''));
+      }
       const { count } = await sb.from('invoices').select('id', { count: 'exact', head: true })
         .eq('customer_id', inv.customer_id).gte('review_requested_at', new Date(now.getTime() - 90 * D).toISOString());
-      if (!count) {
+      if (!count && !skip) {
         const p = await profile(inv.customer_id);
         if (p?.email) await sendAndLog({ templateName: 'review-request', recipientEmail: p.email, idempotencyKey: `review-request-${inv.id}`, templateData: { customerName: first(p.full_name), customerId: inv.customer_id } });
         if (textsOk && p?.phone) {

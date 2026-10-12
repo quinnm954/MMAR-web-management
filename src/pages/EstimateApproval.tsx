@@ -90,7 +90,15 @@ const EstimateApproval = () => {
       _requested_time_window: null,
     });
     setWorking(false);
-    if (error) return toast.error('Could not submit. Please contact us.');
+    if (error) {
+      console.error('estimate decision failed', error);
+      const msg = /expired/i.test(error.message)
+        ? 'This estimate has expired. Text us at (813) 501-7572 and we will send an updated one.'
+        : /not found/i.test(error.message)
+        ? 'This link is no longer valid. Text us at (813) 501-7572 for a new one.'
+        : 'Could not submit. Please try again, or text us at (813) 501-7572.';
+      return toast.error(msg, { duration: 10000 });
+    }
 
     setEst({
       ...est,
