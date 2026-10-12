@@ -362,12 +362,21 @@ Deno.serve(async (req) => {
         return json({ result: 'Could not save. Tell the caller Mike will call them back.' });
       }
       // Leave an unsent draft estimate from the job clues so Mike sees a price before booking.
-      try {
-        const { data: full } = await sb.from('booking_requests').select('*').eq('id', ins.id).single();
-        const q = await buildLaborQuote(sb, full);
-        const did = q.kind === 'none' ? null : await createDraftEstimate(sb, full, q);
-        if (did) await sb.from('booking_requests').update({ draft_estimate_id: did }).eq('id', ins.id);
-      } catch (e) { console.error('draft estimate', e); }
+      // Runs in the background (with one retry) so a slow lookup can't time out the live call.
+      const makeDraft = async () => {
+        for (let i = 0; i < 2; i++) {
+          try {
+            const { data: full } = await sb.from('booking_requests').select('*').eq('id', ins.id).single();
+            if (full?.draft_estimate_id) return;
+            const q = await buildLaborQuote(sb, full);
+            const did = q.kind === 'none' ? null : await createDraftEstimate(sb, full, q);
+            if (did) { await sb.from('booking_requests').update({ draft_estimate_id: did }).eq('id', ins.id); return; }
+            console.error('draft estimate: none created', ins.id, q.kind);
+          } catch (e) { console.error('draft estimate', ins.id, e); }
+        }
+      };
+      // @ts-ignore EdgeRuntime is provided by the runtime
+      if (typeof EdgeRuntime !== 'undefined') EdgeRuntime.waitUntil(makeDraft()); else await makeDraft();
       return json({ result: window ? `Requested ${dateStr} at ${window}. Tell the caller it is requested (not confirmed yet) and the shop will text shortly to confirm.` : 'Booking request saved. Mike will text or call to confirm.' });
     }
 
