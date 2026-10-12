@@ -39,6 +39,7 @@ import AdminShopSettings from '@/components/admin/AdminShopSettings';
 import CalendarFeedSettings from '@/components/admin/CalendarFeedSettings';
 import AdminReports from '@/components/admin/AdminReports';
 import AdminSalesDashboard from '@/components/admin/AdminSalesDashboard';
+import AdConversionsCard from '@/components/admin/AdConversionsCard';
 import { lazy, Suspense } from 'react';
 const StreetRun3D = lazy(() => import('@/components/admin/StreetRun3D'));
 import AdminCustomerShare from '@/components/admin/AdminCustomerShare';
@@ -160,6 +161,7 @@ const AdminDashboard = () => {
             { value: 'reports', label: 'Reports', icon: BarChart3, roles: ADMIN_ONLY, content: (
               <div className="space-y-8">
                 <AdminSalesDashboard />
+                <AdConversionsCard />
                 <div className="border-t border-border pt-6">
                   <h2 className="font-display text-xl mb-3">Profit &amp; invoices</h2>
                   <AdminReports />
