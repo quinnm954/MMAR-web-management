@@ -8,6 +8,7 @@ import { useSwipeTabNav } from "@/hooks/useSwipeTabNav";
 import { Button } from "@/components/ui/button";
 import {
   LayoutDashboard,
+  Landmark,
   Car,
   CreditCard,
   Calendar,
@@ -55,9 +56,17 @@ const PortalLayout = ({ children }: { children: ReactNode }) => {
     if (!user) return;
     supabase.from("fleet_accounts").select("id").eq("user_id", user.id).maybeSingle().then(({ data }) => setIsFleet(!!data));
   }, [user]);
-  const navItems = isFleet
-    ? [baseNavItems[0], { to: "/portal/fleet", label: "My Fleet", icon: Truck }, ...baseNavItems.slice(1)]
+  const [hasFinancing, setHasFinancing] = useState(false);
+  useEffect(() => {
+    if (!user) return;
+    supabase.from("financing_contracts").select("id").eq("customer_id", user.id).eq("status", "active").limit(1).then(({ data }) => setHasFinancing(!!data?.length));
+  }, [user]);
+  const withFinancing = hasFinancing
+    ? baseNavItems.flatMap((i) => i.to === "/portal/invoices" ? [i, { to: "/portal/financing", label: "Financing Payments", icon: Landmark }] : [i])
     : baseNavItems;
+  const navItems = isFleet
+    ? [withFinancing[0], { to: "/portal/fleet", label: "My Fleet", icon: Truck }, ...withFinancing.slice(1)]
+    : withFinancing;
 
   const handleSignOut = async () => {
     await signOut();

@@ -1220,6 +1220,7 @@ export type Database = {
       financing_contracts: {
         Row: {
           agreement_date: string
+          bank_last4: string | null
           client_address: string
           client_contact: string
           client_name: string
@@ -1237,6 +1238,7 @@ export type Database = {
           initial_security_interest: string | null
           initial_terms: string | null
           interest: number
+          invoice_id: string | null
           ip_address: string | null
           monthly_payment: number
           principal: number
@@ -1244,6 +1246,8 @@ export type Database = {
           provider_signed_at: string | null
           service_description: string | null
           status: string
+          stripe_customer_id: string | null
+          stripe_payment_method_id: string | null
           total_financed: number
           total_service_price: number
           updated_at: string
@@ -1252,6 +1256,7 @@ export type Database = {
         }
         Insert: {
           agreement_date: string
+          bank_last4?: string | null
           client_address: string
           client_contact: string
           client_name: string
@@ -1269,6 +1274,7 @@ export type Database = {
           initial_security_interest?: string | null
           initial_terms?: string | null
           interest: number
+          invoice_id?: string | null
           ip_address?: string | null
           monthly_payment: number
           principal: number
@@ -1276,6 +1282,8 @@ export type Database = {
           provider_signed_at?: string | null
           service_description?: string | null
           status?: string
+          stripe_customer_id?: string | null
+          stripe_payment_method_id?: string | null
           total_financed: number
           total_service_price: number
           updated_at?: string
@@ -1284,6 +1292,7 @@ export type Database = {
         }
         Update: {
           agreement_date?: string
+          bank_last4?: string | null
           client_address?: string
           client_contact?: string
           client_name?: string
@@ -1301,6 +1310,7 @@ export type Database = {
           initial_security_interest?: string | null
           initial_terms?: string | null
           interest?: number
+          invoice_id?: string | null
           ip_address?: string | null
           monthly_payment?: number
           principal?: number
@@ -1308,6 +1318,8 @@ export type Database = {
           provider_signed_at?: string | null
           service_description?: string | null
           status?: string
+          stripe_customer_id?: string | null
+          stripe_payment_method_id?: string | null
           total_financed?: number
           total_service_price?: number
           updated_at?: string
@@ -1315,6 +1327,62 @@ export type Database = {
           vehicle_info?: string | null
         }
         Relationships: []
+      }
+      financing_payments: {
+        Row: {
+          amount: number
+          contract_id: string
+          created_at: string
+          customer_id: string
+          due_date: string
+          failure_reason: string | null
+          id: string
+          label: string
+          paid_at: string | null
+          seq: number
+          status: string
+          stripe_payment_intent_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          contract_id: string
+          created_at?: string
+          customer_id: string
+          due_date: string
+          failure_reason?: string | null
+          id?: string
+          label?: string
+          paid_at?: string | null
+          seq: number
+          status?: string
+          stripe_payment_intent_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          contract_id?: string
+          created_at?: string
+          customer_id?: string
+          due_date?: string
+          failure_reason?: string | null
+          id?: string
+          label?: string
+          paid_at?: string | null
+          seq?: number
+          status?: string
+          stripe_payment_intent_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "financing_payments_contract_id_fkey"
+            columns: ["contract_id"]
+            isOneToOne: false
+            referencedRelation: "financing_contracts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       fleet_accounts: {
         Row: {
