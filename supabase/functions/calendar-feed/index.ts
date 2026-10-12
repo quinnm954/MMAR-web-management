@@ -83,7 +83,8 @@ Deno.serve(async (req) => {
     lines.push('BEGIN:VEVENT', `UID:appt-${a.id}@garageace`, `DTSTAMP:${stamp}`);
     if (a.scheduled_at) {
       const s = new Date(a.scheduled_at);
-      lines.push(`DTSTART:${utc(s)}`, `DTEND:${utc(new Date(s.getTime() + 120 * 60000))}`);
+      const mins = /diag|inspect/i.test(a.service_type || '') ? 60 : 120; // diagnosis/inspection = 1 hour
+      lines.push(`DTSTART:${utc(s)}`, `DTEND:${utc(new Date(s.getTime() + mins * 60000))}`);
     } else {
       const [st, en] = windowRange(a.requested_time_window);
       lines.push(`DTSTART;TZID=America/New_York:${local(a.requested_date, st)}`, `DTEND;TZID=America/New_York:${local(a.requested_date, en)}`);
