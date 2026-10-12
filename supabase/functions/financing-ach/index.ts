@@ -51,8 +51,7 @@ Deno.serve(async (req) => {
         mode: "setup",
         customer: customerId,
         currency: "usd",
-        payment_method_types: ["us_bank_account"],
-        payment_method_options: { us_bank_account: { verification_method: "automatic" } },
+        payment_method_types: ["card"],
         success_url: `${origin}${back}?bank_session={CHECKOUT_SESSION_ID}`,
         cancel_url: `${origin}${back}?bank_canceled=1`,
         metadata: { contract_id: c.id },
@@ -67,27 +66,29 @@ Deno.serve(async (req) => {
       await loadContract(contractId);
       const si = s.setup_intent as Stripe.SetupIntent | null;
       const pm = si?.payment_method as Stripe.PaymentMethod | null;
-      if (!pm) return json({ ok: false, message: "Bank not linked yet" });
+      if (!pm) return json({ ok: false, message: "Card not saved yet" });
+      const last4 = pm.card?.last4 ?? pm.us_bank_account?.last4 ?? null;
+      const brand = pm.card?.brand ? pm.card.brand.charAt(0).toUpperCase() + pm.card.brand.slice(1) : "Card";
       await admin.from("financing_contracts").update({
         stripe_payment_method_id: pm.id,
-        bank_last4: pm.us_bank_account?.last4 ?? null,
+        bank_last4: last4,
       }).eq("id", contractId);
-      return json({ ok: true, last4: pm.us_bank_account?.last4 });
+      return json({ ok: true, last4, brand });
     }
 
     if (action === "run") {
       const { data: pay } = await admin.from("financing_payments").select("*").eq("id", body.payment_id).maybeSingle();
-      if (!pay) throw new Error("Draft not found");
+      if (!pay) throw new Error("Payment not found");
       const c = await loadContract(pay.contract_id);
-      if (["paid", "processing"].includes(pay.status)) return json({ error: "This draft is already " + pay.status }, 400);
-      if (!c.stripe_customer_id || !c.stripe_payment_method_id) return json({ error: "Link a bank account first" }, 400);
+      if (["paid", "processing"].includes(pay.status)) return json({ error: "This payment is already " + pay.status }, 400);
+      if (!c.stripe_customer_id || !c.stripe_payment_method_id) return json({ error: "Save a card first" }, 400);
       try {
         const pi = await stripe.paymentIntents.create({
           amount: Math.round(Number(pay.amount) * 100),
           currency: "usd",
           customer: c.stripe_customer_id,
           payment_method: c.stripe_payment_method_id,
-          payment_method_types: ["us_bank_account"],
+          payment_method_types: ["card"],
           confirm: true,
           off_session: true,
           description: `${c.client_name} — ${pay.label}`,

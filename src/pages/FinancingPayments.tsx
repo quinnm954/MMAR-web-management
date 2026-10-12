@@ -6,7 +6,7 @@ import PortalLayout from "@/components/portal/PortalLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Landmark, Loader2, RefreshCw, ArrowLeft } from "lucide-react";
+import { CreditCard, Loader2, RefreshCw, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 
 type Contract = {
@@ -67,11 +67,11 @@ const FinancingPayments = ({ adminView = false }: { adminView?: boolean }) => {
       const params = new URLSearchParams(window.location.search);
       const sid = params.get("bank_session");
       if (sid) {
-        try { const r = await call({ action: "confirm_bank", session_id: sid }); if (r?.ok) toast.success(`Bank account ending ${r.last4} linked`); }
+        try { const r = await call({ action: "confirm_bank", session_id: sid }); if (r?.ok) toast.success(`${r.brand || "Card"} ending ${r.last4} saved`); }
         catch (e: any) { toast.error(e.message); }
         window.history.replaceState({}, "", window.location.pathname);
       }
-      if (params.get("bank_canceled")) toast.info("Bank linking canceled");
+      if (params.get("bank_canceled")) toast.info("Card setup canceled");
       await load();
       const { data: cs } = await supabase.from("financing_contracts").select("id").eq("status", "active");
       for (const c of cs || []) await call({ action: "refresh", contract_id: c.id }).catch(() => {});
@@ -85,11 +85,11 @@ const FinancingPayments = ({ adminView = false }: { adminView?: boolean }) => {
     catch (e: any) { toast.error(e.message); setBusy(null); }
   };
   const runDraft = async (p: Payment) => {
-    if (!confirm(`Draft ${money(p.amount)} from the linked bank account for "${p.label}"?`)) return;
+    if (!confirm(`Charge ${money(p.amount)} to the saved card for "${p.label}"?`)) return;
     setBusy(p.id);
     try {
       const r = await call({ action: "run", payment_id: p.id });
-      toast.success(r.status === "paid" ? "Draft paid" : "Draft submitted — bank drafts take 3–5 business days to clear");
+      toast.success(r.status === "paid" ? "Payment collected" : "Payment submitted");
     } catch (e: any) { toast.error(e.message); }
     setBusy(null); load();
   };
@@ -105,7 +105,7 @@ const FinancingPayments = ({ adminView = false }: { adminView?: boolean }) => {
         <div>
           {adminView && <Link to="/admin" className="text-sm text-muted-foreground inline-flex items-center gap-1 mb-1"><ArrowLeft className="h-4 w-4" /> Admin</Link>}
           <h1 className="text-2xl sm:text-3xl font-bold">Financing payments</h1>
-          <p className="text-muted-foreground text-sm mt-1">Each bank draft, its due date, amount and status. ACH bank draft only.</p>
+          <p className="text-muted-foreground text-sm mt-1">Each payment, its due date, amount and status. Paid by saved debit or credit card.</p>
         </div>
         <Button variant="outline" size="sm" onClick={refresh} disabled={busy === "refresh"}>
           {busy === "refresh" ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4 mr-1" />} Refresh
@@ -131,18 +131,18 @@ const FinancingPayments = ({ adminView = false }: { adminView?: boolean }) => {
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
                 <div className="rounded-md bg-muted/40 p-3"><div className="text-muted-foreground text-xs">Paid so far</div><div className="font-bold text-lg">{money(paid)}</div></div>
                 <div className="rounded-md bg-muted/40 p-3"><div className="text-muted-foreground text-xs">Remaining</div><div className="font-bold text-lg">{money(totalOwed - paid)}</div></div>
-                <div className="rounded-md bg-muted/40 p-3"><div className="text-muted-foreground text-xs">Next draft</div><div className="font-bold">{next ? `${money(next.amount)}` : "—"}</div><div className="text-xs text-muted-foreground">{next ? fmtDate(next.due_date) : "Paid in full"}</div></div>
+                <div className="rounded-md bg-muted/40 p-3"><div className="text-muted-foreground text-xs">Next payment</div><div className="font-bold">{next ? `${money(next.amount)}` : "—"}</div><div className="text-xs text-muted-foreground">{next ? fmtDate(next.due_date) : "Paid in full"}</div></div>
                 <div className="rounded-md bg-muted/40 p-3"><div className="text-muted-foreground text-xs">Interest (10% simple)</div><div className="font-bold">{money(c.interest)}</div></div>
               </div>
 
               <div className="flex items-center justify-between gap-3 flex-wrap rounded-md border border-border p-3">
                 <div className="flex items-center gap-2 text-sm">
-                  <Landmark className="h-4 w-4 text-primary" />
-                  {c.stripe_payment_method_id ? <span>Bank account ending <b>{c.bank_last4}</b></span> : <span className="text-muted-foreground">No bank account linked yet</span>}
+                  <CreditCard className="h-4 w-4 text-primary" />
+                  {c.stripe_payment_method_id ? <span>Card ending <b>{c.bank_last4}</b></span> : <span className="text-muted-foreground">No card saved yet</span>}
                 </div>
                 <Button size="sm" variant={c.stripe_payment_method_id ? "outline" : "default"} onClick={() => linkBank(c.id)} disabled={busy === "bank-" + c.id}>
                   {busy === "bank-" + c.id && <Loader2 className="h-4 w-4 animate-spin mr-1" />}
-                  {c.stripe_payment_method_id ? "Change bank" : "Link bank account"}
+                  {c.stripe_payment_method_id ? "Change card" : "Add debit or credit card"}
                 </Button>
               </div>
 
@@ -159,14 +159,14 @@ const FinancingPayments = ({ adminView = false }: { adminView?: boolean }) => {
                       {statusBadge(p)}
                       {!["paid", "processing"].includes(p.status) && (
                         <Button size="sm" onClick={() => runDraft(p)} disabled={!c.stripe_payment_method_id || busy === p.id}>
-                          {busy === p.id ? <Loader2 className="h-4 w-4 animate-spin" /> : p.status === "failed" ? "Retry draft" : "Run draft"}
+                          {busy === p.id ? <Loader2 className="h-4 w-4 animate-spin" /> : p.status === "failed" ? "Retry charge" : "Charge card"}
                         </Button>
                       )}
                     </div>
                   </div>
                 ))}
               </div>
-              <p className="text-xs text-muted-foreground">Bank drafts take 3–5 business days to clear. Cash is not accepted — pay by ACH bank draft only, never the technician.</p>
+              <p className="text-xs text-muted-foreground">Cash is not accepted — payments are charged to the saved card only, never paid to the technician.</p>
             </CardContent>
           </Card>
         );
