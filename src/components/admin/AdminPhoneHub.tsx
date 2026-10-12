@@ -124,11 +124,19 @@ export default function AdminPhoneHub({ fullscreen = false }: { fullscreen?: boo
   const load = useCallback(async () => {
     setLoading(true);
     const [callResult, threadResult, inboundResult, sentResult, draftResult, profileResult, employeeResult, roleResult] = await Promise.all([
-      supabase.from('call_logs').select('*').order('created_at', { ascending: false }).limit(200),
-      supabase.from('sms_threads').select('*').order('last_message_at', { ascending: false }).limit(200),
-      supabase.from('inbound_messages').select('*').order('received_at', { ascending: false }).limit(200),
-      supabase.from('email_send_log').select('*').order('created_at', { ascending: false }).limit(300),
-      supabase.from('email_drafts').select('*').order('updated_at', { ascending: false }).limit(100),
+      supabase.from('call_logs').select('*').order('created_at', { ascending: false }).limit(1000),
+      supabase.from('sms_threads').select('*').order('last_message_at', { ascending: false }).limit(1000),
+      supabase.from('inbound_messages').select('*').order('received_at', { ascending: false }).limit(1000),
+      (async () => { // every sent email, paged past the 1000-row cap
+        const all: any[] = [];
+        for (let from = 0; from < 10000; from += 1000) {
+          const { data } = await supabase.from('email_send_log').select('*').order('created_at', { ascending: false }).range(from, from + 999);
+          all.push(...(data ?? []));
+          if (!data || data.length < 1000) break;
+        }
+        return { data: all };
+      })(),
+      supabase.from('email_drafts').select('*').order('updated_at', { ascending: false }).limit(1000),
       supabase.from('profiles').select('id, full_name, phone').not('phone', 'is', null),
       supabase.from('employees').select('full_name, phone, user_id').not('phone', 'is', null),
       supabase.from('user_roles').select('user_id, role'),
@@ -154,12 +162,20 @@ export default function AdminPhoneHub({ fullscreen = false }: { fullscreen?: boo
       subject: row.subject || '(no subject)', snippet: (row.body_text || (row.body_html ? stripHtml(row.body_html) : '')).slice(0, 140),
       bodyHtml: row.body_html, bodyText: row.body_text, threadId: row.thread_id, at: row.received_at, unread: !row.read_at,
     }));
+    // One entry per email; keep the newest status but take the full body from whichever row saved it.
+    const hasBody = (r: any) => !!(r?.metadata?.body_html || r?.metadata?.body_text || r?.metadata?.body);
     const sentSeen = new Map<string, any>();
-    (sentResult.data ?? []).forEach((row: any) => { if (!sentSeen.has(row.message_id || row.id)) sentSeen.set(row.message_id || row.id, row); });
+    (sentResult.data ?? []).forEach((row: any) => {
+      const k = row.message_id || row.id;
+      const prev = sentSeen.get(k);
+      if (!prev) sentSeen.set(k, row);
+      else if (!hasBody(prev) && hasBody(row)) sentSeen.set(k, { ...prev, metadata: { ...(row.metadata || {}), ...(prev.metadata || {}), body_html: row.metadata?.body_html, body_text: row.metadata?.body_text, body: row.metadata?.body } });
+    });
     const sent: EmailItem[] = Array.from(sentSeen.values()).map((row: any) => ({
       id: `out:${row.id}`, kind: 'sent', from: 'MMAR', to: row.recipient_email,
-      subject: row.metadata?.subject || row.template_name, snippet: row.metadata?.preview || row.template_name,
-      bodyHtml: row.metadata?.body_html || null, bodyText: row.metadata?.body_text || null,
+      subject: row.metadata?.subject || row.template_name, snippet: row.metadata?.preview || (row.metadata?.body ? String(row.metadata.body).slice(0, 140) : row.template_name),
+      bodyHtml: row.metadata?.body_html || null, bodyText: row.metadata?.body_text || row.metadata?.body
+        || (hasBody(row) ? null : `Full text of this ${String(row.template_name || 'email').replace(/-/g, ' ')} email wasn't saved (sent before full copies were kept). Sent to ${row.recipient_email}.`),
       threadId: row.metadata?.thread_id || null, status: row.status, at: row.created_at,
     }));
     const drafts: EmailItem[] = (draftResult.data ?? []).map((row: any) => ({
