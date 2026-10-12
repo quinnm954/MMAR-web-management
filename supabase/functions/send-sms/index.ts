@@ -1,4 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.95.0';
+import { requireStaff } from '../_shared/staff-auth.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -9,6 +10,9 @@ const GATEWAY_URL = 'https://connector-gateway.lovable.dev/twilio';
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
+  // Only signed-in staff may text from the business line.
+  const auth = await requireStaff(req);
+  if (auth instanceof Response) return new Response(await auth.text(), { status: auth.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
 
   try {
     const { thread_id, to, body } = await req.json();
