@@ -43,7 +43,7 @@ const AboutPage = () => {
               <Calendar className="w-3.5 h-3.5" /> Founded in Southwest Florida
             </span>
             <span className="inline-flex items-center gap-1">
-              <MapPin className="w-3.5 h-3.5" /> Lehigh Acres • Fort Myers • Cape Coral
+              <MapPin className="w-3.5 h-3.5" /> Lehigh Acres • Fort Myers
             </span>
           </div>
         </div>
@@ -77,11 +77,9 @@ const AboutPage = () => {
             wasted day.
           </p>
           <p className="text-muted-foreground leading-relaxed">
-            We service every neighborhood we can reach in a reasonable drive — including{" "}
+            We service every neighborhood in{" "}
             <Link to="/areas/lehigh-acres" className="text-primary hover:underline">Lehigh Acres</Link>,{" "}
-            <Link to="/areas/fort-myers" className="text-primary hover:underline">Fort Myers</Link>,{" "}
-            <Link to="/areas/cape-coral" className="text-primary hover:underline">Cape Coral</Link>,
-            Estero, Gateway, and most of Lee County. See the full{" "}
+            and <Link to="/areas/fort-myers" className="text-primary hover:underline">Fort Myers</Link>. See the full{" "}
             <Link to="/service-areas" className="text-primary hover:underline">service area map</Link>.
           </p>
 

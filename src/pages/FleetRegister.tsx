@@ -16,7 +16,7 @@ import { useSeo } from "@/lib/useSeo";
 import { useAuth } from "@/hooks/useAuth";
 
 const VEHICLE_TYPES = ["Pickup trucks", "Cargo vans", "Box trucks", "SUVs", "Sedans", "Trailers / equipment"];
-const CITIES = ["Fort Myers", "Lehigh Acres", "Cape Coral", "Estero", "Gateway", "Other"];
+const CITIES = ["Fort Myers", "Lehigh Acres"];
 
 const schema = z.object({
   company: z.string().trim().min(2, "Enter your company name").max(120),

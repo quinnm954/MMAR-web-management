@@ -19,8 +19,6 @@ export type LocalLandingPage = {
 const ALLOWED_CITY_SLUGS = new Set([
   "lehigh-acres",
   "fort-myers",
-  "cape-coral",
-  "estero",
 ]);
 
 const _allLocalLandingPages: LocalLandingPage[] = [
@@ -1127,7 +1125,6 @@ const _allLocalLandingPages: LocalLandingPage[] = [
       "Scope work on ignition and injectors",
       "EGR system carbon assessment and cleaning",
       "Vacuum-leak smoke testing",
-      "Pre-purchase engine condition assessment",
       "Written report with photos and quote",
       "Diagnostic fee credited toward repair",
     ],

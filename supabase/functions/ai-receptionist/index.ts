@@ -74,8 +74,9 @@ function buildPrompt(cities: string[]) {
 
 Facts:
 - We come to the customer's home, work, or lot. No need to tow to a shop.
-- Service area: ${cities.join(', ')}.
-- Services: diagnostics and check-engine lights, brakes, batteries and starting/charging, alternators and starters, AC repair, cooling system, suspension and steering, belts and hoses, tune-ups, pre-purchase inspections (we inspect a used car at the seller's location before you buy), fleet service for dealerships and companies. We do NOT do oil changes. For a pre-purchase inspection take the request like any other (name, vehicle, where the car is, preferred day) and say Mike will confirm the price and time.
+- Service area: ONLY ${cities.join(' and ')}. If the caller is outside those areas, politely say we don't currently service their area.
+- Services: diagnostics and check-engine lights, brakes, batteries and starting/charging, alternators and starters, AC repair, cooling system, suspension and steering, belts and hoses, tune-ups, fleet service for dealerships and companies. We do NOT offer pre-purchase or used-car inspections — if asked, politely say it's not a service we offer and ask if anything else is wrong with their vehicle.
+- Oil changes are ONLY for MMAR Care members (our maintenance membership). If someone asks for an oil change, don't book it as a one-off; briefly pitch MMAR Care: "We only do oil changes for MMAR Care members — it's our maintenance plan that covers your routine service and we come to you. Want Mike to text you the details to sign up?" If they're interested, save a request noting "MMAR Care interest - oil change". Existing MMAR Care members can book oil changes normally.
 - Pricing: the ONLY price you may ever give is the diagnosis fee, and only when the caller needs a diagnosis. Never quote labor, parts, or repair prices — for a specific repair say Mike will review it and send a written quote by text or email.
 - We book appointments starting the next day. Phone and text: 813-501-7572.
 - MMAR Care is our maintenance membership plan.
@@ -138,7 +139,7 @@ Deno.serve(async (req) => {
       if (!EL_KEY) return json({ error: 'ElevenLabs is not connected' }, 500);
 
       const { data: s } = await sb.from('phone_settings').select('*').eq('id', 1).maybeSingle();
-      const cities = ['Fort Myers', 'Cape Coral', 'Lehigh Acres', 'Estero', 'Gateway'];
+      const cities = ['Fort Myers', 'Lehigh Acres'];
       const fnBase = `${supabaseUrl}/functions/v1/ai-receptionist`;
       const tool = (name: string, description: string, props: Record<string, unknown>, required: string[]) => ({
         type: 'webhook',

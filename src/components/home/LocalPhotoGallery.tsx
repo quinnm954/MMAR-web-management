@@ -23,8 +23,8 @@ const PHOTOS: Photo[] = [
   },
   {
     src: alternatorImg,
-    alt: "Mobile mechanic replacing an alternator on a sedan in Cape Coral FL",
-    caption: "Alternator replacement — Cape Coral, FL",
+    alt: "Mobile mechanic replacing an alternator on a sedan in Fort Myers FL",
+    caption: "Alternator replacement — Fort Myers, FL",
   },
 ];
 
@@ -37,7 +37,7 @@ const LocalPhotoGallery = () => {
             On-Site Work Across Lehigh Acres and Fort Myers
           </h2>
           <p className="text-muted-foreground text-sm md:text-base">
-            Real mobile auto repair jobs from driveways across Lehigh Acres, Fort Myers, Cape Coral, and Estero.
+            Real mobile auto repair jobs from driveways across Lehigh Acres and Fort Myers.
           </p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
