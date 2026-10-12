@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import ROAttachments from "./ROAttachments";
 import DeleteButton from "./DeleteButton";
 import { generateInvoiceForRepairOrder } from "@/lib/repairOrders";
+import { sendAppointmentConfirmation } from "@/lib/appointmentConfirm";
 
 interface Props {
   appointmentId: string | null;
@@ -159,7 +160,12 @@ export default function RepairOrderDetail({ appointmentId, open, onClose }: Prop
     setSavingSchedule(false);
     if (error) return toast.error(error.message);
     toast.success("Repair order scheduled");
+    const changed = appt.scheduled_at !== iso;
     setAppt({ ...appt, scheduled_at: iso, status: newStatus, board_column: newColumn });
+    if (changed) {
+      sendAppointmentConfirmation({ appointmentId: appt.id, scheduledAt: iso, customer, vehicle, serviceType: appt.service_type })
+        .then((s) => { if (s?.length) toast.success(`Confirmation sent by ${s.join(" and ")}`); });
+    }
   };
 
   const assignTech = async (techId: string | null) => {
