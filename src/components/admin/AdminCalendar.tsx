@@ -25,6 +25,7 @@ export default function AdminCalendar() {
   const [date, setDate] = useState(startOfDay(new Date()));
   const [openId, setOpenId] = useState<string | null>(null);
   const [hiddenTechs, setHiddenTechs] = useState<Set<string>>(new Set());
+  const [blocks, setBlocks] = useState<{ id: string; starts_at: string; ends_at: string; reason: string | null }[]>([]);
 
   useEffect(() => {
     (async () => {
@@ -46,13 +47,21 @@ export default function AdminCalendar() {
         .gte("scheduled_at", from.toISOString())
         .lt("scheduled_at", to.toISOString());
       setAppts((data || []) as any);
+      const { data: b } = await supabase.from("calendar_blocks").select("id,starts_at,ends_at,reason")
+        .lt("starts_at", to.toISOString()).gt("ends_at", from.toISOString());
+      setBlocks(b || []);
       setLoading(false);
     })();
   }, [date, view]);
 
   const colorOf = (techId: string | null) => (techId ? techs.findIndex((t) => t.id === techId) + 1 : 4);
 
-  const events: CalEvent[] = useMemo(() => appts
+  const events: CalEvent[] = useMemo(() => [
+    ...blocks.map((b) => ({
+      id: `block-${b.id}`, title: "Blocked", subtitle: b.reason && b.reason !== "Blocked off" ? b.reason : "No bookings",
+      start: new Date(b.starts_at), end: new Date(b.ends_at), color: 4, muted: true,
+    })),
+    ...appts
     .filter((a) => !HIDDEN.includes(a.status) && !hiddenTechs.has(a.assigned_technician_id ?? "none"))
     .map((a) => ({
       id: a.id,
@@ -62,13 +71,24 @@ export default function AdminCalendar() {
       end: endFromLabor(new Date(a.scheduled_at!), laborMins[a.id]),
       color: colorOf(a.assigned_technician_id),
       muted: a.status === "completed",
-    })), [appts, techs, hiddenTechs, laborMins]);
+    }))], [appts, techs, hiddenTechs, laborMins, blocks]);
 
   const reschedule = async (id: string, start: Date) => {
+    if (id.startsWith("block-")) return;
     const prev = appts;
     setAppts((cur) => cur.map((a) => (a.id === id ? { ...a, scheduled_at: start.toISOString() } : a)));
     const { error } = await supabase.from("appointments").update({ scheduled_at: start.toISOString() }).eq("id", id);
     if (error) { setAppts(prev); toast.error("Reschedule failed"); } else toast.success("Rescheduled");
+  };
+
+  const onClick = async (id: string) => {
+    if (!id.startsWith("block-")) return setOpenId(id);
+    const bid = id.slice(6);
+    if (!window.confirm("Remove this blocked time?")) return;
+    const { error } = await supabase.from("calendar_blocks").delete().eq("id", bid);
+    if (error) return toast.error(error.message);
+    setBlocks((cur) => cur.filter((b) => b.id !== bid));
+    toast.success("Blocked time removed");
   };
 
   const toggle = (k: string) => setHiddenTechs((s) => { const n = new Set(s); n.has(k) ? n.delete(k) : n.add(k); return n; });
@@ -87,7 +107,7 @@ export default function AdminCalendar() {
         {loading && <Loader2 className="h-4 w-4 animate-spin text-primary" />}
       </div>
       <GCalView events={events} view={view} onViewChange={setView} date={date} onDateChange={setDate}
-        onEventClick={setOpenId} onEventDrop={reschedule} />
+        onEventClick={onClick} onEventDrop={reschedule} />
       <p className="text-xs text-muted-foreground">Drag a job to a new time to reschedule. Click it to open the repair order. Tap a name above to hide or show that tech.</p>
       <RepairOrderDetail appointmentId={openId} open={!!openId} onClose={() => setOpenId(null)} />
     </div>

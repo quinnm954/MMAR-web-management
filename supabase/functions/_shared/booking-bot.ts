@@ -89,6 +89,10 @@ export async function openSlots(sb: any, fromDate: string | null, days = 7, excl
     const p = etParts(new Date(a.scheduled_at));
     (busy[p.date] ||= []).push(p.mins);
   }
+  // Admin-blocked time (calendar_blocks) — a slot is unavailable if its job would overlap a block.
+  const { data: blocks } = await sb.from('calendar_blocks').select('starts_at, ends_at')
+    .lt('starts_at', new Date(`${addDays(end, 1)}T23:59:59Z`).toISOString())
+    .gt('ends_at', new Date(`${addDays(start, -1)}T00:00:00Z`).toISOString());
   const out: { date: string; slots: number[] }[] = [];
   for (let i = 0; i < days; i++) {
     const date = addDays(start, i);
@@ -96,8 +100,14 @@ export async function openSlots(sb: any, fromDate: string | null, days = 7, excl
     if (date <= now.date) { out.push({ date, slots: [] }); continue; }
     const earliest = OPEN_MIN;
     const slots: number[] = [];
+    const blocked = (m: number) => (blocks || []).some((b: any) => {
+      const s = etParts(new Date(b.starts_at)), e = etParts(new Date(b.ends_at));
+      const bs = s.date < date ? -1 : s.date > date ? Infinity : s.mins;
+      const be = e.date > date ? Infinity : e.date < date ? -1 : e.mins;
+      return m < be && m + BLOCK_MIN > bs;
+    });
     for (let m = Math.max(OPEN_MIN, earliest); m <= CLOSE_MIN; m += STEP)
-      if (!(busy[date] || []).some((b) => Math.abs(b - m) < BLOCK_MIN)) slots.push(m);
+      if (!(busy[date] || []).some((b) => Math.abs(b - m) < BLOCK_MIN) && !blocked(m)) slots.push(m);
     out.push({ date, slots });
   }
   return out;

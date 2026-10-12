@@ -17,3 +17,4 @@
 - Job completion time lives in `appointments.completed_at`, set by trigger when status becomes completed and cleared if reopened; why: dashboards count finished jobs by when they finished, not by later edits.
 - Techs finish jobs through the `tech_finish_job` RPC (marks complete, logs mileage, creates the invoice, alerts admins), then `send-invoice-payment-link` lets the assigned tech trigger the send without ever receiving the price or link; why: one tap at job end keeps completion times and invoicing accurate.
 - Estimate expiry runs in `followup-worker` (pre-expiry nudge at followup_count 2→3, then status `expired` after `valid_until`), and a trigger on `estimate_decision_logs` blocks customer approval of expired estimates; why: prices go stale and no extra schedule is needed.
+- Blocked-off time lives in `calendar_blocks` (admin-only RLS); open-slot suggestions, the admin calendar and the ICS feed all honor it; why: one source for when the shop is unavailable.
