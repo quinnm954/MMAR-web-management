@@ -93,7 +93,7 @@ interface Region { label: string; multiplier: number }
 const NATIONAL: Region = { label: 'National average', multiplier: 1.0 };
 const ZIP3_REGIONS: Record<string, Region> = {
   // --- Florida (primary service area) ---
-  '339': { label: 'Fort Myers / Cape Coral, FL', multiplier: 1.05 },
+  '339': { label: 'Fort Myers / Lehigh Acres, FL', multiplier: 1.05 },
   '341': { label: 'Southwest Florida, FL', multiplier: 1.12 },
   '342': { label: 'Southwest Florida Gulf Coast, FL', multiplier: 1.12 },
   '338': { label: 'Lakeland / Polk County, FL', multiplier: 0.98 },

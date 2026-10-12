@@ -150,7 +150,7 @@ const MmarCare = () => {
             <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto mb-7">
               MMAR Care is our monthly maintenance subscription. Included oil changes, priority
               scheduling, member-only discounts, and a transferable warranty — designed for busy
-              drivers across Fort Myers, Lehigh Acres, and Cape Coral.
+              drivers across Fort Myers and Lehigh Acres.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Button variant="hero" size="lg" asChild>
