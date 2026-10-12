@@ -114,11 +114,26 @@ const VALID: ConversionEvent[] = ["phone_call", "text_click", "quote_submit", "l
 /** Fire a Google Ads conversion. `type` defaults to phone_call for back-compat.
  *  Tolerates being passed directly as a React onClick handler — non-string args are ignored. */
 export const trackConversion = async (type?: unknown) => {
-  if (typeof window === "undefined" || !window.gtag) return;
+  if (typeof window === "undefined") return;
   const eventType: ConversionEvent =
     typeof type === "string" && (VALID as string[]).includes(type)
       ? (type as ConversionEvent)
       : "phone_call";
+  // Log every call/text/quote tap for the admin dashboard (marks Google-ad visitors).
+  try {
+    const a = getAttribution();
+    const fromAd = !!(a.gclid || a.gbraid || a.wbraid || (a.utm_source || "").toLowerCase().includes("google") && (a.utm_medium || "").match(/cpc|paid|ppc/i));
+    void supabase.from("ad_conversion_events" as never).insert({
+      event_type: eventType,
+      from_google_ad: fromAd,
+      gclid: (a.gclid || a.gbraid || a.wbraid || null)?.slice(0, 300) ?? null,
+      utm_source: a.utm_source?.slice(0, 100) ?? null,
+      utm_campaign: a.utm_campaign?.slice(0, 200) ?? null,
+      landing_page: a.landing_page?.slice(0, 500) ?? null,
+      page_path: window.location.pathname.slice(0, 500),
+    } as never).then(() => {});
+  } catch { /* noop */ }
+  if (!window.gtag) return;
   const s = await loadSettings();
   if (!s?.google_ads_conversion_id) return;
   const label = labelFor(s, eventType);
