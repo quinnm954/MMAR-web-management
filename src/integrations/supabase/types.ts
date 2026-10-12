@@ -83,6 +83,42 @@ export type Database = {
           },
         ]
       }
+      ad_conversion_events: {
+        Row: {
+          created_at: string
+          event_type: string
+          from_google_ad: boolean
+          gclid: string | null
+          id: string
+          landing_page: string | null
+          page_path: string | null
+          utm_campaign: string | null
+          utm_source: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_type: string
+          from_google_ad?: boolean
+          gclid?: string | null
+          id?: string
+          landing_page?: string | null
+          page_path?: string | null
+          utm_campaign?: string | null
+          utm_source?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_type?: string
+          from_google_ad?: boolean
+          gclid?: string | null
+          id?: string
+          landing_page?: string | null
+          page_path?: string | null
+          utm_campaign?: string | null
+          utm_source?: string | null
+        }
+        Relationships: []
+      }
       ai_usage_log: {
         Row: {
           completion_tokens: number | null
