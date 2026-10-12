@@ -102,6 +102,13 @@ Deno.serve(async (req) => {
       `DTSTART;TZID=America/New_York:${local(r.requested_date, st)}`, `DTEND;TZID=America/New_York:${local(r.requested_date, en)}`,
       `SUMMARY:${esc(title)}`, `LOCATION:${esc(r.service_address)}`, `DESCRIPTION:${esc(desc)}`, `URL:${LINK}`, 'STATUS:TENTATIVE', 'TRANSP:TRANSPARENT', 'END:VEVENT');
   }
+  const { data: blocks } = await sb.from('calendar_blocks').select('id,starts_at,ends_at,reason')
+    .lt('starts_at', to.toISOString()).gt('ends_at', from.toISOString());
+  for (const b of blocks || []) {
+    lines.push('BEGIN:VEVENT', `UID:block-${b.id}@garageace`, `DTSTAMP:${stamp}`,
+      `DTSTART:${utc(new Date(b.starts_at))}`, `DTEND:${utc(new Date(b.ends_at))}`,
+      `SUMMARY:${esc(`BLOCKED${b.reason && b.reason !== 'Blocked off' ? `: ${b.reason}` : ''}`)}`, 'STATUS:CONFIRMED', 'END:VEVENT');
+  }
   lines.push('END:VCALENDAR');
 
   return new Response(lines.map(fold).join('\r\n') + '\r\n', {
