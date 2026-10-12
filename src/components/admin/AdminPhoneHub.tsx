@@ -187,7 +187,7 @@ export default function AdminPhoneHub({ fullscreen = false }: { fullscreen?: boo
     const { data: auth } = await supabase.auth.getUser();
     const uid = auth.user?.id || null;
     setMe(uid);
-    const { data: ct } = await supabase.from('message_threads').select('*').order('last_message_at', { ascending: false }).limit(200);
+    const { data: ct } = await supabase.from('message_threads').select('*').order('last_message_at', { ascending: false }).limit(1000);
     const chatList = (ct ?? []) as ChatThread[];
     setChats(chatList);
     const ids = Array.from(new Set(chatList.flatMap(t => [t.customer_id, t.tech_id, t.created_by]).filter(Boolean))) as string[];
