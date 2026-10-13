@@ -1,4 +1,5 @@
 import { useEffect, useState, Fragment } from "react";
+import { useAdminRegion, RegionSwitch, RegionChip } from '@/hooks/useAdminRegion';
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -76,7 +77,8 @@ export default function AdminRepairOrders() {
 
   useEffect(() => { load(); }, []);
 
-  const base = rows.filter((r) => inRange(r.scheduled_at || r.created_at, range) && matches(q,
+  const { match: regionMatch } = useAdminRegion();
+  const base = rows.filter((r) => regionMatch((r as any).region_slug) && inRange(r.scheduled_at || r.created_at, range) && matches(q,
     r.id, r.service_type, r.customer?.full_name, r.customer?.email, r.customer?.phone,
     r.vehicle?.make, r.vehicle?.model, r.vehicle?.license_plate, r.est?.estimate_number, r.inv?.invoice_number));
   const tabDef = RO_TABS.find((t) => t.key === tab) || RO_TABS[0];
@@ -89,6 +91,7 @@ export default function AdminRepairOrders() {
         <CardTitle className="flex items-center gap-2"><Wrench className="h-5 w-5" /> Repair Orders</CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
+        <RegionSwitch rows={rows as any} />
         <ListControls q={q} setQ={setQ} placeholder="Search RO, customer, vehicle, estimate or invoice #..."
           range={range} setRange={setRange} tab={tab} setTab={setTab}
           tabs={RO_TABS.map((t) => ({ key: t.key, label: t.label, count: base.filter(t.test).length }))} />

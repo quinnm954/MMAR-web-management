@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useAdminRegion, RegionSwitch, RegionChip } from '@/hooks/useAdminRegion';
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -221,12 +222,14 @@ const AdminBookingRequests = () => {
     load();
   };
 
-  const visible = filter === "pending"
+  const { match: regionMatch } = useAdminRegion();
+  const visible = (filter === "pending"
     ? rows.filter((r) => r.status === "new" || r.status === "contacted")
-    : rows;
+    : rows).filter((r) => regionMatch((r as any).region_slug));
 
   return (
     <div className="space-y-4">
+      <RegionSwitch rows={rows as any} />
       <div className="flex items-center justify-between flex-wrap gap-2">
         <div>
           <h2 className="text-lg font-semibold flex items-center gap-2">
@@ -277,6 +280,7 @@ const AdminBookingRequests = () => {
                   <p className="text-xs text-muted-foreground">
                     {new Date(r.created_at).toLocaleString()} · via {r.source}
                   </p>
+                  <div className="mt-1 flex flex-wrap gap-1"><RegionChip slug={(r as any).region_slug} city={(r as any).geo_city} />{(r as any).region_slug === 'sfl' && <span className="rounded-full bg-accent/20 px-2 py-0.5 text-[11px] font-medium text-accent">Waitlist</span>}</div>
                 </div>
                 <span className={`text-[11px] font-semibold px-2 py-1 rounded-full ${STATUS_TONE[r.status] ?? "bg-muted"}`}>
                   {r.status}
