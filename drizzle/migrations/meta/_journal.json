@@ -288,6 +288,13 @@
       "when": 1791911112433,
       "tag": "0040_financing_documents",
       "breakpoints": true
+    },
+    {
+      "idx": 41,
+      "version": "7",
+      "when": 1791911133501,
+      "tag": "0041_admin_insert_financing_contracts",
+      "breakpoints": true
     }
   ]
 }
