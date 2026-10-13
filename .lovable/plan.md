@@ -22,6 +22,15 @@
 - **Change it by hand:** a region picker on bookings and appointments for when Google gets it wrong. Linked estimates, orders and invoices follow the change.
 - **Existing records:** everything already in Garage Ace gets looked up once so it sorts correctly.
 
+## New receptionist greeting
+Every call opens with this greeting, then the receptionist carries on as normal in the language the caller picks:
+
+> "Thanks for calling Mike's Mobile Auto Repair. We're mobile mechanics serving Fort Myers and Lehigh Acres, coming soon to Broward and Palm Beach. We come to you for diagnostics, brakes, starters and alternators, tune-ups and major repairs. For English, say English. Para español, diga español."
+
+- The areas in the greeting update automatically. Once a South Florida tech is assigned, "coming soon to" changes to "and".
+- If the caller just starts talking instead of choosing, it answers in whatever language they spoke.
+- Known callers still get greeted by name after they pick a language.
+
 ## Technical details
 - Migration:
   - Add geo fields (`geo_city`, `geo_county`, `geo_lat`, `geo_lng`, `geo_status` = pending/ok/not_found/manual) to `booking_requests` and `appointments`.
