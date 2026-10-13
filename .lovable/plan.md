@@ -23,10 +23,15 @@
 ## Google
 - **Search listings**: at launch, the new pages are added to the sitemap and opened to search engines.
 - **Ads**: a new paused Search campaign, "Mobile Repair Calls Broward Palm Beach", targeting both counties with the same services as the Fort Myers campaign (diagnostics, brakes, starters, alternators, tune-ups, major repairs). I'll show keywords, ad text and budget for your approval before creating it. It stays paused.
-- **Business Profile**: connect your Google Business Profile, then add the new cities as service areas (up to 20 total) once you say go. Google allows one profile per real business location, so if South Florida needs its own address, that's a separate listing you'd verify.
+- **New Business Profile for South Florida**: a separate listing with the same business name, phone, website, hours, category and description as the Fort Myers one. It serves Broward and Palm Beach only, and the Fort Myers listing keeps only Fort Myers and Lehigh Acres, so the two never overlap.
+  - Google only allows a second listing if the business has a real base in the new region, such as a tech's home or a garage in Broward or Palm Beach. Without one, Google can suspend both listings. I'll need that address. Customers won't see it, but Google mails or texts a code there to verify.
+  - The phone number: using (813) 501-7572 on both listings is allowed but can look like a duplicate to Google. A separate number for the new region that rings to the same receptionist is safer. I'll ask which you prefer before creating anything.
+  - Photos and logo can't be copied over automatically. After the listing is verified, you add them from the Google Maps app or business.google.com, and I'll give you the exact list to upload.
+  - Nothing is created until you approve it on the confirmation card. It's built now but stays out of the website and ads until launch.
 
 ## What you'll need to do
 - Approve the ad campaign card and the Business Profile connection.
+- Give me a real South Florida base address and choose the phone number for the new listing, then complete Google's verification and upload the photos.
 - Mark which techs work South Florida.
 - Press **Launch South Florida** when ready, then publish and click **Update AI receptionist**.
 
@@ -36,5 +41,6 @@
 - New city/county entries in `src/data/cities.ts` with `region: 'sfl'`, filtered by active regions in pages, footer, `ServiceAreasPreview`, `llms.txt` and the prerender/sitemap scripts.
 - `ai-receptionist`, `notify-booking-request` and open-slot logic read active regions from the database instead of hardcoded city lists.
 - Ads: `google_ads--create_campaign` Search, PAUSED, location targets for Broward and Palm Beach counties, conversions reusing the existing call and quote actions.
-- GBP: `standard_connectors--connect` google_business_profile, then a validated PATCH of `serviceArea`.
+- GBP: connect google_business_profile, read the existing location (title, categories, phone, hours, profile, website). Then search and create a new service-area location (CUSTOMER_LOCATION_ONLY, Broward/Palm Beach place IDs) with a unique requestId, PATCH the existing listing's serviceArea down to the Southwest Florida cities, and run verification on the user's request.
+- Add roadmap.md entry: "Second Google Business Profile for South Florida".
 - Record the region rule in `AGENTS.md`; update roadmap.md.
