@@ -23,7 +23,7 @@
 ## Google
 - **Search listings**: at launch, the new pages are added to the sitemap and opened to search engines.
 - **Ads**: a new paused Search campaign, "Mobile Repair Calls Broward Palm Beach", targeting both counties with the same services as the Fort Myers campaign (diagnostics, brakes, starters, alternators, tune-ups, major repairs). I'll show keywords, ad text and budget for your approval before creating it. It stays paused.
-- **Business Profile stays as it is** (Fort Myers and Lehigh Acres). The Broward and Palm Beach ad campaign targets those counties directly and doesn't need the profile. A second profile can be added later, once a tech is based there (it needs a real local address to verify).
+- **Business Profile stays as it is** (Fort Myers and Lehigh Acres), so your local ranking isn't affected. The Broward and Palm Beach ad campaign targets those counties directly and won't show the Fort Myers address. A second profile can be added later, once a tech is based there (it needs a real local address to verify).
 - Mark which techs work South Florida.
 - Press **Launch South Florida** when ready, then publish and click **Update AI receptionist**.
 
