@@ -28,8 +28,10 @@
   - Add `counties text[]` to `service_regions` (Lee; Broward and Palm Beach), plus an inactive `outside` region.
   - Add `region_slug` to `estimates` and `invoices`, and to `profiles` (customer home region). Repair orders are covered: check whether they live on `appointments` or `estimates` and add it there if needed.
   - Triggers copy the region from the linked appointment, or the customer profile as a fallback, on insert and when the link changes. A trigger on `appointments.region_slug` cascades to linked estimates and invoices.
-- New `geocode-region` edge function (service role, `GOOGLE_MAPS_API_KEY`): geocodes an address, maps `administrative_area_level_2` to a region, and updates the row. Manual overrides are left alone.
-  - Called from `notify-booking-request`, the receptionist booking path, and on appointment create or address change (client call after save).
+- New `geocode-region` edge function (service role, `GOOGLE_MAPS_API_KEY` via the gateway): reverse-geocodes `geo_lat`/`geo_lng` when present, otherwise geocodes the address or city+ZIP. It maps `administrative_area_level_2` to a region and updates the row. Manual overrides are left alone. Calls are bounded and deduped by address.
+  - Website booking (`Book.tsx` / `QuoteRequestDialog`): a "Share my location" step calls `navigator.geolocation.getCurrentPosition` after a short explanation. Lat/lng go into `submit_booking_request` (new optional `_lat`, `_lng` params; `geo_source = 'device'`). If denied or timed out, the request falls back to the typed address.
+  - Receptionist: the prompt requires asking for and confirming city and ZIP (or cross street) before saving any request. The booking tool gets required `service_city` and `service_zip` fields (`geo_source = 'caller'`).
+  - Called from `notify-booking-request`, the receptionist booking path, and on appointment create or address change.
   - A one-time backfill runs over bookings, appointments and customer profiles in bounded batches.
 - Frontend:
   - New `useAdminRegion` hook (localStorage plus context) and a `RegionSwitch` in the admin header.
