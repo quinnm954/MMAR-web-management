@@ -163,6 +163,13 @@ const FinancingContract = () => {
 
   // Check for saved data on mount
   useEffect(() => {
+    // Unadvertised page: keep it out of search results.
+    const m = document.createElement('meta'); m.name = 'robots'; m.content = 'noindex, nofollow';
+    document.head.appendChild(m);
+    return () => { m.remove(); };
+  }, []);
+
+  useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
     const savedSignatures = localStorage.getItem(SIGNATURE_STORAGE_KEY);
     if (saved) {

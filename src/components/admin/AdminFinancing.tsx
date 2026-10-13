@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
+import FinancingContractsTable from '@/components/admin/FinancingContractsTable';
 import { format, addDays, addMonths } from 'date-fns';
 import { ArrowLeft, CreditCard, FileText, Upload, Trash2, Plus, Copy, MessageSquare, RefreshCw, Search } from 'lucide-react';
 
@@ -80,10 +81,12 @@ export default function AdminFinancing() {
   if (open) return <ContractDetail c={open} payments={payments.filter(p => p.contract_id === open.id)} docs={docs.filter(d => d.contract_id === open.id)} profile={open.customer_id ? profiles[open.customer_id] : undefined} onBack={() => setOpenId(null)} reload={load} />;
 
   return (
+    <div className="space-y-6">
     <Card>
       <CardHeader className="flex flex-row items-center justify-between gap-2 flex-wrap">
         <CardTitle className="flex items-center gap-2"><CreditCard className="h-5 w-5" />Financing</CardTitle>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
+          <Button variant="outline" size="sm" onClick={() => navigator.clipboard.writeText(`${window.location.origin}/financing-contract`).then(() => toast.success('Contract link copied'), () => toast.error('Copy failed'))}><Copy className="h-4 w-4 mr-1" />Contract link</Button>
           <Button variant="outline" size="sm" onClick={load} disabled={loading}><RefreshCw className={`h-4 w-4 mr-1 ${loading ? 'animate-spin' : ''}`} />Refresh</Button>
           <Button size="sm" onClick={() => setNewOpen(true)}><Plus className="h-4 w-4 mr-1" />New</Button>
         </div>
@@ -113,6 +116,8 @@ export default function AdminFinancing() {
       </CardContent>
       <NewArrangement open={newOpen} onOpenChange={setNewOpen} onCreated={id => { load().then(() => setOpenId(id)); }} />
     </Card>
+    <FinancingContractsTable data={contracts as any} onRefresh={load} />
+    </div>
   );
 }
 
