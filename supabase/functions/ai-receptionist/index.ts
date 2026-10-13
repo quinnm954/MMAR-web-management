@@ -166,7 +166,7 @@ Deno.serve(async (req) => {
             first_message: s?.ai_greeting,
             language: 'en',
             prompt: {
-              prompt: buildPrompt(cities),
+              prompt: buildPrompt(cities, waitlist),
               llm: 'gemini-2.5-flash',
               temperature: 0.2,
               tools: [
