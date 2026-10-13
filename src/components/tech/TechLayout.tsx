@@ -1,7 +1,6 @@
 import { ReactNode } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { Wrench, ClipboardCheck, LogOut, LayoutDashboard, Users, History, Bell, MessageCircle } from "lucide-react";
-import MessagesBellLink from "@/components/messaging/MessagesBellLink";
 import NotificationsBell from "@/components/notifications/NotificationsBell";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -20,7 +19,6 @@ const primary = [
 const more = [
   { to: "/tech/customers", label: "Customers", icon: Users },
   { to: "/tech/history", label: "Service History", icon: History },
-  { to: "/messages", label: "Messages", icon: MessageCircle },
   { to: "/settings/notifications", label: "Notifications", icon: Bell },
 ];
 
@@ -43,7 +41,6 @@ const TechLayout = ({ children }: { children: ReactNode }) => {
             </div>
           </div>
           <div className="flex items-center gap-1">
-            <MessagesBellLink />
             <NotificationsBell />
             <Button variant="ghost" size="sm" className="tap-44" onClick={async () => { await signOut(); navigate("/"); }}>
               <LogOut className="h-4 w-4 mr-1" /> Sign out
