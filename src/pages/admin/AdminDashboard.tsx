@@ -1,3 +1,4 @@
+import AdminFinancing from '@/components/admin/AdminFinancing';
 import { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -178,6 +179,7 @@ const AdminDashboard = () => {
             { value: 'estimates', label: 'Estimates', icon: FileSpreadsheet, roles: ADVISOR, content: <AdminEstimates /> },
             { value: 'inspections', label: 'Inspections', icon: ClipboardCheck, roles: SHOP_FLOOR, content: <AdminChecklists /> },
             { value: 'invoices', label: 'Invoices', icon: Receipt, roles: ADVISOR, content: <AdminInvoices /> },
+            { value: 'financing', label: 'Financing', icon: CreditCard, roles: ADMIN_ONLY, content: <AdminFinancing /> },
             { value: 'laborpay', label: 'Labor Pay', icon: DollarSign, roles: ADMIN_ONLY, content: <AdminTechLaborPay /> },
             { value: 'share', label: 'Share', icon: Share2, roles: ADVISOR, content: <AdminCustomerShare /> },
             { value: 'declined', label: 'Declined', icon: AlertTriangle, roles: ADVISOR, content: <AdminDeclinedWork /> },
@@ -225,7 +227,7 @@ const AdminDashboard = () => {
           const groups = [
             { label: 'Workshop', values: ['calendar','ros','service','inspections','estimates','invoices','time','shifts','productivity'] },
             { label: 'Front Desk', values: ['customers','garage','memberships','bookings','share','declined','fleet-accounts','feedback','prospecting'] },
-            { label: 'Admin', values: ['dashboard','reports','laborpay','quickbooks','warranty','audit','employees','roles','phone-settings','tracking','settings'] },
+            { label: 'Admin', values: ['dashboard','reports','financing','laborpay','quickbooks','warranty','audit','employees','roles','phone-settings','tracking','settings'] },
           ];
           const groupedValues = groups.flatMap(g => g.values);
           const ungrouped = visible.filter(t => !groupedValues.includes(t.value));

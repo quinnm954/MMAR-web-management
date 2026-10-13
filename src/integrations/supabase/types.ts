@@ -1355,6 +1355,41 @@ export type Database = {
         }
         Relationships: []
       }
+      financing_documents: {
+        Row: {
+          contract_id: string
+          created_at: string
+          file_name: string
+          file_path: string
+          id: string
+          uploaded_by: string | null
+        }
+        Insert: {
+          contract_id: string
+          created_at?: string
+          file_name: string
+          file_path: string
+          id?: string
+          uploaded_by?: string | null
+        }
+        Update: {
+          contract_id?: string
+          created_at?: string
+          file_name?: string
+          file_path?: string
+          id?: string
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "financing_documents_contract_id_fkey"
+            columns: ["contract_id"]
+            isOneToOne: false
+            referencedRelation: "financing_contracts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       financing_payments: {
         Row: {
           amount: number
@@ -1365,6 +1400,7 @@ export type Database = {
           failure_reason: string | null
           id: string
           label: string
+          note: string | null
           paid_at: string | null
           seq: number
           status: string
@@ -1380,6 +1416,7 @@ export type Database = {
           failure_reason?: string | null
           id?: string
           label?: string
+          note?: string | null
           paid_at?: string | null
           seq: number
           status?: string
@@ -1395,6 +1432,7 @@ export type Database = {
           failure_reason?: string | null
           id?: string
           label?: string
+          note?: string | null
           paid_at?: string | null
           seq?: number
           status?: string
