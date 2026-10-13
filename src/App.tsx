@@ -81,7 +81,6 @@ import NativeBoot from "./components/NativeBoot";
 import NotificationSettings from "./pages/NotificationSettings";
 import NotificationsPage from "./pages/Notifications";
 import BusinessCard from "./pages/BusinessCard";
-import Messages from "./pages/Messages";
 import PullToRefresh from "./components/PullToRefresh";
 import { captureAttribution } from "@/lib/gtag";
 import { useAppBadgeSync } from "@/hooks/useAppBadgeSync";
@@ -177,7 +176,6 @@ const App = () => (
             <Route path="/portal/inspections" element={<CustomerProtectedRoute><PortalInspections /></CustomerProtectedRoute>} />
             <Route path="/settings/notifications" element={<NotificationSettings />} />
             <Route path="/notifications" element={<NotificationsPage />} />
-            <Route path="/messages" element={<Messages />} />
             <Route path="/admin" element={<AdminRedirect />} />
             <Route path="/admin/phone" element={<ProtectedRoute><AdminPhoneApp /></ProtectedRoute>} />
             <Route
