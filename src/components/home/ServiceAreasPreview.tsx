@@ -4,6 +4,10 @@ import { MapPin, ArrowRight } from "lucide-react";
 const cities = [
   { slug: "lehigh-acres", name: "Lehigh Acres" },
   { slug: "fort-myers", name: "Fort Myers" },
+  { slug: "fort-lauderdale", name: "Fort Lauderdale (soon)" },
+  { slug: "west-palm-beach", name: "West Palm Beach (soon)" },
+  { slug: "boca-raton", name: "Boca Raton (soon)" },
+  { slug: "hollywood", name: "Hollywood (soon)" },
 ];
 
 const ServiceAreasPreview = () => {
@@ -16,7 +20,7 @@ const ServiceAreasPreview = () => {
             <span className="text-gold">AREAS</span>
           </h2>
           <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
-            Mobile mechanic service across Lehigh Acres and Fort Myers.
+            Mobile mechanic service across Lehigh Acres and Fort Myers — coming soon to Broward and Palm Beach.
           </p>
         </div>
 
