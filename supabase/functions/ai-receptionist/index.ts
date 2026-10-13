@@ -5,6 +5,7 @@
 //   transfer  – agent tool: transfer the live call to Mike's cell
 //   postcall  – ElevenLabs post-call webhook: save transcript + text summaries
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.95.0';
+import { geocodeRow } from '../_shared/geocode-region.ts';
 import { sendMissedCallFollowup } from '../_shared/missed-call.ts';
 import { isSlotOpen, openSlots, label12 } from '../_shared/booking-bot.ts';
 import { buildLaborQuote, quoteSentence } from '../_shared/labor-quote.ts';
@@ -71,6 +72,9 @@ async function sendSms(to: string, body: string, sb?: any, fromOverride?: string
 
 function buildPrompt(cities: string[], waitlist: string[] = []) {
   return `You are the friendly phone receptionist for Mike's Mobile Auto Repair (MMAR), a mobile mechanic in Southwest Florida. You answer every call for the shop.
+
+Opening: the call starts with a greeting that ends by asking English or Spanish. After the caller chooses, continue entirely in that language (switch with language_detection for Spanish). If they skip the choice and just start talking, answer in the language they spoke. Do not repeat the greeting.
+Location: before saving any request, ask for the city and ZIP code where the car is (or a cross street), repeat it back to confirm, and pass service_city and service_zip.
 
 Facts:
 - We come to the customer's home, work, or lot. No need to tow to a shop.
@@ -147,6 +151,8 @@ Deno.serve(async (req) => {
       const cities: string[] = [], waitlist: string[] = [];
       for (const r of regs || []) ((r.slug === 'swfl' || has.has(r.slug)) ? cities : waitlist).push(...(r.cities || []));
       if (!cities.length) cities.push('Fort Myers', 'Lehigh Acres');
+      const served = cities.join(cities.length > 2 ? ', ' : ' and ');
+      const greeting = `Thanks for calling Mike's Mobile Auto Repair. We're mobile mechanics serving ${served}${waitlist.length ? ', coming soon to Broward and Palm Beach' : ''}. We come to you for diagnostics, brakes, starters and alternators, tune-ups and major repairs. For English, say English. Para español, diga español.`;
       const fnBase = `${supabaseUrl}/functions/v1/ai-receptionist`;
       const tool = (name: string, description: string, props: Record<string, unknown>, required: string[]) => ({
         type: 'webhook',
@@ -163,7 +169,7 @@ Deno.serve(async (req) => {
         name: "MMAR Receptionist",
         conversation_config: {
           agent: {
-            first_message: s?.ai_greeting,
+            first_message: greeting,
             language: 'en',
             prompt: {
               prompt: buildPrompt(cities, waitlist),
@@ -182,10 +188,12 @@ Deno.serve(async (req) => {
                   customer_phone: { type: 'string', description: 'Best phone number' },
                   vehicle_info: { type: 'string', description: 'Year make model engine, e.g. 2011 Chevy Cruze 1.4L' },
                   description: { type: 'string', description: 'What is wrong with the vehicle' },
-                  service_address: { type: 'string', description: 'Address or city for service' },
+                  service_address: { type: 'string', description: 'Street address or cross street where the car is' },
+                  service_city: { type: 'string', description: 'City where the car is (always ask and confirm)' },
+                  service_zip: { type: 'string', description: 'ZIP code where the car is (always ask and confirm)' },
                   requested_date: { type: 'string', description: 'Appointment date YYYY-MM-DD' },
                   requested_time: { type: 'string', description: 'Appointment time HH:MM 24-hour, between 10:00 and 17:00 Eastern' },
-                }, ['customer_name', 'description']),
+                }, ['customer_name', 'description', 'service_city', 'service_zip']),
                 tool('transfer_to_mike', 'Transfer the caller to Mike for urgent issues or when they ask for a person.', {
                   call_sid: callSid,
                   reason: { type: 'string', description: 'Why transferring' },
@@ -325,6 +333,8 @@ Deno.serve(async (req) => {
         const { data: c } = await sb.from('call_logs').select('from_number').eq('twilio_call_sid', sid).maybeSingle();
         phone = c?.from_number || '';
       }
+      { const extra = [body.service_city, body.service_zip].filter(Boolean).map(String).join(' ');
+        if (extra && !String(body.service_address || '').includes(String(body.service_zip || '~'))) body.service_address = [body.service_address, extra].filter(Boolean).join(', '); }
       // Backstop: launched regions without a tech take a waitlist message only — no time slot.
       if (body.service_address) {
         const { data: reg } = await sb.rpc('region_for_address', { _addr: String(body.service_address) });
@@ -372,6 +382,7 @@ Deno.serve(async (req) => {
         requested_time_window: window,
         notes,
       }).select('id').single();
+      if (ins?.id) { await sb.from('booking_requests').update({ geo_source: 'caller' }).eq('id', ins.id); await geocodeRow(sb, 'booking_requests', ins.id); }
       if (error) {
         console.error('booking insert', error);
         return json({ result: 'Could not save. Tell the caller Mike will call them back.' });
