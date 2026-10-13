@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Share, X } from 'lucide-react';
 import AdminPhoneHub from '@/components/admin/AdminPhoneHub';
+import Softphone from '@/components/admin/Softphone';
 import { markPhoneApp } from '@/lib/phoneApp';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
@@ -65,6 +66,7 @@ export default function AdminPhoneApp() {
   return (
     <>
       <AdminPhoneHub fullscreen />
+      <Softphone />
       {askPush && (
         <div className="ios fixed inset-x-3 bottom-[calc(env(safe-area-inset-bottom)+84px)] z-[60] rounded-2xl ios-frost border border-[hsl(var(--ios-separator))] p-4 text-[15px] shadow-lg">
           <p className="font-semibold mb-1">Get call and text alerts here</p>

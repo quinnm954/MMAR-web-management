@@ -7,8 +7,14 @@ import { Mic, MicOff, Phone, PhoneIncoming, PhoneOff, X } from 'lucide-react';
 import { toast } from 'sonner';
 
 /** Open the in-app phone and dial a number from anywhere in admin. */
-export const dialInApp = (number: string) =>
-  window.dispatchEvent(new CustomEvent('softphone:dial', { detail: { number } }));
+let softphoneMounted = 0;
+export const dialInApp = (number: string) => {
+  const to = number.replace(/[^\d+]/g, '');
+  if (!to) return;
+  // No in-app phone on this screen: fall back to the device dialer.
+  if (!softphoneMounted) { window.location.href = `tel:${to}`; return; }
+  window.dispatchEvent(new CustomEvent('softphone:dial', { detail: { number: to } }));
+};
 
 type Status = 'offline' | 'ready' | 'incoming' | 'connecting' | 'in-call';
 
@@ -94,7 +100,7 @@ export default function Softphone() {
   const dial = async (n: string) => {
     const d = deviceRef.current;
     const to = n.replace(/[^\d+]/g, '');
-    if (!d || status === 'offline') return toast.error('Phone is not connected yet');
+    if (!d || status === 'offline') { toast.message('Calling from your phone instead'); window.location.href = `tel:${to}`; return; }
     if (to.length < 10) return toast.error('Enter a full phone number');
     if (!(await ensureAudio())) return;
     setPeer(to); setStatus('connecting'); setOpen(true);
@@ -107,7 +113,8 @@ export default function Softphone() {
   useEffect(() => {
     const h = (e: Event) => { const n = (e as CustomEvent).detail?.number; if (n) { setNumber(n); dial(n); } };
     window.addEventListener('softphone:dial', h);
-    return () => window.removeEventListener('softphone:dial', h);
+    softphoneMounted++;
+    return () => { softphoneMounted--; window.removeEventListener('softphone:dial', h); };
   });
 
   const hangup = () => { callRef.current?.disconnect(); };
