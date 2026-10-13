@@ -174,6 +174,7 @@ export default function Softphone() {
         <div className="space-y-3 text-center">
           <p className="font-mono text-lg">{peer}</p>
           <p className="text-sm text-muted-foreground">{status === 'connecting' ? 'Calling…' : fmt}</p>
+          <p className="text-xs text-muted-foreground">Screen stays on during calls. Don't lock your phone or the mic will cut out.</p>
           <div className="flex gap-2">
             <Button variant="outline" className="flex-1" onClick={() => { const m = !muted; callRef.current?.mute(m); setMuted(m); }}>
               {muted ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
