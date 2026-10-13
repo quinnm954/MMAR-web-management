@@ -37,7 +37,7 @@
 - [x] Service regions in the database, auto-tagging bookings/appointments by address
 - [x] Admin → Settings → Service regions: launch switch + tech region assignment
 - [x] Receptionist service area reads launched regions
-- [x] Hidden website city pages (8 cities), sitemap gated by launch switch
+- [x] South Florida city pages live with "coming soon" waitlist note; receptionist waitlist-only until a tech is assigned
 - [ ] Paused Google Search campaign for Broward & Palm Beach (needs keyword/copy approval)
 - [ ] Region filter on calendar/admin lists and region-aware open times
 - [ ] Second Google Business Profile once a tech has a South Florida base address

@@ -25,6 +25,14 @@ Mike's Mobile Auto Repair operates as MMAR Care, offering on-site diagnostics, b
 - [Fort Myers](/areas/fort-myers)
 - [Lehigh Acres](/areas/lehigh-acres)
 - [North Fort Myers](/areas/north-fort-myers)
+- [Fort Lauderdale (coming soon)](/areas/fort-lauderdale)
+- [Hollywood (coming soon)](/areas/hollywood)
+- [Pembroke Pines (coming soon)](/areas/pembroke-pines)
+- [Coral Springs (coming soon)](/areas/coral-springs)
+- [West Palm Beach (coming soon)](/areas/west-palm-beach)
+- [Boca Raton (coming soon)](/areas/boca-raton)
+- [Delray Beach (coming soon)](/areas/delray-beach)
+- [Boynton Beach (coming soon)](/areas/boynton-beach)
 
 ## Optional
 
