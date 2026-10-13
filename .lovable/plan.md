@@ -8,6 +8,7 @@
   - Estimates
   - Repair orders
   - Invoices
+  - Reports: revenue, jobs done, hours per job, labor margin, payment aging, estimate pipeline and ad conversions, plus a side-by-side "By region" comparison card
 - **Region tabs with counts on each list**, so you can see how many new or open items each region has without switching.
 - **Region label on every item**, such as "Boca Raton · South Florida". South Florida bookings with no tech assigned also get a "Waitlist – no tech" badge.
 - **Automatic location lookup:** Google Maps finds each customer's address when a booking or appointment comes in, then picks the region by county:
@@ -33,4 +34,5 @@
   - Each list (`AdminBookingRequests`, `AdminAppointments`, `AdminEstimates`, `AdminRepairOrders`, `AdminInvoices`) adds `.eq('region_slug', …)` when a region is chosen and shows region tabs with counts and a region chip.
   - `AdminCalendar` filters events and blocks; a block with no region shows everywhere.
   - Region picker on booking and appointment detail.
+  - Reports (Sales Dashboard and related cards in `AdminDashboard`) filter their invoice, appointment and estimate queries by the chosen region, and add a "By region" card with revenue, jobs and margin per region. Ad conversion events get a region from the page path when it's a city page; otherwise they stay unassigned.
 - Update the AGENTS.md region rule (region comes from the geocoded county and is inherited by estimates, orders and invoices) and roadmap.md.
