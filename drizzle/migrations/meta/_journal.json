@@ -302,6 +302,13 @@
       "when": 1791916240792,
       "tag": "0042_service_regions",
       "breakpoints": true
+    },
+    {
+      "idx": 43,
+      "version": "7",
+      "when": 1791916260556,
+      "tag": "0043_appointment_region_trigger",
+      "breakpoints": true
     }
   ]
 }
