@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { RegionChip, REGION_OPTIONS } from '@/hooks/useAdminRegion';
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -32,6 +33,13 @@ export default function RepairOrderDetail({ appointmentId, open, onClose }: Prop
   const [invoices, setInvoices] = useState<any[]>([]);
   
   const [techs, setTechs] = useState<{ id: string; name: string }[]>([]);
+  const [regionTechs, setRegionTechs] = useState<string[] | null>(null);
+  const apptRegion = (appt as any)?.region_slug as string | undefined;
+  useEffect(() => {
+    if (!apptRegion) return;
+    supabase.from("user_service_regions").select("user_id").eq("region_slug", apptRegion)
+      .then(({ data }) => setRegionTechs((data || []).map((x: any) => x.user_id)));
+  }, [apptRegion]);
   const [techMap, setTechMap] = useState<Record<string, string>>({});
   const [assignHistory, setAssignHistory] = useState<any[]>([]);
   const [savingTech, setSavingTech] = useState(false);
@@ -445,6 +453,12 @@ export default function RepairOrderDetail({ appointmentId, open, onClose }: Prop
                 <CardTitle className="text-sm flex items-center gap-2"><UserCog className="h-4 w-4" /> Assigned Technician</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
+                {!appt.assigned_technician_id && appt.needs_tech_choice && (
+                  <div className="rounded-md border border-accent/50 bg-accent/10 p-2 text-sm text-foreground">Choose technician: more than one tech covers this region.</div>
+                )}
+                {!appt.assigned_technician_id && !appt.needs_tech_choice && regionTechs !== null && regionTechs.length === 0 && (
+                  <div className="text-xs text-muted-foreground">No tech in this region.</div>
+                )}
                 <div className="flex items-center gap-2 flex-wrap">
                   <Select
                     value={appt.assigned_technician_id ?? "unassigned"}
@@ -456,12 +470,20 @@ export default function RepairOrderDetail({ appointmentId, open, onClose }: Prop
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="unassigned">— Unassigned —</SelectItem>
-                      {techs.map((t) => (
+                      {(appt.needs_tech_choice && regionTechs?.length ? techs.filter((t) => regionTechs.includes(t.id)) : techs).map((t) => (
                         <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                   {savingTech && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
+                  <Select value={appt.region_slug || 'swfl'} onValueChange={async (v) => {
+                    const { error } = await supabase.from("appointments").update({ region_slug: v } as any).eq("id", appt.id);
+                    if (error) return toast.error(error.message);
+                    setAppt({ ...appt, region_slug: v }); toast.success("Region updated");
+                  }}>
+                    <SelectTrigger className="w-full sm:w-[180px]" aria-label="Region"><SelectValue /></SelectTrigger>
+                    <SelectContent>{REGION_OPTIONS.filter((o) => o.value !== 'all').map((o) => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}</SelectContent>
+                  </Select>
                   {appt.assigned_technician_id && (
                     <Badge variant="secondary" className="text-xs">
                       Currently: {techMap[appt.assigned_technician_id] || appt.assigned_technician_id.slice(0, 8)}

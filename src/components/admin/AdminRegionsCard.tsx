@@ -35,7 +35,7 @@ export default function AdminRegionsCard() {
     if (on && !confirm(`Launch ${r.name}? The receptionist and booking will start accepting customers there.`)) return;
     const { error } = await supabase.from('service_regions').update({ active: on }).eq('slug', r.slug);
     if (error) return toast.error(error.message);
-    toast.success(on ? `${r.name} is live. Tap "Update AI receptionist" in Phone settings.` : `${r.name} switched off`);
+    toast.success(on ? `${r.name} is live. The receptionist updates itself.` : `${r.name} switched off`);
     load();
   };
 

@@ -175,10 +175,17 @@ export default function AdminPhoneSettings() {
             <Label htmlFor="aig">What the AI says first</Label>
             <Textarea id="aig" rows={2} value={s.ai_greeting} onChange={(e) => setS({ ...s, ai_greeting: e.target.value })} />
           </div>
-          <Button onClick={setupAi} disabled={aiBusy} variant="secondary">
-            {aiBusy && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-            {s.ai_agent_id ? 'Update AI receptionist' : 'Set up AI receptionist'}
-          </Button>
+          {s.ai_agent_id ? (
+            <div className="text-xs text-muted-foreground space-y-1">
+              <p>Updates automatically when you save settings, launch a region or assign techs.{(s as any).ai_synced_at ? ` Last updated ${new Date((s as any).ai_synced_at).toLocaleString()}.` : ''}</p>
+              {(s as any).ai_sync_error && <p className="text-destructive">Last update failed ({(s as any).ai_sync_error}); it will retry within the hour.</p>}
+              <button type="button" onClick={setupAi} disabled={aiBusy} className="underline underline-offset-2 hover:text-foreground">{aiBusy ? 'Syncing…' : 'Re-sync now'}</button>
+            </div>
+          ) : (
+            <Button onClick={setupAi} disabled={aiBusy} variant="secondary">
+              {aiBusy && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}Set up AI receptionist
+            </Button>
+          )}
           {postcallUrl && (
             <div className="text-sm space-y-2 border-t pt-3">
               <p>Last step, once: in ElevenLabs → Agents → Settings → Post-call webhook, paste this URL so call summaries arrive here.</p>
