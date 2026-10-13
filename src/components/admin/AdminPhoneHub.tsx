@@ -188,8 +188,8 @@ export default function AdminPhoneHub({ fullscreen = false }: { fullscreen?: boo
     const { data: auth } = await supabase.auth.getUser();
     const uid = auth.user?.id || null;
     setMe(uid);
-    const { data: ct } = await supabase.from('message_threads').select('*').order('last_message_at', { ascending: false }).limit(1000);
-    const chatList = (ct ?? []) as ChatThread[];
+    // In-app chat is retired; only calls, texts and email show here.
+    const chatList: ChatThread[] = [];
     setChats(chatList);
     const ids = Array.from(new Set(chatList.flatMap(t => [t.customer_id, t.tech_id, t.created_by]).filter(Boolean))) as string[];
     if (ids.length) {
@@ -239,7 +239,6 @@ export default function AdminPhoneHub({ fullscreen = false }: { fullscreen?: boo
         .on('postgres_changes', { event: '*', schema: 'public', table: 'sms_threads' }, scheduleLoad)
         .on('postgres_changes', { event: '*', schema: 'public', table: 'inbound_messages' }, scheduleLoad)
         .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'email_send_log' }, scheduleLoad)
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'message_threads' }, scheduleLoad)
         .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, (payload: any) => {
           const row = payload.new; const sel = selectedRef.current;
           if (row && sel?.kind === 'chat' && row.thread_id === sel.id) setChatMsgs(cur => cur.some(m => m.id === row.id) ? cur : [...cur, row as ChatMessage]);
@@ -301,7 +300,7 @@ export default function AdminPhoneHub({ fullscreen = false }: { fullscreen?: boo
       kind: 'email', id: item.id, title: item.kind === 'sent' ? item.to : item.from,
       subtitle: `${item.subject} · ${item.snippet}`, at: item.at, unread: !!item.unread,
     }));
-    return [...callItems, ...textItems, ...chatItems, ...emailItems].sort((a, b) => b.at.localeCompare(a.at));
+    return [...callItems, ...textItems, ...emailItems].sort((a, b) => b.at.localeCompare(a.at));
   }, [calls, threads, emails, names, chats, chatNames, chatReads]);
 
   const q = search.trim().toLowerCase();
@@ -611,7 +610,7 @@ export default function AdminPhoneHub({ fullscreen = false }: { fullscreen?: boo
             {/* Tab bar */}
             <nav className="absolute bottom-0 inset-x-0 ios-frost border-t border-[hsl(var(--ios-separator))] grid grid-cols-4 pt-1.5 pb-7">
               {([
-                ['calls', PhoneCall, 'Calls', 'call'], ['texts', MessageCircle, 'Texts', 'text'], ['chat', MessagesSquare, 'Chat', 'chat'], ['email', Mail, 'Email', 'email'],
+                ['calls', PhoneCall, 'Calls', 'call'], ['texts', MessageCircle, 'Texts', 'text'], ['email', Mail, 'Email', 'email'],
               ] as const).map(([value, Icon, label, kind]) => {
                 const n = unreadBy(kind);
                 return (
@@ -672,7 +671,7 @@ export default function AdminPhoneHub({ fullscreen = false }: { fullscreen?: boo
                 </div>
               ))}
             </div>
-            <p className="pt-2 text-center text-[12px] text-[hsl(var(--ios-label-2))]">Only clears call, text, chat and email alerts. Service alerts stay in Garage Ace.</p>
+            <p className="pt-2 text-center text-[12px] text-[hsl(var(--ios-label-2))]">Only clears call, text and email alerts. Service alerts stay in Garage Ace.</p>
           </Sheet>
 
           {/* Keypad sheet */}
