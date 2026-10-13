@@ -5,6 +5,8 @@ import Footer from "@/components/Footer";
 import FloatingCallButton from "@/components/FloatingCallButton";
 import RequestQuoteCTA from "@/components/RequestQuoteCTA";
 import { getCityBySlug, cities } from "@/data/cities";
+import { southFloridaCities } from "@/data/citiesSouthFlorida";
+const SOUTH_FLORIDA_SLUGS = new Set(southFloridaCities.map((c) => c.slug));
 import { categories } from "@/data/serviceCategories";
 import { localLandingPages } from "@/data/localLandingPages";
 import { useSeo } from "@/lib/useSeo";
@@ -147,6 +149,12 @@ const CityPage = () => {
           <p className="text-base md:text-lg text-muted-foreground mb-8 leading-relaxed">
             {city.intro}
           </p>
+          {SOUTH_FLORIDA_SLUGS.has(city.slug) && (
+            <div className="mb-8 rounded-xl border border-accent/50 bg-accent/10 p-4 text-sm md:text-base">
+              <p className="font-semibold text-accent">Now coming to {city.name}</p>
+              <p className="text-muted-foreground">We're expanding into Broward and Palm Beach and aren't booking appointments here yet. Call or text <a href="tel:8135017572" className="text-primary underline">(813) 501-7572</a> to get on the list.</p>
+            </div>
+          )}
 
           <div className="mb-12">
             <RequestQuoteCTA

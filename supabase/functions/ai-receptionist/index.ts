@@ -358,7 +358,7 @@ Deno.serve(async (req) => {
         window = label;
         slotTime = `${tm[1].padStart(2, '0')}:${tm[2]}`;
       }
-      const notes = [window && `Requested appointment: ${dateStr} at ${window}`, 'Booked by AI receptionist']
+      const notes = [body.notes && String(body.notes).startsWith('WAITLIST') && 'WAITLIST – no tech in this area yet', window && `Requested appointment: ${dateStr} at ${window}`, 'Booked by AI receptionist']
         .filter(Boolean).join('\n');
       const { data: ins, error } = await sb.from('booking_requests').insert({
         customer_name: String(body.customer_name || 'Phone caller').slice(0, 200),
