@@ -158,6 +158,11 @@ export type Database = {
           created_at: string
           customer_id: string
           description: string | null
+          geo_city: string | null
+          geo_county: string | null
+          geo_lat: number | null
+          geo_lng: number | null
+          geo_status: string
           id: string
           membership_id: string | null
           priority: string
@@ -185,6 +190,11 @@ export type Database = {
           created_at?: string
           customer_id: string
           description?: string | null
+          geo_city?: string | null
+          geo_county?: string | null
+          geo_lat?: number | null
+          geo_lng?: number | null
+          geo_status?: string
           id?: string
           membership_id?: string | null
           priority?: string
@@ -212,6 +222,11 @@ export type Database = {
           created_at?: string
           customer_id?: string
           description?: string | null
+          geo_city?: string | null
+          geo_county?: string | null
+          geo_lat?: number | null
+          geo_lng?: number | null
+          geo_status?: string
           id?: string
           membership_id?: string | null
           priority?: string
@@ -367,6 +382,12 @@ export type Database = {
           draft_estimate_id: string | null
           gbraid: string | null
           gclid: string | null
+          geo_city: string | null
+          geo_county: string | null
+          geo_lat: number | null
+          geo_lng: number | null
+          geo_source: string | null
+          geo_status: string
           id: string
           landing_page: string | null
           notes: string | null
@@ -401,6 +422,12 @@ export type Database = {
           draft_estimate_id?: string | null
           gbraid?: string | null
           gclid?: string | null
+          geo_city?: string | null
+          geo_county?: string | null
+          geo_lat?: number | null
+          geo_lng?: number | null
+          geo_source?: string | null
+          geo_status?: string
           id?: string
           landing_page?: string | null
           notes?: string | null
@@ -435,6 +462,12 @@ export type Database = {
           draft_estimate_id?: string | null
           gbraid?: string | null
           gclid?: string | null
+          geo_city?: string | null
+          geo_county?: string | null
+          geo_lat?: number | null
+          geo_lng?: number | null
+          geo_source?: string | null
+          geo_status?: string
           id?: string
           landing_page?: string | null
           notes?: string | null
@@ -1166,6 +1199,7 @@ export type Database = {
           id: string
           line_items: Json
           notes: string | null
+          region_slug: string
           review_discount_pledged: boolean
           sent_at: string | null
           shop_supplies: number
@@ -1195,6 +1229,7 @@ export type Database = {
           id?: string
           line_items?: Json
           notes?: string | null
+          region_slug?: string
           review_discount_pledged?: boolean
           sent_at?: string | null
           shop_supplies?: number
@@ -1224,6 +1259,7 @@ export type Database = {
           id?: string
           line_items?: Json
           notes?: string | null
+          region_slug?: string
           review_discount_pledged?: boolean
           sent_at?: string | null
           shop_supplies?: number
@@ -1265,6 +1301,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "estimates_region_slug_fkey"
+            columns: ["region_slug"]
+            isOneToOne: false
+            referencedRelation: "service_regions"
+            referencedColumns: ["slug"]
           },
           {
             foreignKeyName: "estimates_vehicle_id_fkey"
@@ -1809,6 +1852,7 @@ export type Database = {
           membership_id: string | null
           paid_at: string | null
           pdf_url: string | null
+          region_slug: string
           reminder_count: number
           reminder_last_at: string | null
           review_requested_at: string | null
@@ -1842,6 +1886,7 @@ export type Database = {
           membership_id?: string | null
           paid_at?: string | null
           pdf_url?: string | null
+          region_slug?: string
           reminder_count?: number
           reminder_last_at?: string | null
           review_requested_at?: string | null
@@ -1875,6 +1920,7 @@ export type Database = {
           membership_id?: string | null
           paid_at?: string | null
           pdf_url?: string | null
+          region_slug?: string
           reminder_count?: number
           reminder_last_at?: string | null
           review_requested_at?: string | null
@@ -1919,6 +1965,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "memberships"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoices_region_slug_fkey"
+            columns: ["region_slug"]
+            isOneToOne: false
+            referencedRelation: "service_regions"
+            referencedColumns: ["slug"]
           },
           {
             foreignKeyName: "invoices_service_record_id_fkey"
@@ -2523,6 +2576,7 @@ export type Database = {
           phone: string | null
           postal_code: string | null
           pwa_tutorial_seen_at: string | null
+          region_slug: string | null
           state: string | null
           updated_at: string
         }
@@ -2538,6 +2592,7 @@ export type Database = {
           phone?: string | null
           postal_code?: string | null
           pwa_tutorial_seen_at?: string | null
+          region_slug?: string | null
           state?: string | null
           updated_at?: string
         }
@@ -2553,10 +2608,19 @@ export type Database = {
           phone?: string | null
           postal_code?: string | null
           pwa_tutorial_seen_at?: string | null
+          region_slug?: string | null
           state?: string | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_region_slug_fkey"
+            columns: ["region_slug"]
+            isOneToOne: false
+            referencedRelation: "service_regions"
+            referencedColumns: ["slug"]
+          },
+        ]
       }
       prospect_email_state: {
         Row: {
@@ -3161,6 +3225,7 @@ export type Database = {
         Row: {
           active: boolean
           cities: string[]
+          counties: string[]
           created_at: string
           name: string
           slug: string
@@ -3169,6 +3234,7 @@ export type Database = {
         Insert: {
           active?: boolean
           cities?: string[]
+          counties?: string[]
           created_at?: string
           name: string
           slug: string
@@ -3177,6 +3243,7 @@ export type Database = {
         Update: {
           active?: boolean
           cities?: string[]
+          counties?: string[]
           created_at?: string
           name?: string
           slug?: string
@@ -4219,6 +4286,10 @@ export type Database = {
       }
       set_booking_attribution: {
         Args: { _attribution: Json; _token: string }
+        Returns: undefined
+      }
+      set_booking_location: {
+        Args: { _lat: number; _lng: number; _token: string }
         Returns: undefined
       }
       sign_technician_agreement: {
