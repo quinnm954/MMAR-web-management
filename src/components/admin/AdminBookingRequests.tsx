@@ -280,7 +280,7 @@ const AdminBookingRequests = () => {
                   <p className="text-xs text-muted-foreground">
                     {new Date(r.created_at).toLocaleString()} · via {r.source}
                   </p>
-                  <div className="mt-1 flex flex-wrap gap-1"><RegionChip slug={(r as any).region_slug} city={(r as any).geo_city} />{(r as any).region_slug === 'sfl' && <span className="rounded-full bg-accent/20 px-2 py-0.5 text-[11px] font-medium text-accent">Waitlist</span>}</div>
+                  <div className="mt-1 flex flex-wrap gap-1"><RegionChip slug={(r as any).region_slug} city={(r as any).geo_city} />{JSON.stringify(r).toLowerCase().includes('waitlist') && <span className="rounded-full bg-accent/20 px-2 py-0.5 text-[11px] font-medium text-accent">Waitlist</span>}</div>
                 </div>
                 <span className={`text-[11px] font-semibold px-2 py-1 rounded-full ${STATUS_TONE[r.status] ?? "bg-muted"}`}>
                   {r.status}
