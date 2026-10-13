@@ -4,7 +4,7 @@ import { format, formatDistanceToNow } from 'date-fns';
 import {
   ArrowLeft, Bot, FileEdit, Inbox, Mail, MessageCircle, Phone, PhoneCall,
   PhoneIncoming, PhoneMissed, Plus, MessagesSquare, RefreshCw, Reply, Search, Send,
-  ChevronLeft, ChevronRight, ArrowUp, Delete, Signal, Wifi, BatteryFull, User,
+  ChevronLeft, ChevronRight, ArrowUp, Delete, Signal, Wifi, BatteryFull, User, Bell, Trash2, ChevronDown,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { dialInApp } from '@/components/admin/Softphone';
@@ -16,6 +16,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { clearAppBadge } from '@/lib/appBadge';
 
 type Mode = 'inbox' | 'calls' | 'texts' | 'chat' | 'email';
 type EmailFolder = 'inbox' | 'sent' | 'drafts';
@@ -253,10 +254,10 @@ export default function AdminPhoneHub({ fullscreen = false }: { fullscreen?: boo
       const sel = selectedRef.current;
       if (sel?.kind === 'text') {
         const { data } = await supabase.from('sms_messages').select('*').eq('thread_id', sel.id).order('created_at', { ascending: true });
-        if (data) setMessages(data as SmsMessage[]);
+        if (data) setMessages(cur => sameRows(cur, data as SmsMessage[]) ? cur : data as SmsMessage[]);
       } else if (sel?.kind === 'chat') {
         const { data } = await supabase.from('messages').select('*').eq('thread_id', sel.id).order('created_at', { ascending: true });
-        if (data) setChatMsgs(data as ChatMessage[]);
+        if (data) setChatMsgs(cur => sameRows(cur, data as ChatMessage[]) ? cur : data as ChatMessage[]);
       }
     };
     const onResume = () => { if (document.visibilityState === 'visible') { scheduleLoad(); refreshOpen(); subscribe(); } };
@@ -369,7 +370,92 @@ export default function AdminPhoneHub({ fullscreen = false }: { fullscreen?: boo
     await openItem('text', activeThread.id);
   };
 
+  const ensureThread = async (phone: string): Promise<string | null> => {
+    const clean = phone.replace(/[^\d+]/g, '');
+    if (phoneKey(clean).length < 10) { toast.error('Enter a full phone number'); return null; }
+    const existing = threads.find(thread => phoneKey(thread.phone) === phoneKey(clean));
+    if (existing) return existing.id;
+    const e164 = clean.startsWith('+') ? clean : `+1${phoneKey(clean)}`;
+    const { data, error } = await supabase.from('sms_threads').insert({ phone: e164 }).select().single();
+    if (error || !data) { toast.error(error?.message || 'Could not start conversation'); return null; }
+    setThreads(current => [data as TextThread, ...current]);
+    return (data as TextThread).id;
+  };
+
+  const [newTextOpen, setNewTextOpen] = useState(false);
+  const [ntTo, setNtTo] = useState('');
+  const [ntBody, setNtBody] = useState('');
+  const sendNewText = async () => {
+    if (!ntBody.trim()) return toast.error('Type a message');
+    setSending(true);
+    try {
+      const id = await ensureThread(ntTo);
+      if (!id) return;
+      const to = threads.find(t => t.id === id)?.phone || (ntTo.startsWith('+') ? ntTo : `+1${phoneKey(ntTo)}`);
+      const { data, error } = await supabase.functions.invoke('send-sms', { body: { thread_id: id, to, body: ntBody.trim() } });
+      if (error || data?.error) return toast.error(error?.message || data?.error || 'Text failed');
+      setNewTextOpen(false); setNtTo(''); setNtBody('');
+      setMode('texts');
+      await openItem('text', id);
+    } finally { setSending(false); }
+  };
+
+  const deleteItem = async (kind: Kind, id: string) => {
+    const label = kind === 'call' ? 'this call' : kind === 'text' ? 'this whole text conversation' : 'this whole chat';
+    if (!window.confirm(`Delete ${label}? This can't be undone.`)) return;
+    let error: { message: string } | null = null;
+    if (kind === 'call') {
+      ({ error } = await supabase.from('call_logs').delete().eq('id', id));
+      if (!error) setCalls(cur => cur.filter(c => c.id !== id));
+    } else if (kind === 'text') {
+      ({ error } = await supabase.from('sms_messages').delete().eq('thread_id', id));
+      if (!error) ({ error } = await supabase.from('sms_threads').delete().eq('id', id));
+      if (!error) setThreads(cur => cur.filter(t => t.id !== id));
+    } else if (kind === 'chat') {
+      ({ error } = await supabase.from('messages').delete().eq('thread_id', id));
+      if (!error) ({ error } = await (supabase.from('message_threads') as any).delete().eq('id', id));
+      if (!error) setChats(cur => cur.filter(t => t.id !== id));
+    } else return;
+    if (error) return toast.error(error.message);
+    if (selectedRef.current?.id === id) setSelected(null);
+    toast.success('Deleted');
+  };
+
+  const deleteSms = async (m: SmsMessage) => {
+    if (!window.confirm('Delete this message?')) return;
+    const { error } = await supabase.from('sms_messages').delete().eq('id', m.id);
+    if (error) return toast.error(error.message);
+    setMessages(cur => cur.filter(x => x.id !== m.id));
+  };
+
+  // Phone-only notifications (calls, texts, chat, email alerts)
+  const [bellOpen, setBellOpen] = useState(false);
+  const [phoneNotifs, setPhoneNotifs] = useState<{ id: string; title: string; body: string | null; created_at: string }[]>([]);
+  const refreshBell = useCallback(async () => {
+    const { data: auth } = await supabase.auth.getUser();
+    if (!auth.user) return;
+    const { data } = await supabase.from('notifications').select('id,title,body,created_at').eq('user_id', auth.user.id).eq('category', 'message_updates').is('read_at', null).order('created_at', { ascending: false }).limit(50);
+    setPhoneNotifs((data ?? []) as any);
+  }, []);
+  useEffect(() => { refreshBell(); const t = window.setInterval(refreshBell, 20000); return () => window.clearInterval(t); }, [refreshBell]);
+  const clearPhoneNotifs = async () => {
+    const { data: auth } = await supabase.auth.getUser();
+    if (!auth.user) return;
+    const { error } = await supabase.from('notifications').update({ read_at: new Date().toISOString() }).eq('user_id', auth.user.id).eq('category', 'message_updates').is('read_at', null);
+    if (error) return toast.error(error.message);
+    setPhoneNotifs([]); clearAppBadge(); setBellOpen(false);
+    toast.success('Phone notifications cleared');
+  };
+
   const startText = async (phone: string) => {
+    try {
+      const id = await ensureThread(phone);
+      if (!id) return;
+      setMode('texts');
+      await openItem('text', id);
+    } catch (e) { toast.error(e instanceof Error ? e.message : 'Could not open conversation'); }
+  };
+  const _unusedStartText = async (phone: string) => {
     const clean = phone.replace(/\s/g, '');
     if (!clean) return;
     const existing = threads.find(thread => phoneKey(thread.phone) === phoneKey(clean));
@@ -478,11 +564,22 @@ export default function AdminPhoneHub({ fullscreen = false }: { fullscreen?: boo
             <StatusBar />
             {/* Compact nav bar */}
             <div className="relative h-11 shrink-0 flex items-center justify-between px-4">
-              <button onClick={load} disabled={loading} className="text-[17px] text-[hsl(var(--ios-blue))]" title="Refresh"><RefreshCw className={cn('h-5 w-5', loading && 'animate-spin')} /></button>
+              <span className="flex items-center gap-4">
+                <button onClick={load} disabled={loading} className="text-[17px] text-[hsl(var(--ios-blue))]" title="Refresh"><RefreshCw className={cn('h-5 w-5', loading && 'animate-spin')} /></button>
+                <button onClick={() => { refreshBell(); setBellOpen(true); }} className="relative text-[hsl(var(--ios-blue))]" title="Phone notifications" aria-label={`Phone notifications${phoneNotifs.length ? `, ${phoneNotifs.length} unread` : ''}`}>
+                  <Bell className="h-[22px] w-[22px]" />
+                  {phoneNotifs.length > 0 && <span className="absolute -top-1.5 -right-2 min-w-[18px] h-[18px] px-1 rounded-full bg-[hsl(var(--ios-red))] text-[11px] leading-[18px] text-[hsl(var(--ios-label))] text-center">{phoneNotifs.length > 99 ? '99+' : phoneNotifs.length}</span>}
+                </button>
+              </span>
               <span className={cn('absolute left-1/2 -translate-x-1/2 text-[17px] font-semibold transition-opacity', scrolled ? 'opacity-100' : 'opacity-0')}>{TITLES[mode]}</span>
-              <button onClick={() => mode === 'email' ? openEmailCompose() : setDialOpen(true)} className="text-[hsl(var(--ios-blue))]" title={mode === 'email' ? 'Compose' : 'New'}>
-                {mode === 'email' || mode === 'texts' || mode === 'chat' ? <FileEdit className="h-[22px] w-[22px]" /> : <Plus className="h-6 w-6" />}
-              </button>
+              {mode === 'email' ? (
+                <button onClick={() => openEmailCompose()} className="text-[hsl(var(--ios-blue))]" title="Compose"><FileEdit className="h-[22px] w-[22px]" /></button>
+              ) : (
+                <span className="flex items-center gap-4 text-[hsl(var(--ios-blue))]">
+                  <button onClick={() => setDialOpen(true)} title="Call" aria-label="Call a number"><Phone className="h-[22px] w-[22px]" /></button>
+                  <button onClick={() => setNewTextOpen(true)} title="New text" aria-label="New text message"><FileEdit className="h-[22px] w-[22px]" /></button>
+                </span>
+              )}
             </div>
 
             <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain" onScroll={e => setScrolled(e.currentTarget.scrollTop > 30)}>
@@ -508,7 +605,8 @@ export default function AdminPhoneHub({ fullscreen = false }: { fullscreen?: boo
               ) : listContent.map(item => {
                 const missed = item.kind === 'call' && item.subtitle.toLowerCase().includes('missed');
                 return (
-                  <button key={`${item.kind}:${item.id}`} onClick={() => openItem(item.kind, item.id)} className="w-full flex items-center gap-3 pl-4 text-left active:bg-[hsl(var(--ios-fill))]">
+                  <SwipeRow key={`${item.kind}:${item.id}`} onDelete={item.kind === 'email' ? undefined : () => deleteItem(item.kind, item.id)}>
+                  <button onClick={() => openItem(item.kind, item.id)} className="w-full flex items-center gap-3 pl-4 text-left active:bg-[hsl(var(--ios-fill))]">
                     <span className="w-2.5 shrink-0 flex justify-center">{item.unread && <span className="h-2.5 w-2.5 rounded-full bg-[hsl(var(--ios-blue))]" />}</span>
                     <Avatar name={item.title} />
                     <span className="min-w-0 flex-1 py-2.5 pr-4 border-b border-[hsl(var(--ios-separator))]">
@@ -519,6 +617,7 @@ export default function AdminPhoneHub({ fullscreen = false }: { fullscreen?: boo
                       <span className="block text-[15px] leading-snug text-[hsl(var(--ios-label-2))] line-clamp-2">{item.kind === 'call' && (missed ? <PhoneMissed className="inline h-3.5 w-3.5 mr-1 -mt-0.5" /> : <PhoneIncoming className="inline h-3.5 w-3.5 mr-1 -mt-0.5" />)}{item.subtitle}</span>
                     </span>
                   </button>
+                  </SwipeRow>
                 );
               })}
               <div className="h-24" />
@@ -544,17 +643,53 @@ export default function AdminPhoneHub({ fullscreen = false }: { fullscreen?: boo
           <section onTouchStart={hasDetail ? onTouchStart : undefined} onTouchMove={hasDetail ? onTouchMove : undefined} onTouchEnd={hasDetail ? onTouchEnd : undefined} onTouchCancel={() => { swipe.current = null; setDragX(null); }} style={dragging ? { transform: `translateX(${dragX}px)`, transition: 'none', boxShadow: '-8px 0 24px hsl(var(--ios-bg) / 0.6)' } : undefined} className={cn('absolute inset-0 flex flex-col bg-[hsl(var(--ios-bg))] transition-transform duration-300 ease-out', hasDetail ? 'translate-x-0' : 'translate-x-full')}>
             {selected && <StatusBar />}
             {activeCall ? (
-              <CallDetail call={activeCall} name={displayPhone(activeCall.direction === 'outbound' ? activeCall.to_number : activeCall.from_number)} tag={displayTag(activeCall.from_number)} onBack={() => setSelected(null)} onCall={() => activeCall.from_number && dialInApp(activeCall.from_number)} onText={() => activeCall.from_number && startText(activeCall.from_number)} />
+              <CallDetail call={activeCall} name={displayPhone(activeCall.direction === 'outbound' ? activeCall.to_number : activeCall.from_number)} tag={displayTag(activeCall.from_number)} onBack={() => setSelected(null)} onCall={() => { const n = activeCall.direction === 'outbound' ? activeCall.to_number : activeCall.from_number; if (n) dialInApp(n); else toast.error('No phone number on this call'); }} onText={() => { const n = activeCall.direction === 'outbound' ? activeCall.to_number : activeCall.from_number; if (n) startText(n); else toast.error('No phone number on this call'); }} onMail={() => openEmailCompose()} onDelete={() => deleteItem('call', activeCall.id)} />
             ) : activeThread ? (
-              <TextDetail thread={activeThread} name={displayPhone(activeThread.phone)} tag={displayTag(activeThread.phone)} messages={messages} reply={reply} sending={sending} onReply={setReply} onSend={sendText} onBack={() => setSelected(null)} onCall={() => dialInApp(activeThread.phone)} onAddCustomer={!activeThread.customer_id && !names[phoneKey(activeThread.phone)] ? () => setAddOpen(true) : undefined} />
+              <TextDetail thread={activeThread} name={displayPhone(activeThread.phone)} tag={displayTag(activeThread.phone)} messages={messages} reply={reply} sending={sending} onReply={setReply} onSend={sendText} onBack={() => setSelected(null)} onCall={() => dialInApp(activeThread.phone)} onDelete={() => deleteItem('text', activeThread.id)} onDeleteMessage={deleteSms} onAddCustomer={!activeThread.customer_id && !names[phoneKey(activeThread.phone)] ? () => setAddOpen(true) : undefined} />
             ) : activeChat ? (
-              <ChatDetail title={chatTitle(activeChat)} subtitle={activeChat.subject || (activeChat.tech_id ? 'tech chat' : 'app chat')} me={me} messages={chatMsgs} names={chatNames} reply={reply} sending={sending} onReply={setReply} onSend={sendChat} onBack={() => setSelected(null)} />
+              <ChatDetail title={chatTitle(activeChat)} subtitle={activeChat.subject || (activeChat.tech_id ? 'tech chat' : 'app chat')} me={me} messages={chatMsgs} names={chatNames} reply={reply} sending={sending} onReply={setReply} onSend={sendChat} onBack={() => setSelected(null)} onDelete={() => deleteItem('chat', activeChat.id)} />
             ) : activeEmail ? (
               <EmailDetail email={activeEmail} onBack={() => setSelected(null)} onReply={() => openEmailCompose(activeEmail)} onEdit={() => openEmailCompose(activeEmail)} />
             ) : null}
           </section>
 
           {activeThread && <AddCustomerFromThread open={addOpen} onOpenChange={setAddOpen} threadId={activeThread.id} phone={activeThread.phone} onSaved={load} />}
+          {/* New text sheet */}
+          <Sheet open={newTextOpen} onClose={() => setNewTextOpen(false)} tall>
+            <div className="flex items-center justify-between mb-2">
+              <button onClick={() => setNewTextOpen(false)} className="text-[17px] text-[hsl(var(--ios-blue))]">Cancel</button>
+              <span className="text-[17px] font-semibold">New Message</span>
+              <button onClick={sendNewText} disabled={sending || !ntBody.trim() || phoneKey(ntTo).length < 10} className="text-[17px] font-semibold text-[hsl(var(--ios-blue))] disabled:opacity-40">Send</button>
+            </div>
+            <label className="flex gap-2 py-2.5 border-b border-[hsl(var(--ios-separator))]"><span className="text-[hsl(var(--ios-label-2))]">To:</span><input value={ntTo} onChange={e => setNtTo(e.target.value)} placeholder="Name or number" inputMode="text" className="flex-1 bg-transparent outline-none text-[17px]" /></label>
+            {ntTo.trim() && phoneKey(ntTo).length < 10 && (
+              <div className="max-h-48 overflow-y-auto border-b border-[hsl(var(--ios-separator))]">
+                {Object.entries(names).filter(([k, v]) => `${v.name} ${k}`.toLowerCase().includes(ntTo.trim().toLowerCase())).slice(0, 8).map(([k, v]) => (
+                  <button key={k} onClick={() => setNtTo(`+1${k}`)} className="w-full flex items-center gap-3 py-2 text-left"><Avatar name={v.name} size={32} /><span className="min-w-0"><span className="block text-[16px] truncate">{v.name}</span><span className="block text-[13px] text-[hsl(var(--ios-label-2))]">{k.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3')}</span></span></button>
+                ))}
+              </div>
+            )}
+            <textarea value={ntBody} onChange={e => setNtBody(e.target.value)} placeholder="Text Message" className="w-full flex-1 min-h-[160px] bg-transparent outline-none text-[17px] pt-3 resize-none" />
+          </Sheet>
+
+          {/* Phone notifications sheet */}
+          <Sheet open={bellOpen} onClose={() => setBellOpen(false)} tall>
+            <div className="flex items-center justify-between mb-2">
+              <button onClick={() => setBellOpen(false)} className="text-[17px] text-[hsl(var(--ios-blue))]">Done</button>
+              <span className="text-[17px] font-semibold">Phone Alerts</span>
+              <button onClick={clearPhoneNotifs} disabled={!phoneNotifs.length} className="text-[17px] text-[hsl(var(--ios-red))] disabled:opacity-40">Clear all</button>
+            </div>
+            <div className="flex-1 min-h-0 overflow-y-auto">
+              {phoneNotifs.length === 0 ? <p className="py-16 text-center text-[15px] text-[hsl(var(--ios-label-2))]">No new phone alerts.</p> : phoneNotifs.map(n => (
+                <div key={n.id} className="py-2.5 border-b border-[hsl(var(--ios-separator))]">
+                  <div className="flex justify-between gap-2"><p className="text-[15px] font-semibold truncate">{n.title}</p><span className="text-[13px] text-[hsl(var(--ios-label-2))] shrink-0">{shortTime(n.created_at)}</span></div>
+                  {n.body && <p className="text-[14px] text-[hsl(var(--ios-label-2))] line-clamp-2">{n.body}</p>}
+                </div>
+              ))}
+            </div>
+            <p className="pt-2 text-center text-[12px] text-[hsl(var(--ios-label-2))]">Only clears call, text, chat and email alerts. Service alerts stay in Garage Ace.</p>
+          </Sheet>
+
           {/* Keypad sheet */}
           <Sheet open={dialOpen} onClose={() => setDialOpen(false)}>
             <div className="text-center pt-2">
@@ -674,9 +809,13 @@ function ContactHead({ name, sub }: { name: string; sub?: string }) {
   return <div className="-mt-9 flex flex-col items-center gap-1 pointer-events-none"><Avatar name={name} size={52} /><span className="text-[12px] flex items-center max-w-[220px]"><span className="truncate">{name}</span><ChevronRight className="h-3 w-3 opacity-60" /></span>{sub && <span className="text-[11px] text-[hsl(var(--ios-label-2))] truncate max-w-[240px] capitalize">{sub}</span>}</div>;
 }
 
-function Bubbles<T extends { id: string; created_at: string }>({ items, mine, render, boxRef }: { items: T[]; mine: (m: T) => boolean; render: (m: T) => React.ReactNode; boxRef: React.RefObject<HTMLDivElement> }) {
+function Bubbles<T extends { id: string; created_at: string }>({ items, mine, render, sticky, onHold }: { items: T[]; mine: (m: T) => boolean; render: (m: T) => React.ReactNode; sticky: ReturnType<typeof useStickyBottom>; onHold?: (m: T) => void }) {
+  const holdTimer = useRef<number | null>(null);
+  const cancelHold = () => { if (holdTimer.current) { window.clearTimeout(holdTimer.current); holdTimer.current = null; } };
   return (
-    <div ref={boxRef} className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-3 py-3">
+    <div className="relative flex-1 min-h-0 flex flex-col">
+    {sticky.pill && <button onClick={sticky.jump} className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 flex items-center gap-1 rounded-full bg-[hsl(var(--ios-blue))] px-3 py-1.5 text-[13px] font-semibold text-[hsl(var(--ios-label))] shadow-lg"><ChevronDown className="h-4 w-4" />New message</button>}
+    <div ref={sticky.ref} className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-3 py-3">
       {items.map((m, i) => {
         const prev = items[i - 1], next = items[i + 1];
         const gap = !prev || new Date(m.created_at).getTime() - new Date(prev.created_at).getTime() > 60 * 60000;
@@ -686,7 +825,7 @@ function Bubbles<T extends { id: string; created_at: string }>({ items, mine, re
           <div key={m.id}>
             {gap && <p className="text-center text-[11px] text-[hsl(var(--ios-label-2))] my-3"><span className="font-semibold">{shortTime(m.created_at)}</span>{shortTime(m.created_at).includes(':') ? '' : ` ${format(new Date(m.created_at), 'h:mm a')}`}</p>}
             <div className={cn('flex', out ? 'justify-end' : 'justify-start', last ? 'mb-2' : 'mb-0.5')}>
-              <div className={cn('max-w-[75%] px-3 py-[7px] text-[17px] leading-[22px] rounded-[18px]', out ? 'bg-[hsl(var(--ios-blue))] text-[hsl(var(--ios-label))]' : 'bg-[hsl(var(--ios-bubble))]', last && (out ? 'rounded-br-[5px]' : 'rounded-bl-[5px]'))}>
+              <div onContextMenu={onHold ? e => { e.preventDefault(); onHold(m); } : undefined} onTouchStart={onHold ? () => { cancelHold(); holdTimer.current = window.setTimeout(() => onHold(m), 550); } : undefined} onTouchMove={cancelHold} onTouchEnd={cancelHold} style={onHold ? { WebkitTouchCallout: 'none', WebkitUserSelect: 'none' } as React.CSSProperties : undefined} className={cn('max-w-[75%] px-3 py-[7px] text-[17px] leading-[22px] rounded-[18px]', out ? 'bg-[hsl(var(--ios-blue))] text-[hsl(var(--ios-label))]' : 'bg-[hsl(var(--ios-bubble))]', last && (out ? 'rounded-br-[5px]' : 'rounded-bl-[5px]'))}>
                 {render(m)}
               </div>
             </div>
@@ -694,6 +833,7 @@ function Bubbles<T extends { id: string; created_at: string }>({ items, mine, re
         );
       })}
       {items.length === 0 && <div className="h-full grid place-items-center text-[15px] text-[hsl(var(--ios-label-2))]">No messages yet.</div>}
+    </div>
     </div>
   );
 }
@@ -710,36 +850,83 @@ function Composer({ value, onChange, onSend, sending, placeholder }: { value: st
   );
 }
 
-function useBottom(dep: unknown[]) {
+const sameRows = <T extends { id: string; status?: string | null; body?: string | null }>(a: T[], b: T[]) =>
+  a.length === b.length && a.every((x, i) => x.id === b[i].id && x.status === b[i].status && x.body === b[i].body);
+
+function useStickyBottom(items: unknown[], key: unknown) {
   const ref = useRef<HTMLDivElement>(null);
+  const near = useRef(true);
+  const count = useRef(0);
+  const [pill, setPill] = useState(false);
   useEffect(() => {
     const el = ref.current; if (!el) return;
-    el.scrollTop = el.scrollHeight;
-    const t = setTimeout(() => { el.scrollTop = el.scrollHeight; }, 300);
-    return () => clearTimeout(t);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, dep);
-  return ref;
+    const on = () => { near.current = el.scrollHeight - el.scrollTop - el.clientHeight < 80; if (near.current) setPill(false); };
+    el.addEventListener('scroll', on, { passive: true });
+    return () => el.removeEventListener('scroll', on);
+  }, []);
+  useEffect(() => { near.current = true; count.current = 0; setPill(false); }, [key]);
+  useEffect(() => {
+    const el = ref.current; if (!el) return;
+    const first = count.current === 0;
+    const grew = items.length > count.current;
+    count.current = items.length;
+    if (first || near.current) {
+      const go = () => { el.scrollTop = el.scrollHeight; };
+      go();
+      const t = setTimeout(go, 300);
+      return () => clearTimeout(t);
+    }
+    if (grew) setPill(true);
+  }, [items]);
+  const jump = () => { const el = ref.current; if (el) el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' }); setPill(false); };
+  return { ref, pill, jump };
+}
+
+function SwipeRow({ onDelete, children }: { onDelete?: () => void; children: React.ReactNode }) {
+  const [x, setX] = useState(0);
+  const [drag, setDrag] = useState(false);
+  const s = useRef<{ x: number; y: number; base: number; dir?: 'h' | 'v' } | null>(null);
+  if (!onDelete) return <>{children}</>;
+  return (
+    <div className="relative overflow-hidden">
+      <button onClick={() => { setX(0); onDelete(); }} className="absolute inset-y-0 right-0 w-20 bg-[hsl(var(--ios-red))] text-[15px] font-semibold text-[hsl(var(--ios-label))]" tabIndex={x ? 0 : -1}>Delete</button>
+      <div
+        style={{ transform: `translateX(${x}px)` }}
+        className={cn('relative bg-[hsl(var(--ios-bg))]', !drag && 'transition-transform duration-200')}
+        onTouchStart={e => { const t = e.touches[0]; s.current = { x: t.clientX, y: t.clientY, base: x }; }}
+        onTouchMove={e => {
+          const c = s.current; if (!c) return;
+          const t = e.touches[0]; const dx = t.clientX - c.x; const dy = t.clientY - c.y;
+          if (!c.dir) { if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return; c.dir = Math.abs(dx) > Math.abs(dy) ? 'h' : 'v'; }
+          if (c.dir === 'h') { setDrag(true); setX(Math.min(0, Math.max(-120, c.base + dx))); }
+        }}
+        onTouchEnd={() => { s.current = null; setDrag(false); setX(v => (v < -40 ? -80 : 0)); }}
+        onClickCapture={e => { if (x !== 0) { e.stopPropagation(); e.preventDefault(); setX(0); } }}
+      >
+        {children}
+      </div>
+    </div>
+  );
 }
 
 function Group({ children }: { children: React.ReactNode }) {
   return <div className="rounded-[10px] bg-[hsl(var(--ios-grouped))] overflow-hidden">{children}</div>;
 }
 
-function CallDetail({ call, name, tag, onBack, onCall, onText }: { call: CallRow; name: string; tag?: string; onBack: () => void; onCall: () => void; onText: () => void }) {
+function CallDetail({ call, name, tag, onBack, onCall, onText, onMail, onDelete }: { call: CallRow; name: string; tag?: string; onBack: () => void; onCall: () => void; onText: () => void; onMail: () => void; onDelete: () => void }) {
   const missed = call.status === 'missed' || call.status === 'no-answer';
   const number = call.direction === 'outbound' ? call.to_number : call.from_number;
   return (
     <>
-      <NavBar onBack={onBack} back="Recents" />
+      <NavBar onBack={onBack} back="Recents" right={<button onClick={onDelete} title="Delete call" aria-label="Delete call" className="p-1 text-[hsl(var(--ios-red))]"><Trash2 className="h-5 w-5" /></button>} />
       <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-4 pb-10 space-y-5">
         <div className="text-center pt-4">
           <div className="flex justify-center"><Avatar name={name} size={96} /></div>
           <h3 className="text-[28px] font-semibold mt-3 leading-tight">{name}</h3>
           {tag && <p className="text-[15px] text-[hsl(var(--ios-label-2))]">{tag}</p>}
           <div className="grid grid-cols-3 gap-2 mt-5">
-            {([[MessageCircle, 'message', onText], [Phone, 'call', onCall], [Mail, 'mail', undefined]] as const).map(([Icon, label, fn]) => (
-              <button key={label} onClick={fn} disabled={!fn} className="rounded-[10px] bg-[hsl(var(--ios-grouped))] py-2.5 flex flex-col items-center gap-1 text-[hsl(var(--ios-blue))] disabled:opacity-40"><Icon className="h-5 w-5" fill="currentColor" /><span className="text-[12px]">{label}</span></button>
+            {([[MessageCircle, 'message', onText], [Phone, 'call', onCall], [Mail, 'mail', onMail]] as const).map(([Icon, label, fn]) => (
+              <button key={label} type="button" onClick={fn} className="rounded-[10px] bg-[hsl(var(--ios-grouped))] py-2.5 flex flex-col items-center gap-1 text-[hsl(var(--ios-blue))] disabled:opacity-40"><Icon className="h-5 w-5" fill="currentColor" /><span className="text-[12px]">{label}</span></button>
             ))}
           </div>
         </div>
@@ -769,15 +956,15 @@ function CallDetail({ call, name, tag, onBack, onCall, onText }: { call: CallRow
   );
 }
 
-function TextDetail({ thread, name, tag, messages, reply, sending, onReply, onSend, onBack, onCall, onAddCustomer }: { thread: TextThread; name: string; tag?: string; messages: SmsMessage[]; reply: string; sending: boolean; onReply: (value: string) => void; onSend: () => void; onBack: () => void; onCall: () => void; onAddCustomer?: () => void }) {
-  const boxRef = useBottom([messages, thread.id]);
+function TextDetail({ thread, name, tag, messages, reply, sending, onReply, onSend, onBack, onCall, onDelete, onDeleteMessage, onAddCustomer }: { thread: TextThread; name: string; tag?: string; messages: SmsMessage[]; reply: string; sending: boolean; onReply: (value: string) => void; onSend: () => void; onBack: () => void; onCall: () => void; onDelete: () => void; onDeleteMessage: (m: SmsMessage) => void; onAddCustomer?: () => void }) {
+  const sticky = useStickyBottom(messages, thread.id);
   return (
     <>
-      <NavBar onBack={onBack} right={<button onClick={onCall} title="Call" className="p-1"><Phone className="h-5 w-5" /></button>}><ContactHead name={name} sub={tag || thread.phone} /></NavBar>
+      <NavBar onBack={onBack} right={<><button onClick={onCall} title="Call" className="p-1"><Phone className="h-5 w-5" /></button><button onClick={onDelete} title="Delete conversation" aria-label="Delete conversation" className="p-1 text-[hsl(var(--ios-red))]"><Trash2 className="h-5 w-5" /></button></>}><ContactHead name={name} sub={tag || thread.phone} /></NavBar>
       {onAddCustomer && (
         <button onClick={onAddCustomer} className="mx-4 mt-1 mb-1 shrink-0 rounded-xl bg-[hsl(var(--ios-fill))] py-2 text-[15px] font-medium text-[hsl(var(--ios-blue))]">Add to customers</button>
       )}
-      <Bubbles items={messages} boxRef={boxRef} mine={m => m.direction === 'outbound'} render={m => (
+      <Bubbles items={messages} sticky={sticky} onHold={onDeleteMessage} mine={m => m.direction === 'outbound'} render={m => (
         <>
           <MessageMedia media={m.media_urls} />
           {m.body && <p className="whitespace-pre-wrap break-words [overflow-wrap:anywhere]">{m.body}</p>}
@@ -789,12 +976,12 @@ function TextDetail({ thread, name, tag, messages, reply, sending, onReply, onSe
   );
 }
 
-function ChatDetail({ title, subtitle, me, messages, names, reply, sending, onReply, onSend, onBack }: { title: string; subtitle: string; me: string | null; messages: ChatMessage[]; names: Record<string, string>; reply: string; sending: boolean; onReply: (v: string) => void; onSend: () => void; onBack: () => void }) {
-  const boxRef = useBottom([messages]);
+function ChatDetail({ title, subtitle, me, messages, names, reply, sending, onReply, onSend, onBack, onDelete }: { title: string; subtitle: string; me: string | null; messages: ChatMessage[]; names: Record<string, string>; reply: string; sending: boolean; onReply: (v: string) => void; onSend: () => void; onBack: () => void; onDelete: () => void }) {
+  const sticky = useStickyBottom(messages, title);
   return (
     <>
-      <NavBar onBack={onBack}><ContactHead name={title} sub={subtitle} /></NavBar>
-      <Bubbles items={messages} boxRef={boxRef} mine={m => m.sender_id === me} render={m => (
+      <NavBar onBack={onBack} right={<button onClick={onDelete} title="Delete chat" aria-label="Delete chat" className="p-1 text-[hsl(var(--ios-red))]"><Trash2 className="h-5 w-5" /></button>}><ContactHead name={title} sub={subtitle} /></NavBar>
+      <Bubbles items={messages} sticky={sticky} mine={m => m.sender_id === me} render={m => (
         <>
           {m.sender_id !== me && names[m.sender_id] && <p className="text-[11px] text-[hsl(var(--ios-label-2))] -mb-0.5">{names[m.sender_id]}</p>}
           <p className="whitespace-pre-wrap break-words [overflow-wrap:anywhere]">{m.body}</p>
