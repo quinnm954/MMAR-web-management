@@ -77,6 +77,31 @@ export default function Softphone() {
     return () => clearInterval(t);
   }, [status]);
 
+  // Keep the screen awake during a call: iOS mutes the mic when a web app's screen locks.
+  useEffect(() => {
+    const active = status === 'in-call' || status === 'connecting' || status === 'incoming';
+    if (!active) return;
+    let lock: any = null;
+    let dead = false;
+    const acquire = async () => {
+      try {
+        if (document.visibilityState !== 'visible' || !(navigator as any).wakeLock) return;
+        lock = await (navigator as any).wakeLock.request('screen');
+        if (dead) lock?.release?.();
+      } catch {}
+    };
+    const onVis = () => {
+      if (document.visibilityState === 'visible') {
+        acquire();
+        // Un-mute the mic track if iOS paused it while hidden (unless the user muted).
+        try { if (!callRef.current?.isMuted()) callRef.current?.mute(false); } catch {}
+      }
+    };
+    acquire();
+    document.addEventListener('visibilitychange', onVis);
+    return () => { dead = true; document.removeEventListener('visibilitychange', onVis); lock?.release?.().catch?.(() => {}); };
+  }, [status]);
+
   /** Ask for this device's microphone and route audio to its speaker. */
   const ensureAudio = async () => {
     try {
