@@ -40,5 +40,5 @@
 - [x] South Florida city pages live with "coming soon" waitlist note; receptionist waitlist-only until a tech is assigned
 - [ ] Paused Google Search campaign for Broward & Palm Beach (needs keyword/copy approval)
 - [x] Region tabs on booking requests, estimates, repair orders, invoices
-- [ ] Region filter on calendar and Reports
+- [x] Region filter on calendar, appointments and Reports; manual region pickers; auto receptionist sync; auto tech assignment
 - [ ] Second Google Business Profile once a tech has a South Florida base address
