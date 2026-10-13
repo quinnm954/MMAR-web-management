@@ -77,6 +77,31 @@ export default function Softphone() {
     return () => clearInterval(t);
   }, [status]);
 
+  // Keep the screen awake during a call: iOS mutes the mic when a web app's screen locks.
+  useEffect(() => {
+    const active = status === 'in-call' || status === 'connecting' || status === 'incoming';
+    if (!active) return;
+    let lock: any = null;
+    let dead = false;
+    const acquire = async () => {
+      try {
+        if (document.visibilityState !== 'visible' || !(navigator as any).wakeLock) return;
+        lock = await (navigator as any).wakeLock.request('screen');
+        if (dead) lock?.release?.();
+      } catch {}
+    };
+    const onVis = () => {
+      if (document.visibilityState === 'visible') {
+        acquire();
+        // Un-mute the mic track if iOS paused it while hidden (unless the user muted).
+        try { if (!callRef.current?.isMuted()) callRef.current?.mute(false); } catch {}
+      }
+    };
+    acquire();
+    document.addEventListener('visibilitychange', onVis);
+    return () => { dead = true; document.removeEventListener('visibilitychange', onVis); lock?.release?.().catch?.(() => {}); };
+  }, [status]);
+
   /** Ask for this device's microphone and route audio to its speaker. */
   const ensureAudio = async () => {
     try {
@@ -149,6 +174,7 @@ export default function Softphone() {
         <div className="space-y-3 text-center">
           <p className="font-mono text-lg">{peer}</p>
           <p className="text-sm text-muted-foreground">{status === 'connecting' ? 'Calling…' : fmt}</p>
+          <p className="text-xs text-muted-foreground">Screen stays on during calls. Don't lock your phone or the mic will cut out.</p>
           <div className="flex gap-2">
             <Button variant="outline" className="flex-1" onClick={() => { const m = !muted; callRef.current?.mute(m); setMuted(m); }}>
               {muted ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
