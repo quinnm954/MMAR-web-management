@@ -1,4 +1,4 @@
-import { SOUTH_FLORIDA_WEBSITE_LIVE } from "@/lib/regions";
+import { SOUTH_FLORIDA_WEBSITE_LIVE } from "../lib/regions";
 import { southFloridaCities } from "./citiesSouthFlorida";
 
 export type CityFAQ = { question: string; answer: string };
