@@ -281,6 +281,13 @@
       "when": 1791910681026,
       "tag": "0039_admin_delete_chat",
       "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "7",
+      "when": 1791911112433,
+      "tag": "0040_financing_documents",
+      "breakpoints": true
     }
   ]
 }
