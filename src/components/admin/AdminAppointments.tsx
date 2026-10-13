@@ -125,7 +125,7 @@ const AdminAppointments = () => {
             <div className="flex flex-wrap items-start justify-between gap-2">
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="font-bold">{r.service_type}</span>
+                  <span className="font-bold">{r.service_type}</span><RegionChip slug={(r as any).region_slug} />
                   <Badge className={statusColor(r.status)}>{r.status}</Badge>
                 </div>
                 <div className="text-xs text-muted-foreground flex flex-wrap items-center gap-x-2 gap-y-0.5">
