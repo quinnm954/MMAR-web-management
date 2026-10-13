@@ -1,4 +1,5 @@
 import { useEffect, useState, Fragment } from "react";
+import { useAdminRegion, RegionSwitch, RegionChip } from '@/hooks/useAdminRegion';
 import { ListControls, inRange, matches, groupHeader, GroupLabel, type Range } from "./ListControls";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
@@ -373,7 +374,8 @@ const AdminInvoices = () => {
     { key: 'paid', label: 'Paid', test: i => i.status === 'paid' },
     { key: 'draft', label: 'Draft / Void', test: i => i.status === 'draft' || i.status === 'void' },
   ];
-  const invBase = invoices.filter(i => inRange(i.created_at, range) && matches(q, i.invoice_number, i.customer?.full_name, i.customer?.email, i.total));
+  const { match: regionMatch } = useAdminRegion();
+  const invBase = invoices.filter(i => regionMatch((i as any).region_slug) && inRange(i.created_at, range) && matches(q, i.invoice_number, i.customer?.full_name, i.customer?.email, i.total));
   const invShown = invBase.filter((INV_TABS.find(t => t.key === tab) || INV_TABS[0]).test);
 
   return (
@@ -438,6 +440,7 @@ const AdminInvoices = () => {
         <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
       ) : (
         <div className="space-y-2">
+          <RegionSwitch rows={invoices as any} />
           <ListControls q={q} setQ={setQ} placeholder="Search invoice #, customer..." range={range} setRange={setRange}
             tab={tab} setTab={setTab} tabs={INV_TABS.map(t => ({ key: t.key, label: t.label, count: invBase.filter(i => t.test(i)).length }))} />
           {invShown.length === 0 && <div className="text-center text-sm text-muted-foreground py-8">No invoices match</div>}

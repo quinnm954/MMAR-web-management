@@ -1,4 +1,5 @@
 import { useEffect, useState, Fragment } from 'react';
+import { useAdminRegion, RegionSwitch, RegionChip } from '@/hooks/useAdminRegion';
 import { ListControls, inRange, matches, groupHeader, GroupLabel, type Range } from './ListControls';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
@@ -528,8 +529,9 @@ const AdminEstimates = () => {
     { key: 'converted', label: 'Complete', test: s => s === 'converted' },
     { key: 'declined', label: 'Declined', test: s => s === 'declined' || s === 'expired' },
   ];
+  const { match: regionMatch } = useAdminRegion();
   const base = estimates
-    .filter(e => inRange(e.created_at, range) && matches(q, e.estimate_number, customerName(e.customer_id), e.notes, e.total))
+    .filter(e => regionMatch((e as any).region_slug) && inRange(e.created_at, range) && matches(q, e.estimate_number, customerName(e.customer_id), e.notes, e.total))
     .sort((a, b) => (b.created_at || '').localeCompare(a.created_at || ''));
   const tabDef = EST_TABS.find(t => t.key === tab) || EST_TABS[0];
   const shown = base.filter(e => tabDef.test(e.status));
@@ -545,6 +547,7 @@ const AdminEstimates = () => {
         <Button onClick={newEstimate}><Plus className="h-4 w-4 mr-1" /> New Estimate</Button>
       </div>
 
+      <RegionSwitch rows={estimates as any} />
       <ListControls q={q} setQ={setQ} placeholder="Search estimate #, customer, notes..." range={range} setRange={setRange}
         tab={tab} setTab={setTab} tabs={EST_TABS.map(t => ({ key: t.key, label: t.label, count: base.filter(e => t.test(e.status)).length }))} />
 
