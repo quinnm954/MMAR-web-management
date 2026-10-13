@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useAdminRegion, RegionSwitch, RegionChip } from '@/hooks/useAdminRegion';
 import { format } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
@@ -39,6 +40,7 @@ const statusColor = (s: string) => {
 };
 
 const AdminAppointments = () => {
+  const { match } = useAdminRegion();
   const [rows, setRows] = useState<Row[]>([]);
   const [techs, setTechs] = useState<Tech[]>([]);
   const [loading, setLoading] = useState(true);
@@ -48,7 +50,7 @@ const AdminAppointments = () => {
     setLoading(true);
     const { data } = await supabase
       .from("appointments")
-      .select("id, service_type, description, service_address, requested_date, requested_time_window, scheduled_at, status, customer_id, technician_notes, assigned_technician_id, vehicle:vehicles(year, make, model)")
+      .select("id, service_type, description, service_address, requested_date, requested_time_window, scheduled_at, status, customer_id, technician_notes, assigned_technician_id, region_slug, vehicle:vehicles(year, make, model)")
       .order("requested_date", { ascending: false, nullsFirst: false });
     const list = (data as unknown as Row[]) ?? [];
     const ids = Array.from(new Set(list.map((r) => r.customer_id)));
@@ -99,12 +101,13 @@ const AdminAppointments = () => {
     load();
   };
 
-  const filtered = filter === "all" ? rows : rows.filter((r) => r.status === filter);
+  const filtered = (filter === "all" ? rows : rows.filter((r) => r.status === filter)).filter((r) => match((r as any).region_slug));
 
   if (loading) return <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>;
 
   return (
     <div className="space-y-3">
+      <RegionSwitch rows={rows as any} />
       <div className="flex items-center gap-2">
         <Select value={filter} onValueChange={setFilter}>
           <SelectTrigger className="w-44"><SelectValue /></SelectTrigger>

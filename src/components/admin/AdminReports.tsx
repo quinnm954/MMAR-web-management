@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useAdminRegion, RegionSwitch, RegionChip } from '@/hooks/useAdminRegion';
 import { supabase } from '@/integrations/supabase/client';
 import { techHoursForInvoice } from '@/lib/techHours';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -78,6 +79,8 @@ const itemKind = (li: LineItem) => String(li.kind ?? (Number(li.labor_hours ?? 0
 const laborHoursFromInvoice = (items: LineItem[], _fallbackRate: number, _fallbackSubtotal: number) => techHoursForInvoice(items);
 
 export default function AdminReports() {
+  const { region } = useAdminRegion();
+  const R = (q: any) => (region === 'all' ? q : q.eq('region_slug', region));
   const [data, setData] = useState({
     revenue30: 0,
     invoiceCount: 0,
@@ -124,15 +127,15 @@ export default function AdminReports() {
       const prevSince = prevStart.toISOString();
 
       const [inv, completed, members, ests, settings, employeesRes, mpRes, prevInv] = await Promise.all([
-        supabase
-          .from('invoices')
+        R(supabase
+          .from('invoices'))
           .select('id, invoice_number, total, subtotal, status, created_at, paid_at, customer_id, service_record_id, technician_id, line_items, stripe_session_id, stripe_payment_intent_id, stripe_fee, stripe_fee_synced_at')
           .eq('status', 'paid')
           .gte('paid_at', since)
           .order('paid_at', { ascending: false }),
-        supabase.from('appointments').select('id', { count: 'exact', head: true }).eq('status', 'completed').gte('completed_at', since),
+        R(supabase.from('appointments').select('id', { count: 'exact', head: true })).eq('status', 'completed').gte('completed_at', since),
         supabase.from('memberships').select('id', { count: 'exact', head: true }).eq('status', 'active'),
-        supabase.from('estimates').select('id', { count: 'exact', head: true }).eq('status', 'sent'),
+        R(supabase.from('estimates').select('id', { count: 'exact', head: true })).eq('status', 'sent'),
         supabase.from('shop_settings').select('labor_cost_per_hour').eq('id', 1).single(),
         supabase.from('employees' as any).select('id, user_id, full_name, hourly_rate, pay_basis').eq('is_active', true),
         supabase
@@ -141,7 +144,7 @@ export default function AdminReports() {
           .eq('status', 'paid')
           .gte('paid_at', since)
           .order('paid_at', { ascending: false }),
-        supabase.from('invoices').select('total').eq('status', 'paid').gte('paid_at', prevSince).lt('paid_at', since),
+        R(supabase.from('invoices').select('total')).eq('status', 'paid').gte('paid_at', prevSince).lt('paid_at', since),
       ]);
       setPrevRevenue(((prevInv.data ?? []) as any[]).reduce((s, i) => s + Number(i.total || 0), 0));
 
@@ -307,7 +310,7 @@ export default function AdminReports() {
         partsMargin,
         partsMarginPct,
       });
-  }, [days, preset]);
+  }, [days, preset, region]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -482,6 +485,7 @@ export default function AdminReports() {
 
   return (
     <div className="space-y-4">
+      <RegionSwitch />
       <div className="flex items-end justify-between flex-wrap gap-3">
         <div>
           <h2 className="font-display text-xl">{PRESET_LABEL[preset]}{preset === 'custom' ? ` · Last ${days} days` : ''}</h2>

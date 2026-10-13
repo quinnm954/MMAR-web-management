@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useAdminRegion, RegionSwitch, RegionChip } from '@/hooks/useAdminRegion';
 import { useLaborMinutes, endFromLabor } from "@/lib/useLaborMinutes";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
@@ -17,6 +18,7 @@ interface Appt {
 const HIDDEN = ["cancelled", "canceled", "declined"];
 
 export default function AdminCalendar() {
+  const { region, match } = useAdminRegion();
   const [loading, setLoading] = useState(true);
   const [techs, setTechs] = useState<Tech[]>([]);
   const [appts, setAppts] = useState<Appt[]>([]);
@@ -42,17 +44,17 @@ export default function AdminCalendar() {
       const { from, to } = calRange(view, date);
       const { data } = await supabase
         .from("appointments")
-        .select("id,service_type,status,scheduled_at,assigned_technician_id,profiles:customer_id(full_name)")
+        .select("id,service_type,status,scheduled_at,assigned_technician_id,region_slug,profiles:customer_id(full_name)")
         .not("scheduled_at", "is", null)
         .gte("scheduled_at", from.toISOString())
         .lt("scheduled_at", to.toISOString());
-      setAppts((data || []) as any);
-      const { data: b } = await supabase.from("calendar_blocks").select("id,starts_at,ends_at,reason")
+      setAppts(((data || []) as any[]).filter((a) => match(a.region_slug)) as any);
+      const { data: b } = await supabase.from("calendar_blocks").select("id,starts_at,ends_at,reason,region_slug")
         .lt("starts_at", to.toISOString()).gt("ends_at", from.toISOString());
-      setBlocks(b || []);
+      setBlocks(((b || []) as any[]).filter((x) => !x.region_slug || match(x.region_slug)));
       setLoading(false);
     })();
-  }, [date, view]);
+  }, [date, view, region]);
 
   const colorOf = (techId: string | null) => (techId ? techs.findIndex((t) => t.id === techId) + 1 : 4);
 
@@ -96,6 +98,7 @@ export default function AdminCalendar() {
 
   return (
     <div className="space-y-3">
+      <RegionSwitch />
       <div className="flex flex-wrap gap-2 text-xs">
         {legend.map((t) => (
           <button key={t.id} onClick={() => toggle(t.id)}

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useAdminRegion, RegionSwitch, RegionChip } from '@/hooks/useAdminRegion';
 import { supabase } from '@/integrations/supabase/client';
 import { techHoursForInvoice, techHoursForLine, isDiagnosisLine } from '@/lib/techHours';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -35,6 +36,8 @@ const tip = { background: 'hsl(var(--popover))', border: '1px solid hsl(var(--bo
 const yFmt = (v: number) => `$${v >= 1000 ? (v / 1000).toFixed(v >= 10000 ? 0 : 1) + 'k' : v}`;
 
 export default function AdminSalesDashboard() {
+  const { region } = useAdminRegion();
+  const R = (q: any) => (region === 'all' ? q : q.eq('region_slug', region));
   const [loading, setLoading] = useState(true);
   const [invoices, setInvoices] = useState<Inv[]>([]);
   const [estimates, setEstimates] = useState<Est[]>([]);
@@ -75,12 +78,12 @@ export default function AdminSalesDashboard() {
       const mondayish = addDays(todayStart, -6).toISOString();
       const [inv, est, cust, mem, appts, dw, dm, shop] = await Promise.all([
         // Include invoices created OR paid in the window, so an old invoice paid today still counts today
-        supabase.from('invoices').select('id,total,amount_paid,status,created_at,paid_at,customer_id,line_items,appointment_id').or(`created_at.gte.${since},paid_at.gte.${since}`).order('created_at', { ascending: false }).limit(3000),
-        supabase.from('estimates').select('id,total,status,sent_at,approved_at,created_at').gte('created_at', addDays(todayStart, -90).toISOString()).limit(2000),
+        R(supabase.from('invoices').select('id,total,amount_paid,status,created_at,paid_at,customer_id,line_items,appointment_id')).or(`created_at.gte.${since},paid_at.gte.${since}`).order('created_at', { ascending: false }).limit(3000),
+        R(supabase.from('estimates').select('id,total,status,sent_at,approved_at,created_at')).gte('created_at', addDays(todayStart, -90).toISOString()).limit(2000),
         supabase.from('profiles').select('id', { count: 'exact', head: true }),
         supabase.from('memberships').select('id', { count: 'exact', head: true }).eq('status', 'active'),
-        supabase.from('appointments').select('id', { count: 'exact', head: true }).in('status', ['requested', 'scheduled', 'in_progress']),
-        supabase.from('appointments').select('id, completed_at').eq('status', 'completed').gte('completed_at', mondayish < monthStart.toISOString() ? mondayish : monthStart.toISOString()).limit(2000),
+        R(supabase.from('appointments').select('id', { count: 'exact', head: true })).in('status', ['requested', 'scheduled', 'in_progress']),
+        R(supabase.from('appointments').select('id, completed_at')).eq('status', 'completed').gte('completed_at', mondayish < monthStart.toISOString() ? mondayish : monthStart.toISOString()).limit(2000),
         Promise.resolve(null),
         supabase.from('shop_settings').select('labor_cost_per_hour, monthly_revenue_goal').limit(1).maybeSingle(),
       ]);
@@ -100,7 +103,7 @@ export default function AdminSalesDashboard() {
       setLoading(false);
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tick]);
+  }, [tick, region]);
 
   const saveGoal = async () => {
     const v = Number(goalDraft.replace(/[^0-9.]/g, ''));
@@ -244,6 +247,7 @@ export default function AdminSalesDashboard() {
 
   return (
     <div className="space-y-5 font-sans">
+      <RegionSwitch />
       <DailyTodo />
       {/* Headline */}
       <Card className="overflow-hidden border-primary/30 bg-gradient-to-br from-primary/10 via-card to-card">
