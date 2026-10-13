@@ -39,5 +39,6 @@
 - [x] Receptionist service area reads launched regions
 - [x] South Florida city pages live with "coming soon" waitlist note; receptionist waitlist-only until a tech is assigned
 - [ ] Paused Google Search campaign for Broward & Palm Beach (needs keyword/copy approval)
-- [ ] Region filter on calendar/admin lists and region-aware open times
+- [x] Region tabs on booking requests, estimates, repair orders, invoices
+- [ ] Region filter on calendar and Reports
 - [ ] Second Google Business Profile once a tech has a South Florida base address
