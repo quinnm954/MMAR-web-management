@@ -23,15 +23,7 @@
 ## Google
 - **Search listings**: at launch, the new pages are added to the sitemap and opened to search engines.
 - **Ads**: a new paused Search campaign, "Mobile Repair Calls Broward Palm Beach", targeting both counties with the same services as the Fort Myers campaign (diagnostics, brakes, starters, alternators, tune-ups, major repairs). I'll show keywords, ad text and budget for your approval before creating it. It stays paused.
-- **New Business Profile for South Florida**: a separate listing with the same business name, phone, website, hours, category and description as the Fort Myers one. It serves Broward and Palm Beach only, and the Fort Myers listing keeps only Fort Myers and Lehigh Acres, so the two never overlap.
-  - Google only allows a second listing if the business has a real base in the new region, such as a tech's home or a garage in Broward or Palm Beach. Without one, Google can suspend both listings. I'll need that address. Customers won't see it, but Google mails or texts a code there to verify.
-  - The phone number: using (813) 501-7572 on both listings is allowed but can look like a duplicate to Google. A separate number for the new region that rings to the same receptionist is safer. I'll ask which you prefer before creating anything.
-  - Photos and logo can't be copied over automatically. After the listing is verified, you add them from the Google Maps app or business.google.com, and I'll give you the exact list to upload.
-  - Nothing is created until you approve it on the confirmation card. It's built now but stays out of the website and ads until launch.
-
-## What you'll need to do
-- Approve the ad campaign card and the Business Profile connection.
-- Give me a real South Florida base address and choose the phone number for the new listing, then complete Google's verification and upload the photos.
+- **Business Profile stays as it is** (Fort Myers and Lehigh Acres). The Broward and Palm Beach ad campaign targets those counties directly and doesn't need the profile. A second profile can be added later, once a tech is based there (it needs a real local address to verify).
 - Mark which techs work South Florida.
 - Press **Launch South Florida** when ready, then publish and click **Update AI receptionist**.
 
