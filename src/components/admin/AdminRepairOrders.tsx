@@ -1,4 +1,5 @@
 import { useEffect, useState, Fragment } from "react";
+import { CustomerAddress, formatAddress } from "@/components/admin/CustomerAddress";
 import { useAdminRegion, RegionSwitch, RegionChip } from '@/hooks/useAdminRegion';
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -121,6 +122,7 @@ export default function AdminRepairOrders() {
                           <div className="text-xs text-muted-foreground truncate">
                             {r.customer?.full_name || "Unknown"} · {r.vehicle ? `${r.vehicle.year} ${r.vehicle.make} ${r.vehicle.model}` : "No vehicle"}
                           </div>
+                          <CustomerAddress customerId={r.customer_id} />
                         </div>
                         <div className="text-xs text-muted-foreground text-right shrink-0">
                           {r.scheduled_at ? format(new Date(r.scheduled_at), "MMM d, p") : r.requested_date || format(new Date(r.created_at), "MMM d")}

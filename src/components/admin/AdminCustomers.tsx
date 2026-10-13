@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { CustomerAddress, formatAddress } from "@/components/admin/CustomerAddress";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -272,6 +273,7 @@ const AdminCustomers = () => {
                         <span>(no phone)</span>
                       )}
                     </div>
+                    <CustomerAddress customerId={c.id} fallback={formatAddress(c as any)} className="mt-0.5" />
                   </div>
                   <div className="flex gap-1 shrink-0">
                     <Button size="icon" variant="ghost" className="h-7 w-7" onClick={(e) => openEdit(c, e)} title="Edit">
@@ -315,6 +317,7 @@ const AdminCustomers = () => {
             <div className="text-sm text-muted-foreground space-y-1">
               <div className="flex items-center gap-3 flex-wrap">
                 <span className="inline-flex items-center gap-1"><Mail className="h-3 w-3" /> {selected?.email || "(no email)"}</span>
+                <CustomerAddress customerId={selected?.id} fallback={formatAddress(selected as any)} />
                 <span className="inline-flex items-center gap-1">
                   <Phone className="h-3 w-3" />
                   {selected?.phone ? (

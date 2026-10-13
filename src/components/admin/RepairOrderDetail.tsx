@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { CustomerAddress, formatAddress } from "@/components/admin/CustomerAddress";
 import { RegionChip, REGION_OPTIONS } from '@/hooks/useAdminRegion';
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -363,6 +364,7 @@ export default function RepairOrderDetail({ appointmentId, open, onClose }: Prop
                 <CardContent className="text-sm space-y-1">
                   <div className="font-medium">{customer?.full_name || "—"}</div>
                   {customer?.email && <div className="text-muted-foreground text-xs">{customer.email}</div>}
+                  <CustomerAddress customerId={customer?.id} fallback={formatAddress(customer) || appt?.service_address} />
                   {customer?.phone && (
                     <a href={`tel:${customer.phone}`} className="text-primary text-xs inline-flex items-center gap-1">
                       <Phone className="h-3 w-3" /> {customer.phone}

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { CustomerAddress, formatAddress } from "@/components/admin/CustomerAddress";
 import { useAdminRegion, RegionSwitch, RegionChip } from '@/hooks/useAdminRegion';
 import { format } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
@@ -136,6 +137,7 @@ const AdminAppointments = () => {
                     </a>
                   )}
                 </div>
+                <CustomerAddress customerId={r.customer_id} fallback={r.service_address} />
                 {r.vehicle && <div className="text-xs">{r.vehicle.year} {r.vehicle.make} {r.vehicle.model}</div>}
               </div>
               <div className="text-right text-sm">

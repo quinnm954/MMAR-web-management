@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { formatAddress } from "@/components/admin/CustomerAddress";
 import { useAdminRegion, RegionSwitch, RegionChip } from '@/hooks/useAdminRegion';
 import { useLaborMinutes, endFromLabor } from "@/lib/useLaborMinutes";
 import { supabase } from "@/integrations/supabase/client";
@@ -44,7 +45,7 @@ export default function AdminCalendar() {
       const { from, to } = calRange(view, date);
       const { data } = await supabase
         .from("appointments")
-        .select("id,service_type,status,scheduled_at,assigned_technician_id,region_slug,profiles:customer_id(full_name)")
+        .select("id,service_type,status,scheduled_at,assigned_technician_id,region_slug,profiles:customer_id(full_name,address_line1,address_line2,city,state,postal_code)")
         .not("scheduled_at", "is", null)
         .gte("scheduled_at", from.toISOString())
         .lt("scheduled_at", to.toISOString());
@@ -68,7 +69,7 @@ export default function AdminCalendar() {
     .map((a) => ({
       id: a.id,
       title: a.profiles?.full_name ? `${a.service_type} · ${a.profiles.full_name}` : a.service_type,
-      subtitle: techs.find((t) => t.id === a.assigned_technician_id)?.full_name ?? "Unassigned",
+      subtitle: [techs.find((t) => t.id === a.assigned_technician_id)?.full_name ?? "Unassigned", formatAddress(a.profiles as any)].filter(Boolean).join(" · "),
       start: new Date(a.scheduled_at!),
       end: endFromLabor(new Date(a.scheduled_at!), laborMins[a.id]),
       color: colorOf(a.assigned_technician_id),
