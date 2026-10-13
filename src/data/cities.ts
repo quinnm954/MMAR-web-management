@@ -1,3 +1,6 @@
+import { SOUTH_FLORIDA_WEBSITE_LIVE } from "../lib/regions";
+import { southFloridaCities } from "./citiesSouthFlorida";
+
 export type CityFAQ = { question: string; answer: string };
 export type CityPriceRow = { service: string; range: string; note?: string };
 export type NeighborhoodNote = { name: string; note: string };
@@ -183,6 +186,9 @@ export const cities: City[] = [
 ];
 
 
+
+// South Florida pages join only once that region's website launch switch is on.
+if (SOUTH_FLORIDA_WEBSITE_LIVE) cities.push(...southFloridaCities);
 
 // Attach defaults (pricing + FAQs) without bloating the literals above.
 for (const c of cities) {

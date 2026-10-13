@@ -37,6 +37,7 @@ import AdminInvoices from '@/components/admin/AdminInvoices';
 import AdminEmails from '@/components/admin/AdminEmails';
 import AdminEstimates from '@/components/admin/AdminEstimates';
 import AdminShopSettings from '@/components/admin/AdminShopSettings';
+import AdminRegionsCard from '@/components/admin/AdminRegionsCard';
 import CalendarFeedSettings from '@/components/admin/CalendarFeedSettings';
 import AdminReports from '@/components/admin/AdminReports';
 import AdminSalesDashboard from '@/components/admin/AdminSalesDashboard';
@@ -194,7 +195,7 @@ const AdminDashboard = () => {
             { value: 'prospecting', label: 'Prospecting', icon: Search, roles: OWNER_ADMIN, content: <AdminProspecting /> },
             { value: 'phone-settings', label: 'Phone Setup', icon: PhoneCall, roles: OWNER_ADMIN, content: <AdminPhoneSettings /> },
             { value: 'tracking', label: 'Tracking', icon: ShieldCheck, roles: OWNER_ADMIN, content: <AdminTrackingSettings /> },
-            { value: 'settings', label: 'Settings', icon: Settings, roles: OWNER_ADMIN, content: <div className="space-y-6"><PushNotificationCard /><CalendarFeedSettings /><AdminShopSettings /></div> },
+            { value: 'settings', label: 'Settings', icon: Settings, roles: OWNER_ADMIN, content: <div className="space-y-6"><PushNotificationCard /><CalendarFeedSettings /><AdminRegionsCard /><AdminShopSettings /></div> },
           ];
           const visible = tabs.filter(t => hasAnyRole(t.roles));
           if (visible.length === 0) {

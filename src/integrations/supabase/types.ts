@@ -161,6 +161,7 @@ export type Database = {
           id: string
           membership_id: string | null
           priority: string
+          region_slug: string
           reminder_sent_24h: boolean
           reminder_sent_2h: boolean
           repair_order_number: string | null
@@ -187,6 +188,7 @@ export type Database = {
           id?: string
           membership_id?: string | null
           priority?: string
+          region_slug?: string
           reminder_sent_24h?: boolean
           reminder_sent_2h?: boolean
           repair_order_number?: string | null
@@ -213,6 +215,7 @@ export type Database = {
           id?: string
           membership_id?: string | null
           priority?: string
+          region_slug?: string
           reminder_sent_24h?: boolean
           reminder_sent_2h?: boolean
           repair_order_number?: string | null
@@ -263,6 +266,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "memberships"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointments_region_slug_fkey"
+            columns: ["region_slug"]
+            isOneToOne: false
+            referencedRelation: "service_regions"
+            referencedColumns: ["slug"]
           },
           {
             foreignKeyName: "appointments_vehicle_id_fkey"
@@ -360,6 +370,7 @@ export type Database = {
           id: string
           landing_page: string | null
           notes: string | null
+          region_slug: string
           requested_date: string | null
           requested_time_window: string | null
           service_address: string | null
@@ -393,6 +404,7 @@ export type Database = {
           id?: string
           landing_page?: string | null
           notes?: string | null
+          region_slug?: string
           requested_date?: string | null
           requested_time_window?: string | null
           service_address?: string | null
@@ -426,6 +438,7 @@ export type Database = {
           id?: string
           landing_page?: string | null
           notes?: string | null
+          region_slug?: string
           requested_date?: string | null
           requested_time_window?: string | null
           service_address?: string | null
@@ -450,6 +463,13 @@ export type Database = {
             referencedRelation: "estimates"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "booking_requests_region_slug_fkey"
+            columns: ["region_slug"]
+            isOneToOne: false
+            referencedRelation: "service_regions"
+            referencedColumns: ["slug"]
+          },
         ]
       }
       calendar_blocks: {
@@ -459,6 +479,7 @@ export type Database = {
           ends_at: string
           id: string
           reason: string | null
+          region_slug: string | null
           starts_at: string
         }
         Insert: {
@@ -467,6 +488,7 @@ export type Database = {
           ends_at: string
           id?: string
           reason?: string | null
+          region_slug?: string | null
           starts_at: string
         }
         Update: {
@@ -475,9 +497,18 @@ export type Database = {
           ends_at?: string
           id?: string
           reason?: string | null
+          region_slug?: string | null
           starts_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "calendar_blocks_region_slug_fkey"
+            columns: ["region_slug"]
+            isOneToOne: false
+            referencedRelation: "service_regions"
+            referencedColumns: ["slug"]
+          },
+        ]
       }
       calendar_feed_tokens: {
         Row: {
@@ -3126,6 +3157,33 @@ export type Database = {
           },
         ]
       }
+      service_regions: {
+        Row: {
+          active: boolean
+          cities: string[]
+          created_at: string
+          name: string
+          slug: string
+          zip_prefixes: string[]
+        }
+        Insert: {
+          active?: boolean
+          cities?: string[]
+          created_at?: string
+          name: string
+          slug: string
+          zip_prefixes?: string[]
+        }
+        Update: {
+          active?: boolean
+          cities?: string[]
+          created_at?: string
+          name?: string
+          slug?: string
+          zip_prefixes?: string[]
+        }
+        Relationships: []
+      }
       service_reminders_sent: {
         Row: {
           customer_id: string | null
@@ -3620,6 +3678,29 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      user_service_regions: {
+        Row: {
+          region_slug: string
+          user_id: string
+        }
+        Insert: {
+          region_slug: string
+          user_id: string
+        }
+        Update: {
+          region_slug?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_service_regions_region_slug_fkey"
+            columns: ["region_slug"]
+            isOneToOne: false
+            referencedRelation: "service_regions"
+            referencedColumns: ["slug"]
+          },
+        ]
       }
       vehicle_master_checklist_items: {
         Row: {
@@ -4117,6 +4198,7 @@ export type Database = {
         Args: { _miles: number; _token: string }
         Returns: Json
       }
+      region_for_address: { Args: { _addr: string }; Returns: string }
       register_fleet_for_me: {
         Args: {
           _city: string
