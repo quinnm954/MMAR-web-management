@@ -455,21 +455,6 @@ export default function AdminPhoneHub({ fullscreen = false }: { fullscreen?: boo
       await openItem('text', id);
     } catch (e) { toast.error(e instanceof Error ? e.message : 'Could not open conversation'); }
   };
-  const _unusedStartText = async (phone: string) => {
-    const clean = phone.replace(/\s/g, '');
-    if (!clean) return;
-    const existing = threads.find(thread => phoneKey(thread.phone) === phoneKey(clean));
-    if (existing) {
-      setMode('texts');
-      await openItem('text', existing.id);
-      return;
-    }
-    const { data, error } = await supabase.from('sms_threads').insert({ phone: clean }).select().single();
-    if (error || !data) return toast.error(error?.message || 'Could not start conversation');
-    setThreads(current => [data as TextThread, ...current]);
-    setMode('texts');
-    await openItem('text', data.id);
-  };
 
   const openEmailCompose = (email?: EmailItem | null) => {
     setComposeDraftId(email?.kind === 'draft' ? email.id.slice(6) : null);
