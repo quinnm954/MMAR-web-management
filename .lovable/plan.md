@@ -1,20 +1,36 @@
-# Booking requests organized by region, with automatic location lookup
+# Organize all work by region, with automatic location lookup
 
 ## What you'll get
-- **Region tabs at the top of Admin → Booking requests:** All, Southwest Florida, South Florida, and Outside service area. Each tab shows a count of new requests.
-- **Region label on every request**, such as "Fort Myers · Southwest Florida". South Florida requests with no tech assigned also show a "Waitlist – no tech" badge.
-- **Automatic location lookup:** Google Maps finds each customer's address when the request comes in, from the website, the receptionist or the phone. It records the city, county and a map pin, then picks the region by county:
+- **One region switch for Admin**, at the top of the admin screens: All regions, Southwest Florida, South Florida, Outside service area. Your choice is remembered and applies to:
+  - Booking requests
+  - Appointments
+  - Calendar (day, week and month views)
+  - Estimates
+  - Repair orders
+  - Invoices
+- **Region tabs with counts on each list**, so you can see how many new or open items each region has without switching.
+- **Region label on every item**, such as "Boca Raton · South Florida". South Florida bookings with no tech assigned also get a "Waitlist – no tech" badge.
+- **Automatic location lookup:** Google Maps finds each customer's address when a booking or appointment comes in, then picks the region by county:
   - Lee County → Southwest Florida
   - Broward or Palm Beach County → South Florida
   - Anywhere else → Outside service area
-  - If Google can't find the address, the request shows "Location unknown". You can still set the region by hand.
-- **Change region by hand:** a small region picker on each request, in case Google gets it wrong.
-- **Existing requests:** all past booking requests get looked up once so they sort correctly.
+  - If Google can't find the address, it shows "Location unknown".
+- **How the other records get a region:** estimates, repair orders and invoices take it from their linked appointment. Without one, they use the customer's home address.
+- **Change it by hand:** a region picker on bookings and appointments for when Google gets it wrong. Linked estimates, orders and invoices follow the change.
+- **Existing records:** everything already in Garage Ace gets looked up once so it sorts correctly.
 
 ## Technical details
-- Migration: add `geo_city`, `geo_county`, `geo_lat`, `geo_lng`, `geo_status` ('pending' | 'ok' | 'not_found' | 'manual') to `booking_requests`. Add an `outside` row to `service_regions` (inactive) so out-of-area requests have a region value. Add a `counties text[]` column to `service_regions`, filled with Lee, Broward and Palm Beach.
-- New edge function `geocode-booking` (service role): calls Google Geocoding with `GOOGLE_MAPS_API_KEY` for the service address, reads `administrative_area_level_2` and `locality`, maps the county to a region, and updates the row. Skip rows set to `manual`.
-- Run it from `notify-booking-request` after submission, and from the receptionist booking path. A one-time backfill runs over all existing rows (bounded batches).
-- The address-text trigger stays as the instant first guess. The geocode result replaces it, unless the region was set by hand.
-- `AdminBookingRequests.tsx`: region tabs with counts, a region and city chip per card, a waitlist badge (region active and no tech in `user_service_regions`), and a region select that saves `region_slug` with `geo_status = 'manual'`.
-- Update the AGENTS.md region rule to say regions come from geocoded county.
+- Migration:
+  - Add geo fields (`geo_city`, `geo_county`, `geo_lat`, `geo_lng`, `geo_status` = pending/ok/not_found/manual) to `booking_requests` and `appointments`.
+  - Add `counties text[]` to `service_regions` (Lee; Broward and Palm Beach), plus an inactive `outside` region.
+  - Add `region_slug` to `estimates` and `invoices`, and to `profiles` (customer home region). Repair orders are covered: check whether they live on `appointments` or `estimates` and add it there if needed.
+  - Triggers copy the region from the linked appointment, or the customer profile as a fallback, on insert and when the link changes. A trigger on `appointments.region_slug` cascades to linked estimates and invoices.
+- New `geocode-region` edge function (service role, `GOOGLE_MAPS_API_KEY`): geocodes an address, maps `administrative_area_level_2` to a region, and updates the row. Manual overrides are left alone.
+  - Called from `notify-booking-request`, the receptionist booking path, and on appointment create or address change (client call after save).
+  - A one-time backfill runs over bookings, appointments and customer profiles in bounded batches.
+- Frontend:
+  - New `useAdminRegion` hook (localStorage plus context) and a `RegionSwitch` in the admin header.
+  - Each list (`AdminBookingRequests`, `AdminAppointments`, `AdminEstimates`, `AdminRepairOrders`, `AdminInvoices`) adds `.eq('region_slug', …)` when a region is chosen and shows region tabs with counts and a region chip.
+  - `AdminCalendar` filters events and blocks; a block with no region shows everywhere.
+  - Region picker on booking and appointment detail.
+- Update the AGENTS.md region rule (region comes from the geocoded county and is inherited by estimates, orders and invoices) and roadmap.md.
