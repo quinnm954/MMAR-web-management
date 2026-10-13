@@ -17,6 +17,11 @@ Deno.serve(async () => {
   const sb = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
   const now = new Date();
 
+  // Retry any pending AI receptionist auto-sync (runs any hour; the function skips if up to date).
+  try {
+    await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/ai-receptionist?action=setup&auto=1`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${Deno.env.get('SUPABASE_ANON_KEY')}` }, body: '{}' });
+  } catch (e) { console.error('receptionist sync', String(e)); }
+
   // Quiet hours: only reach out 9am–7pm Eastern.
   const etHour = Number(now.toLocaleString('en-US', { timeZone: 'America/New_York', hour: 'numeric', hour12: false }));
   if (etHour < 9 || etHour >= 19) return Response.json({ skipped: 'quiet hours' });

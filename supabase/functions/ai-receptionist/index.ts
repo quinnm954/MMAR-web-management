@@ -136,11 +136,20 @@ Deno.serve(async (req) => {
 
     // ---------- Admin setup ----------
     if (action === 'setup') {
-      const auth = req.headers.get('Authorization')?.replace('Bearer ', '') || '';
-      const { data: u } = await sb.auth.getUser(auth);
-      if (!u?.user) return json({ error: 'Unauthorized' }, 401);
-      const { data: isAdmin } = await sb.rpc('has_role', { _user_id: u.user.id, _role: 'admin' });
-      if (!isAdmin) return json({ error: 'Admins only' }, 403);
+      // Auto-sync: database triggers / hourly worker call with auto=1; only allowed while a sync is pending.
+      const auto = url.searchParams.get('auto') === '1';
+      if (auto) {
+        const { data: ps } = await sb.from('phone_settings').select('ai_agent_id, ai_sync_requested_at, ai_synced_at').eq('id', 1).maybeSingle();
+        if (!ps?.ai_agent_id) return json({ skipped: 'not set up' });
+        if (!ps.ai_sync_requested_at || (ps.ai_synced_at && ps.ai_synced_at >= ps.ai_sync_requested_at)) return json({ skipped: 'up to date' });
+      } else {
+        const auth = req.headers.get('Authorization')?.replace('Bearer ', '') || '';
+        const { data: u } = await sb.auth.getUser(auth);
+        if (!u?.user) return json({ error: 'Unauthorized' }, 401);
+        const { data: isAdmin } = await sb.rpc('has_role', { _user_id: u.user.id, _role: 'admin' });
+        if (!isAdmin) return json({ error: 'Admins only' }, 403);
+      }
+      const syncStart = new Date().toISOString();
       if (!EL_KEY) return json({ error: 'ElevenLabs is not connected' }, 500);
 
       const { data: s } = await sb.from('phone_settings').select('*').eq('id', 1).maybeSingle();
@@ -230,9 +239,12 @@ Deno.serve(async (req) => {
         body: JSON.stringify(agentBody),
       });
       const txt = await r.text();
-      if (!r.ok) return json({ error: 'ElevenLabs error', status: r.status, details: txt }, 502);
+      if (!r.ok) {
+        await sb.from('phone_settings').update({ ai_sync_error: `ElevenLabs ${r.status}` } as any).eq('id', 1);
+        return json({ error: 'ElevenLabs error', status: r.status, details: txt }, 502);
+      }
       if (!agentId) agentId = JSON.parse(txt).agent_id;
-      await sb.from('phone_settings').update({ ai_agent_id: agentId }).eq('id', 1);
+      await sb.from('phone_settings').update({ ai_agent_id: agentId, ai_synced_at: syncStart, ai_sync_error: null } as any).eq('id', 1);
 
       // Configure the workspace post-call webhook so ElevenLabs sends us transcripts
       const postcallUrl = `${fnBase}?action=postcall&token=${TOKEN}`;

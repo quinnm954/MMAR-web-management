@@ -165,6 +165,7 @@ export type Database = {
           geo_status: string
           id: string
           membership_id: string | null
+          needs_tech_choice: boolean
           priority: string
           region_slug: string
           reminder_sent_24h: boolean
@@ -197,6 +198,7 @@ export type Database = {
           geo_status?: string
           id?: string
           membership_id?: string | null
+          needs_tech_choice?: boolean
           priority?: string
           region_slug?: string
           reminder_sent_24h?: boolean
@@ -229,6 +231,7 @@ export type Database = {
           geo_status?: string
           id?: string
           membership_id?: string | null
+          needs_tech_choice?: boolean
           priority?: string
           region_slug?: string
           reminder_sent_24h?: boolean
@@ -2518,6 +2521,9 @@ export type Database = {
           ai_enabled: boolean
           ai_greeting: string
           ai_summary_to_number: string | null
+          ai_sync_error: string | null
+          ai_sync_requested_at: string | null
+          ai_synced_at: string | null
           business_hours: Json
           forward_to_number: string | null
           id: number
@@ -2534,6 +2540,9 @@ export type Database = {
           ai_enabled?: boolean
           ai_greeting?: string
           ai_summary_to_number?: string | null
+          ai_sync_error?: string | null
+          ai_sync_requested_at?: string | null
+          ai_synced_at?: string | null
           business_hours?: Json
           forward_to_number?: string | null
           id?: number
@@ -2550,6 +2559,9 @@ export type Database = {
           ai_enabled?: boolean
           ai_greeting?: string
           ai_summary_to_number?: string | null
+          ai_sync_error?: string | null
+          ai_sync_requested_at?: string | null
+          ai_synced_at?: string | null
           business_hours?: Json
           forward_to_number?: string | null
           id?: number

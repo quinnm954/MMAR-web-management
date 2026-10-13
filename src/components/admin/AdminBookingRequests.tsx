@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useAdminRegion, RegionSwitch, RegionChip } from '@/hooks/useAdminRegion';
+import { useAdminRegion, RegionSwitch, RegionChip, REGION_OPTIONS } from '@/hooks/useAdminRegion';
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -280,7 +280,9 @@ const AdminBookingRequests = () => {
                   <p className="text-xs text-muted-foreground">
                     {new Date(r.created_at).toLocaleString()} · via {r.source}
                   </p>
-                  <div className="mt-1 flex flex-wrap gap-1"><RegionChip slug={(r as any).region_slug} city={(r as any).geo_city} />{JSON.stringify(r).toLowerCase().includes('waitlist') && <span className="rounded-full bg-accent/20 px-2 py-0.5 text-[11px] font-medium text-accent">Waitlist</span>}</div>
+                  <div className="mt-1 flex flex-wrap gap-1"><RegionChip slug={(r as any).region_slug} city={(r as any).geo_city} /><select aria-label="Change region" className="rounded-full border border-border bg-background px-1.5 text-[11px] text-muted-foreground" value={(r as any).region_slug || 'swfl'}
+                    onChange={async (e) => { const { error } = await supabase.from("booking_requests").update({ region_slug: e.target.value } as any).eq("id", r.id); if (error) toast.error(error.message); else { toast.success("Region updated"); load(); } }}>
+                    {REGION_OPTIONS.filter((o) => o.value !== 'all').map((o) => <option key={o.value} value={o.value}>{o.short}</option>)}</select>{JSON.stringify(r).toLowerCase().includes('waitlist') && <span className="rounded-full bg-accent/20 px-2 py-0.5 text-[11px] font-medium text-accent">Waitlist</span>}</div>
                 </div>
                 <span className={`text-[11px] font-semibold px-2 py-1 rounded-full ${STATUS_TONE[r.status] ?? "bg-muted"}`}>
                   {r.status}
