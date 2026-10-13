@@ -18,6 +18,10 @@ const matchAll = (src, re) => [...src.matchAll(re)].map((m) => m[1]);
 
 // --- Extract dynamic data ---
 const cities = matchAll(read("src/data/cities.ts"), /^\s*slug:\s*"([^"]+)"/gm);
+// South Florida city pages are listed only after their website launch switch is on.
+if (/SOUTH_FLORIDA_WEBSITE_LIVE\s*=\s*true/.test(read("src/lib/regions.ts"))) {
+  cities.push(...matchAll(read("src/data/citiesSouthFlorida.ts"), /slug:\s*"([^"]+)"/g));
+}
 const categories = matchAll(
   read("src/data/serviceCategories.ts"),
   /^\s*id:\s*"([^"]+)"/gm
