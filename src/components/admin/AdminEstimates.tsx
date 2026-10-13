@@ -1,4 +1,5 @@
 import { useEffect, useState, Fragment } from 'react';
+import { CustomerAddress, formatAddress } from "@/components/admin/CustomerAddress";
 import { useAdminRegion, RegionSwitch, RegionChip } from '@/hooks/useAdminRegion';
 import { ListControls, inRange, matches, groupHeader, GroupLabel, type Range } from './ListControls';
 import { supabase } from '@/integrations/supabase/client';
@@ -571,7 +572,7 @@ const AdminEstimates = () => {
                 {hdr && <TableRow className="hover:bg-transparent"><TableCell colSpan={6} className="py-1"><GroupLabel label={hdr} /></TableCell></TableRow>}
                 <TableRow>
                   <TableCell className="font-mono text-xs">{e.estimate_number}</TableCell>
-                  <TableCell>{customerName(e.customer_id)}</TableCell>
+                  <TableCell><div>{customerName(e.customer_id)}</div><CustomerAddress customerId={e.customer_id} /></TableCell>
                   <TableCell><Badge variant="outline" className={STATUS_COLORS[e.status]}>{e.status === 'converted' ? 'complete' : e.status.replace('_', ' ')}</Badge></TableCell>
                   <TableCell className="text-right">${Number(e.total).toFixed(2)}</TableCell>
                   <TableCell className="text-xs text-muted-foreground">{e.valid_until || '—'}</TableCell>
@@ -615,6 +616,7 @@ const AdminEstimates = () => {
                       {customers.map(c => <SelectItem key={c.id} value={c.id}>{c.full_name || c.email}</SelectItem>)}
                     </SelectContent>
                   </Select>
+                  <CustomerAddress customerId={editing.customer_id} className="mt-1" />
                 </div>
                 <div>
                   <Label>Vehicle</Label>

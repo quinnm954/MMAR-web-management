@@ -1,4 +1,5 @@
 import { useEffect, useState, Fragment } from "react";
+import { CustomerAddress, formatAddress } from "@/components/admin/CustomerAddress";
 import { useAdminRegion, RegionSwitch, RegionChip } from '@/hooks/useAdminRegion';
 import { ListControls, inRange, matches, groupHeader, GroupLabel, type Range } from "./ListControls";
 import { supabase } from "@/integrations/supabase/client";
@@ -457,6 +458,7 @@ const AdminInvoices = () => {
                     <div>
                       <div className="font-mono text-sm">{i.invoice_number}</div>
                       <div className="text-xs text-muted-foreground">{i.customer?.full_name || i.customer?.email}</div>
+                      <CustomerAddress customerId={i.customer_id} />
                       <div className="text-[10px] text-muted-foreground">
                         {new Date(i.created_at).toLocaleDateString()}{i.due_date && ` • Due ${i.due_date}`}
                       </div>
