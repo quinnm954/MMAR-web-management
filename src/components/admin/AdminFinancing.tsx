@@ -157,7 +157,16 @@ function ContractDetail({ c, payments, docs, profile, onBack, reload }: { c: Con
   const sendLink = async () => {
     if (!phone) return toast.error('No phone number on file');
     const body = `Hi ${c.client_name.split(' ')[0]}, here's your MMAR payment page to see your schedule and card on file: ${link}`;
-    const { data, error } = await supabase.functions.invoke('send-sms', { body: { to: phone, body } });
+    const key = phone.replace(/\D/g, '').slice(-10);
+    const e164 = `+1${key}`;
+    const { data: existing } = await supabase.from('sms_threads').select('id,phone').ilike('phone', `%${key}`).limit(1);
+    let threadId = existing?.[0]?.id as string | undefined;
+    if (!threadId) {
+      const { data: t, error: te } = await supabase.from('sms_threads').insert({ phone: e164, customer_id: c.customer_id }).select('id').single();
+      if (te || !t) return toast.error(te?.message || 'Could not start text');
+      threadId = t.id;
+    }
+    const { data, error } = await supabase.functions.invoke('send-sms', { body: { thread_id: threadId, to: existing?.[0]?.phone || e164, body } });
     if (error || data?.error) return toast.error(data?.error || error?.message || 'Text failed');
     toast.success('Link texted');
   };
@@ -288,7 +297,7 @@ function NewArrangement({ open, onOpenChange, onCreated }: { open: boolean; onOp
   }, [open]);
 
   const inv = invoices.find(i => i.id === invoiceId);
-  const total = Number(inv?.total ?? inv?.balance_due ?? 0);
+  const total = Math.max(0, Number(inv?.total ?? 0) - Number(inv?.amount_paid ?? 0));
   const downAmt = Math.round(total * Number(down) / 100 * 100) / 100;
   const principal = Math.round((total - downAmt) * 100) / 100;
   const n = Math.max(1, parseInt(count) || 1);
@@ -303,9 +312,9 @@ function NewArrangement({ open, onOpenChange, onCreated }: { open: boolean; onOp
     setSaving(true);
     const p = inv.profile || {};
     const { data: c, error } = await supabase.from('financing_contracts').insert({
-      client_name: p.full_name || inv.customer_name || 'Customer', client_contact: [p.phone, p.email].filter(Boolean).join(' · ') || null,
+      client_name: p.full_name || 'Customer', client_contact: [p.phone, p.email].filter(Boolean).join(' · ') || null,
       client_address: [p.address_line1, p.city, p.state].filter(Boolean).join(', ') || null, agreement_date: today(),
-      vehicle_info: inv.vehicle_info || null, service_description: inv.title || inv.description || `Invoice ${inv.invoice_number || ''}`.trim(),
+      vehicle_info: null, service_description: (inv.line_items || []).map((l: any) => l.description).filter(Boolean).slice(0, 3).join(', ') || `Invoice ${inv.invoice_number || ''}`.trim(),
       total_service_price: total, first_payment_date: first, down_payment: downAmt, principal, interest, total_financed: financed,
       monthly_payment: each, status: 'active', customer_id: inv.customer_id, invoice_id: inv.id,
     } as any).select().single();
