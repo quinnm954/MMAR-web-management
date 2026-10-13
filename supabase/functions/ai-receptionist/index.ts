@@ -139,7 +139,10 @@ Deno.serve(async (req) => {
       if (!EL_KEY) return json({ error: 'ElevenLabs is not connected' }, 500);
 
       const { data: s } = await sb.from('phone_settings').select('*').eq('id', 1).maybeSingle();
-      const cities = ['Fort Myers', 'Lehigh Acres'];
+      // Service area comes from the launched regions (Admin → Settings → Service regions).
+      const { data: regs } = await sb.from('service_regions').select('cities').eq('active', true);
+      const cities: string[] = (regs || []).flatMap((r: any) => r.cities || []);
+      if (!cities.length) cities.push('Fort Myers', 'Lehigh Acres');
       const fnBase = `${supabaseUrl}/functions/v1/ai-receptionist`;
       const tool = (name: string, description: string, props: Record<string, unknown>, required: string[]) => ({
         type: 'webhook',
