@@ -57,6 +57,19 @@ const QuoteRequestDialog = ({
   const [engine, setEngine] = useState("");
   const [mileage, setMileage] = useState("");
   const [location, setLocation] = useState("");
+  const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
+  const [geoAsking, setGeoAsking] = useState(false);
+  const askLocation = () => {
+    if (!navigator.geolocation || coords) return;
+    setGeoAsking(true);
+    navigator.geolocation.getCurrentPosition(
+      (p) => { setCoords({ lat: p.coords.latitude, lng: p.coords.longitude }); setGeoAsking(false); },
+      () => { setGeoAsking(false); toast.message("No problem — we'll use the address you typed."); },
+      { enableHighAccuracy: false, timeout: 10000, maximumAge: 600000 },
+    );
+  };
+  // Ask once when the form opens; booking works the same if they decline.
+  useEffect(() => { if (open && !coords) askLocation(); }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
   const [notes, setNotes] = useState("");
   const [requestedDate, setRequestedDate] = useState("");
   const [timeWindow, setTimeWindow] = useState("");
@@ -183,6 +196,7 @@ const QuoteRequestDialog = ({
     if (token) {
       const attr = { ...getAttribution(), user_agent: navigator.userAgent };
       void supabase.rpc("set_booking_attribution", { _token: token, _attribution: attr }).then(() => {}, () => {});
+      if (coords) await supabase.rpc("set_booking_location", { _token: token, _lat: coords.lat, _lng: coords.lng }).then(() => {}, () => {});
 
       // Auto-create a customer account (profile + login). We await this so we
       // can email the new user a set-password link. Failures are non-blocking.
@@ -410,6 +424,9 @@ const QuoteRequestDialog = ({
             <div className="space-y-1.5">
               <Label htmlFor="location">Service address (optional)</Label>
               <Input id="location" placeholder="Fort Myers, FL" value={location} onChange={(e) => setLocation(e.target.value)} />
+              <button type="button" onClick={askLocation} className="text-xs text-primary underline">
+                {coords ? "Location shared ✓" : geoAsking ? "Getting your location…" : "Share your location so we send the right mechanic"}
+              </button>
             </div>
           </div>
 
