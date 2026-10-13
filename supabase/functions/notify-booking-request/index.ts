@@ -6,6 +6,7 @@ import { z } from 'npm:zod@3.23.8'
 import { sendAndLog } from '../_shared/send-and-log.ts'
 import { buildLaborQuote, createDraftEstimate } from '../_shared/labor-quote.ts'
 import { corsHeaders, json } from '../_shared/staff-auth.ts'
+import { geocodeRow } from '../_shared/geocode-region.ts'
 
 const ADMIN_EMAIL = 'quinnm954@gmail.com'
 const SITE_URL = 'https://mikesmautorepair.com'
@@ -25,6 +26,7 @@ Deno.serve(async (req) => {
   if (!b) return json({ error: 'Not found' }, 404)
   // Only notify for fresh submissions (limits abuse / replays).
   if (Date.now() - new Date(b.created_at).getTime() > 15 * 60 * 1000) return json({ ok: true, skipped: true })
+  await geocodeRow(sb, 'booking_requests', b.id)
 
   const shared = {
     customerName: b.customer_name,
