@@ -69,12 +69,13 @@ async function sendSms(to: string, body: string, sb?: any, fromOverride?: string
   }
 }
 
-function buildPrompt(cities: string[]) {
+function buildPrompt(cities: string[], waitlist: string[] = []) {
   return `You are the friendly phone receptionist for Mike's Mobile Auto Repair (MMAR), a mobile mechanic in Southwest Florida. You answer every call for the shop.
 
 Facts:
 - We come to the customer's home, work, or lot. No need to tow to a shop.
-- Service area: ONLY ${cities.join(' and ')}. If the caller is outside those areas, politely say we don't currently service their area.
+- Service area: ONLY ${cities.join(' and ')}. If the caller is outside those areas, politely say we don't currently service their area.${waitlist.length ? `
+- Coming soon (NOT booking yet): ${waitlist.join(', ')} and the rest of Broward and Palm Beach counties. For callers there, say "We're expanding there soon but we aren't booking appointments yet." Offer to put them on the list: take their name, number, vehicle and what they need, and save a request with no date or time. Never quote any price, never offer or check open times, and never promise a start date.` : ''}
 - Services: diagnostics and check-engine lights, brakes, batteries and starting/charging, alternators and starters, AC repair, cooling system, suspension and steering, belts and hoses, tune-ups, fleet service for dealerships and companies. We do NOT offer pre-purchase or used-car inspections — if asked, politely say it's not a service we offer and ask if anything else is wrong with their vehicle.
 - Oil changes are ONLY for MMAR Care members (our maintenance membership). If someone asks for an oil change, don't book it as a one-off; briefly pitch MMAR Care: "We only do oil changes for MMAR Care members — it's our maintenance plan that covers your routine service and we come to you. Want Mike to text you the details to sign up?" If they're interested, save a request noting "MMAR Care interest - oil change". Existing MMAR Care members can book oil changes normally.
 - Pricing: the ONLY price you may ever give is the diagnosis fee, and only when the caller needs a diagnosis. Never quote labor, parts, or repair prices — for a specific repair say Mike will review it and send a written quote by text or email.
@@ -139,9 +140,12 @@ Deno.serve(async (req) => {
       if (!EL_KEY) return json({ error: 'ElevenLabs is not connected' }, 500);
 
       const { data: s } = await sb.from('phone_settings').select('*').eq('id', 1).maybeSingle();
-      // Service area comes from the launched regions (Admin → Settings → Service regions).
-      const { data: regs } = await sb.from('service_regions').select('cities').eq('active', true);
-      const cities: string[] = (regs || []).flatMap((r: any) => r.cities || []);
+      // Service area = launched regions that have at least one tech; launched but unstaffed = waitlist.
+      const { data: regs } = await sb.from('service_regions').select('slug,cities').eq('active', true);
+      const { data: staffed } = await sb.from('user_service_regions').select('region_slug');
+      const has = new Set((staffed || []).map((x: any) => x.region_slug));
+      const cities: string[] = [], waitlist: string[] = [];
+      for (const r of regs || []) ((r.slug === 'swfl' || has.has(r.slug)) ? cities : waitlist).push(...(r.cities || []));
       if (!cities.length) cities.push('Fort Myers', 'Lehigh Acres');
       const fnBase = `${supabaseUrl}/functions/v1/ai-receptionist`;
       const tool = (name: string, description: string, props: Record<string, unknown>, required: string[]) => ({
@@ -320,6 +324,14 @@ Deno.serve(async (req) => {
       if (!phone && sid) {
         const { data: c } = await sb.from('call_logs').select('from_number').eq('twilio_call_sid', sid).maybeSingle();
         phone = c?.from_number || '';
+      }
+      // Backstop: launched regions without a tech take a waitlist message only — no time slot.
+      if (body.service_address) {
+        const { data: reg } = await sb.rpc('region_for_address', { _addr: String(body.service_address) });
+        if (reg && reg !== 'swfl') {
+          const { count } = await sb.from('user_service_regions').select('user_id', { count: 'exact', head: true }).eq('region_slug', reg);
+          if (!count) { body.requested_date = ''; body.requested_time = ''; body.notes = `WAITLIST (no tech in area yet). ${body.notes || ''}`.trim(); }
+        }
       }
       // Validate requested slot: any day, 10:00–17:00 Eastern, not in the past
       const dateStr = String(body.requested_date || '').trim();
