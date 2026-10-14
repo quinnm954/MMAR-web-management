@@ -456,7 +456,8 @@ const AdminInvoices = () => {
                   <div className="flex items-center gap-3">
                     <Receipt className="h-5 w-5 text-primary shrink-0" />
                     <div>
-                      <div className="font-mono text-sm">{i.invoice_number}</div>
+                      <div className="font-mono text-sm">{i.invoice_number}{(i as any).is_financed && <span className="ml-2 rounded border border-accent/40 bg-accent/15 px-1.5 py-0.5 text-[10px] font-sans font-semibold uppercase text-accent">Financed</span>}</div>
+                      {(i as any).is_financed && <div className="text-[10px] text-muted-foreground">Paid ${Number((i as any).amount_paid || 0).toFixed(2)} · balance on weekly financing</div>}
                       <div className="text-xs text-muted-foreground">{i.customer?.full_name || i.customer?.email}</div>
                       <CustomerAddress customerId={i.customer_id} />
                       <div className="text-[10px] text-muted-foreground">

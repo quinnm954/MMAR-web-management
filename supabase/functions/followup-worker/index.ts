@@ -144,7 +144,7 @@ Deno.serve(async () => {
     };
     const { data: invs } = await sb.from('invoices')
       .select('id,customer_id,invoice_number,total,amount_paid,status,auto_sent_at,reminder_count')
-      .not('status', 'in', '(paid,void,draft)').lt('reminder_count', 2).order('created_at').limit(BATCH);
+      .not('status', 'in', '(paid,void,draft)').eq('is_financed', false).lt('reminder_count', 2).order('created_at').limit(BATCH);
     for (const inv of invs || []) {
       const dueAmt = Number(inv.total) - Number(inv.amount_paid || 0);
       if (dueAmt <= 0) continue;
