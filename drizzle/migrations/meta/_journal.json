@@ -337,6 +337,13 @@
       "when": 1792001563094,
       "tag": "0047_allow_followup_invoice_per_repair_order",
       "breakpoints": true
+    },
+    {
+      "idx": 48,
+      "version": "7",
+      "when": 1792010532656,
+      "tag": "0048_financed_invoices",
+      "breakpoints": true
     }
   ]
 }
