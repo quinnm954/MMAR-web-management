@@ -330,6 +330,13 @@
       "when": 1791919265541,
       "tag": "0046_retire_in_app_chat",
       "breakpoints": true
+    },
+    {
+      "idx": 47,
+      "version": "7",
+      "when": 1792001563094,
+      "tag": "0047_allow_followup_invoice_per_repair_order",
+      "breakpoints": true
     }
   ]
 }
