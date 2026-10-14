@@ -650,3 +650,28 @@ const Row = ({ children }: any) => (
   <div className="flex items-center justify-between py-2 border-b border-border/40 last:border-0">{children}</div>
 );
 const Empty = ({ children }: any) => <div className="text-sm text-muted-foreground py-2">{children}</div>;
+
+function LinkVehiclePicker({ customerId, onPick }: { customerId?: string; onPick: (v: any) => void }) {
+  const [list, setList] = useState<any[] | null>(null);
+  useEffect(() => {
+    if (!customerId) return;
+    supabase.from("vehicles").select("*").eq("owner_id", customerId).then(({ data }) => setList(data || []));
+  }, [customerId]);
+  return (
+    <div className="space-y-2">
+      <div className="text-destructive text-xs font-medium">No vehicle linked — pick one to continue</div>
+      {list === null ? null : list.length === 0 ? (
+        <div className="text-muted-foreground text-xs">This customer has no saved vehicles. Add one in their customer file.</div>
+      ) : (
+        <div className="flex flex-wrap gap-2">
+          {list.map((v) => (
+            <button key={v.id} type="button" onClick={() => onPick(v)}
+              className="rounded-md border border-border px-2 py-1 text-xs hover:bg-muted">
+              Link {v.year} {v.make} {v.model}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
