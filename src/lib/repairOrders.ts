@@ -26,6 +26,10 @@ export async function startRepairOrderFromEstimate(estimate: {
   if (estimate.status !== 'approved' && estimate.status !== 'partially_approved') {
     throw new Error('Only approved estimates can start a Repair Order.');
   }
+  const { data: apptRow } = await supabase.from('appointments').select('vehicle_id').eq('id', estimate.appointment_id).maybeSingle();
+  if (!apptRow?.vehicle_id) {
+    throw new Error('Link a vehicle to this job before starting the Repair Order.');
+  }
   const approvedLines = (estimate.line_items || []).filter((line: LineItem & { status?: string }) => !line.status || line.status === 'approved');
   const preferredLines = approvedLines.some((line) => line.kind === 'labor')
     ? approvedLines.filter((line) => line.kind === 'labor')
