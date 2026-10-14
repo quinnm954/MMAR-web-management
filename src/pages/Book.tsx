@@ -13,7 +13,6 @@ import { trackConversion } from "@/lib/gtag";
 const COMMON_SERVICES = [
   "Oil & Filter Change",
   "Brake Service",
-  "Tire Rotation",
   "Battery Replacement",
   "Check Engine Light Diagnostics",
   "AC Service",

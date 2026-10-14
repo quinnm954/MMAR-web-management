@@ -3,7 +3,6 @@
 // checklist_templates.service_type_match keyword array.
 export const SERVICE_TYPES = [
   "Brake Service",
-  "Tire Service / Alignment",
   "Battery / Electrical",
   "Cooling System",
   "Transmission Service",
