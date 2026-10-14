@@ -202,7 +202,8 @@ export default function AdminSalesDashboard() {
     const ids = new Set(month.map(j => j.id));
     let hrs = 0, rev = 0; const withInv = new Set<string>();
     invoices.forEach(inv => {
-      if (!inv.appointment_id || !ids.has(inv.appointment_id) || inv.status !== 'paid') return;
+      const payable = inv.status === 'paid' || ((inv as any).is_financed && Number(inv.amount_paid || 0) > 0);
+      if (!inv.appointment_id || !ids.has(inv.appointment_id) || !payable) return;
       withInv.add(inv.appointment_id); rev += Number(inv.total || 0);
       hrs += techHoursForInvoice(inv.line_items);
     });

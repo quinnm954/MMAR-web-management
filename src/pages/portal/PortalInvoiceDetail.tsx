@@ -211,6 +211,11 @@ const PortalInvoiceDetail = () => {
             <div className="flex items-center gap-2 justify-center text-primary font-semibold py-3 border border-primary/30 bg-primary/5 rounded">
               <CheckCircle2 className="h-5 w-5" /> Paid in full — thank you!
             </div>
+          ) : (inv as any).is_financed ? (
+            <div className="rounded border border-accent/40 bg-accent/10 px-3 py-3 text-center text-sm">
+              <div className="font-semibold">Financed invoice</div>
+              <div className="text-muted-foreground">The balance of ${due.toFixed(2)} plus interest is paid weekly under your financing agreement.</div>
+            </div>
           ) : due > 0 && inv.status !== "void" ? (
             <Button onClick={pay} disabled={paying} variant="hero" className="w-full" size="lg">
               {paying ? <Loader2 className="h-4 w-4 animate-spin" /> : <><CreditCard className="h-4 w-4 mr-2" /> Pay ${due.toFixed(2)} Securely</>}

@@ -1851,6 +1851,7 @@ export type Database = {
           due_date: string | null
           id: string
           invoice_number: string | null
+          is_financed: boolean
           line_items: Json
           membership_id: string | null
           paid_at: string | null
@@ -1885,6 +1886,7 @@ export type Database = {
           due_date?: string | null
           id?: string
           invoice_number?: string | null
+          is_financed?: boolean
           line_items?: Json
           membership_id?: string | null
           paid_at?: string | null
@@ -1919,6 +1921,7 @@ export type Database = {
           due_date?: string | null
           id?: string
           invoice_number?: string | null
+          is_financed?: boolean
           line_items?: Json
           membership_id?: string | null
           paid_at?: string | null

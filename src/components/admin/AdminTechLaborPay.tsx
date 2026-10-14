@@ -53,8 +53,8 @@ export default function AdminTechLaborPay() {
 
       const { data: paidInvoices } = await supabase.from("invoices")
         .select("id, subtotal, status, paid_at, service_record_id, technician_id, line_items")
-        .eq("status", "paid")
-        .gte("paid_at", since);
+        // Financed invoices pay the tech full labor once the down payment is in
+        .or(`and(status.eq.paid,paid_at.gte.${since}),and(is_financed.eq.true,amount_paid.gt.0,status.neq.paid,created_at.gte.${since})`);
 
       const serviceIds = ((paidInvoices ?? []) as any[]).filter((i) => !i.technician_id && i.service_record_id).map((i) => i.service_record_id);
       const techByService = new Map<string, string | null>();
