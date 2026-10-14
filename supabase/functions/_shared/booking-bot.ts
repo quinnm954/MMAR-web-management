@@ -64,6 +64,9 @@ export function cleanService(s?: string | null) {
 export const LEAD_MIN = 60;   // minimum notice so Mike can finish up and drive over
 export const BLOCK_MIN = 120; // each job holds ~1.5h work + 30m travel
 const OPEN_MIN = 600, CLOSE_MIN = 1020, STEP = 30;
+const TRAVEL_MIN = 30; // drive time between jobs
+// Services the shop does not offer — the bot never offers a time for these; Mike follows up.
+export const NOT_OFFERED = /\btire|\btpms|mount (and|&) balanc|wheel alignment|pre-?purchase/i;
 
 function etParts(d: Date) {
   const f = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false }).formatToParts(d);
@@ -79,15 +82,34 @@ export async function openSlots(sb: any, fromDate: string | null, days = 7, excl
   const now = etParts(new Date());
   const start = fromDate && fromDate > now.date ? fromDate : now.date;
   const end = addDays(start, days);
-  const { data } = await sb.from('appointments').select('id, scheduled_at, status')
+  const { data } = await sb.from('appointments').select('id, scheduled_at, status, service_type')
     .gte('scheduled_at', new Date(`${addDays(start, -1)}T00:00:00Z`).toISOString())
     .lte('scheduled_at', new Date(`${addDays(end, 1)}T23:59:59Z`).toISOString())
     .not('status', 'in', '(cancelled,canceled,declined,no_show)');
-  const busy: Record<string, number[]> = {};
+  // Real job length, same rule as the calendar: estimate labor hours (diagnosis = 1h, else 2h default).
+  const ids = (data || []).map((a: any) => a.id);
+  const { data: ests } = ids.length
+    ? await sb.from('estimates').select('appointment_id, status, line_items, updated_at').in('appointment_id', ids).order('updated_at', { ascending: false })
+    : { data: [] };
+  const rank = (s: string) => (s === 'approved' || s === 'converted' ? 0 : s === 'declined' ? 9 : 1);
+  const best: Record<string, any> = {};
+  for (const e of ests || []) if (!best[e.appointment_id] || rank(e.status) < rank(best[e.appointment_id].status)) best[e.appointment_id] = e;
+  const isDiag = (s?: string | null) => /diag|inspect/i.test(s || '');
+  const lengthOf = (a: any) => {
+    const e = best[a.id];
+    if (e && rank(e.status) !== 9) {
+      const items = Array.isArray(e.line_items) ? e.line_items : [];
+      const hrs = items.reduce((s: number, l: any) => s + (Number(l?.labor_hours) || 0), 0);
+      if (hrs > 0) return Math.max(30, Math.ceil((hrs * 60) / 15) * 15);
+      if (items.some((l: any) => isDiag(l?.description))) return 60;
+    }
+    return isDiag(a.service_type) ? 60 : 120;
+  };
+  const busy: Record<string, [number, number][]> = {};
   for (const a of data || []) {
     if (!a.scheduled_at || a.id === excludeApptId) continue;
     const p = etParts(new Date(a.scheduled_at));
-    (busy[p.date] ||= []).push(p.mins);
+    (busy[p.date] ||= []).push([p.mins, p.mins + lengthOf(a) + TRAVEL_MIN]);
   }
   // Admin-blocked time (calendar_blocks) — a slot is unavailable if its job would overlap a block.
   const { data: blocks } = await sb.from('calendar_blocks').select('starts_at, ends_at')
@@ -107,7 +129,7 @@ export async function openSlots(sb: any, fromDate: string | null, days = 7, excl
       return m < be && m + BLOCK_MIN > bs;
     });
     for (let m = Math.max(OPEN_MIN, earliest); m <= CLOSE_MIN; m += STEP)
-      if (!(busy[date] || []).some((b) => Math.abs(b - m) < BLOCK_MIN) && !blocked(m)) slots.push(m);
+      if (!(busy[date] || []).some(([bs, be]) => m < be && m + BLOCK_MIN + TRAVEL_MIN > bs) && !blocked(m)) slots.push(m);
     out.push({ date, slots });
   }
   return out;
