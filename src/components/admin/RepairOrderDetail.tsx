@@ -120,7 +120,12 @@ export default function RepairOrderDetail({ appointmentId, open, onClose }: Prop
   const totalLaborMinutes = 0;
   const totalInvoiced = invoices.reduce((s, i) => s + Number(i.total || 0), 0);
   const totalPaid = invoices.reduce((s, i) => s + Number(i.amount_paid || 0), 0);
-  const approvedEstimate = estimates.find((e: any) => e.status === 'approved' || e.status === 'partially_approved' || e.status === 'converted');
+  // Bill the newest approved estimate that hasn't been invoiced yet (e.g. a repair
+  // estimate approved after the diagnosis fee was already invoiced and paid).
+  const lastInvoiceAt = invoices.reduce((m: number, i: any) => Math.max(m, new Date(i.created_at).getTime()), 0);
+  const approvedEstimate = estimates.find((e: any) =>
+    (e.status === 'approved' || e.status === 'partially_approved' || e.status === 'converted') &&
+    new Date(e.created_at).getTime() > lastInvoiceAt);
   const [issuing, setIssuing] = useState(false);
 
   const reload = async () => {
