@@ -382,7 +382,19 @@ export default function RepairOrderDetail({ appointmentId, open, onClose }: Prop
                       <div className="font-medium">{vehicle.year} {vehicle.make} {vehicle.model}</div>
                       <div className="text-muted-foreground text-xs">{vehicle.license_plate || vehicle.vin || "—"}</div>
                     </>
-                  ) : <div className="text-muted-foreground">No vehicle linked</div>}
+                  ) : (
+                    <LinkVehiclePicker
+                      customerId={appt?.customer_id}
+                      onPick={async (v) => {
+                        const { error } = await supabase.from("appointments").update({ vehicle_id: v.id }).eq("id", appt.id);
+                        if (!error) {
+                          await supabase.from("estimates").update({ vehicle_id: v.id }).eq("appointment_id", appt.id).is("vehicle_id", null);
+                          setAppt({ ...appt, vehicle_id: v.id });
+                          setVehicle(v);
+                        }
+                      }}
+                    />
+                  )}
                 </CardContent>
               </Card>
               <Card>
