@@ -124,8 +124,8 @@ Deno.serve(async (req) => {
     });
     if (profErr) throw profErr;
 
-    // Ensure customer role is assigned when we created/reused an auth user
-    if (rawEmail) {
+    // Ensure customer role is assigned
+    {
       const { error: roleErr } = await admin
         .from("user_roles")
         .insert({ user_id: userId, role: "customer" });
