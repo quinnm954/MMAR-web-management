@@ -351,6 +351,13 @@
       "when": 1792156304431,
       "tag": "0049_ai_sms_enabled",
       "breakpoints": true
+    },
+    {
+      "idx": 50,
+      "version": "7",
+      "when": 1792169436221,
+      "tag": "0050_invoice_notes",
+      "breakpoints": true
     }
   ]
 }
