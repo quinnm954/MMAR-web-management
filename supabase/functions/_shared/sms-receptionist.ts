@@ -51,7 +51,7 @@ export async function handleReceptionistText(sb: any, from: string, body: string
   let ctx = 'Unknown number (not a saved customer).';
   if (prof) {
     const { data: veh } = await sb.from('vehicles').select('year, make, model, engine').eq('owner_id', prof.id).limit(5);
-    ctx = `Saved customer: ${prof.full_name || 'name unknown'}; address: ${(prof.address || prof.service_address || prof.street_address) || 'none on file'}; vehicles: ${(veh || []).map((v: any) => [v.year, v.make, v.model, v.engine].filter(Boolean).join(' ')).join('; ') || 'none'}. Greet them by first name and confirm saved details instead of asking again.`;
+    ctx = `Saved customer: ${prof.full_name || 'name unknown'}; address: ${[prof.address_line1, prof.address_line2].filter(Boolean).join(', ') || 'none on file'}; vehicles: ${(veh || []).map((v: any) => [v.year, v.make, v.model, v.engine].filter(Boolean).join(' ')).join('; ') || 'none'}. Greet them by first name and confirm saved details instead of asking again.`;
   }
   const { data: regions } = await sb.from('service_regions').select('name, cities, active, slug');
   const { data: techRegions } = await sb.from('user_service_regions').select('region_slug');
@@ -95,7 +95,7 @@ Respond ONLY with JSON: {"reply": string, "handoff": boolean, "booking": null or
         customer_email: prof?.email || null,
         vehicle_info: b.vehicle_info ? String(b.vehicle_info).slice(0, 200) : null,
         description: String(b.description).slice(0, 2000),
-        service_address: b.service_address ? String(b.service_address).slice(0, 300) : (prof?.address || prof?.service_address || null),
+        service_address: b.service_address ? String(b.service_address).slice(0, 300) : ([prof?.address_line1, prof?.address_line2].filter(Boolean).join(', ') || null),
         service_type: 'General Repair',
         source: 'ai_phone',
         notes: ['Booked by AI text receptionist', b.preferred_day && `Preferred day: ${b.preferred_day}`].filter(Boolean).join('\n'),
