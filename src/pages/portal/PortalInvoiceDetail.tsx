@@ -167,6 +167,13 @@ const PortalInvoiceDetail = () => {
           )}
         </div>
 
+        {(inv as any).notes?.trim() && (
+          <div className="mt-4 text-sm">
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Notes</div>
+            <p className="whitespace-pre-line">{(inv as any).notes}</p>
+          </div>
+        )}
+
         {/* Totals */}
         <div className="mt-4 ml-auto sm:w-72 space-y-1 text-sm">
           <div className="flex justify-between"><span className="text-muted-foreground">Subtotal</span><span>${Number(inv.subtotal).toFixed(2)}</span></div>
