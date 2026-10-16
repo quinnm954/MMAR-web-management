@@ -1854,6 +1854,7 @@ export type Database = {
           is_financed: boolean
           line_items: Json
           membership_id: string | null
+          notes: string | null
           paid_at: string | null
           pdf_url: string | null
           region_slug: string
@@ -1889,6 +1890,7 @@ export type Database = {
           is_financed?: boolean
           line_items?: Json
           membership_id?: string | null
+          notes?: string | null
           paid_at?: string | null
           pdf_url?: string | null
           region_slug?: string
@@ -1924,6 +1926,7 @@ export type Database = {
           is_financed?: boolean
           line_items?: Json
           membership_id?: string | null
+          notes?: string | null
           paid_at?: string | null
           pdf_url?: string | null
           region_slug?: string

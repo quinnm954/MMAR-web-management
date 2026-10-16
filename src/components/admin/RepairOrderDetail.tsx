@@ -618,7 +618,8 @@ export default function RepairOrderDetail({ appointmentId, open, onClose }: Prop
                 </Empty>
               )}
               {invoices.map((i) => (
-                <Row key={i.id}>
+                <div key={i.id}>
+                <Row>
                   <div>
                     <div className="font-medium">{i.invoice_number || i.id.slice(0, 8)}</div>
                     <div className="text-xs text-muted-foreground">Due {i.due_date || "—"}</div>
@@ -628,6 +629,20 @@ export default function RepairOrderDetail({ appointmentId, open, onClose }: Prop
                     <span className="text-sm">${Number(i.total).toFixed(2)}</span>
                   </div>
                 </Row>
+                <textarea
+                  className="mt-1 mb-2 w-full rounded-md border border-input bg-background px-2 py-1.5 text-sm"
+                  rows={3}
+                  placeholder="Invoice notes (shown to customer only if filled in)"
+                  defaultValue={i.notes || ""}
+                  onBlur={async (e) => {
+                    const v = e.target.value.trim() || null;
+                    if (v === (i.notes || null)) return;
+                    const { error } = await supabase.from("invoices").update({ notes: v } as any).eq("id", i.id);
+                    if (error) toast.error(error.message);
+                    else { i.notes = v; toast.success("Invoice notes saved"); }
+                  }}
+                />
+                </div>
               ))}
             </Section>
 
