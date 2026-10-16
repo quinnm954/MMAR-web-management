@@ -1,0 +1,1 @@
+ALTER TABLE public.phone_settings ADD COLUMN IF NOT EXISTS ai_sms_enabled boolean NOT NULL DEFAULT true;

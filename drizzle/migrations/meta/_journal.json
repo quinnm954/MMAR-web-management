@@ -344,6 +344,13 @@
       "when": 1792010532656,
       "tag": "0048_financed_invoices",
       "breakpoints": true
+    },
+    {
+      "idx": 49,
+      "version": "7",
+      "when": 1792156304431,
+      "tag": "0049_ai_sms_enabled",
+      "breakpoints": true
     }
   ]
 }

@@ -2523,6 +2523,7 @@ export type Database = {
           ai_agent_id: string | null
           ai_enabled: boolean
           ai_greeting: string
+          ai_sms_enabled: boolean
           ai_summary_to_number: string | null
           ai_sync_error: string | null
           ai_sync_requested_at: string | null
@@ -2542,6 +2543,7 @@ export type Database = {
           ai_agent_id?: string | null
           ai_enabled?: boolean
           ai_greeting?: string
+          ai_sms_enabled?: boolean
           ai_summary_to_number?: string | null
           ai_sync_error?: string | null
           ai_sync_requested_at?: string | null
@@ -2561,6 +2563,7 @@ export type Database = {
           ai_agent_id?: string | null
           ai_enabled?: boolean
           ai_greeting?: string
+          ai_sms_enabled?: boolean
           ai_summary_to_number?: string | null
           ai_sync_error?: string | null
           ai_sync_requested_at?: string | null

@@ -70,6 +70,7 @@ export default function AdminPhoneSettings() {
         transcribe_voicemail: s.transcribe_voicemail,
         ring_timeout_seconds: Number(s.ring_timeout_seconds) || 20,
         ai_enabled: s.ai_enabled,
+        ai_sms_enabled: (s as any).ai_sms_enabled !== false,
         ai_greeting: s.ai_greeting,
         ai_summary_to_number: s.ai_summary_to_number || null,
       })
@@ -171,6 +172,11 @@ export default function AdminPhoneSettings() {
             <Switch id="ai" checked={s.ai_enabled} disabled={!s.ai_agent_id} onCheckedChange={(v) => setS({ ...s, ai_enabled: v })} />
           </div>
           {!s.ai_agent_id && <p className="text-xs text-muted-foreground">Click "Set up AI receptionist" first.</p>}
+          <div className="flex items-center justify-between">
+            <Label htmlFor="aisms" className="text-base">Let AI answer texts</Label>
+            <Switch id="aisms" checked={(s as any).ai_sms_enabled !== false} onCheckedChange={(v) => setS({ ...s, ai_sms_enabled: v } as any)} />
+          </div>
+          <p className="text-xs text-muted-foreground -mt-2">Stays quiet for 2 hours after you text someone yourself.</p>
           <div>
             <Label htmlFor="aig">What the AI says first</Label>
             <Textarea id="aig" rows={2} value={s.ai_greeting} onChange={(e) => setS({ ...s, ai_greeting: e.target.value })} />
