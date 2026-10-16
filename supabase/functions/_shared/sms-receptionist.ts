@@ -32,7 +32,7 @@ export async function handleReceptionistText(sb: any, from: string, body: string
   if (key.length !== 10) return; // short codes / automated senders
 
   // Skip staff/techs
-  const { data: profs } = await sb.from('profiles').select('id, full_name, email, phone, address').not('phone', 'is', null);
+  const { data: profs } = await sb.from('profiles').select('*').not('phone', 'is', null);
   const prof = (profs || []).find((p: any) => digits(p.phone) === key);
   const { data: emps } = await sb.from('employees').select('phone');
   if ((emps || []).some((e: any) => digits(e.phone) === key)) return;
@@ -45,19 +45,13 @@ export async function handleReceptionistText(sb: any, from: string, body: string
   const { data: recent } = await sb.from('sms_messages').select('direction, body, status, created_at')
     .eq('thread_id', threadId).order('created_at', { ascending: false }).limit(20);
   const twoH = Date.now() - 2 * 3600_000;
-  if ((recent || []).some((m: any) => m.direction === 'outbound' && m.status !== 'ai' && new Date(m.created_at).getTime() > twoH && !m.body?.startsWith('\u200b'))) {
-    // outbound from staff (AI replies are tracked below via ai_sms marker)
-    const { data: aiIds } = await sb.from('sms_messages').select('id').eq('thread_id', threadId).eq('status', 'ai').limit(1);
-    void aiIds;
-    const human = (recent || []).find((m: any) => m.direction === 'outbound' && m.status !== 'ai' && new Date(m.created_at).getTime() > twoH);
-    if (human) return;
-  }
+  if ((recent || []).some((m: any) => m.direction === 'outbound' && m.status !== 'ai' && new Date(m.created_at).getTime() > twoH)) return;
 
   // Customer context
   let ctx = 'Unknown number (not a saved customer).';
   if (prof) {
-    const { data: veh } = await sb.from('vehicles').select('year, make, model, engine').eq('customer_id', prof.id).limit(5);
-    ctx = `Saved customer: ${prof.full_name || 'name unknown'}; address: ${prof.address || 'none on file'}; vehicles: ${(veh || []).map((v: any) => [v.year, v.make, v.model, v.engine].filter(Boolean).join(' ')).join('; ') || 'none'}. Greet them by first name and confirm saved details instead of asking again.`;
+    const { data: veh } = await sb.from('vehicles').select('year, make, model, engine').eq('owner_id', prof.id).limit(5);
+    ctx = `Saved customer: ${prof.full_name || 'name unknown'}; address: ${(prof.address || prof.service_address || prof.street_address) || 'none on file'}; vehicles: ${(veh || []).map((v: any) => [v.year, v.make, v.model, v.engine].filter(Boolean).join(' ')).join('; ') || 'none'}. Greet them by first name and confirm saved details instead of asking again.`;
   }
   const { data: regions } = await sb.from('service_regions').select('name, cities, active, slug');
   const { data: techRegions } = await sb.from('user_service_regions').select('region_slug');
@@ -101,7 +95,7 @@ Respond ONLY with JSON: {"reply": string, "handoff": boolean, "booking": null or
         customer_email: prof?.email || null,
         vehicle_info: b.vehicle_info ? String(b.vehicle_info).slice(0, 200) : null,
         description: String(b.description).slice(0, 2000),
-        service_address: b.service_address ? String(b.service_address).slice(0, 300) : (prof?.address || null),
+        service_address: b.service_address ? String(b.service_address).slice(0, 300) : (prof?.address || prof?.service_address || null),
         service_type: 'General Repair',
         source: 'ai_phone',
         notes: ['Booked by AI text receptionist', b.preferred_day && `Preferred day: ${b.preferred_day}`].filter(Boolean).join('\n'),
