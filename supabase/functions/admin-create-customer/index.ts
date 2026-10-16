@@ -97,8 +97,23 @@ Deno.serve(async (req) => {
         }
       }
     } else {
-      // No email — create a profile-only record (cannot self-login)
-      userId = crypto.randomUUID();
+      // No email — profiles require a backing account, so create one without login.
+      const digits = phone.replace(/\D/g, "");
+      const e164 = digits ? (digits.length === 10 ? `1${digits}` : digits) : "";
+      const meta = { full_name: fullName, phone, imported: true, no_email: true };
+      let created = e164
+        ? await admin.auth.admin.createUser({ phone: e164, phone_confirm: true, user_metadata: meta })
+        : null;
+      if (!created || created.error) {
+        created = await admin.auth.admin.createUser({
+          email: `noemail+${crypto.randomUUID()}@customers.invalid`,
+          email_confirm: true,
+          password: crypto.randomUUID() + "Aa1!",
+          user_metadata: meta,
+        });
+      }
+      if (created.error) throw created.error;
+      userId = created.data.user!.id;
     }
 
     // Ensure profile exists / is up to date
@@ -109,8 +124,8 @@ Deno.serve(async (req) => {
     });
     if (profErr) throw profErr;
 
-    // Ensure customer role is assigned when we created/reused an auth user
-    if (rawEmail) {
+    // Ensure customer role is assigned
+    {
       const { error: roleErr } = await admin
         .from("user_roles")
         .insert({ user_id: userId, role: "customer" });
