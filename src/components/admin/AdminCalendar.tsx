@@ -3,7 +3,9 @@ import { formatAddress } from "@/components/admin/CustomerAddress";
 import { useAdminRegion, RegionSwitch, RegionChip } from '@/hooks/useAdminRegion';
 import { useLaborMinutes, endFromLabor } from "@/lib/useLaborMinutes";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2 } from "lucide-react";
+import { Loader2, CalendarOff } from "lucide-react";
+import { Button } from '@/components/ui/button';
+import CalendarBlockDialog, { CalendarBlock } from './CalendarBlockDialog';
 import { startOfDay } from "date-fns";
 import { toast } from "sonner";
 import RepairOrderDetail from "./RepairOrderDetail";
@@ -28,6 +30,9 @@ export default function AdminCalendar() {
   const [date, setDate] = useState(startOfDay(new Date()));
   const [openId, setOpenId] = useState<string | null>(null);
   const [hiddenTechs, setHiddenTechs] = useState<Set<string>>(new Set());
+  const [blockDialogOpen, setBlockDialogOpen] = useState(false);
+  const [editingBlock, setEditingBlock] = useState<CalendarBlock | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
   const [blocks, setBlocks] = useState<{ id: string; starts_at: string; ends_at: string; reason: string | null }[]>([]);
 
   useEffect(() => {
@@ -55,23 +60,23 @@ export default function AdminCalendar() {
       setBlocks(((b || []) as any[]).filter((x) => !x.region_slug || match(x.region_slug)));
       setLoading(false);
     })();
-  }, [date, view, region]);
+  }, [date, view, region, refreshKey]);
 
   const colorOf = (techId: string | null) => (techId ? techs.findIndex((t) => t.id === techId) + 1 : 4);
 
   const events: CalEvent[] = useMemo(() => [
     ...blocks.map((b) => ({
       id: `block-${b.id}`, title: "Blocked", subtitle: b.reason && b.reason !== "Blocked off" ? b.reason : "No bookings",
-      start: new Date(b.starts_at), end: new Date(b.ends_at), color: 4, muted: true,
+      start: new Date(b.starts_at), end: new Date(b.ends_at), color: 4,
     })),
     ...appts
-    .filter((a) => !HIDDEN.includes(a.status) && !hiddenTechs.has(a.assigned_technician_id ?? "none"))
+    .filter((a) => a.scheduled_at && !HIDDEN.includes(a.status) && !hiddenTechs.has(a.assigned_technician_id ?? "none"))
     .map((a) => ({
       id: a.id,
       title: a.profiles?.full_name ? `${a.service_type} · ${a.profiles.full_name}` : a.service_type,
       subtitle: [techs.find((t) => t.id === a.assigned_technician_id)?.full_name ?? "Unassigned", formatAddress(a.profiles as any)].filter(Boolean).join(" · "),
-      start: new Date(a.scheduled_at!),
-      end: endFromLabor(new Date(a.scheduled_at!), laborMins[a.id]),
+       start: new Date(a.scheduled_at ?? ''),
+       end: endFromLabor(new Date(a.scheduled_at ?? ''), laborMins[a.id]),
       color: colorOf(a.assigned_technician_id),
       muted: a.status === "completed",
     }))], [appts, techs, hiddenTechs, laborMins, blocks]);
@@ -86,12 +91,10 @@ export default function AdminCalendar() {
 
   const onClick = async (id: string) => {
     if (!id.startsWith("block-")) return setOpenId(id);
-    const bid = id.slice(6);
-    if (!window.confirm("Remove this blocked time?")) return;
-    const { error } = await supabase.from("calendar_blocks").delete().eq("id", bid);
-    if (error) return toast.error(error.message);
-    setBlocks((cur) => cur.filter((b) => b.id !== bid));
-    toast.success("Blocked time removed");
+    const block = blocks.find((b) => b.id === id.slice(6));
+    if (!block) return;
+    setEditingBlock(block);
+    setBlockDialogOpen(true);
   };
 
   const toggle = (k: string) => setHiddenTechs((s) => { const n = new Set(s); n.has(k) ? n.delete(k) : n.add(k); return n; });
@@ -111,9 +114,11 @@ export default function AdminCalendar() {
         {loading && <Loader2 className="h-4 w-4 animate-spin text-primary" />}
       </div>
       <GCalView events={events} view={view} onViewChange={setView} date={date} onDateChange={setDate}
-        onEventClick={onClick} onEventDrop={reschedule} />
+        onEventClick={onClick} onEventDrop={reschedule}
+        toolbarExtra={<Button size="sm" onClick={() => { setEditingBlock(null); setBlockDialogOpen(true); }}><CalendarOff className="mr-2 h-4 w-4" />Block off time</Button>} />
       <p className="text-xs text-muted-foreground">Drag a job to a new time to reschedule. Click it to open the repair order. Tap a name above to hide or show that tech.</p>
       <RepairOrderDetail appointmentId={openId} open={!!openId} onClose={() => setOpenId(null)} />
+      <CalendarBlockDialog open={blockDialogOpen} block={editingBlock} date={date} onClose={() => setBlockDialogOpen(false)} onSaved={() => setRefreshKey((key) => key + 1)} />
     </div>
   );
 }
