@@ -628,7 +628,7 @@ export default function AdminReports() {
 
         <TabsContent value="summary" className="space-y-2">
           <p className="text-xs text-muted-foreground">
-            Totals rolled up by {granularity}. Each row aggregates every paid invoice that landed in that bucket.
+            Paid sales and completed refunds by {granularity}.
           </p>
           <Card>
             <CardContent className="p-0 overflow-x-auto">
@@ -650,7 +650,7 @@ export default function AdminReports() {
                   {summaryRows.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={9} className="text-center text-muted-foreground py-6">
-                        No paid invoices in this window.
+                        No paid sales or completed refunds in this window.
                       </TableCell>
                     </TableRow>
                   ) : (
@@ -678,7 +678,7 @@ export default function AdminReports() {
 
         <TabsContent value="detail" className="space-y-2">
           <p className="text-xs text-muted-foreground">
-            One row per paid invoice. Gross profit = revenue − cost of goods. Net profit = gross − cost of employees − Stripe fees.
+            Paid invoices and completed refunds. Gross profit = revenue − cost of goods. Net profit = gross − cost of employees − Stripe fees.
             Employee cost uses the technician's hourly rate from Employees × <strong>paid labor hours</strong> from the estimate
             (default ${defaultRate.toFixed(2)}/hr when no employee record). Stripe fees use the actual amount when synced, else
             an estimate of 2.9% + $0.30.
@@ -705,7 +705,7 @@ export default function AdminReports() {
                   {filteredRows.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={11} className="text-center text-muted-foreground py-6">
-                        {profitRows.length === 0 ? 'No paid invoices in this window.' : 'No invoices for this technician.'}
+                        {profitRows.length === 0 ? 'No paid sales or completed refunds in this window.' : 'No invoices for this technician.'}
                       </TableCell>
                     </TableRow>
                   ) : (
