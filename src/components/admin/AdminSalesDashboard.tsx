@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useAdminRegion, RegionSwitch, RegionChip } from '@/hooks/useAdminRegion';
 import { supabase } from '@/integrations/supabase/client';
 import { techHoursForInvoice, techHoursForLine, isDiagnosisLine } from '@/lib/techHours';
+import { isReportTransaction, reportInvoiceRevenue } from '@/lib/reportInvoice';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Progress } from '@/components/ui/progress';
@@ -114,7 +115,8 @@ export default function AdminSalesDashboard() {
   };
 
   const paid = useMemo(() => invoices.filter(i => i.status === 'paid'), [invoices]);
-  const sumIn = (from: Date, to?: Date) => paid.reduce((s, i) => { const d = paidDate(i); return d >= from && (!to || d < to) ? s + Number(i.total || 0) : s; }, 0);
+  const transactions = useMemo(() => invoices.filter(isReportTransaction), [invoices]);
+  const sumIn = (from: Date, to?: Date) => transactions.reduce((s, i) => { const d = paidDate(i); return d >= from && (!to || d < to) ? s + reportInvoiceRevenue(i) : s; }, 0);
   const countIn = (from: Date, to?: Date) => paid.filter(i => { const d = paidDate(i); return d >= from && (!to || d < to); }).length;
 
   const todayRev = sumIn(todayStart);
@@ -129,7 +131,8 @@ export default function AdminSalesDashboard() {
   const momPct = lastMonthToDate > 0 ? ((monthRev - lastMonthToDate) / lastMonthToDate) * 100 : null;
   const wowPct = prevWeekRev > 0 ? ((weekRev - prevWeekRev) / prevWeekRev) * 100 : null;
   const monthInv = countIn(monthStart);
-  const aro = monthInv ? monthRev / monthInv : 0;
+  const monthSales = paid.filter(i => paidDate(i) >= monthStart).reduce((s, i) => s + reportInvoiceRevenue(i), 0);
+  const aro = monthInv ? monthSales / monthInv : 0;
 
   const billedMTD = invoices.filter(i => i.status !== 'void' && i.status !== 'draft' && new Date(i.created_at) >= monthStart).reduce((s, i) => s + Number(i.total || 0), 0);
 
@@ -216,13 +219,13 @@ export default function AdminSalesDashboard() {
     const i = 29 - k; const d = addDays(todayStart, -i); const n = addDays(d, 1);
     const pd = addDays(d, -30), pn = addDays(n, -30);
     return { date: d.toLocaleDateString(undefined, { month: 'numeric', day: 'numeric' }), revenue: Math.round(sumIn(d, n)), prior: Math.round(sumIn(pd, pn)) };
-  }), [paid]);
+  }), [transactions]);
   const monthly = useMemo(() => Array.from({ length: 12 }, (_, k) => {
     const i = 11 - k;
     const s = startOf(new Date(now.getFullYear(), now.getMonth() - i, 1));
     const e = startOf(new Date(now.getFullYear(), now.getMonth() - i + 1, 1));
     return { month: s.toLocaleDateString(undefined, { month: 'short' }), revenue: Math.round(sumIn(s, e)) };
-  }), [paid]);
+  }), [transactions]);
   const spark7 = daily.slice(-14);
 
   const topCustomers = useMemo(() => {
