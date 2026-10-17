@@ -10,9 +10,10 @@ function calendarWithBlock(starts_at: string, ends_at: string) {
   } };
 }
 
-test('receptionist skips start times whose diagnosis slot overlaps blocked time', async () => {
+test('receptionist skips start times whose reserved slot overlaps blocked time', async () => {
   const [day] = await openSlots(calendarWithBlock('2099-01-05T19:00:00Z', '2099-01-05T22:00:00Z'), '2099-01-05', 1);
-  expect(day.slots).toContain(13 * 60);
+  expect(day.slots).toContain(12 * 60);
+  expect(day.slots).not.toContain(13 * 60);
   expect(day.slots).not.toContain(13 * 60 + 30);
   expect(day.slots).not.toContain(14 * 60);
   expect(day.slots).not.toContain(16 * 60 + 30);
