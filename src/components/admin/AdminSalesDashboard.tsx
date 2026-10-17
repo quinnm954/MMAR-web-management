@@ -134,7 +134,7 @@ export default function AdminSalesDashboard() {
   const monthSales = paid.filter(i => paidDate(i) >= monthStart).reduce((s, i) => s + reportInvoiceRevenue(i), 0);
   const aro = monthInv ? monthSales / monthInv : 0;
 
-  const billedMTD = invoices.filter(i => i.status !== 'void' && i.status !== 'draft' && new Date(i.created_at) >= monthStart).reduce((s, i) => s + Number(i.total || 0), 0);
+  const billedMTD = invoices.filter(i => !['void', 'draft', 'refunded'].includes(i.status) && new Date(i.created_at) >= monthStart).reduce((s, i) => s + Number(i.total || 0), 0);
 
   // Money owed + aging
   const owed = useMemo(() => {
