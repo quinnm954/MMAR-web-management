@@ -1,8 +1,8 @@
 # Roadmap
 
 ## Schedule blocking
-- [ ] Add calendar controls to create, edit and remove blocked times.
-- [ ] Verify saved blocks and receptionist availability exclusion.
+- [x] Add calendar controls to create, edit and remove blocked times.
+- [x] Verify saved blocks and receptionist availability exclusion.
 
 ## Refund reporting
 - [x] Include completed refunds in report revenue/profit, charts and exports without counting them as sales or technician labor.
