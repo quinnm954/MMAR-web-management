@@ -1,5 +1,9 @@
 # Roadmap
 
+## Refund reporting
+- [ ] Include completed refunds in report revenue/profit, charts and exports without counting them as sales or technician labor.
+- [ ] Verify Alex Ortiz’s $600 refund in the live Reports page.
+
 - [x] Remove the two excluded locations from public copy and search metadata.
 - [x] Remove their service-area pages, links, and generated city coverage.
 - [x] Verify no references remain and the site builds cleanly.
