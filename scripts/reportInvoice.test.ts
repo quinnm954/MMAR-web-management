@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { isReportSale, isReportTransaction, reportInvoiceRevenue } from './reportInvoice';
+import { isReportSale, isReportTransaction, reportInvoiceRevenue } from '../src/lib/reportInvoice';
 
 describe('completed refund reporting', () => {
   const alexRefund = { status: 'refunded', total: -600 };
