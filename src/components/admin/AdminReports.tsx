@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useAdminRegion, RegionSwitch, RegionChip } from '@/hooks/useAdminRegion';
 import { supabase } from '@/integrations/supabase/client';
 import { techHoursForInvoice } from '@/lib/techHours';
+import { isReportSale, reportInvoiceRevenue } from '@/lib/reportInvoice';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
@@ -42,6 +43,7 @@ type InvoiceRow = {
 
 type ProfitRow = {
   id: string;
+  isRefund: boolean;
   invoice_number: string | null;
   date: string;
   createdAt: string;
@@ -130,7 +132,7 @@ export default function AdminReports() {
         R(supabase
           .from('invoices'))
           .select('id, invoice_number, total, subtotal, status, created_at, paid_at, customer_id, service_record_id, technician_id, line_items, stripe_session_id, stripe_payment_intent_id, stripe_fee, stripe_fee_synced_at')
-          .eq('status', 'paid')
+          .in('status', ['paid', 'refunded'])
           .gte('paid_at', since)
           .order('paid_at', { ascending: false }),
         R(supabase.from('appointments').select('id', { count: 'exact', head: true })).eq('status', 'completed').gte('completed_at', since),
@@ -144,13 +146,14 @@ export default function AdminReports() {
           .eq('status', 'paid')
           .gte('paid_at', since)
           .order('paid_at', { ascending: false }),
-        R(supabase.from('invoices').select('total')).eq('status', 'paid').gte('paid_at', prevSince).lt('paid_at', since),
+        R(supabase.from('invoices').select('total, status')).in('status', ['paid', 'refunded']).gte('paid_at', prevSince).lt('paid_at', since),
       ]);
-      setPrevRevenue(((prevInv.data ?? []) as any[]).reduce((s, i) => s + Number(i.total || 0), 0));
+      setPrevRevenue(((prevInv.data ?? []) as any[]).reduce((s, i) => s + reportInvoiceRevenue(i), 0));
 
       const allInvoices = ((inv.data ?? []) as any[]).map((i) => ({ ...i, created_at: i.paid_at || i.created_at })) as InvoiceRow[];
       const paid = allInvoices;
-      const revenue = paid.reduce((s, i) => s + Number(i.total || 0), 0);
+      const revenue = paid.reduce((s, i) => s + reportInvoiceRevenue(i), 0);
+      const sales = paid.filter(isReportSale);
 
       const configuredRate = Number((settings.data as any)?.labor_cost_per_hour);
       const rate = configuredRate > 0 ? configuredRate : 35;
@@ -170,7 +173,7 @@ export default function AdminReports() {
       // and we count revenue even if unit_cost is 0 so margin reflects reality.
       let partsRevenue = 0;
       let partsCost = 0;
-      for (const i of paid) {
+      for (const i of sales) {
         const items = Array.isArray(i.line_items) ? i.line_items : [];
         for (const li of items) {
           const kind = itemKind(li);
@@ -224,7 +227,8 @@ export default function AdminReports() {
       const techProfileById = new Map<string, any>((techProfiles ?? []).map((p: any) => [p.id, p]));
 
       const rows: ProfitRow[] = paid.map((inv) => {
-        const items = Array.isArray(inv.line_items) ? inv.line_items : [];
+        const isRefund = inv.status === 'refunded';
+        const items = !isRefund && Array.isArray(inv.line_items) ? inv.line_items : [];
         const cogs = items.reduce((s, li) => {
           const kind = itemKind(li);
           return kind === 'part' ? s + partCost(li) : s;
@@ -234,16 +238,16 @@ export default function AdminReports() {
         const paidLaborHours = laborHoursFromInvoice(items, rate, Number(inv.subtotal || 0));
         // Prefer the tech assigned directly to the invoice (set when RO completes,
         // editable from Admin → Invoices), and fall back to the appointment.
-        const techId = (inv as any).technician_id ?? info?.tech ?? null;
+        const techId = isRefund ? null : inv.technician_id ?? info?.tech ?? null;
         const tech = techId ? empByUser.get(techId) : null;
         const techProfile = techId ? techProfileById.get(techId) : null;
         const techRate = tech?.hourly_rate != null ? Number(tech.hourly_rate) : rate;
         // Pay technicians on PAID labor hours (from the estimate), not clocked time
         const employeeCost = paidLaborHours * techRate;
-        const revenueRow = Number(inv.total || 0);
+        const revenueRow = reportInvoiceRevenue(inv);
         const hasStripe = Boolean(inv.stripe_session_id || inv.stripe_payment_intent_id);
         const isPaid = inv.status === 'paid';
-        const actualFee = inv.stripe_fee != null ? Number(inv.stripe_fee) : null;
+        const actualFee = isRefund ? 0 : inv.stripe_fee != null ? Number(inv.stripe_fee) : null;
         const stripeFee = actualFee != null
           ? actualFee
           : estimatedStripeFee(revenueRow, isPaid, hasStripe);
@@ -252,6 +256,7 @@ export default function AdminReports() {
         const cust = customerMap.get(inv.customer_id);
         return {
           id: inv.id,
+          isRefund,
           invoice_number: inv.invoice_number,
           date: new Date(inv.created_at).toLocaleDateString(),
           createdAt: inv.created_at,
@@ -299,8 +304,8 @@ export default function AdminReports() {
 
       setData({
         revenue30: revenue,
-        invoiceCount: paid.length,
-        aro: paid.length ? revenue / paid.length : 0,
+        invoiceCount: sales.length,
+        aro: sales.length ? sales.reduce((s, i) => s + reportInvoiceRevenue(i), 0) / sales.length : 0,
         completedJobs: completed.count ?? 0,
         activeMembers: members.count ?? 0,
         pendingEstimates: ests.count ?? 0,
@@ -359,6 +364,8 @@ export default function AdminReports() {
     () => (techFilter === 'all' ? profitRows : profitRows.filter((r) => r.technician === techFilter)),
     [profitRows, techFilter],
   );
+  const filteredSaleCount = filteredRows.filter((r) => !r.isRefund).length;
+  const refundTotal = -filteredRows.filter((r) => r.isRefund).reduce((sum, r) => sum + r.revenue, 0);
 
   const perfTotals = useMemo(() => {
     const paidH = filteredRows.reduce((s, r) => s + r.paidLaborHours, 0);
@@ -454,7 +461,7 @@ export default function AdminReports() {
         invoices: 0, paidLaborHours: 0, revenue: 0, cogs: 0,
         grossProfit: 0, employeeCost: 0, stripeFee: 0, netProfit: 0,
       };
-      cur.invoices += 1;
+      cur.invoices += r.isRefund ? 0 : 1;
       cur.paidLaborHours += r.paidLaborHours;
       cur.revenue += r.revenue;
       cur.cogs += r.cogs;
@@ -490,7 +497,7 @@ export default function AdminReports() {
         <div>
           <h2 className="font-display text-xl">{PRESET_LABEL[preset]}{preset === 'custom' ? ` · Last ${days} days` : ''}</h2>
           <p className="text-xs text-muted-foreground">
-            Grouped by {granularity} · {filteredRows.length} paid invoice{filteredRows.length === 1 ? '' : 's'}
+            Grouped by {granularity} · {filteredSaleCount} paid invoice{filteredSaleCount === 1 ? '' : 's'}
           </p>
         </div>
         <div className="flex items-end gap-2 flex-wrap">
@@ -567,6 +574,7 @@ export default function AdminReports() {
                 <div>
                   <p className="text-xs uppercase tracking-wide text-muted-foreground">Revenue · {PRESET_LABEL[preset]}</p>
                   <p className="font-display text-4xl mt-1">{fmt(totals.revenue)}</p>
+                  {refundTotal > 0 && <p className="text-sm text-destructive mt-1">Refunds deducted: {fmt(refundTotal)}</p>}
                   {change != null && (
                     <p className={`text-sm mt-1 ${change >= 0 ? 'text-primary' : 'text-destructive'}`}>
                       {change >= 0 ? '▲' : '▼'} {Math.abs(change).toFixed(0)}% vs previous period
@@ -605,7 +613,7 @@ export default function AdminReports() {
               <KPI label="Paid invoices" value={String(data.invoiceCount)} />
               <KPI label="Avg repair order" value={fmt(data.aro)} />
               <KPI label={`Labor hrs${techFilter !== 'all' ? ` · ${techFilter}` : ''}`} value={perfTotals.paidH.toFixed(1)} />
-              <KPI label="Hrs per invoice" value={filteredRows.length ? (perfTotals.paidH / filteredRows.length).toFixed(1) : '0'} />
+              <KPI label="Hrs per invoice" value={filteredSaleCount ? (perfTotals.paidH / filteredSaleCount).toFixed(1) : '0'} />
               <KPI label="Membership revenue" value={fmt(membershipTotals.revenue)} />
             </div>
           </>
@@ -620,7 +628,7 @@ export default function AdminReports() {
 
         <TabsContent value="summary" className="space-y-2">
           <p className="text-xs text-muted-foreground">
-            Totals rolled up by {granularity}. Each row aggregates every paid invoice that landed in that bucket.
+            Paid sales and completed refunds by {granularity}.
           </p>
           <Card>
             <CardContent className="p-0 overflow-x-auto">
@@ -642,7 +650,7 @@ export default function AdminReports() {
                   {summaryRows.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={9} className="text-center text-muted-foreground py-6">
-                        No paid invoices in this window.
+                        No paid sales or completed refunds in this window.
                       </TableCell>
                     </TableRow>
                   ) : (
@@ -670,7 +678,7 @@ export default function AdminReports() {
 
         <TabsContent value="detail" className="space-y-2">
           <p className="text-xs text-muted-foreground">
-            One row per paid invoice. Gross profit = revenue − cost of goods. Net profit = gross − cost of employees − Stripe fees.
+            Paid invoices and completed refunds. Gross profit = revenue − cost of goods. Net profit = gross − cost of employees − Stripe fees.
             Employee cost uses the technician's hourly rate from Employees × <strong>paid labor hours</strong> from the estimate
             (default ${defaultRate.toFixed(2)}/hr when no employee record). Stripe fees use the actual amount when synced, else
             an estimate of 2.9% + $0.30.
@@ -697,13 +705,13 @@ export default function AdminReports() {
                   {filteredRows.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={11} className="text-center text-muted-foreground py-6">
-                        {profitRows.length === 0 ? 'No paid invoices in this window.' : 'No invoices for this technician.'}
+                        {profitRows.length === 0 ? 'No paid sales or completed refunds in this window.' : 'No invoices for this technician.'}
                       </TableCell>
                     </TableRow>
                   ) : (
                     filteredRows.map((r) => (
                       <TableRow key={r.id}>
-                        <TableCell className="font-mono text-xs">{r.invoice_number ?? r.id.slice(0, 8)}</TableCell>
+                        <TableCell className="font-mono text-xs">{r.invoice_number ?? r.id.slice(0, 8)}{r.isRefund && <span className="block text-destructive">Refund completed</span>}</TableCell>
                         <TableCell className="text-xs">{r.date}</TableCell>
                         <TableCell className="text-xs">{r.customer}</TableCell>
                         <TableCell className="text-xs">{r.technician}</TableCell>

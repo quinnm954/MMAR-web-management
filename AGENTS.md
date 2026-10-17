@@ -1,6 +1,8 @@
 
 - Subdirectories have their own AGENTS.md (supabase/functions/AGENTS.md); read it before changing files there.
 
+- Financial reports use shared invoice classification: completed standalone refunds reduce revenue and profit on their recorded completion date, but never count as paid sales, labor or technician pay; why: money returned must not inflate sales or reverse earned labor.
+
 - Fleet registration: /fleet/register signs up via auth then calls anon-executable `submit_fleet_registration` RPC, guarded by user id+email match within 15 min of account creation.
 - App emails are sent only from edge functions via `_shared/send-and-log.ts` (managed send + email_send_log row); why: the admin Emails screen reads that log and the browser must never send directly.
 - Staff calendar feed: public `calendar-feed` edge function serves ICS keyed by a per-user token in `calendar_feed_tokens` (issued/rotated via `get_calendar_feed_token` RPC); technician-only users get just their assigned appointments; why: phone/PC calendar widgets need an unauthenticated subscribable URL.
