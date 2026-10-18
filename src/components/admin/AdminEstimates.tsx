@@ -367,7 +367,14 @@ const AdminEstimates = () => {
           estimateId: editing?.id ?? undefined,
         },
       });
-      if (error) throw error;
+      if (error) {
+        const context = error.context;
+        if (context instanceof Response) {
+          const detail = await context.clone().json().catch(() => null);
+          if (typeof detail?.error === 'string') throw new Error(detail.error);
+        }
+        throw error;
+      }
       if (data?.error) throw new Error(data.error);
       setPtSession(data.sessionId);
       window.open(data.redirectUrl, '_blank');

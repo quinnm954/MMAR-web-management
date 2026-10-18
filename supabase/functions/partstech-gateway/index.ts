@@ -16,8 +16,9 @@ async function getToken(): Promise<string> {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(auth),
   })
-  if (!res.ok) throw new Error(`PartsTech auth failed: ${res.status} ${await res.text()}`)
+  if (!res.ok) throw new Error(`PartsTech rejected the connection (HTTP ${res.status}). Check the shop credentials and Garage Ace partner setup with PartsTech.`)
   const data = await res.json()
+  if (typeof data.accessToken !== 'string' || !data.accessToken) throw new Error('PartsTech did not return an access token.')
   return data.accessToken
 }
 
