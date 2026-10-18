@@ -1,24 +1,20 @@
 import { createClient } from 'npm:@supabase/supabase-js@2'
 import { corsHeaders, json, requireStaff } from '../_shared/staff-auth.ts'
+import { buildPartsTechAuth, PartsTechSetupError } from './auth.ts'
 
 const PT_BASE = 'https://api.partstech.com'
 
 async function getToken(): Promise<string> {
-  const user = Deno.env.get('PARTSTECH_USER')
-  const key = Deno.env.get('PARTSTECH_API_KEY')
-  if (!user || !key) throw new Error('PartsTech credentials not configured')
+  const auth = buildPartsTechAuth({
+    userId: Deno.env.get('PARTSTECH_USER'),
+    userKey: Deno.env.get('PARTSTECH_API_KEY'),
+    partnerId: Deno.env.get('PARTSTECH_PARTNER'),
+    partnerKey: Deno.env.get('PARTSTECH_PARTNER_KEY'),
+  })
   const res = await fetch(`${PT_BASE}/oauth/access`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      accessType: Deno.env.get('PARTSTECH_PARTNER') ? 'user' : 'partner',
-      credentials: Deno.env.get('PARTSTECH_PARTNER')
-        ? {
-            user: { id: user, key },
-            partner: { id: Deno.env.get('PARTSTECH_PARTNER'), key: Deno.env.get('PARTSTECH_PARTNER_KEY') ?? key },
-          }
-        : { partner: { id: user, key } },
-    }),
+    body: JSON.stringify(auth),
   })
   if (!res.ok) throw new Error(`PartsTech auth failed: ${res.status} ${await res.text()}`)
   const data = await res.json()
@@ -147,6 +143,7 @@ Deno.serve(async (req) => {
 
     return json({ error: `Unknown action: ${action}` }, 400)
   } catch (e) {
+    if (e instanceof PartsTechSetupError) return json({ error: e.message, code: 'PARTSTECH_SETUP_REQUIRED' }, e.status)
     return json({ error: (e as Error).message }, 500)
   }
 })

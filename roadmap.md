@@ -1,5 +1,9 @@
 # Roadmap
 
+## PartsTech connection
+- [ ] Correct punchout authentication and verify the request format.
+- [ ] Connect and verify a real parts quote. Blocked: PartsTech-issued Garage Ace partner credentials.
+
 ## Schedule blocking
 - [x] Add calendar controls to create, edit and remove blocked times.
 - [x] Verify saved blocks and receptionist availability exclusion.

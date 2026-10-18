@@ -1,5 +1,6 @@
 
 - Subdirectories have their own AGENTS.md (supabase/functions/AGENTS.md); read it before changing files there.
+- PartsTech punchout authentication uses `partstech-gateway/auth.ts` to require user access with distinct shop and software-partner credentials; why: shop credentials must never be substituted for the integration partner identity.
 
 - Financial reports use shared invoice classification: completed standalone refunds reduce revenue and profit on their recorded completion date, but never count as paid sales, labor or technician pay; why: money returned must not inflate sales or reverse earned labor.
 
