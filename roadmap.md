@@ -1,7 +1,7 @@
 # Roadmap
 
 ## PartsTech connection
-- [ ] Correct punchout authentication and verify the request format.
+- [x] Correct punchout authentication and verify the request format (four tests and authenticated deployed check passed).
 - [ ] Connect and verify a real parts quote. Blocked: PartsTech-issued Garage Ace partner credentials.
 
 ## Schedule blocking
