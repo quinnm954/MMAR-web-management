@@ -1,3 +1,4 @@
+import { useHomeRegion, AREA_TEXT } from "@/lib/homeRegion";
 import { useEffect } from "react";
 import {
   Accordion,
@@ -9,7 +10,7 @@ import {
 const faqs = [
   {
     q: "How much does a mobile mechanic cost in Lehigh Acres and Fort Myers?",
-    a: "Most repairs are billed the same as a brick-and-mortar shop — there's no separate trip fee inside our regular service area. Diagnostic appointments run $80–$150 and are credited toward any repair we perform. You always get a written quote before any work begins.",
+    a: "Most repairs are billed the same as a brick-and-mortar shop — there's no separate trip fee inside our regular service area. A diagnosis visit is $100, and $50 of it is credited toward the repair labor. You always get a written quote before any work begins.",
   },
   {
     q: "How fast can you get to me?",
@@ -33,14 +34,27 @@ const faqs = [
   },
 ];
 
+const sflFaqs = faqs.map((f, i) =>
+  i === 0
+    ? { ...f, q: "How much does a mobile mechanic cost in Broward and Palm Beach?" }
+    : i === 1
+      ? { ...f, a: "We're now coming to Broward and Palm Beach. Call or text (813) 501-7572 to get on the list; appointments start next-day once your area opens." }
+      : i === 3
+        ? { ...f, a: "Broward and Palm Beach Counties, including Fort Lauderdale, Hollywood, Pembroke Pines, Coral Springs, West Palm Beach, Boca Raton, Delray Beach and Boynton Beach." }
+        : f,
+);
+
 const HomeFAQ = () => {
+  const region = useHomeRegion();
+  const A = AREA_TEXT[region];
   useEffect(() => {
+    const list = region === "sfl" ? sflFaqs : faqs;
     const id = "ld-home-faq";
     document.getElementById(id)?.remove();
     const ld = {
       "@context": "https://schema.org",
       "@type": "FAQPage",
-      mainEntity: faqs.map((f) => ({
+      mainEntity: list.map((f) => ({
         "@type": "Question",
         name: f.q,
         acceptedAnswer: { "@type": "Answer", text: f.a },
@@ -52,7 +66,7 @@ const HomeFAQ = () => {
     script.text = JSON.stringify(ld);
     document.head.appendChild(script);
     return () => script.remove();
-  }, []);
+  }, [region]);
 
   return (
     <section className="py-14 md:py-20">
@@ -63,12 +77,12 @@ const HomeFAQ = () => {
             <span className="text-gold">QUESTIONS</span>
           </h2>
           <p className="text-base md:text-lg text-muted-foreground">
-            Common questions from Lehigh Acres and Fort Myers drivers.
+            Common questions from {A.areas} drivers.
           </p>
         </div>
 
         <Accordion type="single" collapsible className="glass-card rounded-xl border border-border/40 px-4 md:px-6">
-          {faqs.map((f) => (
+          {(region === "sfl" ? sflFaqs : faqs).map((f) => (
             <AccordionItem key={f.q} value={f.q}>
               <AccordionTrigger className="text-left text-base md:text-lg">
                 {f.q}

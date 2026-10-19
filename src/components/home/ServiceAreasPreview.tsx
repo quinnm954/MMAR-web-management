@@ -1,5 +1,7 @@
+import { useHomeRegion, AREA_TEXT } from "@/lib/homeRegion";
 import { Link } from "react-router-dom";
 import { MapPin, ArrowRight } from "lucide-react";
+import { southFloridaCities } from "@/data/citiesSouthFlorida";
 
 const cities = [
   { slug: "lehigh-acres", name: "Lehigh Acres" },
@@ -7,6 +9,8 @@ const cities = [
 ];
 
 const ServiceAreasPreview = () => {
+  const region = useHomeRegion();
+  const A = AREA_TEXT[region];
   return (
     <section className="py-14 md:py-20">
       <div className="container mx-auto px-4">
@@ -16,12 +20,12 @@ const ServiceAreasPreview = () => {
             <span className="text-gold">AREAS</span>
           </h2>
           <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
-            Mobile mechanic service across Lehigh Acres and Fort Myers.
+            Mobile mechanic service across {A.areas}.
           </p>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-4 max-w-3xl mx-auto">
-          {cities.map((c) => (
+          {(region === "sfl" ? southFloridaCities : cities).map((c) => (
             <Link
               key={c.slug}
               to={`/areas/${c.slug}`}
@@ -37,7 +41,7 @@ const ServiceAreasPreview = () => {
 
         <div className="text-center mt-8">
           <Link
-            to="/service-areas"
+            to={region === "sfl" ? "/south-florida" : "/service-areas"}
             className="inline-flex items-center gap-1 text-primary hover:underline font-semibold"
           >
             See all service areas <ArrowRight className="w-4 h-4" />

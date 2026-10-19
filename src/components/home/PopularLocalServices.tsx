@@ -1,5 +1,7 @@
+import { useHomeRegion, AREA_TEXT } from "@/lib/homeRegion";
 import { Link } from "react-router-dom";
 import { Wrench, ArrowRight } from "lucide-react";
+import { southFloridaCities } from "@/data/citiesSouthFlorida";
 
 type Item = { slug: string; label: string };
 
@@ -46,7 +48,35 @@ const Column = ({ city, items }: { city: string; items: Item[] }) => (
   </div>
 );
 
+// South Florida: each city links to its mobile mechanic page.
+const CityColumn = ({ county }: { county: "Broward" | "Palm Beach" }) => (
+  <div className="glass-card rounded-2xl p-6 md:p-8 border border-border/40">
+    <h3 className="font-display text-xl md:text-2xl tracking-wide mb-4">
+      <span className="text-sky">{county.toUpperCase()}</span>{" "}
+      <span className="text-gold">COUNTY</span>
+    </h3>
+    <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+      {southFloridaCities.filter((c) => c.intro.includes(`${county} County`)).map((c) => (
+        <li key={c.slug}>
+          <Link
+            to={`/areas/${c.slug}`}
+            className="group flex items-center gap-2 rounded-lg px-3 py-2 border border-border/40 hover:border-primary/60 hover:bg-primary/5 transition-all"
+          >
+            <Wrench className="w-4 h-4 text-primary shrink-0" />
+            <span className="text-sm md:text-base text-foreground group-hover:text-primary transition-colors flex-1">
+              Mobile Mechanic in {c.name}
+            </span>
+            <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary opacity-0 group-hover:opacity-100 transition-all" />
+          </Link>
+        </li>
+      ))}
+    </ul>
+  </div>
+);
+
 const PopularLocalServices = () => {
+  const region = useHomeRegion();
+  const A = AREA_TEXT[region];
   return (
     <section className="py-14 md:py-20 bg-gradient-to-b from-background via-secondary/10 to-background">
       <div className="container mx-auto px-4">
@@ -56,12 +86,21 @@ const PopularLocalServices = () => {
             <span className="text-gold">LOCAL SERVICES</span>
           </h2>
           <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
-            Next-day mobile auto repair across Fort Myers and Lehigh Acres.
+            {region === "sfl" ? "Mobile auto repair coming to every corner of Broward and Palm Beach." : "Next-day mobile auto repair across Fort Myers and Lehigh Acres."}
           </p>
         </div>
         <div className="grid md:grid-cols-2 gap-5 md:gap-6 max-w-5xl mx-auto">
-          <Column city="Fort Myers" items={FORT_MYERS} />
-          <Column city="Lehigh Acres" items={LEHIGH} />
+          {region === "sfl" ? (
+            <>
+              <CityColumn county="Broward" />
+              <CityColumn county="Palm Beach" />
+            </>
+          ) : (
+            <>
+              <Column city="Fort Myers" items={FORT_MYERS} />
+              <Column city="Lehigh Acres" items={LEHIGH} />
+            </>
+          )}
         </div>
       </div>
     </section>

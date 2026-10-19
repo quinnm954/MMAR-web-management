@@ -1,3 +1,4 @@
+import { useHomeRegion, AREA_TEXT } from "@/lib/homeRegion";
 import batteryImg from "@/assets/gallery-battery-lehigh.jpg";
 import brakesImg from "@/assets/gallery-brakes-fortmyers.jpg";
 import vanImg from "@/assets/gallery-service-van.jpg";
@@ -28,20 +29,29 @@ const PHOTOS: Photo[] = [
   },
 ];
 
+// South Florida page: same real job photos, captions without Lee County places.
+const SFL_PHOTOS: Photo[] = PHOTOS.map((p) => ({
+  ...p,
+  alt: p.alt.replace(/ in (Lehigh Acres|Fort Myers) FL| in Southwest Florida/, ""),
+  caption: p.caption.split(" — ")[0],
+}));
+
 const LocalPhotoGallery = () => {
+  const region = useHomeRegion();
+  const A = AREA_TEXT[region];
   return (
     <section className="py-12 md:py-16 bg-secondary/20">
       <div className="container mx-auto px-4">
         <div className="max-w-2xl mb-8">
           <h2 className="font-display text-2xl md:text-3xl text-sky mb-2">
-            On-Site Work Across Lehigh Acres and Fort Myers
+            {region === "sfl" ? "Our On-Site Work" : "On-Site Work Across Lehigh Acres and Fort Myers"}
           </h2>
           <p className="text-muted-foreground text-sm md:text-base">
-            Real mobile auto repair jobs from driveways across Lehigh Acres and Fort Myers.
+            {region === "sfl" ? "Real mobile auto repair jobs from our customers' driveways." : "Real mobile auto repair jobs from driveways across Lehigh Acres and Fort Myers."}
           </p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {PHOTOS.map((p) => (
+          {(region === "sfl" ? SFL_PHOTOS : PHOTOS).map((p) => (
             <figure
               key={p.src}
               className="rounded-xl overflow-hidden border border-border/50 bg-background"
