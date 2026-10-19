@@ -26,6 +26,12 @@ Mike's Mobile Auto Repair operates as MMAR Care, offering on-site diagnostics, b
 - [Lehigh Acres](/areas/lehigh-acres)
 - [North Fort Myers](/areas/north-fort-myers)
 
+## South Florida (coming soon, waitlist)
+
+- [South Florida hub](/south-florida): Broward & Palm Beach Counties.
+- [Fort Lauderdale](/areas/fort-lauderdale), [Hollywood](/areas/hollywood), [Pembroke Pines](/areas/pembroke-pines), [Coral Springs](/areas/coral-springs)
+- [West Palm Beach](/areas/west-palm-beach), [Boca Raton](/areas/boca-raton), [Delray Beach](/areas/delray-beach), [Boynton Beach](/areas/boynton-beach)
+
 ## Optional
 
 - [Why Garage Ace](/why-garage-ace): About the platform powering MMAR Care.
