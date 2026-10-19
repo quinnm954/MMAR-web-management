@@ -76,7 +76,7 @@ const PortalInvoices = () => {
     if (params.get("canceled") === "1") toast.info("Checkout canceled.");
   }, []);
 
-  const totalDue = invoices.filter((i) => i.status !== "paid").reduce((sum, i) => sum + (i.total - i.amount_paid), 0);
+  const totalDue = invoices.reduce((sum, i) => sum + invoiceBalanceDue(i as any), 0);
 
   return (
     <PortalLayout>
@@ -92,9 +92,6 @@ const PortalInvoices = () => {
               <div className="text-sm text-muted-foreground">Outstanding balance</div>
               <div className="text-2xl font-bold">${totalDue.toFixed(2)}</div>
             </div>
-            <p className="text-xs text-muted-foreground max-w-xs text-right">
-              We'll automatically charge your authorized payment method on the next billing date.
-            </p>
           </CardContent>
         </Card>
       )}
@@ -110,29 +107,41 @@ const PortalInvoices = () => {
         </Card>
       ) : (
         <div className="space-y-2">
-          {invoices.map((i) => (
+          {invoices.map((i) => {
+            const isRefund = i.status === "refunded";
+            const due = invoiceBalanceDue(i as any);
+            return (
             <Card key={i.id} className="border-border/50">
               <CardContent className="p-4 flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="font-mono text-sm font-medium">{i.invoice_number || `INV-${i.id.slice(0, 8)}`}</span>
-                    <Badge className={statusColor(i.status)}>{i.status}</Badge>
+                    <Badge className={statusColor(i.status)}>{isRefund ? "Refunded" : i.status}</Badge>
                   </div>
                   <div className="text-xs text-muted-foreground mt-0.5">
-                    {new Date(i.created_at).toLocaleDateString()}{i.due_date && ` • Due ${i.due_date}`}
+                    {new Date(i.created_at).toLocaleDateString()}{i.due_date && !isRefund && ` • Due ${i.due_date}`}
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="text-right">
-                    <div className="font-bold">${i.total.toFixed(2)}</div>
-                    {i.amount_paid > 0 && i.status !== "paid" && (
-                      <div className="text-xs text-muted-foreground">Paid ${i.amount_paid.toFixed(2)}</div>
+                    {isRefund ? (
+                      <>
+                        <div className="font-bold">-${Math.abs(Number(i.total)).toFixed(2)}</div>
+                        <div className="text-xs text-muted-foreground">Refund</div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="font-bold">${Number(i.total).toFixed(2)}</div>
+                        {due > 0 && i.amount_paid > 0 && (
+                          <div className="text-xs text-muted-foreground">Paid ${Number(i.amount_paid).toFixed(2)}</div>
+                        )}
+                      </>
                     )}
                   </div>
                   <Button size="sm" variant="outline" asChild>
                     <Link to={`/portal/invoices/${i.id}`}>View</Link>
                   </Button>
-                  {i.status !== "paid" && (
+                  {due > 0 && (
                     <Button size="sm" onClick={() => payInvoice(i.id)} disabled={paying === i.id}>
                       {paying === i.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <CreditCard className="h-4 w-4 mr-1" />}
                       Pay
