@@ -43,7 +43,7 @@ const Footer = () => {
               1143 Joel Blvd, Lehigh Acres, FL 33936
             </p>
             <p className="mt-3 text-xs text-muted-foreground leading-relaxed">
-              <span className="block"><span className="font-semibold text-foreground/80">Hours:</span> 9am–5pm daily · By appointment only</span>
+              <span className="block"><span className="font-semibold text-foreground/80">Hours:</span> Mon–Sat 8am–8pm · Closed Sunday</span>
               <span className="block mt-1"><span className="font-semibold text-foreground/80">Service area:</span> Fort Myers and Lehigh Acres, FL</span>
             </p>
             <div className="mt-4">

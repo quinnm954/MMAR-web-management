@@ -475,7 +475,7 @@ export const blogPosts: BlogPost[] = [
         <li><strong>Estimates, inspections & repair orders.</strong> Approve estimates online, see digital inspection photos, follow each repair in real time.</li>
         <li><strong>Invoices and membership.</strong> Pay online, view receipts, and manage your monthly membership.</li>
         <li><strong>Warranty & records on demand.</strong> Magnuson-Moss warranty coverage and service records you can pull up any time — perfect for resale or trade-in.</li>
-        <li><strong>Member perks.</strong> Discounted labor, included oil changes on select plans, and special pricing on tires, brakes, and seasonal services.</li>
+        <li><strong>Member perks.</strong> Discounted labor, included oil changes on select plans, and special pricing on brakes, batteries, and seasonal services.</li>
       </ul>
 
       <h2>Why we built it</h2>
