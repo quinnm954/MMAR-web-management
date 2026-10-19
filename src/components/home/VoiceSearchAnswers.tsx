@@ -23,7 +23,7 @@ const VoiceSearchAnswers = () => {
             <dd className="speakable-answer text-muted-foreground mt-1">
               Mike's Mobile Auto Repair is a 5-star rated mobile mechanic
               serving Lehigh Acres and Fort Myers,
-              Florida. Call 813-501-7572 for same-day service.
+              Florida. Call 813-501-7572 for next-day service.
             </dd>
           </div>
 
@@ -43,7 +43,7 @@ const VoiceSearchAnswers = () => {
               How fast can a mechanic come to my house?
             </dt>
             <dd className="speakable-answer text-muted-foreground mt-1">
-              Same-day appointments are usually available across Southwest
+              Next-day appointments are usually available across Southwest
               Florida and most calls are reached within an hour.
             </dd>
           </div>

@@ -71,11 +71,11 @@ export const blogPosts: BlogPost[] = [
       <h2>Battery vs alternator — which is it?</h2>
       <p>Both can produce the same symptoms. We always test both before condemning a part. If you're in <a href="/areas/fort-myers">Fort Myers</a>, or anywhere across Lehigh Acres and Fort Myers, our <a href="/alternator-repair-fort-myers">mobile alternator repair</a> service includes a full charging-system test on site so you only pay for what you actually need.</p>
 
-      <p>Stuck right now? Call <a href="tel:8135017572">(813) 501-7572</a> — same-day mobile service is usually available.</p>
+      <p>Stuck right now? Call <a href="tel:8135017572">(813) 501-7572</a> — next-day mobile service is usually available.</p>
     `,
     faqs: [
       { question: "Can a bad alternator drain a brand new battery?", answer: "Yes. A failing alternator can either undercharge (slowly draining the battery while you drive) or overcharge (boiling and ruining a new battery in days). Always test the alternator before replacing the battery." },
-      { question: "How long can I drive with a bad alternator?", answer: "Usually 20–60 minutes once the warning light comes on, depending on accessories running. Once the battery is depleted, the engine stalls. Don't risk it — get tested same day." },
+      { question: "How long can I drive with a bad alternator?", answer: "Usually 20–60 minutes once the warning light comes on, depending on accessories running. Once the battery is depleted, the engine stalls. Don't risk it — get tested next day." },
       { question: "How much does mobile alternator replacement cost in Fort Myers?", answer: "Most alternator jobs in Lehigh Acres and Fort Myers run $350–$750 fully installed mobile, depending on vehicle. We provide upfront quotes after a free on-site charging-system test." },
     ],
   },
@@ -369,7 +369,7 @@ export const blogPosts: BlogPost[] = [
       <p>If your car came from the factory with an AGM battery (most newer European cars, anything with start/stop), you must replace it with another AGM — an ordinary flooded battery will fail prematurely and may damage charging electronics. If your car came with a flooded battery, AGM is an upgrade worth considering for Florida: better heat tolerance, longer typical lifespan, and more reliable cranking.</p>
 
       <h2>Get a real quote in 5 minutes</h2>
-      <p>Tell us your year, make, and model and we'll text back a flat all-in price for a mobile battery replacement at your home or workplace anywhere in <a href="/service-areas">Lehigh Acres and Fort Myers</a>. Call or text <a href="tel:8135017572">(813) 501-7572</a> — same-day service is usually available, and we always quote in writing before any work begins. See more on our <a href="/battery-alternator-starter">mobile battery, alternator, and starter</a> page.</p>
+      <p>Tell us your year, make, and model and we'll text back a flat all-in price for a mobile battery replacement at your home or workplace anywhere in <a href="/service-areas">Lehigh Acres and Fort Myers</a>. Call or text <a href="tel:8135017572">(813) 501-7572</a> — next-day service is usually available, and we always quote in writing before any work begins. See more on our <a href="/battery-alternator-starter">mobile battery, alternator, and starter</a> page.</p>
     `,
     faqs: [
       { question: "How much does it cost to replace a car battery in Fort Myers in 2026?", answer: "A standard flooded lead-acid battery replacement costs $185–$245 all-in for a mobile install. AGM and premium high-heat batteries run $245–$345. European luxury and large truck batteries can run $325–$475+." },

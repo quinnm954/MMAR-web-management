@@ -163,7 +163,7 @@ const AboutPage = () => {
           </h2>
           <p className="text-muted-foreground leading-relaxed">
             Southwest Florida is growing fast and the wait times at most shops keep getting longer.
-            Our plan is simple: more trucks, better technology, the same standards. Same-day or
+            Our plan is simple: more trucks, better technology, the same standards. Next-day or
             next-day for most jobs, transparent pricing across the board, and a warranty you can
             actually use. If you've had a bad experience with a shop in the past, we'd love the
             chance to change your mind.

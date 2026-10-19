@@ -43,7 +43,7 @@ const HomeServicesOverview = () => {
             <p>
               Ready to book? Tap{" "}
               <a href="tel:8135017572" className="text-gold font-semibold hover:underline">(813) 501-7572</a>{" "}
-              for same-day mobile mechanic service, or browse all of our{" "}
+              for next-day mobile mechanic service, or browse all of our{" "}
               <Link to="/services" className="text-primary hover:underline">repair services</Link>{" "}
               and{" "}
               <Link to="/blog" className="text-primary hover:underline">Lehigh Acres and Fort Myers auto-repair guides</Link>.

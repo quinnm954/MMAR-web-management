@@ -42,8 +42,8 @@ const FAQ_BASE = (cityName: string, state: string): CityFAQ[] => [
     answer: `Most mobile services in ${cityName} cost about the same as a brick-and-mortar shop — and usually less when you factor in the tow and the rental car you don't need. We always quote up front, in writing, before any work begins.`,
   },
   {
-    question: `Can you do same-day service in ${cityName}?`,
-    answer: `Same-day appointments in ${cityName} are usually available, especially for batteries, brakes, AC issues, and no-start diagnostics. Call or text (813) 501-7572 and a real technician will respond.`,
+    question: `Can you do next-day service in ${cityName}?`,
+    answer: `Next-day appointments in ${cityName} are usually available, especially for batteries, brakes, AC issues, and no-start diagnostics. Call or text (813) 501-7572 and a real technician will respond.`,
   },
   {
     question: `What payment methods do you accept?`,
@@ -86,7 +86,7 @@ export const cities: City[] = [
       "Lehigh's climate punishes specific systems on a predictable schedule. Underhood temperatures routinely break 175°F in July, which depletes the calcium-grid lead-acid chemistry in standard flooded batteries 35–40% faster than northern averages — most fail the CCA load test by year three. Severe-service oil intervals apply to virtually every vehicle here: short trips under 10 miles in 90°F+ ambient cause moisture and fuel dilution to accumulate in the sump faster than the oil's TBN reserve can neutralize, especially in direct-injected turbo engines vulnerable to LSPI.",
       "Brake service in Lehigh is dictated by the stop-and-go on SR-82 and Lee Boulevard. We measure rotor thickness with a micrometer against the manufacturer's discard spec stamped on the hat, check lateral runout with a dial indicator (target <0.002\"), and use G3500-grade carbon castings on resurfaced or replacement rotors. Pads are matched to driving profile — ceramic for daily commuters, semi-metallic for fleet trucks pulling trailers off Alabama Road. Brake fluid is moisture-tested with a refractometer; anything over 3% gets a full DOT 4 flush, since boiling point degradation is what causes the soft-pedal complaints we hear most often.",
       "Electrical diagnostics are a Lehigh specialty. We see a lot of failing alternators where the rotor windings are still intact but the diode pack is leaking AC ripple — captured cleanly on an oscilloscope as a >500 mV peak-to-peak ripple on the B+ post — which silently destroys downstream modules and batteries. A standard parts-counter alternator test will pass these units. We don't.",
-      "Need a real technician on-site today? Call or text (813) 501-7572. Same-day windows are typical for batteries, brakes, AC service, and no-start diagnostics throughout 33936, 33971, 33972, 33973, 33974, and 33976.",
+      "Need a real technician on-site today? Call or text (813) 501-7572. Next-day windows are typical for batteries, brakes, AC service, and no-start diagnostics throughout 33936, 33971, 33972, 33973, 33974, and 33976.",
     ],
     faqs: [
       {
@@ -110,8 +110,8 @@ export const cities: City[] = [
         answer: "Most jobs price within 5–10% of a brick-and-mortar shop, and usually less once you remove the tow bill ($85–$150 round trip from Lehigh) and the lost workday. We quote in writing before any work begins, and the diagnosis fee is $100, with $50 credited to repair labor if you go ahead.",
       },
       {
-        question: "Same-day service in Lehigh Acres?",
-        answer: "Yes — batteries, brakes, AC service, alternator/starter replacement, and no-start diagnostics are typically same-day across 33936, 33971, 33972, 33973, 33974, and 33976. Call or text (813) 501-7572.",
+        question: "Next-day service in Lehigh Acres?",
+        answer: "Yes — batteries, brakes, AC service, alternator/starter replacement, and no-start diagnostics are typically next-day across 33936, 33971, 33972, 33973, 33974, and 33976. Call or text (813) 501-7572.",
       },
       {
         question: "Warranty on mobile repairs?",
@@ -150,7 +150,7 @@ export const cities: City[] = [
       "Brake work in Fort Myers is high-volume because of stop-and-go on US-41, Colonial, Daniels, and the I-75 northbound morning crawl. Our procedure: pad measurement to the manufacturer's discard spec, rotor thickness with a micrometer, lateral runout under 0.002\" verified with a dial indicator, and G3500-grade carbon castings on replacement rotors. Caliper slide pins are cleaned and re-greased with high-temp synthetic — not generic chassis grease, which liquefies and migrates onto the friction surface in Florida heat. Brake fluid is moisture-tested with a refractometer; >3% triggers a full DOT 4 flush, since that's the threshold where boiling point drops into the soft-pedal range under hard use.",
       "AC service in Fort Myers is a year-round demand. We carry separate R-134a and R-1234yf machines to prevent cross-contamination, identify the refrigerant before any service, evacuate to 29 in Hg and hold for 30 minutes to verify a leak-free system, then charge by weight to OE spec — never by sight glass or low-side pressure. UV dye and electronic leak detection are used together on intermittent leaks, since condenser micro-leaks often show up only at high-side pressure under hood-closed conditions. Compressor replacements always include receiver/drier, orifice tube or expansion valve, system flush, and PAG oil charge calculated to OE volume.",
       "Coastal corrosion changes parts selection. On vehicles garaged in Iona, Sanibel-adjacent neighborhoods, or Fort Myers Beach, we use stainless brake hardware kits, dielectric grease on every connector we open, and corrosion-X on exposed grounds. We've seen 4-year-old brake calipers seized solid from salt intrusion when standard zinc hardware was used at the last service. The right parts cost a few dollars more and last 3–4x longer in this environment.",
-      "Fleet and small-business work is a meaningful share of our Fort Myers volume — plumbers, HVAC, landscapers, locksmiths, and last-mile delivery. We schedule on-site preventive maintenance during your downtime windows so trucks aren't pulled from revenue. Call or text (813) 501-7572 for fleet rates or a same-day quote anywhere in Fort Myers.",
+      "Fleet and small-business work is a meaningful share of our Fort Myers volume — plumbers, HVAC, landscapers, locksmiths, and last-mile delivery. We schedule on-site preventive maintenance during your downtime windows so trucks aren't pulled from revenue. Call or text (813) 501-7572 for fleet rates or a next-day quote anywhere in Fort Myers.",
     ],
     faqs: [
       {
