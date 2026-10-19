@@ -112,7 +112,7 @@ const SeoContent = () => {
               to manufacturer spec, and the new pads are properly bedded so you
               get a quiet, confident pedal from the very first stop. Ask about
               brake repair in{" "}
-              <Link to="/mobile-brake-repair-lehigh-acres" className="text-primary underline-offset-4 hover:underline">Lehigh Acres</Link> or{" "}
+              <Link to="/brake-repair-lehigh-acres" className="text-primary underline-offset-4 hover:underline">Lehigh Acres</Link> or{" "}
               <Link to="/areas/fort-myers" className="text-primary underline-offset-4 hover:underline">Fort Myers</Link>.
             </p>
           </div>

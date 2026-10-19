@@ -4,7 +4,7 @@ import { Wrench, ArrowRight } from "lucide-react";
 type Item = { slug: string; label: string };
 
 const FORT_MYERS: Item[] = [
-  { slug: "mobile-mechanic-fort-myers-fl", label: "Mobile Mechanic" },
+  { slug: "mobile-mechanic-fort-myers", label: "Mobile Mechanic" },
   { slug: "brake-repair-fort-myers-fl", label: "Brake Repair" },
   { slug: "alternator-repair-fort-myers", label: "Alternator Repair" },
   { slug: "battery-replacement-fort-myers-fl", label: "Battery Replacement" },
@@ -13,12 +13,12 @@ const FORT_MYERS: Item[] = [
 ];
 
 const LEHIGH: Item[] = [
-  { slug: "mobile-mechanic-lehigh-acres-fl", label: "Mobile Mechanic" },
-  { slug: "brake-repair-lehigh-acres-fl", label: "Brake Repair" },
+  { slug: "mobile-mechanic-lehigh-acres", label: "Mobile Mechanic" },
+  { slug: "brake-repair-lehigh-acres", label: "Brake Repair" },
   { slug: "alternator-repair-lehigh-acres-fl", label: "Alternator Repair" },
-  { slug: "battery-replacement-lehigh-acres-fl", label: "Battery Replacement" },
+  { slug: "battery-replacement-lehigh-acres", label: "Battery Replacement" },
   { slug: "ac-repair-lehigh-acres-fl", label: "AC Repair" },
-  { slug: "engine-diagnostics-lehigh-acres-fl", label: "Engine Diagnostics" },
+  { slug: "diagnostics-lehigh-acres", label: "Engine Diagnostics" },
 ];
 
 const Column = ({ city, items }: { city: string; items: Item[] }) => (

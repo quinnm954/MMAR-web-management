@@ -26,53 +26,6 @@ const _allLocalLandingPages: LocalLandingPage[] = [
   // BRAKES
   // ============================================================
   {
-    slug: "mobile-brake-repair-lehigh-acres",
-    service: "Mobile Brake Repair",
-    citySlug: "lehigh-acres",
-    categoryId: "brakes",
-    h1: "Mobile Brake Repair in Lehigh Acres, FL",
-    metaTitle:
-      "Mobile Brake Repair in Lehigh Acres, FL | Mike's Mobile Auto Repair",
-    metaDescription:
-      "On-site brake pad, rotor, and caliper replacement in Lehigh Acres, FL. Same-day mobile brake repair at your home or workplace. Call (813) 501-7572.",
-    canonical: "https://mikesmautorepair.com/brake-repair-lehigh-acres",
-    intro:
-      "Pulsing pedal under braking, a low-pitched groan that disappears once you're rolling, or a dash light that won't reset? Those are the three most common brake complaints we hear in Lehigh Acres, and they each point to a different failed component. We diagnose first, then repair on site.",
-    paragraphs: [
-      "A pulsing pedal almost always means rotor runout has exceeded about 0.003 inches — usually because the pads got cooked once on a long Lee Boulevard descent and laid down uneven friction material. Resurfacing buys time only if rotor thickness is still above the manufacturer's minimum stamped on the hat; otherwise it's replacement. We measure with a micrometer before we touch anything.",
-      "A grind that goes away the moment you press the pedal is the wear indicator scraping the rotor — a designed-in audible warning that you have roughly 1,000 to 1,500 miles of pad left. A grind that gets worse with brake application means the backing plate is now eating the rotor, and you're looking at pads, rotors, and possibly a caliper bracket if it scored.",
-      "An ABS dash light without a brake feel change usually traces to a wheel-speed sensor reading out of range — most often the front-passenger sensor in Lehigh Acres trucks because of how road grit and reclaimed-water spray accumulates in the hub area. We pull the chassis codes with a real bidirectional scanner, clean or replace the sensor, and clear the module.",
-      "Every brake job we perform in Lehigh Acres includes torque-to-spec on the lug nuts (one of the most common shop oversights), proper pad bedding through 8 to 10 controlled stops from 35 mph, and a brake-fluid moisture check with a refractometer. Fluid above 3% water content boils at lower temps and causes pedal fade — we recommend flush at 3-year intervals in this climate.",
-    ],
-    included: [
-      "Pre-repair micrometer measurement of rotor thickness",
-      "Ceramic or semi-metallic pad selection per vehicle weight and use",
-      "Caliper slide-pin clean, inspection, and re-grease with high-temp lube",
-      "Lug nut torque-to-spec with calibrated torque wrench",
-      "Controlled pad bed-in procedure (8–10 stops, 35→5 mph)",
-      "Brake fluid moisture test with refractometer",
-      "Wheel-speed sensor inspection and clean if ABS light is on",
-    ],
-    faqs: [
-      {
-        q: "How do I know if my Lehigh Acres rotors can be resurfaced or have to be replaced?",
-        a: "We measure with a micrometer. If thickness is above the minimum stamped on the rotor hat (usually about 1mm of wear margin) and runout is correctable, we resurface. Below minimum, replacement is the only safe option — a too-thin rotor cannot dissipate heat fast enough and will warp again within months.",
-      },
-      {
-        q: "Why does my pedal go almost to the floor before the brakes bite?",
-        a: "Three common causes in Lehigh Acres vehicles: air in the lines from a recent caliper failure, a rear shoe out of adjustment on drum-equipped trucks, or — most common in cars 7+ years old — a master cylinder bypassing internally. We bench-bleed and pressure test before recommending parts.",
-      },
-      {
-        q: "How long is mobile brake service in my driveway?",
-        a: "Front pads and rotors with caliper hardware: 75–90 minutes. Rears with parking-brake adjustment add about 20 minutes. Brake-fluid flush is another 30. We do not rush the bed-in procedure — that's where shops cut corners and customers end up with brake dust shudder.",
-      },
-      {
-        q: "What ZIP codes in Lehigh Acres do you cover?",
-        a: "Every Lehigh Acres ZIP — 33936, 33971, 33972, 33973, 33974, and 33976 — plus the surrounding Lee County area.",
-      },
-    ],
-  },
-  {
     slug: "brake-repair-lehigh-acres",
     service: "Brake Repair",
     citySlug: "lehigh-acres",
@@ -115,52 +68,6 @@ const _allLocalLandingPages: LocalLandingPage[] = [
       {
         q: "Is parking-brake service included?",
         a: "Adjustment is included on rear-disc-with-drum-in-hat designs (the most common). Full shoe replacement is quoted separately if the parking brake itself has worn shoes.",
-      },
-    ],
-  },
-  {
-    slug: "brake-repair-lehigh-acres-fl",
-    service: "Brake Repair",
-    citySlug: "lehigh-acres",
-    categoryId: "brakes",
-    h1: "Brake Repair in Lehigh Acres, FL",
-    metaTitle: "Brake Repair in Lehigh Acres, FL | Mobile Same-Day Pads, Rotors & Calipers",
-    metaDescription:
-      "Mobile brake repair in Lehigh Acres, FL. Caliper rebuilds, parking-brake service, ABS module diagnosis, fluid flush at your driveway. Call (813) 501-7572.",
-    intro:
-      "Stuck calipers, a parking brake that won't release, a soft pedal that won't bleed firm, or an ABS warning that comes back the moment you reset it — these are the four brake complaints most shops in Lehigh Acres talk customers into 'just doing pads' instead of fixing. We don't do that.",
-    paragraphs: [
-      "A stuck caliper in a Lehigh Acres vehicle is almost always a piston-bore corrosion issue, not a slide-pin issue. Florida humidity gets past the dust boot, the piston seal corrodes against the bore, and the piston no longer retracts after release. Symptoms: hot wheel after a short drive, fuel economy drop of 2–4 mpg, pad wear measured in weeks instead of years. We rebuild the caliper if the bore is salvageable, or replace if it's pitted past spec.",
-      "Parking brakes in Lehigh Acres are a regional weak point because they so rarely get used in flat terrain — the cable seizes inside its sheath from inactivity. The fix isn't lubricant; it's cable replacement. Once the cable's inner wire has corroded, no spray penetrates well enough to last. We replace the cable, adjust the shoes (drum-in-hat designs) or the actuator (electronic parking brakes), and verify proper engagement and release.",
-      "A pedal that won't bleed firm after pad replacement is almost always a master-cylinder issue — the internal seals have rolled past a corroded section of the bore and air keeps reappearing in the lines no matter how many times you bleed. The DIY fix is endless bleeding; the actual fix is master cylinder replacement and a power bleed. We carry pressure bleeders on the truck.",
-      "ABS warnings in Lehigh Acres trace to wheel-speed sensors more than 70% of the time — fronts more than rears because the sensor sits low and reclaimed-water spray off Lehigh streets coats the reluctor ring with conductive grime. We pull live data from the ABS module, compare wheel-speed reads at 25 mph, and isolate the failed sensor by signal not by code. The other 30% are tone-ring failures, hub damage, or the module itself.",
-      "Every brake repair in Lehigh Acres is quoted in writing before work starts and warranted parts and labor. Call or text (813) 501-7572 for same-day mobile service.",
-    ],
-    included: [
-      "Caliper piston-bore inspection and rebuild or replacement",
-      "Parking-brake cable, shoe, or actuator service",
-      "Power-bleed brake fluid service after caliper or master work",
-      "ABS wheel-speed sensor diagnosis with live module data",
-      "Tone-ring inspection on each wheel",
-      "Master cylinder bench test before condemning",
-      "Written diagnosis with photos of failed components",
-    ],
-    faqs: [
-      {
-        q: "My brake light AND ABS light are both on in Lehigh Acres — what's that?",
-        a: "Two lights together usually means the ABS module has detected a fault serious enough to disable both anti-lock and stability control. Most common cause: a single failed wheel-speed sensor, occasionally low fluid triggering the brake light independently. We diagnose the actual fault, not just clear codes.",
-      },
-      {
-        q: "Why does my pedal feel fine cold but soft after 20 minutes of driving?",
-        a: "Classic fluid moisture problem. Water in old brake fluid boils once the calipers heat up and creates compressible vapor in the lines. A flush with fresh DOT 3 or DOT 4 brings the boiling point back to spec. We test moisture content before recommending flush.",
-      },
-      {
-        q: "Can you do an electronic parking brake on a newer vehicle in my driveway?",
-        a: "Yes. Electronic parking brakes need a scan tool to retract the caliper for pad service — we have the bidirectional capability for most makes. Doing it without the tool will damage the actuator.",
-      },
-      {
-        q: "Do you handle Lehigh Acres fleet brakes?",
-        a: "Yes — we run scheduled brake inspections and pad swaps for several local Lehigh Acres fleets, with on-site service so vehicles never sit at a shop.",
       },
     ],
   },
@@ -306,54 +213,6 @@ const _allLocalLandingPages: LocalLandingPage[] = [
   // ============================================================
   // ALTERNATOR
   // ============================================================
-  {
-    slug: "mobile-alternator-repair-fort-myers",
-    service: "Mobile Alternator Repair",
-    citySlug: "fort-myers",
-    categoryId: "electrical",
-    h1: "Mobile Alternator Repair in Fort Myers, FL",
-    metaTitle:
-      "Mobile Alternator Repair in Fort Myers, FL | Mike's Mobile Auto Repair",
-    metaDescription:
-      "On-site alternator replacement in Fort Myers. Charging-system load testing, ground-cable diagnosis, post-install voltage verification. Call (813) 501-7572.",
-    canonical: "https://mikesmautorepair.com/alternator-repair-fort-myers",
-    intro:
-      "An alternator failure usually shows up in this order: battery light flickers under load (headlights + AC + wipers all on), then the battery starts dying overnight, then a no-start. By the time the dash light is steady, the alternator is producing under 12.6 volts and the battery is finishing its job for it.",
-    paragraphs: [
-      "Alternator output is rated by amperage, not voltage. A typical Fort Myers sedan needs 120–140 amps to keep up with AC compressor draw, headlights, and the dozens of electronic modules now standard on every vehicle. Trucks and tow vehicles need 160–220 amps. Installing a 105-amp parts-store unit on a vehicle that needs 140 amps is the most common reason a 'fresh' alternator fails again within a year — it never gets to coast, it's always at full output.",
-      "The diagnostic that separates real alternator work from a parts-store guess is a voltage-drop test on the main charge cable, the battery negative cable, and the engine-to-chassis ground strap. A drop of more than 0.3 volts on any one of those means the new alternator is working harder than rated to overcome resistance — and will fail early. We test all three before installing.",
-      "Diode failure is the failure mode we see most in Fort Myers. The internal rectifier converts the alternator's three-phase AC output to DC; when one diode fails (heat is the usual cause in this climate), the alternator can still charge but produces 'AC ripple' that confuses electronic modules. Symptoms: warning-light gremlins, infotainment glitches, intermittent stalls. We test for ripple with a scope on every charging-system call.",
-      "Belt and tensioner condition affects the alternator more than most drivers realize. A glazed belt slips under high electrical load, the alternator under-produces, and the system stays in a constant voltage-drop state that cooks the rotor windings. We check belt tension with a gauge and replace if cracked, glazed, or noisy.",
-      "Service covers every Fort Myers ZIP. Stuck right now? Call or text (813) 501-7572.",
-    ],
-    included: [
-      "Charging-system test under live electrical load",
-      "Voltage-drop test on charge cable, battery ground, engine ground",
-      "AC-ripple test with oscilloscope (diode failure detection)",
-      "Belt and tensioner inspection",
-      "Alternator amperage matched to vehicle requirement",
-      "Post-install verification (13.8–14.7V at idle, full load)",
-      "Battery state-of-health test included",
-    ],
-    faqs: [
-      {
-        q: "How can I tell if it's the alternator or the battery in Fort Myers?",
-        a: "Quick test: jump-start the vehicle and disconnect the jumper. If it dies within 60 seconds, alternator is not charging. If it keeps running but won't restart later, battery is bad. Real diagnosis uses a load tester on each — we always check both.",
-      },
-      {
-        q: "How long does an alternator job take in my Fort Myers driveway?",
-        a: "Typical sedan: 60–75 minutes. Truck or van with serpentine routing through accessories: 90–120 minutes. Some V6s with rear-mounted alternators run longer and may need different access.",
-      },
-      {
-        q: "Do you use rebuilt or new alternators?",
-        a: "Quality remanufactured units from established brands for most jobs — they meet OE spec at lower cost. New OE on request, especially for newer vehicles still under hybrid or warranty consideration.",
-      },
-      {
-        q: "Can a bad ground cable look like a bad alternator?",
-        a: "Absolutely. A corroded battery negative or engine ground will mimic alternator failure exactly. That's why voltage-drop testing is non-negotiable before condemning the alternator.",
-      },
-    ],
-  },
   {
     slug: "alternator-repair-fort-myers",
     service: "Alternator Repair",
@@ -676,52 +535,6 @@ const _allLocalLandingPages: LocalLandingPage[] = [
       {
         q: "How much will the install cost in Lehigh Acres?",
         a: "Most flooded and EFB batteries: $180–$320 installed. AGM: $260–$425. Quoted up front before work.",
-      },
-    ],
-  },
-  {
-    slug: "battery-replacement-lehigh-acres-fl",
-    service: "Battery Replacement",
-    citySlug: "lehigh-acres",
-    categoryId: "electrical",
-    h1: "Mobile Battery Replacement in Lehigh Acres, FL",
-    metaTitle: "Battery Replacement in Lehigh Acres, FL | Same-Day Mobile Install",
-    metaDescription:
-      "Mobile car battery replacement in Lehigh Acres, FL. Smart-charging reset and parasitic-draw test included. Call (813) 501-7572.",
-    intro:
-      "A battery that won't hold charge after sitting overnight is rarely a bad battery — it's almost always a parasitic-draw problem. We diagnose before we replace, because installing a battery on top of an unfixed parasitic draw means the new battery fails within months.",
-    paragraphs: [
-      "Common parasitic-draw culprits in Lehigh Acres vehicles: aftermarket dash cameras wired to constant-12V (should be wired to switched accessory), aftermarket subwoofer amps with leaky power capacitors, trunk-light pin switches that have lost their detent, glove-box bulbs that stay on, and door-courtesy modules that fail to enter sleep mode after lock.",
-      "The diagnostic procedure: lock the vehicle, wait 30 minutes for modules to sleep, then place an inductive amp clamp on the negative battery cable. Healthy reading: under 50mA. Anything higher gets traced fuse-by-fuse until the offending circuit is identified.",
-      "Smart-charging vehicles (most 2014+) use a current sensor on the negative battery cable to monitor state-of-charge. Disconnecting the battery without scan-tool reset can confuse the sensor, causing the alternator to over- or under-charge for weeks. We perform the reset on every applicable Lehigh Acres install.",
-      "Steering-angle sensors, throttle-body relearns, and idle-air relearns are common 'comebacks' on vehicles where the customer notices unusual behavior after battery disconnect. Our scan tool handles all of those resets at install — no separate trip to a dealer.",
-      "Same-day Lehigh Acres service across all six ZIPs. Call or text (813) 501-7572.",
-    ],
-    included: [
-      "Parasitic-draw test (post-sleep inductive clamp)",
-      "Fuse-by-fuse trace if draw exceeds 50mA",
-      "Smart-charging battery monitor reset",
-      "Post-install module relearns (throttle, steering angle, idle)",
-      "Memory-saver during install for radio/preset retention",
-      "Old battery hauled and recycled",
-      "Charging-system output verification",
-    ],
-    faqs: [
-      {
-        q: "What's a parasitic draw and how much is normal?",
-        a: "Current the vehicle pulls while parked and locked. Normal is under 50 milliamps once modules sleep (about 30 minutes). Above that and your battery will discharge over a few days to a few weeks.",
-      },
-      {
-        q: "Why do I need a 'reset' after a battery change?",
-        a: "Modern vehicles store learned values for throttle response, idle, transmission shift points, etc. A battery disconnect erases those, and the vehicle drives oddly until they relearn — sometimes weeks. Scan-tool relearn restores them in minutes.",
-      },
-      {
-        q: "Can you do AGM in my driveway in Lehigh Acres?",
-        a: "Yes — we carry AGM inventory and install in driveways across Lehigh Acres same-day.",
-      },
-      {
-        q: "Is the install warrantied?",
-        a: "Yes — battery manufacturer warranty plus our mobile-install labor warranty.",
       },
     ],
   },
@@ -1057,52 +870,6 @@ const _allLocalLandingPages: LocalLandingPage[] = [
     ],
   },
   {
-    slug: "engine-diagnostics-lehigh-acres-fl",
-    service: "Engine Diagnostics",
-    citySlug: "lehigh-acres",
-    categoryId: "engine",
-    h1: "Mobile Engine Diagnostics in Lehigh Acres, FL",
-    metaTitle: "Engine Diagnostics in Lehigh Acres, FL | Mobile Check-Engine-Light Testing",
-    metaDescription:
-      "Mobile engine diagnostics in Lehigh Acres, FL. Compression testing, leak-down, scope work. Call (813) 501-7572.",
-    intro:
-      "Engine drivability complaints in Lehigh Acres usually fall into one of three categories: hesitation (bad acceleration response), surging (RPM hunting at steady throttle), or rough idle (uneven engine speed at stop). Each has a distinct diagnostic path; we don't shotgun parts.",
-    paragraphs: [
-      "Hesitation under throttle in Lehigh Acres vehicles is almost always one of: a lazy or contaminated MAF sensor, a failing throttle position sensor, dirty injectors restricting spray pattern, or an EGR valve stuck partially open. We test in that order using live-data trends — MAF reading versus expected for the throttle position is the quickest tell.",
-      "Surging at steady cruise is usually closed-loop fueling instability — the O2 sensors are sending erratic signals and the ECU is over-correcting. Common causes: a lazy upstream O2 (slow-responding), a small intake or vacuum leak that's most obvious at low load, or an EVAP purge solenoid stuck partially open. Scope work on the O2 voltage signal makes the diagnosis fast.",
-      "Rough idle in Lehigh Acres trucks past 100,000 miles is frequently a vacuum leak — cracked intake hoses, deteriorated PCV grommets, or a torn brake-booster diaphragm. Smoke-testing the intake makes the leak visible directly. Less common but real: a single dead cylinder from a failed coil or a burned exhaust valve.",
-      "Compression and leak-down testing get pulled out for the harder cases — a misfiring cylinder that doesn't respond to coil/plug/injector swap, or a no-start with no obvious cause. A 30% leak-down on a single cylinder points at a valve issue; uniform low compression across all cylinders points at a timing chain stretch.",
-      "Diagnostic appointments in Lehigh Acres run $80–$150 and credit toward repair. Call or text (813) 501-7572.",
-    ],
-    included: [
-      "Drivability diagnosis (hesitation/surge/rough idle)",
-      "Compression and leak-down testing when warranted",
-      "MAF, TPS, O2 sensor live-data analysis",
-      "Vacuum-leak smoke testing",
-      "Scope work for ignition and injector waveforms",
-      "Written diagnosis and parts/labor quote",
-      "Diagnostic fee credited toward repair",
-    ],
-    faqs: [
-      {
-        q: "What's the difference between a misfire and a rough idle?",
-        a: "A misfire is the ECU detecting that a cylinder didn't fire — it sets a code. A rough idle is the engine running unevenly without necessarily setting a misfire code; could be vacuum leak, EGR issue, or marginal fueling without a hard fault.",
-      },
-      {
-        q: "When do you need compression testing?",
-        a: "When other diagnostic data points at internal mechanical failure — persistent single-cylinder misfire that doesn't respond to coil/plug/injector swap, or a no-start with crank, fuel, and spark all confirmed present.",
-      },
-      {
-        q: "Can you do timing-chain diagnosis in Lehigh Acres?",
-        a: "Yes — chain stretch shows up as P0008/P0017 codes, lower-than-expected compression, or scan-tool cam-vs-crank correlation off-spec. We can confirm the issue and quote replacement separately.",
-      },
-      {
-        q: "Same day diagnostics in Lehigh Acres?",
-        a: "Yes — same-day diagnostic appointments are the norm here.",
-      },
-    ],
-  },
-  {
     slug: "mobile-engine-diagnostics",
     service: "Mobile Engine Diagnostics",
     categoryId: "engine",
@@ -1433,52 +1200,6 @@ const _allLocalLandingPages: LocalLandingPage[] = [
     ],
   },
   {
-    slug: "oil-change-lehigh-acres-fl",
-    service: "Oil Change",
-    citySlug: "lehigh-acres",
-    categoryId: "engine",
-    h1: "Mobile Oil Change in Lehigh Acres, FL",
-    metaTitle: "Mobile Oil Change in Lehigh Acres, FL | At Your Driveway in 30 Minutes",
-    metaDescription:
-      "Mobile oil change in Lehigh Acres, FL. OEM-spec oils, dealer-grade filters, multi-point inspection. Call (813) 501-7572.",
-    intro:
-      "If you drive a 2014-or-newer car in Lehigh Acres, your engine almost certainly has direct injection — and direct-injected engines have specific oil requirements that most quick-lubes don't follow. Wrong oil here doesn't just mean shortened service life; it can mean a broken piston from LSPI.",
-    paragraphs: [
-      "Low-speed pre-ignition (LSPI) is a real phenomenon on small-displacement turbocharged direct-injected engines — Ford EcoBoost, GM 1.4T/2.0T, Hyundai 1.6T/2.0T, Honda 1.5T, etc. Under high load at low RPM, the air-fuel mixture can self-ignite before the spark plug fires, producing a destructive pressure spike that can break pistons and connecting rods. The cure is oils formulated specifically to suppress LSPI — typically those carrying dexos1 Gen 3, GF-6, or specific OEM approvals.",
-      "Direct-injected engines also build carbon on the back of intake valves because, unlike port injection, no fuel washes the valve. Quality oil with low Noack volatility (resistant to evaporating into the intake) reduces but doesn't eliminate this. Walnut-blast cleaning every 60,000-80,000 miles is the proper preventive — we can perform this on most platforms.",
-      "Turbocharged engines need oil that resists thermal breakdown at the turbo center-section, where temperatures routinely exceed 400°F at engine-off heat soak. Synthetic base stocks handle this; conventional does not. Many turbo failures we diagnose trace back to conventional oil used in a turbo engine that specified synthetic.",
-      "Lehigh Acres oil-change service includes verified OEM-approved oil for your vehicle, a quality filter, a new crush washer, drain-plug torque to spec, multi-point inspection, and service-light reset. No upsell scripts, no 'we found these other things' surprise items.",
-      "Same-day across all Lehigh Acres ZIPs. Call or text (813) 501-7572.",
-    ],
-    included: [
-      "LSPI-rated oil for turbocharged direct-injected engines",
-      "Synthetic base stock for any turbo or direct-injection engine",
-      "OEM-approved oil verified by manufacturer specification",
-      "Premium filter with proper bypass and anti-drainback valves",
-      "Multi-point inspection",
-      "Service light reset",
-      "Recycled used oil",
-    ],
-    faqs: [
-      {
-        q: "What is LSPI and why does it matter?",
-        a: "Low-speed pre-ignition — destructive abnormal combustion in turbocharged direct-injection engines under low-RPM high-load conditions. Modern oils with dexos1 Gen 3 or similar approvals are formulated to prevent it. Wrong oil = broken piston risk.",
-      },
-      {
-        q: "Does my vehicle have direct injection?",
-        a: "Most 2012-and-newer turbocharged engines and most 2014-and-newer naturally aspirated engines. We verify by VIN before recommending oil spec.",
-      },
-      {
-        q: "Why do you charge more than a quick-lube?",
-        a: "Verified-spec oil and a real filter cost more than no-name 5W-30 and a $4 filter. The difference matters on a $30,000+ vehicle.",
-      },
-      {
-        q: "How long does the service take?",
-        a: "About 30 minutes including the inspection.",
-      },
-    ],
-  },
-  {
     slug: "oil-change-fort-myers-fl",
     service: "Oil Change",
     citySlug: "fort-myers",
@@ -1721,52 +1442,6 @@ const _allLocalLandingPages: LocalLandingPage[] = [
     ],
   },
   {
-    slug: "mobile-mechanic-lehigh-acres-fl",
-    service: "Mobile Mechanic",
-    citySlug: "lehigh-acres",
-    categoryId: "engine",
-    h1: "Mobile Mechanic in Lehigh Acres, FL",
-    metaTitle: "Mobile Mechanic in Lehigh Acres, FL | Same-Day On-Site Auto Repair",
-    metaDescription:
-      "Top-rated mobile mechanic in Lehigh Acres, FL. Bidirectional diagnostics, brakes, batteries, alternators, AC, oil. Call (813) 501-7572.",
-    intro:
-      "What makes a mobile mechanic in Lehigh Acres genuinely useful (versus a 'we'll come look at it' mobile call) is the equipment and inventory on the truck. Diagnose, source the part, install it, verify it — all in one visit, most of the time.",
-    paragraphs: [
-      "Equipment-on-truck for Lehigh Acres calls includes: portable lift system rated for most passenger vehicles and light trucks, full hand-tool sets including specialty tools for common Lehigh Acres applications (Toyota, Honda, Ford, GM, Ram, Hyundai/Kia), full air-tool capability via portable compressor, and a full electrical workstation including soldering, crimping, and heat-shrink for wiring repair done correctly.",
-      "Parts sourcing is the second half of mobile speed. We have working accounts with local Lehigh Acres parts distributors who deliver direct to job sites — meaning we can diagnose at 9 AM, source a part at 10, and have it installed by 1 PM. Common-failure parts for high-volume Lehigh Acres vehicles are already on the truck.",
-      "Diagnostic-first service philosophy. Most no-start, drivability, and electrical complaints get a real diagnostic before any parts are recommended. The diagnostic fee credits toward repair on the same visit. This eliminates the parts-store guessing that drives up customer cost on most of these jobs.",
-      "Lehigh Acres specifics that affect how we work: long driveways (great for setup), shaded driveways under live oaks (ideal for AC and electrical work in summer), dirt roads in the Buckingham area (we plan service around weather), long distances between calls (we batch routing for efficiency).",
-      "Same-day appointments across every Lehigh Acres ZIP. Call or text (813) 501-7572.",
-    ],
-    included: [
-      "Portable lift for safe under-vehicle work",
-      "Local distributor parts sourcing within hours",
-      "Diagnostic-first approach with fee credit toward repair",
-      "Truck-stocked common-failure parts for high-volume Lehigh Acres vehicles",
-      "Wiring repair done correctly (solder, heat-shrink, no quick splices)",
-      "Written quote before any work begins",
-      "Standard mobile-service warranty on parts and labor",
-    ],
-    faqs: [
-      {
-        q: "Are you really just one tech, or do you have a team?",
-        a: "Owner-operator model — we keep overhead low so prices stay fair. For larger jobs (multi-vehicle fleet days, complex jobs needing two sets of hands), we coordinate accordingly.",
-      },
-      {
-        q: "Will you tell me if I should go to a shop instead?",
-        a: "Yes — if a job is genuinely better done on a lift in a controlled environment, we'll say so and refer to a vetted shop. We don't take work that doesn't make sense to do mobile.",
-      },
-      {
-        q: "What about diagnosing and fixing on the same visit in Lehigh Acres?",
-        a: "Most of the time, yes — we diagnose, source the part, and install on the same visit. Some specialized parts require next-day return.",
-      },
-      {
-        q: "Are diagnostics free?",
-        a: "No — they cost $80-$150 and credit toward any repair. 'Free diagnostics' usually means the shop is making money on overpriced parts to compensate.",
-      },
-    ],
-  },
-  {
     slug: "mobile-mechanic-fort-myers",
     service: "Mobile Mechanic",
     citySlug: "fort-myers",
@@ -1812,52 +1487,6 @@ const _allLocalLandingPages: LocalLandingPage[] = [
       },
     ],
   },
-  {
-    slug: "mobile-mechanic-fort-myers-fl",
-    service: "Mobile Mechanic",
-    citySlug: "fort-myers",
-    categoryId: "engine",
-    h1: "Mobile Mechanic in Fort Myers, FL",
-    metaTitle: "Mobile Mechanic in Fort Myers, FL | On-Site Auto Repair At Your Driveway",
-    metaDescription:
-      "Mobile mechanic in Fort Myers, FL. ASE-level diagnostics, brakes, AC, batteries at your home or office. Call (813) 501-7572.",
-    intro:
-      "There are two kinds of 'mobile mechanic' service in Fort Myers: the call-center model (a dispatch service that routes work to whoever's nearest, no continuity, mixed quality) and the owner-operator model (one technician, one truck, accountable for every job). We're the second kind.",
-    paragraphs: [
-      "Owner-operator means the tech who diagnoses your problem is the one who fixes it, who calls you back, and who answers if anything needs follow-up. There's no dispatcher between you and the work, no quota-driven 'recommended additional services,' no rotating cast of techs with different skill levels.",
-      "The trade-off: we're not 24/7. Hours run roughly 8 AM to 7 PM seven days a week with same-day availability for most calls. Genuine emergencies (no-starts, brake failures, AC out in 95° weather) are prioritized.",
-      "Quality control is built into the workflow. Every job ends with a verification — test drive, scan for fault recurrence, road-condition check. Comebacks under warranty are handled by us, on us, with no runaround.",
-      "Fort Myers community involvement: we live and work in Lee County, support local fleets, and stake our reputation on every job. The Google reviews are from real Fort Myers customers; we read them and respond.",
-      "Same-day mobile mechanic service across every Fort Myers ZIP. Call or text (813) 501-7572.",
-    ],
-    included: [
-      "Owner-operator mobile mechanic service",
-      "Same-day availability for most calls",
-      "Priority response for no-starts and emergency repairs",
-      "Verified completion (test drive, scan, road check)",
-      "Warranty comebacks handled by the same tech",
-      "Local fleet maintenance contracts",
-      "Cards and ACH accepted",
-    ],
-    faqs: [
-      {
-        q: "Are you on call 24/7?",
-        a: "No — hours are roughly 8 AM to 7 PM, seven days. Genuine emergencies handled outside hours when possible. Predictable hours let us provide consistent service.",
-      },
-      {
-        q: "What happens if a repair has a problem after you leave?",
-        a: "Call back — same tech, same truck, no dispatcher. Warranty comebacks are resolved at no additional charge.",
-      },
-      {
-        q: "Can you handle hybrids and EVs in Fort Myers?",
-        a: "Hybrids: yes, most platforms. EVs: most service items (brakes, suspension, 12V battery, AC) are routine. High-voltage diagnostics on EVs are limited to specific platforms; we'll confirm at booking.",
-      },
-      {
-        q: "Same-day in Fort Myers?",
-        a: "Almost always for in-stock work; sometimes next-day for special-order parts.",
-      },
-    ],
-  },
 ];
 
 import { buildMatrixPages } from "./serviceCityMatrix";
@@ -1879,10 +1508,39 @@ const _matrix = buildMatrixPages(_existingSlugs).filter(
   (p) => !_coveredPairs.has(`${p.categoryId}|${p.citySlug}`)
 );
 
+// Old duplicate service+city addresses, merged into one page per service per city.
+export const LANDING_REDIRECTS: Record<string, string> = {
+  "mobile-brake-repair-lehigh-acres": "brake-repair-lehigh-acres",
+  "brake-repair-lehigh-acres": "brake-repair-lehigh-acres",
+  "battery-replacement-lehigh-acres": "battery-replacement-lehigh-acres",
+  "diagnostics-lehigh-acres": "diagnostics-lehigh-acres",
+  "oil-change-lehigh-acres": "oil-change-lehigh-acres",
+  "mobile-mechanic-lehigh-acres": "mobile-mechanic-lehigh-acres",
+  "mobile-mechanic-fort-myers": "mobile-mechanic-fort-myers",
+  "mobile-alternator-repair-fort-myers": "alternator-repair-fort-myers",
+};
+
+const localFaqs = (cityName: string, service: string): FAQ[] => [
+  {
+    q: `How much does ${service.toLowerCase()} cost in ${cityName}?`,
+    a: `If the problem isn't pinned down yet, we start with a $100 diagnosis, and $50 of it is credited toward the repair labor if you go ahead. You get a written estimate before any work starts, and there's no extra trip fee in ${cityName}.`,
+  },
+  {
+    q: `Can you come out the same day in ${cityName}?`,
+    a: `Often, yes. We work Monday to Saturday, 8 AM to 8 PM. Call or text (813) 501-7572 and we'll offer you the earliest open time.`,
+  },
+];
+
+const _cityName: Record<string, string> = { "lehigh-acres": "Lehigh Acres", "fort-myers": "Fort Myers" };
+
 export const localLandingPages: LocalLandingPage[] = [
   ..._handWritten,
   ..._matrix,
-];
+].map((p) =>
+  p.citySlug && _cityName[p.citySlug]
+    ? { ...p, faqs: [...p.faqs, ...localFaqs(_cityName[p.citySlug], p.service)] }
+    : p
+);
 
 export const getLandingPageBySlug = (slug: string) =>
   localLandingPages.find((p) => p.slug === slug);
