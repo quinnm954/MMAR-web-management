@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { isPayableInvoice } from "@/lib/reportInvoice";
 import { useParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -223,7 +224,9 @@ const PortalInvoiceDetail = () => {
               <div className="font-semibold">Financed invoice</div>
               <div className="text-muted-foreground">The balance of ${due.toFixed(2)} plus interest is paid weekly under your financing agreement.</div>
             </div>
-          ) : due > 0 && inv.status !== "void" ? (
+          ) : inv.status === "refunded" ? (
+            <div className="text-center text-sm text-muted-foreground py-3 border border-border rounded">Refund receipt — nothing to pay.</div>
+          ) : isPayableInvoice(inv as any) ? (
             <Button onClick={pay} disabled={paying} variant="hero" className="w-full" size="lg">
               {paying ? <Loader2 className="h-4 w-4 animate-spin" /> : <><CreditCard className="h-4 w-4 mr-2" /> Pay ${due.toFixed(2)} Securely</>}
             </Button>

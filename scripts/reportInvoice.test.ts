@@ -16,3 +16,16 @@ describe('completed refund reporting', () => {
     expect(reportInvoiceRevenue({ status: 'refunded', total: 600 })).toBe(-600);
   });
 });
+import { invoiceBalanceDue, isPayableInvoice } from '../src/lib/reportInvoice';
+describe('customer balance due', () => {
+  test('the -$600 refund is not payable and adds $0', () => {
+    expect(isPayableInvoice({ status: 'refunded', total: -600, amount_paid: 0 })).toBe(false);
+    expect(invoiceBalanceDue({ status: 'refunded', total: -600, amount_paid: 0 })).toBe(0);
+  });
+  test('$1,000 unpaid with $400 paid owes $600', () => {
+    expect(invoiceBalanceDue({ status: 'unpaid', total: 1000, amount_paid: 400 })).toBe(600);
+  });
+  test('financed invoices are not payable online', () => {
+    expect(isPayableInvoice({ status: 'unpaid', total: 1613.32, amount_paid: 806.66, is_financed: true })).toBe(false);
+  });
+});
