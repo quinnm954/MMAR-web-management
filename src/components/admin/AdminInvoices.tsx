@@ -370,8 +370,8 @@ const AdminInvoices = () => {
 
   const INV_TABS: { key: string; label: string; test: (i: Invoice) => boolean }[] = [
     { key: 'all', label: 'All', test: () => true },
-    { key: 'unpaid', label: 'Unpaid', test: i => !['paid', 'void', 'draft'].includes(i.status) },
-    { key: 'overdue', label: 'Overdue', test: i => i.status === 'overdue' || (!!i.due_date && i.status !== 'paid' && i.status !== 'void' && new Date(i.due_date) < new Date()) },
+    { key: 'unpaid', label: 'Unpaid', test: i => invoiceBalanceDue(i as any) > 0 },
+    { key: 'overdue', label: 'Overdue', test: i => invoiceBalanceDue(i as any) > 0 && (i.status === 'overdue' || (!!i.due_date && new Date(i.due_date) < new Date())) },
     { key: 'paid', label: 'Paid', test: i => i.status === 'paid' },
     { key: 'draft', label: 'Draft / Void', test: i => i.status === 'draft' || i.status === 'void' },
   ];
