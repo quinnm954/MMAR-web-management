@@ -3,8 +3,14 @@ import mmarLogo from "@/assets/mmar-logo.png";
 import { categories } from "@/data/serviceCategories";
 import { cities } from "@/data/cities";
 import LocalServicesDropdown from "@/components/footer/LocalServicesDropdown";
+import { southFloridaCities } from "@/data/citiesSouthFlorida";
+import { useHomeRegion } from "@/lib/homeRegion";
+
+const SFL_SLUGS = new Set(southFloridaCities.map((c) => c.slug));
 
 const Footer = () => {
+  const sfl = useHomeRegion() === "sfl";
+  const areaCities = sfl ? southFloridaCities : cities.filter((c) => !SFL_SLUGS.has(c.slug));
   return (
     <footer className="pt-12 pb-6 md:pb-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] border-t border-border bg-secondary/20">
       <div className="container mx-auto px-4">
@@ -19,7 +25,7 @@ const Footer = () => {
               Mike's Mobile Auto Repair LLC
             </p>
             <p className="text-sm text-muted-foreground">
-              Mobile auto repair across Fort Myers and Lehigh Acres, FL.
+              {sfl ? "Mobile auto repair coming to Broward and Palm Beach, FL." : "Mobile auto repair across Fort Myers and Lehigh Acres, FL."}
             </p>
             <a
               href="tel:8135017572"
@@ -44,7 +50,7 @@ const Footer = () => {
             </p>
             <p className="mt-3 text-xs text-muted-foreground leading-relaxed">
               <span className="block"><span className="font-semibold text-foreground/80">Hours:</span> Mon–Sat 8am–8pm · Closed Sunday</span>
-              <span className="block mt-1"><span className="font-semibold text-foreground/80">Service area:</span> Fort Myers and Lehigh Acres, FL</span>
+              <span className="block mt-1"><span className="font-semibold text-foreground/80">Service area:</span> {sfl ? "Broward and Palm Beach Counties, FL" : "Fort Myers and Lehigh Acres, FL"}</span>
             </p>
             <div className="mt-4">
               <p className="text-xs uppercase tracking-wider text-muted-foreground mb-2">Reviews &amp; Social</p>
@@ -65,7 +71,7 @@ const Footer = () => {
                 <span className="text-xs transition-transform group-open:rotate-180">▾</span>
               </summary>
               <ul className="space-y-2 text-sm mt-2">
-                {cities.map((c) => (
+                {areaCities.map((c) => (
                   <li key={c.slug}>
                     <Link
                       to={`/areas/${c.slug}`}
@@ -77,10 +83,10 @@ const Footer = () => {
                 ))}
                 <li>
                   <Link
-                    to="/lee-county-fl"
+                    to={sfl ? "/" : "/lee-county-fl"}
                     className="text-gold hover:text-primary font-semibold"
                   >
-                    All of Lee County, FL →
+                    {sfl ? "In Lee County? Fort Myers & Lehigh Acres →" : "All of Lee County, FL →"}
                   </Link>
                 </li>
               </ul>
@@ -109,7 +115,7 @@ const Footer = () => {
           </div>
         </div>
 
-        <LocalServicesDropdown />
+        {!sfl && <LocalServicesDropdown />}
 
         <div className="border-t border-border pt-6 mb-6 flex flex-wrap gap-x-6 gap-y-2 text-sm">
           <Link to="/blog" className="text-muted-foreground hover:text-primary">Blog</Link>

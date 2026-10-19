@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
+import { useHomeRegion } from "@/lib/homeRegion";
 
 const HomeServicesOverview = () => {
+  if (useHomeRegion() === "sfl") return <SflServicesOverview />;
   return (
     <section className="py-14 md:py-20 bg-secondary/20">
       <div className="container mx-auto px-4">
@@ -56,3 +58,54 @@ const HomeServicesOverview = () => {
 };
 
 export default HomeServicesOverview;
+
+const SflServicesOverview = () => (
+  <section className="py-14 md:py-20 bg-secondary/20">
+    <div className="container mx-auto px-4">
+      <div className="max-w-3xl mx-auto">
+        <div className="text-center mb-10 md:mb-12">
+          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl tracking-wide mb-3">
+            <span className="text-sky">MOBILE AUTO REPAIR</span>{" "}
+            <span className="text-gold">BROWARD &amp; PALM BEACH</span>
+          </h2>
+          <p className="text-base md:text-lg text-muted-foreground">
+            Honest, on-site auto repair across Broward and Palm Beach.
+          </p>
+        </div>
+
+        <article className="space-y-5 text-foreground/90 leading-relaxed text-base md:text-lg">
+          <p>
+            Mike's Mobile Auto Repair brings ASE-level service straight to your driveway, condo lot or office anywhere in Broward and Palm Beach. Instead of waiting half a day at a shop in Fort Lauderdale or paying for a tow across Boca Raton, we roll up with the diagnostic tools, quality parts, and experience to handle most repairs in a single visit. A real technician answers the phone — never a call center.
+          </p>
+          <p>
+            Our most-called services include{" "}
+            <Link to="/brake-repair" className="text-primary hover:underline">brake repair</Link>{" "}
+            (pads, rotors, calipers, and brake fluid),{" "}
+            <Link to="/alternator-repair" className="text-primary hover:underline">alternator repair</Link>,{" "}
+            <Link to="/battery-replacement" className="text-primary hover:underline">car battery delivery and installation</Link>,{" "}
+            <Link to="/vehicle-diagnostics" className="text-primary hover:underline">check-engine-light diagnostics</Link>, and full{" "}
+            <Link to="/no-start-diagnostics" className="text-primary hover:underline">no-start diagnostics</Link>. Most jobs are completed in 60 to 120 minutes on site, and pricing is quoted up front before any work begins.
+          </p>
+          <p>
+            South Florida is hard on vehicles. Stop-and-go traffic on I-95, Florida's Turnpike and the Sawgrass Expressway wears brakes and transmissions early, heat and humidity push AC systems and batteries past their limits, and salt air from the Intracoastal to A1A corrodes brake hardware and electrical connectors. Routine{" "}
+            <Link to="/services" className="text-primary hover:underline">maintenance</Link>{" "}
+            like brake service, cooling-system checks, and multi-point inspections is the cheapest insurance against a breakdown in 95° heat.
+          </p>
+          <p>
+            When something does go wrong, we come to you. Dead battery in an office garage in Fort Lauderdale? We replace it on site. Brakes grinding on the way home to Pembroke Pines? We bring the parts and fix it in your driveway. No-start in a Boca Raton condo lot? We diagnose, replace the failed component, and verify the repair before we leave.
+          </p>
+          <p>
+            We're coming to Fort Lauderdale, Hollywood, Pembroke Pines, Coral Springs, West Palm Beach, Boca Raton, Delray Beach and Boynton Beach. Most condo and HOA lots allow repairs — check your association's rules and we'll work within them. See all{" "}
+            <Link to="/south-florida" className="text-primary hover:underline">South Florida service areas</Link>.
+          </p>
+          <p>
+            Want in? Call or text{" "}
+            <a href="tel:8135017572" className="text-gold font-semibold hover:underline">(813) 501-7572</a>{" "}
+            to get on the list, or browse all of our{" "}
+            <Link to="/services" className="text-primary hover:underline">repair services</Link>.
+          </p>
+        </article>
+      </div>
+    </div>
+  </section>
+);
