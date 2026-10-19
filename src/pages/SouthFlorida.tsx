@@ -1,7 +1,6 @@
 import RegionHome from "@/components/home/RegionHome";
 import { southFloridaCities } from "@/data/citiesSouthFlorida";
 import { SOUTH_FLORIDA_WEBSITE_LIVE } from "@/lib/regions";
-import { trackConversion } from "@/lib/gtag";
 import { useSeo } from "@/lib/useSeo";
 
 const SITE = "https://mikesmautorepair.com";
