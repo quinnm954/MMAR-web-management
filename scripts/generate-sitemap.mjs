@@ -96,6 +96,9 @@ const mainEntries = [
   urlEntry({ loc: `${SITE}/reviews`, priority: "0.6" }),
   urlEntry({ loc: `${SITE}/contact`, priority: "0.7" }),
   urlEntry({ loc: `${SITE}/lee-county-fl`, priority: "0.8" }),
+  ...(/SOUTH_FLORIDA_WEBSITE_LIVE\s*=\s*true/.test(read("src/lib/regions.ts"))
+    ? [urlEntry({ loc: `${SITE}/south-florida`, priority: "0.8" })]
+    : []),
   urlEntry({ loc: `${SITE}/install`, priority: "0.4" }),
   urlEntry({ loc: `${SITE}/warranty-policy`, changefreq: "yearly", priority: "0.3" }),
   ...categories.map((id) =>
