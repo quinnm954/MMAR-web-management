@@ -55,7 +55,7 @@ const BENEFITS = [
   {
     icon: Sparkles,
     title: "Discounted labor & parts",
-    text: "Member-only pricing on brakes, batteries, tires, and seasonal work — usually pays for the plan after one or two visits.",
+    text: "Member-only pricing on brakes, batteries, and seasonal work — usually pays for the plan after one or two visits.",
   },
   {
     icon: ShieldCheck,

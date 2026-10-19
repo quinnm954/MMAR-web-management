@@ -140,8 +140,8 @@ const LeeCounty = () => {
             Mechanical Services Across Lee County
           </h2>
           <p className="text-muted-foreground mb-4">
-            Every mechanical service except bodywork — brakes, AC, batteries,
-            engine, transmission, suspension, tires, fuel/exhaust, cooling, and
+            Mechanical repairs (no bodywork, tires or alignments) — brakes, AC, batteries,
+            engine, transmission, suspension, fuel/exhaust, cooling, and
             inspections. Tap a service to see how we deliver it across Lee County.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-12">

@@ -28,8 +28,8 @@ const PRICING_DEFAULT: CityPriceRow[] = [
   { service: "Starter replacement", range: "$325 – $625" },
   { service: "Front brake pads + rotors", range: "$285 – $475", note: "Per axle, quality parts" },
   { service: "AC recharge with leak check", range: "$145 – $235", note: "R-134a or R-1234yf" },
-  { service: "Check-engine-light diagnostic", range: "$95 – $145", note: "Waived if you book the repair" },
-  { service: "No-start diagnostic (on-site)", range: "$95 – $165" },
+  { service: "Check-engine-light diagnostic", range: "$100", note: "$50 credited to repair labor" },
+  { service: "No-start diagnostic (on-site)", range: "$100", note: "$50 credited to repair labor" },
 ];
 
 const FAQ_BASE = (cityName: string, state: string): CityFAQ[] => [
@@ -107,7 +107,7 @@ export const cities: City[] = [
       },
       {
         question: "How much does a mobile mechanic cost in Lehigh Acres?",
-        answer: "Most jobs price within 5–10% of a brick-and-mortar shop, and usually less once you remove the tow bill ($85–$150 round trip from Lehigh) and the lost workday. We quote in writing before any work begins, and the diagnostic fee is waived if you book the repair.",
+        answer: "Most jobs price within 5–10% of a brick-and-mortar shop, and usually less once you remove the tow bill ($85–$150 round trip from Lehigh) and the lost workday. We quote in writing before any work begins, and the diagnosis fee is $100, with $50 credited to repair labor if you go ahead.",
       },
       {
         question: "Same-day service in Lehigh Acres?",
@@ -171,7 +171,7 @@ export const cities: City[] = [
       },
       {
         question: "Do you handle fleet maintenance for small businesses in Fort Myers?",
-        answer: "Yes — we run scheduled PM (oil, filters, tire rotation, brake inspection, fluid checks) for fleets of 3+ vehicles on-site at your shop or yard. We track each vehicle's mileage, service history, and recommended next-service date, and quote larger repairs in writing before any work begins.",
+        answer: "Yes — we run scheduled PM (oil, filters, brake inspection, fluid checks) for fleets of 3+ vehicles on-site at your shop or yard. We track each vehicle's mileage, service history, and recommended next-service date, and quote larger repairs in writing before any work begins.",
       },
       {
         question: "Pricing and payment in Fort Myers?",

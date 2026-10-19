@@ -224,9 +224,6 @@ const SeoContent = () => {
             <ul className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-4">
               <li><Link to="/areas/lehigh-acres" className="text-primary underline-offset-4 hover:underline">Lehigh Acres</Link></li>
               <li><Link to="/areas/fort-myers" className="text-primary underline-offset-4 hover:underline">Fort Myers</Link></li>
-              <li>San Carlos Park</li>
-              <li>Gateway</li>
-              <li>North Fort Myers</li>
             </ul>
             <p className="mt-4">
               Don't see your town? Call us — chances are we cover it. Our goal

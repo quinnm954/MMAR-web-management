@@ -9,7 +9,7 @@ const points = [
   {
     icon: DollarSign,
     title: "Transparent, Up-Front Pricing",
-    body: "You get a written quote before any wrench turns. No bait-and-switch shop fees, no surprise add-ons, and no diagnostic charge stacked on top of a repair we're already doing.",
+    body: "You get a written quote before any wrench turns. No bait-and-switch shop fees, no surprise add-ons. Diagnosis is a flat $100, and $50 of it is credited to your repair labor.",
   },
   {
     icon: Truck,
@@ -18,7 +18,7 @@ const points = [
   },
   {
     icon: Clock,
-    title: "Fast Response, 7am–9pm",
+    title: "Fast Response, Mon–Sat 8am–8pm",
     body: "Most appointments are same-day across Lehigh Acres and Fort Myers — a real technician answers, not a call center.",
   },
   {
