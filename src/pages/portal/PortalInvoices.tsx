@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Receipt, Loader2, FileText, CreditCard } from "lucide-react";
 import { portalStrings } from "@/lib/portalStrings";
 import { toast } from "sonner";
+import { invoiceBalanceDue } from "@/lib/reportInvoice";
 
 interface Invoice {
   id: string;
@@ -155,7 +156,8 @@ const PortalInvoices = () => {
                 </div>
               </CardContent>
             </Card>
-          ))}
+            );
+          })}
         </div>
       )}
     </PortalLayout>
