@@ -323,7 +323,7 @@ const AdminInvoices = () => {
 
 
 
-  const totalDue = invoices.filter((i) => i.status !== "paid" && i.status !== "void").reduce((s, i) => s + (i.total - i.amount_paid), 0);
+  const totalDue = invoices.reduce((s, i) => s + invoiceBalanceDue(i as any), 0);
 
   const [textingId, setTextingId] = useState<string | null>(null);
 
@@ -496,7 +496,11 @@ const AdminInvoices = () => {
                   </div>
                   <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                     <div className="text-right ml-auto sm:ml-0">
-                      <div className="font-bold">${i.total.toFixed(2)}</div>
+                      {i.status === "refunded" ? (
+                        <div className="font-bold">-${Math.abs(Number(i.total)).toFixed(2)} <span className="text-xs font-normal text-muted-foreground">Refund</span></div>
+                      ) : (
+                        <div className="font-bold">${i.total.toFixed(2)}</div>
+                      )}
                       {(i.discount_amount ?? 0) > 0 && (
                         <div className="text-xs text-primary">
                           −${Number(i.discount_amount).toFixed(2)} discount
@@ -513,7 +517,7 @@ const AdminInvoices = () => {
                       <ExternalLink className="h-3 w-3 mr-1" />
                       View
                     </Button>
-                    {i.status !== "paid" && i.status !== "void" && (
+                    {invoiceBalanceDue(i as any) > 0 && (
                       <>
                         <Button size="sm" variant="hero" onClick={() => openPayment(i)} title="Record a payment (cash, card, check, Zelle, split, etc.)">
                           <DollarSign className="h-3 w-3 mr-1" />
