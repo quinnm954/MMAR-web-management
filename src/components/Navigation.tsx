@@ -49,6 +49,9 @@ const RESOURCES = [
 ];
 
 const Navigation = () => {
+  const sflHome = useHomeRegion() === "sfl";
+  const homeTo = sflHome ? "/south-florida" : "/";
+  const areas = sflHome ? SFL_AREAS : AREAS;
   const [isOpen, setIsOpen] = useState(false);
   const { user, roles, signOut } = useAuth();
   const navigate = useNavigate();

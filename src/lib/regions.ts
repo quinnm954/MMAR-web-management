@@ -8,3 +8,7 @@ export const REGION_NAMES: Record<RegionSlug, string> = {
   swfl: 'Southwest Florida',
   sfl: 'South Florida',
 };
+
+// Receptionist/booking open for South Florida (a tech is assigned). Hides the
+// website "coming soon" notes; flip together with assigning an SFL tech.
+export const SOUTH_FLORIDA_BOOKING_OPEN = false;
