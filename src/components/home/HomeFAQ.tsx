@@ -13,7 +13,7 @@ const faqs = [
   },
   {
     q: "How fast can you get to me?",
-    a: "Same-day appointments are usually available across Lehigh Acres and Fort Myers. Most calls are reached within an hour.",
+    a: "Next-day appointments are usually available across Lehigh Acres and Fort Myers.",
   },
   {
     q: "Are your repairs warrantied?",

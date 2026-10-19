@@ -19,7 +19,7 @@ const points = [
   {
     icon: Clock,
     title: "Fast Response, Mon–Sat 8am–8pm",
-    body: "Most appointments are same-day across Lehigh Acres and Fort Myers — a real technician answers, not a call center.",
+    body: "Most appointments are next-day across Lehigh Acres and Fort Myers — a real technician answers, not a call center.",
   },
   {
     icon: ShieldCheck,

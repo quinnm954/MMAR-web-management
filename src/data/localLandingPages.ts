@@ -33,7 +33,7 @@ const _allLocalLandingPages: LocalLandingPage[] = [
     h1: "Brake Repair in Lehigh Acres, FL",
     metaTitle: "Brake Repair in Lehigh Acres, FL | Mobile Same-Day Service",
     metaDescription:
-      "Mobile brake repair in Lehigh Acres, FL. Pads, rotors, calipers, and brake fluid done in your driveway. Same-day service. Call (813) 501-7572.",
+      "Mobile brake repair in Lehigh Acres, FL. Pads, rotors, calipers, and brake fluid done in your driveway. Next-day service. Call (813) 501-7572.",
     intro:
       "Brake heat fade is the underlying enemy in Lehigh Acres. The long stretches of stop-and-go on Lee Boulevard heading toward Fort Myers cycle pad temperatures from 200°F at cruise to 600°F under heavy braking, dozens of times per commute. That thermal load is what destroys cheap pads in 18 months and good pads in 3–4 years.",
     paragraphs: [
@@ -41,7 +41,7 @@ const _allLocalLandingPages: LocalLandingPage[] = [
       "Rotor metallurgy matters more than most shops admit. The OE replacement rotors most chains install are gray cast iron with low carbon content — they're cheap to make and warp predictably under repeated heat cycles. We spec rotors with higher carbon content (G3500 or better), which costs about $15 more per rotor but extends life by 30–40% in Lehigh Acres conditions.",
       "Caliper service is the part shops skip to save 20 minutes. Slide pins seize from boot tears, especially in the rainy season; one frozen pin means uneven pad wear, increased stopping distance, and eventual rotor warpage. Every brake job includes pin removal, full clean, inspection of the boot, and high-temperature silicone grease — the only lubricant rated for the temperatures inside a caliper bracket.",
       "Brake fluid is hygroscopic — it absorbs water out of humid Florida air through the reservoir cap and through micro-permeable rubber lines. Once moisture content passes 3%, fluid boil point drops from 446°F to under 311°F, and the first hard stop on a hot day produces vapor lock. We test moisture content on every brake call and recommend a full flush every 36 months in Lehigh Acres.",
-      "Same-day mobile brake service is usually available across all Lehigh Acres ZIPs. Call or text (813) 501-7572 and we'll quote up front, before any wrench turns.",
+      "Next-day mobile brake service is usually available across all Lehigh Acres ZIPs. Call or text (813) 501-7572 and we'll quote up front, before any wrench turns.",
     ],
     included: [
       "Pad friction-compound selection matched to vehicle weight",
@@ -113,7 +113,7 @@ const _allLocalLandingPages: LocalLandingPage[] = [
       },
       {
         q: "How quickly can you get to me in Fort Myers?",
-        a: "Same-day mobile brake service is the norm across all Fort Myers ZIPs (33901, 33907, 33908, 33912, 33913, 33916, 33919, 33966).",
+        a: "Next-day mobile brake service is the norm across all Fort Myers ZIPs (33901, 33907, 33908, 33912, 33913, 33916, 33919, 33966).",
       },
     ],
   },
@@ -179,7 +179,7 @@ const _allLocalLandingPages: LocalLandingPage[] = [
       "Modern brake systems are integrated with stability control, traction control, hill-hold, and on newer vehicles regenerative braking blending. Replacing pads on a hybrid or EV requires using a scan tool to retract the caliper electronically — pushing the piston back manually damages the parking-brake actuator. Our scan tools cover that on most domestic, Asian, and European makes.",
       "Brake hardware — clips, shims, springs — is consumable. We replace it on every pad job. Re-using old hardware is the single most common reason a 'fresh' brake job is back making noise within 90 days. The clips lose tension, the shims lose their shim coating, the pad rattles in the bracket and either squeals or wears unevenly.",
       "Brake fluid service belongs in every preventive plan in this climate. Florida humidity drives moisture into the fluid through the reservoir cap and lines; once moisture passes 3%, you have a safety problem on the first hot day. We test with a refractometer, not by looking at fluid color.",
-      "Service across every Lehigh Acres and Fort Myers ZIP. Same-day appointments usually available. Call or text (813) 501-7572.",
+      "Service across every Lehigh Acres and Fort Myers ZIP. Next-day appointments usually available. Call or text (813) 501-7572.",
     ],
     included: [
       "Diagnostic before any parts are recommended",
@@ -193,7 +193,7 @@ const _allLocalLandingPages: LocalLandingPage[] = [
     faqs: [
       {
         q: "Can I drive on grinding brakes safely for a few days?",
-        a: "No. Grinding means metal-on-metal contact, and every additional mile is scoring the rotor (and possibly the caliper bracket). The repair gets meaningfully more expensive every day. We can be there same day.",
+        a: "No. Grinding means metal-on-metal contact, and every additional mile is scoring the rotor (and possibly the caliper bracket). The repair gets meaningfully more expensive every day. We can be there next day.",
       },
       {
         q: "Why do new brakes squeal sometimes?",
@@ -229,7 +229,7 @@ const _allLocalLandingPages: LocalLandingPage[] = [
       "Engine-to-chassis ground straps in Fort Myers vehicles corrode predictably between years 5 and 8. The strap looks fine externally but the copper braid under the heat-shield insulation has oxidized. The fix is replacement, not cleaning — once the copper has lost cross-section to corrosion, no amount of brushing restores conductivity.",
       "Newer Fort Myers vehicles (2014 and later, especially GM and Ford) use 'smart' charging systems that vary alternator output based on battery state-of-charge as commanded by the body control module. Replacing the alternator on a smart-charging vehicle without resetting the battery monitor sensor produces the symptom 'new alternator overcharges or undercharges.' Our scan tool resets the battery sensor on every applicable job.",
       "AGM batteries, common in Fort Myers stop-start vehicles, require a charging system that can hold 14.6–14.8 volts at temperature, higher than a flooded battery's 13.8–14.4. Mismatching the alternator profile to the battery type cooks the battery in 12 months. We confirm battery type before recommending the alternator part.",
-      "Same-day mobile alternator service usually available. Call or text (813) 501-7572.",
+      "Next-day mobile alternator service usually available. Call or text (813) 501-7572.",
     ],
     included: [
       "Full charging-circuit voltage-drop test",
@@ -275,7 +275,7 @@ const _allLocalLandingPages: LocalLandingPage[] = [
       "Alternator brushes are the wear item inside the alternator. They're spring-loaded carbon contacts that ride against the slip rings to deliver field current to the rotor. When they wear past about 5mm of length (typically at 150,000+ miles in Lehigh Acres), output gets unstable — fine at idle, weak under load, then total failure. Some alternators support brush-only service; most don't, and it's a full replacement.",
       "Pulley engagement is overlooked. A one-way clutch pulley (OAD) decouples the alternator from belt deceleration to reduce belt fatigue — when it fails, the symptom is a chirp on engine shutdown or a rattle at idle, and the alternator behind it eventually overheats from belt-shock. We inspect the OAD on every alternator service.",
       "Lehigh Acres heat is the underlying stressor. Engine bay temperatures regularly exceed 220°F in summer, and the alternator sits inches from that heat. Diode rectifiers fail thermally, voltage regulators drift with temperature, and bearings dry out. Quality remanufactured alternators with new diodes, new bearings, and new regulators cost about 20% more than basic units and last roughly twice as long here.",
-      "Same-day service across all Lehigh Acres ZIPs. Call or text (813) 501-7572.",
+      "Next-day service across all Lehigh Acres ZIPs. Call or text (813) 501-7572.",
     ],
     included: [
       "Live-load charging system test (not bench-style)",
@@ -321,7 +321,7 @@ const _allLocalLandingPages: LocalLandingPage[] = [
       "Selection of replacement amperage matters. We don't downgrade a 160A truck alternator to a 105A 'universal fit' unit because that's what's cheap on the shelf. We match or exceed the OE rating, especially on Lehigh Acres trucks and Fort Myers tow vehicles that pull at full demand for hours.",
       "Smart-charging vehicles (2014+ from most makes) require a battery-monitor reset after alternator or battery replacement. Without the reset, the body control module commands wrong output and either undercharges or cooks the battery. We carry the right scan-tool coverage for most makes.",
       "Belt-system geometry is often the hidden culprit. A failing tensioner, glazed belt, or misaligned idler pulley produces belt slip under load, which produces low alternator output, which the customer reads as 'bad alternator.' Replacing the alternator without addressing the belt issue means the new unit lasts a few months at best.",
-      "Same-day mobile service across every Lehigh Acres and Fort Myers ZIP. Call or text (813) 501-7572.",
+      "Next-day mobile service across every Lehigh Acres and Fort Myers ZIP. Call or text (813) 501-7572.",
     ],
     included: [
       "Full charging-circuit test (load + voltage drop)",
@@ -366,7 +366,7 @@ const _allLocalLandingPages: LocalLandingPage[] = [
       "Brush wear shows up as intermittent charging that gets worse with vibration. Most common Lehigh Acres / Fort Myers symptom: dash voltage drops by a few tenths every time you go over a speed bump or hit Lee Boulevard's rougher patches. The brushes momentarily lose contact with the slip rings.",
       "Bearing failure announces itself with a high-pitched squeal under acceleration, audible from the front of the engine. Once it starts, you have weeks at most before the bearing seizes — and a seized alternator pulley snaps the serpentine belt and disables every belt-driven accessory at once.",
       "Belt-driven accessories are integrated. A weak alternator can mask a tensioner problem, and a tensioner problem can mask a weak alternator. We inspect the entire belt path on every alternator call and replace the belt with the alternator if it has more than 60,000 miles or shows any glazing.",
-      "Same-day service available. Call or text (813) 501-7572.",
+      "Next-day service available. Call or text (813) 501-7572.",
     ],
     included: [
       "Diode-rectifier test (oscilloscope ripple measurement)",
@@ -392,7 +392,7 @@ const _allLocalLandingPages: LocalLandingPage[] = [
       },
       {
         q: "Do you cover Lehigh Acres AND Fort Myers?",
-        a: "Yes — every ZIP in both cities, same-day service standard.",
+        a: "Yes — every ZIP in both cities, next-day service standard.",
       },
     ],
   },
@@ -417,7 +417,7 @@ const _allLocalLandingPages: LocalLandingPage[] = [
       "EFB (Enhanced Flooded Battery) is the entry-level upgrade for stop-start vehicles. It tolerates the higher cycle count of stop-start operation and costs roughly 30% more than flooded. Most 2015+ economy cars with stop-start need EFB or better; installing flooded shortens battery life to 12–18 months.",
       "AGM (Absorbed Glass Mat) is sealed, vibration-resistant, and the only correct choice for vehicles with regenerative braking, premium audio, or significant key-off electrical load. AGM holds higher voltage (12.85V resting versus 12.6V for flooded) and tolerates deep discharge cycles flooded batteries can't. Cost is roughly double flooded; service life is typically 4–6 years even in Florida.",
       "Group size, cold-cranking amps, reserve capacity, and terminal layout all need to match the vehicle. Wrong group size means the battery doesn't fit the tray. Wrong CCA leaves marginal cold cranking. Wrong reserve capacity means accessories drain it faster. We carry the right specs for most vehicles and install with proper terminal cleaning, hold-down torque, and post-install voltage verification.",
-      "Service across every Lehigh Acres and Fort Myers ZIP. Same-day standard. Call or text (813) 501-7572.",
+      "Service across every Lehigh Acres and Fort Myers ZIP. Next-day standard. Call or text (813) 501-7572.",
     ],
     included: [
       "Battery type matched to vehicle (flooded / EFB / AGM)",
@@ -462,7 +462,7 @@ const _allLocalLandingPages: LocalLandingPage[] = [
       "Battery state-of-health is more meaningful than voltage. A 12.6V resting battery looks fine on a multimeter but may fail a 50% load test if internal sulfation has reduced capacity. Our load testers measure cold-cranking-amp output under simulated start load — that's the only test that reveals usable battery condition.",
       "Heat is what kills batteries in Lehigh Acres and Fort Myers. The chemical reaction that produces electricity accelerates with temperature, but so does internal grid corrosion and water loss. A battery rated for 60 months in Minnesota will deliver 30–36 months here. AGM construction tolerates heat better than flooded; that's why we recommend AGM for any vehicle that parks outdoors regularly.",
       "Charging-system condition determines whether the new battery has a chance. An alternator producing 13.5V instead of the spec 14.2V will undercharge the battery for its entire life. An alternator with diode ripple will produce charge but cook the battery from electrolyte agitation. We test both before declaring the install complete.",
-      "Same-day service. Call or text (813) 501-7572.",
+      "Next-day service. Call or text (813) 501-7572.",
     ],
     included: [
       "Parasitic-draw measurement with inductive clamp",
@@ -508,7 +508,7 @@ const _allLocalLandingPages: LocalLandingPage[] = [
       "Parasitic-draw testing is part of every Lehigh Acres battery install. We measure with an inductive clamp after the vehicle has been locked and gone through its sleep cycle (typically 30 minutes). Above 50 mA continuous draw means something isn't sleeping properly — most common offenders in this market are aftermarket alarm modules, dash cameras hard-wired incorrectly, and trunk lights with failed pin switches.",
       "Battery selection depends on vehicle. A daily-driver Camry doesn't need AGM. A 2020 F-150 with stop-start absolutely does. A 2017 Ram with trailer-tow package needs higher CCA than the base model. We carry battery references for most makes and don't 'universal-fit' a battery into a vehicle that needs a specific spec.",
       "Lehigh Acres summers cycle a battery between 100°F engine-off heat soak and 200°F+ engine-on heat. That thermal stress is what cuts service life from a rated 60 months down to a real-world 30–36 months. We mention AGM upgrade on every install for vehicles that park outdoors all summer; in our experience the longer life justifies the price difference within the second year.",
-      "Same-day Lehigh Acres mobile battery service. Call or text (813) 501-7572.",
+      "Next-day Lehigh Acres mobile battery service. Call or text (813) 501-7572.",
     ],
     included: [
       "Battery removal and full terminal corrosion cleanup",
@@ -554,7 +554,7 @@ const _allLocalLandingPages: LocalLandingPage[] = [
       "Coastal Fort Myers vehicles (Iona, Fort Myers Beach, parts of South Fort Myers, McGregor near the river) need sealed AGM construction for one specific reason: the vented gas from a flooded battery reacts with salt-laden humid air to form acidic crust that destroys the terminals and surrounding metal in months. AGM is sealed, no venting, no terminal corrosion.",
       "Charging-system testing is non-negotiable on every install. An alternator producing low voltage will undercharge the new battery for its life; an alternator with diode ripple will cook it from inside. We measure both before declaring the install complete.",
       "Battery monitor sensors on smart-charging Fort Myers vehicles need to be reset with a scan tool after install. Skip the reset and the alternator commands wrong output for weeks until the system relearns — meanwhile the new battery is being mishandled. Our scan tool covers most makes.",
-      "Same-day Fort Myers mobile battery service across every ZIP. Call or text (813) 501-7572.",
+      "Next-day Fort Myers mobile battery service across every ZIP. Call or text (813) 501-7572.",
     ],
     included: [
       "Battery type matched to vehicle (AGM/EFB/flooded)",
@@ -576,7 +576,7 @@ const _allLocalLandingPages: LocalLandingPage[] = [
       },
       {
         q: "Can you cover Fort Myers Beach?",
-        a: "Yes — Fort Myers Beach is part of our regular service area, same-day available.",
+        a: "Yes — Fort Myers Beach is part of our regular service area, next-day available.",
       },
       {
         q: "How long should an AGM battery last in Fort Myers?",
@@ -604,7 +604,7 @@ const _allLocalLandingPages: LocalLandingPage[] = [
       "Voltage-drop testing on the starter circuit is where DIY diagnosis usually fails. The cables and connections look fine, voltage at the battery is fine, but voltage at the starter under crank load drops below the 9.6V minimum for solenoid engagement. The problem is often a corroded ground strap or a high-resistance positive cable connection — not the starter at all.",
       "Heat-soak no-start is a common Lehigh Acres / Fort Myers starter complaint. The car starts fine cold; after a 20-minute drive and a 10-minute heat soak (engine off, exhaust radiating onto the starter), it won't restart. Cool the starter with a wet rag and it cranks. That's a heat-failed starter — internal solenoid windings have lost insulation integrity.",
       "Replacement starters need to match the OE spec exactly, including pinion tooth count, gear-reduction ratio, and mounting bolt pattern. 'Universal fit' starters that close-enough at a parts store often have wrong rotation timing and grind on engagement. We carry direct-fit OE-equivalent units.",
-      "Same-day mobile starter service across both cities. Call or text (813) 501-7572.",
+      "Next-day mobile starter service across both cities. Call or text (813) 501-7572.",
     ],
     included: [
       "Battery and ground-cable voltage-drop test",
@@ -771,7 +771,7 @@ const _allLocalLandingPages: LocalLandingPage[] = [
         a: "We can pull pending codes (set but not yet matured to MIL) and freeze-frame data from any past code. For truly intermittent issues we can leave a data logger on the vehicle to capture the next event.",
       },
       {
-        q: "Same day in Lehigh Acres?",
+        q: "Next day in Lehigh Acres?",
         a: "Almost always.",
       },
     ],
@@ -819,7 +819,7 @@ const _allLocalLandingPages: LocalLandingPage[] = [
       },
       {
         q: "How fast can you respond?",
-        a: "Same-day across Lehigh Acres and Fort Myers is standard.",
+        a: "Next-day across Lehigh Acres and Fort Myers is standard.",
       },
     ],
   },
@@ -833,7 +833,7 @@ const _allLocalLandingPages: LocalLandingPage[] = [
     metaDescription:
       "Mobile engine diagnostics in Fort Myers, FL. Misfire isolation, fuel-trim analysis, EVAP smoke testing. Call (813) 501-7572.",
     intro:
-      "A flashing check-engine light in Fort Myers means active misfire. Drive on it and the unburned fuel washes the catalyst — a $30 ignition coil becomes a $1,800 catalyst job in under 100 miles. We diagnose flashing-MIL situations same-day and prioritize them.",
+      "A flashing check-engine light in Fort Myers means active misfire. Drive on it and the unburned fuel washes the catalyst — a $30 ignition coil becomes a $1,800 catalyst job in under 100 miles. We diagnose flashing-MIL situations next-day and prioritize them.",
     paragraphs: [
       "Misfire isolation by cylinder is straightforward with a modern scan tool — the ECU keeps individual misfire counters per cylinder. Cylinder #4 with 800 misfires versus cylinders #1, #2, #3 at zero is a clear pointer at the #4 coil, plug, or injector. We swap-test by moving suspect parts to a known-good cylinder and watching whether the misfire moves with them.",
       "Misfire root causes in Fort Myers vehicles, in approximate order of frequency: failing ignition coil (most common, especially on coil-on-plug systems past 80,000 miles), worn spark plug (overdue service interval), dirty or leaking injector, vacuum leak on a single intake runner, failing oxygen sensor causing wrong fueling, low compression on the affected cylinder. We test in that order.",
@@ -853,7 +853,7 @@ const _allLocalLandingPages: LocalLandingPage[] = [
     faqs: [
       {
         q: "How urgent is a flashing check-engine light?",
-        a: "Very. Flashing MIL means active misfire and ongoing catalyst damage. Pull over at the next safe spot and call. Same-day diagnosis is the norm in Fort Myers.",
+        a: "Very. Flashing MIL means active misfire and ongoing catalyst damage. Pull over at the next safe spot and call. Next-day diagnosis is the norm in Fort Myers.",
       },
       {
         q: "Can a bad gas cap really cause a check-engine light?",
@@ -864,8 +864,8 @@ const _allLocalLandingPages: LocalLandingPage[] = [
         a: "Most common: temperature-related — a coil that fails when hot but works cold, or vice versa. We can capture freeze-frame data from past events and often diagnose without waiting for the symptom to recur.",
       },
       {
-        q: "Same-day in Fort Myers?",
-        a: "Yes — diagnosis is one of our most common same-day Fort Myers services.",
+        q: "Next-day in Fort Myers?",
+        a: "Yes — diagnosis is one of our most common next-day Fort Myers services.",
       },
     ],
   },
@@ -909,8 +909,8 @@ const _allLocalLandingPages: LocalLandingPage[] = [
         a: "Usually timing chain stretch (cam timing retarded, valves opening late). Confirmed with cam-vs-crank correlation on the scan tool.",
       },
       {
-        q: "Same day across both cities?",
-        a: "Yes — diagnostics are one of our most common same-day jobs.",
+        q: "Next day across both cities?",
+        a: "Yes — diagnostics are one of our most common next-day jobs.",
       },
     ],
   },
@@ -935,7 +935,7 @@ const _allLocalLandingPages: LocalLandingPage[] = [
       "Cranks-but-won't-fire diagnosis follows the three-things-an-engine-needs framework: spark, fuel, compression. We verify each. Spark: pull a coil and check for spark to ground during crank. Fuel: check fuel-pressure with a gauge during crank — should read at or near spec. Compression: usually presumed if the engine cranks at normal speed and recently ran fine, otherwise verified with a compression gauge.",
       "Security/immobilizer is the one Lehigh Acres / Fort Myers no-start that often gets missed. The engine cranks normally, has spark, has fuel, but won't fire because the immobilizer hasn't authorized the start. Symptom is identical to a fueling or ignition problem unless you're looking for the security light flashing on the dash — which most diagnostic shortcuts skip.",
       "Crank-position sensor failures account for a significant share of cranks-but-won't-fire calls in this region. The sensor often fails heat-related — works cold, dies after the engine warms up, comes back after the sensor cools. We've seen vehicles towed three times before someone identified a heat-failed crank sensor.",
-      "Same-day no-start service across all of Lehigh Acres and Fort Myers — these are priority calls. Call or text (813) 501-7572.",
+      "Next-day no-start service across all of Lehigh Acres and Fort Myers — these are priority calls. Call or text (813) 501-7572.",
     ],
     included: [
       "Battery, starter circuit, and start-signal verification",
@@ -980,7 +980,7 @@ const _allLocalLandingPages: LocalLandingPage[] = [
       "Fuel pressure during crank should read at or near manufacturer spec — typically 40-60 psi for port-injected gasoline engines, 800-2200 psi for direct injection. Zero pressure during crank: dead fuel pump, blown fuel-pump fuse, or failed fuel-pump relay. Pressure that rapidly bleeds off after key-off: failed fuel-pressure regulator or leaking injector.",
       "Spark verification: pull one coil-on-plug or one plug wire, ground the plug to a clean engine surface, crank the engine. Visible blue spark means ignition system is functional. No spark or weak yellow spark points at coil, ignition control module, or — for cranks-but-no-spark — most often the crankshaft position sensor.",
       "If all three (voltage, fuel, spark) are present and the engine still won't fire, the path narrows quickly to: timing-chain skipped (cam-vs-crank correlation off), security/immobilizer block, or — rarest — internal mechanical failure like jumped timing belt or hydrolocked cylinder.",
-      "Priority same-day service. Call or text (813) 501-7572.",
+      "Priority next-day service. Call or text (813) 501-7572.",
     ],
     included: [
       "Cranking-voltage measurement at the starter",
@@ -1006,7 +1006,7 @@ const _allLocalLandingPages: LocalLandingPage[] = [
       },
       {
         q: "Available across both cities?",
-        a: "Yes — same-day no-start response across all of Lehigh Acres and Fort Myers.",
+        a: "Yes — next-day no-start response across all of Lehigh Acres and Fort Myers.",
       },
     ],
   },
@@ -1027,7 +1027,7 @@ const _allLocalLandingPages: LocalLandingPage[] = [
       "Alternator condition is measured by output voltage at idle (should be 13.8V minimum), output under full electrical load (lights, AC, defroster on — should hold 13.5V minimum), and AC ripple (should be under 50 mV). A pass on voltage but a fail on ripple means the diode rectifier is failing and will kill the next battery.",
       "Starter condition is measured by current draw during crank — typically 150-250 amps for a healthy small-engine starter, 300-450 for a large V8. High draw means worn brushes or armature; low draw with no rotation means ignition-side or circuit problem upstream.",
       "Cabling and grounds are the system's hidden weak point. A corroded battery cable, a failing engine-to-chassis ground strap, or a high-resistance starter solenoid lead can mimic any of the three component failures. Voltage-drop testing isolates these in minutes.",
-      "We test all three components plus cabling on every starting-and-charging call across Lehigh Acres and Fort Myers. Same-day service standard. Call or text (813) 501-7572.",
+      "We test all three components plus cabling on every starting-and-charging call across Lehigh Acres and Fort Myers. Next-day service standard. Call or text (813) 501-7572.",
     ],
     included: [
       "Battery CCA load test",
@@ -1052,7 +1052,7 @@ const _allLocalLandingPages: LocalLandingPage[] = [
         a: "Battery: 30–48 months in Florida. Alternator: 7–10 years. Starter: 100,000–180,000 miles. All shortened by heat and by frequent short trips.",
       },
       {
-        q: "Same-day in both cities?",
+        q: "Next-day in both cities?",
         a: "Yes — these are priority no-start calls.",
       },
     ],
@@ -1169,7 +1169,7 @@ const _allLocalLandingPages: LocalLandingPage[] = [
       "Wrong-viscosity oil is the second-most-common mistake. A modern engine specifying 0W-20 with a 5W-30 in the sump runs higher oil pressure, slower oil flow at startup, and (on engines with variable-valve-timing using oil pressure as actuation) erratic VVT behavior. Symptoms can be subtle: hesitation under throttle, MIL with a P0011 or P0014 code.",
       "Wrong-specification oil is the sneakiest. The viscosity is right and the brand is reputable, but the oil doesn't carry the manufacturer's specific approval (dexos1, 502 00, 229.5, etc.). Direct-injected gasoline engines using non-approved oil can experience LSPI (low-speed pre-ignition) — a destructive event that breaks pistons. Approved oils are formulated to prevent it.",
       "Every Lehigh Acres oil change we perform verifies the OEM-approved oil and filter spec for the specific vehicle, measures capacity to the tenth, includes new crush washer, and torques the drain plug to manufacturer ft-lbs. Those four steps eliminate the most common chain-shop failure modes.",
-      "Service across all six Lehigh Acres ZIPs. Same-day available. Call or text (813) 501-7572.",
+      "Service across all six Lehigh Acres ZIPs. Next-day available. Call or text (813) 501-7572.",
     ],
     included: [
       "Verified OEM-approved oil and filter for the specific vehicle",
@@ -1215,7 +1215,7 @@ const _allLocalLandingPages: LocalLandingPage[] = [
       "Idle time is harder on oil than miles. An engine idling in Fort Myers traffic at 80 RPM for 10 minutes accumulates the wear-equivalent of about 7 highway miles. Oil-life monitors on most modern vehicles factor this; if your maintenance-minder hits well before your mileage interval, that's why.",
       "Synthetic oils carry pour-point depressants and viscosity-index improvers that retain stability across the temperature range Florida engines see. Conventional oils lose viscosity faster at sustained high temperature and shear in turbocharger bearings sooner. Synthetic is the right choice for any Fort Myers vehicle with a turbo, direct injection, or stop-start.",
       "Filter quality is where chain shops cut margin. A budget filter with weak bypass-valve calibration or compromised filter media lets unfiltered oil through under cold-start or high-RPM conditions. We use OEM-grade filters that match the vehicle's design specifications.",
-      "Same-day mobile oil change across every Fort Myers ZIP. Call or text (813) 501-7572.",
+      "Next-day mobile oil change across every Fort Myers ZIP. Call or text (813) 501-7572.",
     ],
     included: [
       "Synthetic, synthetic blend, conventional, or diesel-rated oil",
@@ -1340,7 +1340,7 @@ const _allLocalLandingPages: LocalLandingPage[] = [
         a: "Thermal expansion valve — the metering device that controls refrigerant flow into the evaporator. When it sticks (common after moisture intrusion), the AC blows warm or freezes up. Usually requires evaporator-area access.",
       },
       {
-        q: "Same-day in Fort Myers?",
+        q: "Next-day in Fort Myers?",
         a: "Yes — AC failures are priority calls in summer.",
       },
     ],
@@ -1361,7 +1361,7 @@ const _allLocalLandingPages: LocalLandingPage[] = [
       "Condenser airflow restriction is the second-most-common Lehigh Acres complaint. The condenser sits in front of the radiator and accumulates road debris, bug grit, and cottonwood fluff over years. Restricted airflow means the high side can't shed heat, pressures climb, and the high-pressure cutoff trips. A condenser cleaning often restores function without any refrigerant work at all.",
       "Refrigerant leaks in Lehigh Acres vehicles most often originate at: AC service-port Schrader valves (cheap to replace), the condenser core itself (after rock damage on Lee Boulevard or SR-82), or evaporator core (older vehicles, requires dash R&R for replacement). UV dye injection identifies the leak location within 1-2 weeks of operation.",
       "Charging by weight to OE spec is the only correct method. Most modern AC systems hold 1.5-2.5 lbs of refrigerant total — over-charging by even 4-6 ounces raises high-side pressure into the danger zone and either trips the cutoff or damages the compressor. We use a recover/recycle/recharge machine that measures to the gram.",
-      "Same-day mobile AC service across all Lehigh Acres ZIPs. Call or text (813) 501-7572.",
+      "Next-day mobile AC service across all Lehigh Acres ZIPs. Call or text (813) 501-7572.",
     ],
     included: [
       "Compressor clutch electrical and mechanical test",
@@ -1411,7 +1411,7 @@ const _allLocalLandingPages: LocalLandingPage[] = [
       "Diagnostic tools matter. Our scan-tool coverage includes most domestic, Asian, and European platforms with bidirectional capability — meaning we can command components on, not just read codes. We carry a smoke machine for vacuum/EVAP testing, oscilloscope for ignition and injector waveforms, refractometer for brake-fluid moisture, leak-down tester for cylinder integrity, and the standard array of pressure gauges, multimeters, and inspection cameras.",
       "Repairs we routinely complete in a single Lehigh Acres visit: brake pads/rotors (front and rear), battery delivery and install, alternator replacement, starter replacement, water pump (most platforms), serpentine belt and tensioner, ignition coils, spark plugs, oxygen sensors, MAF / MAP / TPS sensors, fuel-pump relays, AC recharges and most leak repairs, oil changes, timing belts (some vehicles), control arms / ball joints / tie rods, wheel bearings (most), and EVAP system repairs.",
       "Repairs that may need a follow-up visit or a referral: head gaskets (long labor in confined spaces), clutch and transmission internal work, body and frame work, alignment (we work with local alignment partners), and some fuel-pump-in-tank jobs that need a lift. We tell you up front when a job is or isn't mobile-friendly.",
-      "Same-day service across all Lehigh Acres ZIPs (33936, 33971, 33972, 33973, 33974, 33976). Call or text (813) 501-7572.",
+      "Next-day service across all Lehigh Acres ZIPs (33936, 33971, 33972, 33973, 33974, 33976). Call or text (813) 501-7572.",
     ],
     included: [
       "Bidirectional scan-tool coverage on most makes",
@@ -1457,7 +1457,7 @@ const _allLocalLandingPages: LocalLandingPage[] = [
       "Specific Fort Myers vehicle mix shapes our truck inventory: high count of Camry, Civic, Accord, Corolla, F-150, Silverado, Ram, Altima, Sentra. We carry brake pads, ignition coils, batteries, and starters for these platforms. Less-common vehicles get parts sourced same-day from local distributors.",
       "Coastal-area Fort Myers (Iona, Beach, parts of South Fort Myers) gets a different parts spec for hardware-exposed components: stainless brake hardware, sealed AGM batteries, dielectric protection on every electrical connection. The salt-air corrosion is real and predictable; we plan for it.",
       "Fort Myers fleet support is a meaningful part of our work — small businesses (HVAC, plumbing, landscaping, locksmith, mobile detailing, delivery) running 2-12 vehicles. Scheduled on-site maintenance keeps trucks earning instead of sitting at a shop. We invoice consolidated monthly for fleet customers.",
-      "Same-day mobile mechanic service across every Fort Myers ZIP. Call or text (813) 501-7572.",
+      "Next-day mobile mechanic service across every Fort Myers ZIP. Call or text (813) 501-7572.",
     ],
     included: [
       "Mobile mechanic service at home, office, or roadside",
@@ -1475,7 +1475,7 @@ const _allLocalLandingPages: LocalLandingPage[] = [
       },
       {
         q: "Do you cover Fort Myers Beach?",
-        a: "Yes — Fort Myers Beach is part of our regular service area, including same-day where possible.",
+        a: "Yes — Fort Myers Beach is part of our regular service area, including next-day where possible.",
       },
       {
         q: "Do you handle European cars in Fort Myers?",
@@ -1527,7 +1527,7 @@ const localFaqs = (cityName: string, service: string): FAQ[] => [
   },
   {
     q: `Can you come out the same day in ${cityName}?`,
-    a: `Often, yes. We work Monday to Saturday, 8 AM to 8 PM. Call or text (813) 501-7572 and we'll offer you the earliest open time.`,
+    a: `We don't book same-day repairs. Appointments start the next day, Monday to Saturday, 8 AM to 8 PM. Call or text (813) 501-7572 and we'll offer you the earliest open time.`,
   },
 ];
 

@@ -205,7 +205,7 @@ function buildPage(categoryId: string, citySlug: string): LocalLandingPage | nul
   const paragraphs = [
     `Coverage spans every ${city.name} ZIP — ${zipList} — and every neighborhood, including ${neighborhoodList}. ${city.intro}`,
     proc,
-    `${serviceLabel} pricing in ${city.name} matches or beats brick-and-mortar shops once the tow and the lost workday are factored in. We quote in writing before any work begins, and the diagnosis fee is $100, with $50 credited to repair labor if you go ahead. Same-day windows are typical for in-stock work; special-order parts may push to next day.`,
+    `${serviceLabel} pricing in ${city.name} matches or beats brick-and-mortar shops once the tow and the lost workday are factored in. We quote in writing before any work begins, and the diagnosis fee is $100, with $50 credited to repair labor if you go ahead. Next-day windows are typical for in-stock work; special-order parts may push to next day.`,
     `Every job is backed by our 12-month / 12,000-mile warranty on parts and labor. If a repair has a problem after we leave, the same technician returns at no charge — there's no dispatcher and no second-tier sub. Real ASE-grade work, real accountability.`,
     `Need ${serviceLabel.toLowerCase()} in ${city.name} today? Call or text (813) 501-7572. A real technician answers and quotes the work in writing before anything starts.`,
   ];
@@ -220,7 +220,7 @@ function buildPage(categoryId: string, citySlug: string): LocalLandingPage | nul
       a: `Pricing is at or below brick-and-mortar shop rates once tow and rental are factored out. We quote every ${serviceLabel.toLowerCase()} job in writing before work begins, and the diagnosis fee is $100, with $50 credited to repair labor if you go ahead.`,
     },
     {
-      q: `Can you do same-day ${serviceLabel.toLowerCase()} in ${city.name}?`,
+      q: `Can you do next-day ${serviceLabel.toLowerCase()} in ${city.name}?`,
       a: `Almost always for in-stock work. ${city.name} is inside our standard service area, so there is no trip fee, and our truck is loaded for most ${cat.title.toLowerCase()} jobs. Special-order parts may push to next-day.`,
     },
     {

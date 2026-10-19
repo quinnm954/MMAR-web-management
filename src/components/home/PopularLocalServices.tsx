@@ -56,7 +56,7 @@ const PopularLocalServices = () => {
             <span className="text-gold">LOCAL SERVICES</span>
           </h2>
           <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
-            Same-day mobile auto repair across Fort Myers and Lehigh Acres.
+            Next-day mobile auto repair across Fort Myers and Lehigh Acres.
           </p>
         </div>
         <div className="grid md:grid-cols-2 gap-5 md:gap-6 max-w-5xl mx-auto">

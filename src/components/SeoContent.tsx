@@ -15,8 +15,8 @@ const faqs = [
     a: "Yes — every job. Our service truck arrives at your driveway or parking lot with the tools, scanners, and parts to handle most repairs on the spot.",
   },
   {
-    q: "Do you offer same-day service?",
-    a: "Same-day appointments are usually available across Lehigh Acres and Fort Myers, including evenings and weekends whenever possible.",
+    q: "Do you offer next-day service?",
+    a: "Next-day appointments are usually available across Lehigh Acres and Fort Myers, including evenings and weekends whenever possible.",
   },
   {
     q: "How is pricing handled?",
@@ -159,7 +159,7 @@ const SeoContent = () => {
               . Every install includes a free charging-system test (so we don't
               hand you a new battery if your alternator is the real culprit),
               terminal cleaning, and old-battery recycling at no extra charge.
-              Same-day service is the norm anywhere in our service area.
+              Next-day service is the norm anywhere in our service area.
             </p>
           </div>
 
@@ -206,7 +206,7 @@ const SeoContent = () => {
               <li>✅ Mobile service — we come to you</li>
               <li>✅ Up-front, transparent pricing</li>
               <li>✅ Real diagnostics, not guess-and-replace</li>
-              <li>✅ Same-day appointments usually available</li>
+              <li>✅ Next-day appointments usually available</li>
               <li>✅ Parts &amp; labor warranty on every job</li>
               <li>✅ 5-star rated on Google, Facebook, Yelp, Nextdoor</li>
             </ul>
