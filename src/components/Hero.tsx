@@ -1,9 +1,13 @@
+import { useHomeRegion, AREA_TEXT } from "@/lib/homeRegion";
 import { Button } from "@/components/ui/button";
 import { MapPin, Phone, MessageCircle, Wrench, User, CalendarCheck } from "lucide-react";
 import { Link } from "react-router-dom";
 import { trackConversion } from "@/lib/gtag";
+import { SOUTH_FLORIDA_BOOKING_OPEN } from "@/lib/regions";
 
 const Hero = () => {
+  const region = useHomeRegion();
+  const A = AREA_TEXT[region];
   return (
     <section className="relative min-h-[100svh] flex items-center justify-center pt-16 md:pt-20 overflow-hidden">
       <div className="container mx-auto px-4 relative z-10">
@@ -11,15 +15,22 @@ const Hero = () => {
           <h1 className="font-display text-3xl sm:text-4xl md:text-6xl lg:text-7xl tracking-wide mb-4 md:mb-6 animate-slide-up">
             <span className="text-sky">MOBILE MECHANIC</span>
             <br />
-            <span className="text-gold">IN LEHIGH ACRES &amp; FORT MYERS, FL</span>
+            <span className="text-gold">IN {A.areasCaps}, FL</span>
           </h1>
 
           <p
             className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-7 md:mb-9 px-2 animate-slide-up"
             style={{ animationDelay: "0.1s" }}
           >
-            On-site auto repair and full diagnostics across Lehigh Acres and Fort Myers — we come to you.
+            On-site auto repair and full diagnostics across {A.areas} — we come to you.
           </p>
+
+          {region === "sfl" && !SOUTH_FLORIDA_BOOKING_OPEN && (
+            <div className="glass-card max-w-xl mx-auto mb-7 rounded-xl border border-accent/40 px-4 py-3 text-sm sm:text-base">
+              <p className="font-semibold text-accent">Now coming to Broward &amp; Palm Beach</p>
+              <p className="text-muted-foreground">Call or text (813) 501-7572 to get on the list — we'll reach out as soon as appointments open in your area.</p>
+            </div>
+          )}
 
           <div
             className="flex flex-col gap-2.5 sm:gap-3 max-w-3xl mx-auto mb-8 md:mb-12 px-4 animate-slide-up"
@@ -64,7 +75,7 @@ const Hero = () => {
           >
             <div className="flex items-center gap-2">
               <MapPin className="w-5 h-5 text-primary shrink-0" />
-              <span className="text-sm sm:text-base">Lehigh Acres and Fort Myers</span>
+              <span className="text-sm sm:text-base">{A.areas}</span>
             </div>
             <a href="tel:8135017572" onClick={() => trackConversion("phone_call")} className="flex items-center gap-2 hover:text-accent transition-colors active:scale-95">
               <Phone className="w-5 h-5 text-accent shrink-0" />

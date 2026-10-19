@@ -1,3 +1,4 @@
+import { useHomeRegion, AREA_TEXT } from "@/lib/homeRegion";
 import { Link } from "react-router-dom";
 import {
   Stethoscope,
@@ -17,6 +18,8 @@ const featured = [
 ];
 
 const FeaturedServices = () => {
+  const region = useHomeRegion();
+  const A = AREA_TEXT[region];
   return (
     <section className="py-14 md:py-20 bg-secondary/20">
       <div className="container mx-auto px-4">
@@ -26,7 +29,7 @@ const FeaturedServices = () => {
             <span className="text-gold">SERVICES</span>
           </h2>
           <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
-            The mobile repairs we get called for most across Lehigh Acres and Fort Myers.
+            The mobile repairs we get called for most across {A.areas}.
           </p>
         </div>
 
