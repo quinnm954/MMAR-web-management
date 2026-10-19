@@ -1,6 +1,5 @@
 import RegionHome from "@/components/home/RegionHome";
 import { southFloridaCities } from "@/data/citiesSouthFlorida";
-import { SOUTH_FLORIDA_WEBSITE_LIVE } from "@/lib/regions";
 import { useSeo } from "@/lib/useSeo";
 
 const SITE = "https://mikesmautorepair.com";
@@ -11,14 +10,11 @@ const SouthFlorida = () => {
     title: "Mobile Mechanic in Broward & Palm Beach | Mike's Mobile Auto Repair",
     description: "Mobile mechanic for Broward and Palm Beach Counties, FL. Diagnostics, brakes, batteries and repairs at your home or work. Call (813) 501-7572.",
     canonical: URL,
-    // Kept out of Google until the South Florida region launches.
-    noindex: !SOUTH_FLORIDA_WEBSITE_LIVE,
     breadcrumbs: [
       { name: "Home", url: `${SITE}/` },
       { name: "South Florida", url: URL },
     ],
-    jsonLd: SOUTH_FLORIDA_WEBSITE_LIVE
-      ? [
+    jsonLd: [
           {
             "@context": "https://schema.org",
             "@type": "AutoRepair",
@@ -40,8 +36,7 @@ const SouthFlorida = () => {
               closes: "20:00",
             }],
           },
-        ]
-      : undefined,
+        ],
   });
 
   return <RegionHome region="sfl" />;

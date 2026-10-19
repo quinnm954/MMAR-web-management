@@ -18,10 +18,8 @@ const matchAll = (src, re) => [...src.matchAll(re)].map((m) => m[1]);
 
 // --- Extract dynamic data ---
 const cities = matchAll(read("src/data/cities.ts"), /^\s*slug:\s*"([^"]+)"/gm);
-// South Florida city pages are listed only after their website launch switch is on.
-if (/SOUTH_FLORIDA_WEBSITE_LIVE\s*=\s*true/.test(read("src/lib/regions.ts"))) {
-  cities.push(...matchAll(read("src/data/citiesSouthFlorida.ts"), /slug:\s*"([^"]+)"/g));
-}
+// South Florida pages are always crawlable; booking is gated separately.
+cities.push(...matchAll(read("src/data/citiesSouthFlorida.ts"), /slug:\s*"([^"]+)"/g));
 const categories = matchAll(
   read("src/data/serviceCategories.ts"),
   /^\s*id:\s*"([^"]+)"/gm
@@ -96,9 +94,7 @@ const mainEntries = [
   urlEntry({ loc: `${SITE}/reviews`, priority: "0.6" }),
   urlEntry({ loc: `${SITE}/contact`, priority: "0.7" }),
   urlEntry({ loc: `${SITE}/lee-county-fl`, priority: "0.8" }),
-  ...(/SOUTH_FLORIDA_WEBSITE_LIVE\s*=\s*true/.test(read("src/lib/regions.ts"))
-    ? [urlEntry({ loc: `${SITE}/south-florida`, priority: "0.8" })]
-    : []),
+  urlEntry({ loc: `${SITE}/south-florida`, priority: "0.8" }),
   urlEntry({ loc: `${SITE}/install`, priority: "0.4" }),
   urlEntry({ loc: `${SITE}/warranty-policy`, changefreq: "yearly", priority: "0.3" }),
   ...categories.map((id) =>
