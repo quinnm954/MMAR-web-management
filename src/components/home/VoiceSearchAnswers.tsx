@@ -44,7 +44,7 @@ const VoiceSearchAnswers = () => {
             </dt>
             <dd className="speakable-answer text-muted-foreground mt-1">
               Next-day appointments are usually available across Southwest
-              Florida and most calls are reached within an hour.
+              Florida.
             </dd>
           </div>
 
