@@ -1,8 +1,11 @@
+import { useHomeRegion, AREA_TEXT } from "@/lib/homeRegion";
 import { Phone, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { trackConversion } from "@/lib/gtag";
 
 const FinalCTA = () => {
+  const region = useHomeRegion();
+  const A = AREA_TEXT[region];
   return (
     <section className="py-16 md:py-24 bg-gradient-to-b from-background via-secondary/20 to-background">
       <div className="container mx-auto px-4">
@@ -12,7 +15,7 @@ const FinalCTA = () => {
             <span className="text-gold">MECHANIC TODAY?</span>
           </h2>
           <p className="text-base md:text-lg text-muted-foreground mb-7 max-w-xl mx-auto">
-            Next-day mobile service across Lehigh Acres and Fort Myers.
+            Next-day mobile service across {A.areas}.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Button variant="hero" size="lg" className="min-h-[52px]" asChild>

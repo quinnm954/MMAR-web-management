@@ -1,13 +1,9 @@
 
-- Subdirectories have their own AGENTS.md (supabase/functions/AGENTS.md); read it before changing files there.
-- PartsTech punchout authentication uses `partstech-gateway/auth.ts` to require user access with distinct shop and software-partner credentials; why: shop credentials must never be substituted for the integration partner identity.
+- Subdirectories have their own AGENTS.md (supabase/functions/AGENTS.md: PartsTech auth, email sending, calendar feed, follow-up worker); read it before changing files there.
 
 - Financial reports use shared invoice classification: completed standalone refunds reduce revenue and profit on their recorded completion date, but never count as paid sales, labor or technician pay; why: money returned must not inflate sales or reverse earned labor.
 
 - Fleet registration: /fleet/register signs up via auth then calls anon-executable `submit_fleet_registration` RPC, guarded by user id+email match within 15 min of account creation.
-- App emails are sent only from edge functions via `_shared/send-and-log.ts` (managed send + email_send_log row); why: the admin Emails screen reads that log and the browser must never send directly.
-- Staff calendar feed: public `calendar-feed` edge function serves ICS keyed by a per-user token in `calendar_feed_tokens` (issued/rotated via `get_calendar_feed_token` RPC); technician-only users get just their assigned appointments; why: phone/PC calendar widgets need an unauthenticated subscribable URL.
-- Customer follow-ups (estimate nudges, invoice auto-send/reminders, review requests) run in the hourly `followup-worker` edge function with per-row counters on estimates/invoices; why: one bounded, idempotent job instead of many crons, and texts stay gated by `smsAllowed()` until A2P is approved.
 - The Admin Phone workspace is the only screen for calls, texts and email; in-app chat (/messages, message_threads) is retired for every role; why: the owner communicates only by SMS, email and calls.
 - Repair-order names derive from approved estimate repair lines, preferring labor descriptions; why: orders must identify the repair rather than the estimate workflow state.
 - Technician agreement: `technician_agreements` table (admin-only RLS) signed by techs via token link through `get_technician_agreement`/`sign_technician_agreement` RPCs; text lives in `src/lib/techAgreement.ts`; why: techs sign on phone without an account.
@@ -21,3 +17,4 @@
 - Service regions live in `service_regions` (active = launched) with `user_service_regions` for techs; a launched region with no tech is waitlist-only (receptionist takes details, no slots/prices); bookings/appointments get `region_slug` by trigger from the service address; website region pages are gated by `SOUTH_FLORIDA_WEBSITE_LIVE` in `src/lib/regions.ts` because the site is pre-rendered; why: launch regions without code changes while never booking work nobody can do.
 - The AI receptionist auto-syncs: triggers on phone_settings/service_regions/user_service_regions set `ai_sync_requested_at` and call `ai-receptionist?action=setup&auto=1` (allowed only while a sync is pending); followup-worker retries hourly; why: the owner shouldn't have to press an update button.
 - New appointments auto-assign the region's only tech by trigger; with several techs `needs_tech_choice` is set and staff are alerted, never overwriting a manual pick; why: one-tech regions need no dispatch step.
+- Regional home pages (/ and /south-florida) share `RegionHome`; sections read `useHomeRegion()` to swap only local copy, and `SOUTH_FLORIDA_BOOKING_OPEN` in `src/lib/regions.ts` hides the website waitlist notes; why: identical design per region without duplicating the page.

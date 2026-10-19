@@ -1,8 +1,11 @@
+import { useHomeRegion, AREA_TEXT } from "@/lib/homeRegion";
 // Voice-search optimized answer block. Short, conversational, first-sentence
 // answers are what Google Assistant / Siri / Alexa read aloud. The matching
 // SpeakableSpecification in Index.tsx points to #speakable-summary and the
 // .speakable-answer class so assistants know which text to vocalize.
 const VoiceSearchAnswers = () => {
+  const region = useHomeRegion();
+  const A = AREA_TEXT[region];
   return (
     <section
       id="speakable-summary"
@@ -18,11 +21,11 @@ const VoiceSearchAnswers = () => {
         <dl className="space-y-5 text-base md:text-lg">
           <div>
             <dt className="font-semibold text-foreground">
-              Who is the best mobile mechanic near me in Lehigh Acres and Fort Myers?
+              Who is the best mobile mechanic near me in {A.areas}?
             </dt>
             <dd className="speakable-answer text-muted-foreground mt-1">
               Mike's Mobile Auto Repair is a 5-star rated mobile mechanic
-              serving Lehigh Acres and Fort Myers,
+              serving {A.areas},
               Florida. Call 813-501-7572 for next-day service.
             </dd>
           </div>
@@ -33,8 +36,8 @@ const VoiceSearchAnswers = () => {
             </dt>
             <dd className="speakable-answer text-muted-foreground mt-1">
               Most repairs cost the same as a regular auto shop with no extra
-              trip fee inside our service area. Diagnostics run 80 to 150
-              dollars and apply toward the repair.
+              trip fee inside our service area. Diagnosis is 100 dollars,
+              and 50 of it is credited toward the repair labor.
             </dd>
           </div>
 
@@ -43,8 +46,7 @@ const VoiceSearchAnswers = () => {
               How fast can a mechanic come to my house?
             </dt>
             <dd className="speakable-answer text-muted-foreground mt-1">
-              Next-day appointments are usually available across Southwest
-              Florida.
+              Next-day appointments are usually available across {A.areaShort}.
             </dd>
           </div>
 

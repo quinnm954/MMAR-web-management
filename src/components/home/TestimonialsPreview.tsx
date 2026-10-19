@@ -1,3 +1,4 @@
+import { useHomeRegion, AREA_TEXT } from "@/lib/homeRegion";
 import { Link } from "react-router-dom";
 import { Star, Quote, ArrowRight } from "lucide-react";
 
@@ -20,6 +21,8 @@ const previews = [
 ];
 
 const TestimonialsPreview = () => {
+  const region = useHomeRegion();
+  const A = AREA_TEXT[region];
   return (
     <section className="py-14 md:py-20 bg-secondary/20">
       <div className="container mx-auto px-4">
@@ -29,7 +32,7 @@ const TestimonialsPreview = () => {
             <span className="text-gold">REVIEWS</span>
           </h2>
           <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
-            Real customers across Lehigh Acres and Fort Myers.
+            {region === "sfl" ? "Real Google reviews from our customers." : "Real customers across Lehigh Acres and Fort Myers."}
           </p>
         </div>
 
