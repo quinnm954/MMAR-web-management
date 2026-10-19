@@ -1,3 +1,4 @@
+import { useHomeRegion } from "@/lib/homeRegion";
 import { useState } from "react";
 import { Menu, X, ChevronDown, Phone, User, LogOut, LayoutDashboard, CalendarCheck, Wrench, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -31,6 +32,14 @@ const AREAS = [
   { to: "/service-areas", label: "All Service Areas" },
   { to: "/mobile-mechanic-lehigh-acres", label: "Lehigh Acres" },
   { to: "/mobile-mechanic-fort-myers", label: "Fort Myers" },
+];
+
+const SFL_AREAS = [
+  { to: "/south-florida", label: "South Florida" },
+  { to: "/areas/fort-lauderdale", label: "Fort Lauderdale" },
+  { to: "/areas/boca-raton", label: "Boca Raton" },
+  { to: "/areas/west-palm-beach", label: "West Palm Beach" },
+  { to: "/", label: "Fort Myers & Lehigh Acres" },
 ];
 
 const RESOURCES = [
@@ -68,13 +77,13 @@ const Navigation = () => {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border safe-area-inset">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16 md:h-20">
-          <Link to="/" className="flex items-center gap-3 active:scale-95 transition-transform" onClick={close}>
+          <Link to={homeTo} className="flex items-center gap-3 active:scale-95 transition-transform" onClick={close}>
             <img src={mmarLogo} alt="Mike's Mobile Auto Repair home" className="h-10 sm:h-12 md:h-14 w-auto rounded" />
           </Link>
 
           {/* Desktop nav */}
           <div className="hidden lg:flex items-center gap-2 xl:gap-4">
-            <NavLink to="/" end className={({ isActive }) => `px-3 py-2 font-medium transition-colors ${isActive ? "text-primary" : "text-muted-foreground hover:text-primary"}`}>
+            <NavLink to={homeTo} end className={({ isActive }) => `px-3 py-2 font-medium transition-colors ${isActive ? "text-primary" : "text-muted-foreground hover:text-primary"}`}>
               Home
             </NavLink>
             <NavLink to="/about" className={({ isActive }) => `px-3 py-2 font-medium transition-colors ${isActive ? "text-primary" : "text-muted-foreground hover:text-primary"}`}>
@@ -102,7 +111,7 @@ const Navigation = () => {
                 Service Areas <ChevronDown className="w-4 h-4" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="w-56 bg-background z-50">
-                {AREAS.map((a, i) => (
+                {areas.map((a, i) => (
                   <div key={a.to}>
                     {i === 1 && <DropdownMenuSeparator />}
                     <DropdownMenuItem asChild>
@@ -192,7 +201,7 @@ const Navigation = () => {
         {isOpen && (
           <div className="lg:hidden py-2 border-t border-border animate-fade-in max-h-[calc(100vh-4rem)] overflow-y-auto overscroll-contain">
             <div className="flex flex-col gap-0.5 pb-[env(safe-area-inset-bottom)]">
-              <Link to="/" onClick={close} className="text-foreground hover:text-primary font-medium py-2 px-2 rounded-lg">Home</Link>
+              <Link to={homeTo} onClick={close} className="text-foreground hover:text-primary font-medium py-2 px-2 rounded-lg">Home</Link>
               <Link to="/about" onClick={close} className="text-foreground hover:text-primary font-medium py-2 px-2 rounded-lg">About MMAR</Link>
 
               <Accordion type="multiple" className="w-full">
@@ -213,7 +222,7 @@ const Navigation = () => {
                   <AccordionTrigger className="px-2 py-2 hover:no-underline font-medium text-foreground">Service Areas</AccordionTrigger>
                   <AccordionContent className="pb-1">
                     <div className="flex flex-col">
-                      {AREAS.map((a) => (
+                      {areas.map((a) => (
                         <Link key={a.to} to={a.to} onClick={close} className="text-muted-foreground hover:text-primary py-1.5 px-4 rounded-lg text-sm">
                           {a.label}
                         </Link>
