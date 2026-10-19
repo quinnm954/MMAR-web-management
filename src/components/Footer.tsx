@@ -132,7 +132,7 @@ const Footer = () => {
             © {new Date().getFullYear()} Capital Services Management, INC. All rights reserved.
           </p>
           <div className="flex items-center gap-3">
-            <span>Lehigh Acres and Fort Myers</span>
+            <span>{sfl ? "Broward and Palm Beach" : "Lehigh Acres and Fort Myers"}</span>
             <span aria-hidden="true">·</span>
             <Link
               to="/login"
