@@ -1511,12 +1511,12 @@ const _matrix = buildMatrixPages(_existingSlugs).filter(
 // Old duplicate service+city addresses, merged into one page per service per city.
 export const LANDING_REDIRECTS: Record<string, string> = {
   "mobile-brake-repair-lehigh-acres": "brake-repair-lehigh-acres",
-  "brake-repair-lehigh-acres-fl": "brake-repair-lehigh-acres",
-  "battery-replacement-lehigh-acres-fl": "battery-replacement-lehigh-acres",
-  "engine-diagnostics-lehigh-acres-fl": "diagnostics-lehigh-acres",
-  "oil-change-lehigh-acres-fl": "oil-change-lehigh-acres",
-  "mobile-mechanic-lehigh-acres-fl": "mobile-mechanic-lehigh-acres",
-  "mobile-mechanic-fort-myers-fl": "mobile-mechanic-fort-myers",
+  "brake-repair-lehigh-acres": "brake-repair-lehigh-acres",
+  "battery-replacement-lehigh-acres": "battery-replacement-lehigh-acres",
+  "diagnostics-lehigh-acres": "diagnostics-lehigh-acres",
+  "oil-change-lehigh-acres": "oil-change-lehigh-acres",
+  "mobile-mechanic-lehigh-acres": "mobile-mechanic-lehigh-acres",
+  "mobile-mechanic-fort-myers": "mobile-mechanic-fort-myers",
   "mobile-alternator-repair-fort-myers": "alternator-repair-fort-myers",
 };
 

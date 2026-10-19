@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, Navigate, useParams } from "react-router-dom";
 import { ArrowLeft, MapPin, CheckCircle2, Phone } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
@@ -9,7 +9,7 @@ import InlineCallStrip from "@/components/InlineCallStrip";
 import TrustBadges from "@/components/TrustBadges";
 import LocalPhotoGallery from "@/components/home/LocalPhotoGallery";
 
-import { getLandingPageBySlug, localLandingPages } from "@/data/localLandingPages";
+import { getLandingPageBySlug, localLandingPages, LANDING_REDIRECTS } from "@/data/localLandingPages";
 import { cities, getCityBySlug } from "@/data/cities";
 import { getCategoryBySlug } from "@/data/serviceCategories";
 
@@ -76,6 +76,8 @@ const LocalLanding = () => {
     return () => script.remove();
   }, [page, city, category]);
 
+  const redirectTo = LANDING_REDIRECTS[landingSlug];
+  if (redirectTo) return <Navigate to={`/${redirectTo}`} replace />;
   if (!page) return <NotFound />;
 
   const siblings = localLandingPages
