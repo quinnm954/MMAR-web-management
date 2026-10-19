@@ -69,7 +69,7 @@ export const blogPosts: BlogPost[] = [
       </ol>
 
       <h2>Battery vs alternator — which is it?</h2>
-      <p>Both can produce the same symptoms. We always test both before condemning a part. If you're in <a href="/areas/fort-myers">Fort Myers</a>, or anywhere across Lehigh Acres and Fort Myers, our <a href="/mobile-alternator-repair-fort-myers">mobile alternator repair</a> service includes a full charging-system test on site so you only pay for what you actually need.</p>
+      <p>Both can produce the same symptoms. We always test both before condemning a part. If you're in <a href="/areas/fort-myers">Fort Myers</a>, or anywhere across Lehigh Acres and Fort Myers, our <a href="/alternator-repair-fort-myers">mobile alternator repair</a> service includes a full charging-system test on site so you only pay for what you actually need.</p>
 
       <p>Stuck right now? Call <a href="tel:8135017572">(813) 501-7572</a> — same-day mobile service is usually available.</p>
     `,
