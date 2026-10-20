@@ -84,7 +84,7 @@ const itemKind = (li: LineItem) => String(li.kind ?? (Number(li.labor_hours ?? 0
 
 const laborHoursFromInvoice = (items: LineItem[], _fallbackRate: number, _fallbackSubtotal: number) => techHoursForInvoice(items);
 
-export default function AdminReports() {
+export default function AdminReports({ extras }: { extras?: React.ReactNode } = {}) {
   const { region } = useAdminRegion();
   const R = (q: any) => (region === 'all' ? q : q.eq('region_slug', region));
   const [data, setData] = useState({
