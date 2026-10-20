@@ -118,7 +118,15 @@ export function useNotifications(limit = 50) {
     await supabase.from("notifications" as any).delete().eq("id", id);
   }, []);
 
+  const markManyRead = useCallback(async (ids: string[]) => {
+    if (ids.length === 0) return;
+    const now = new Date().toISOString();
+    const set = new Set(ids);
+    setItems((prev) => prev.map((n) => (set.has(n.id) && !n.read_at ? { ...n, read_at: now } : n)));
+    await supabase.from("notifications" as any).update({ read_at: now }).in("id", ids);
+  }, []);
+
   const unreadCount = items.filter((n) => !n.read_at).length;
 
-  return { items, loading, unreadCount, refresh, markRead, markAllRead, remove };
+  return { items, loading, unreadCount, refresh, markRead, markAllRead, markManyRead, remove };
 }
