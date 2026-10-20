@@ -630,6 +630,8 @@ export default function AdminReports() {
         </StatGroup>
       </div>
 
+      {extras}
+
       {/* Detail tabs */}
       <Tabs defaultValue="breakdown" className="w-full">
         <TabsList className="w-full grid grid-cols-4 h-10">

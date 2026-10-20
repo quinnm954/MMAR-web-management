@@ -11,7 +11,6 @@ import { Button } from '@/components/ui/button';
 import { TrendingUp, TrendingDown, Wallet, ClipboardList, Wrench, Target, Pencil, Check } from 'lucide-react';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid, BarChart, Bar, PieChart, Pie, Cell, Legend, Line, ComposedChart } from 'recharts';
 import { toast } from 'sonner';
-import DailyTodo from './DailyTodo';
 
 type Inv = {
   id: string; total: number | null; amount_paid: number | null; status: string; created_at: string;
