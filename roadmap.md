@@ -1,8 +1,8 @@
 # Roadmap
 
 ## Previous reporting periods and future chart values
-- [ ] Add previous day/week/month/year selection with bounded report queries.
-- [ ] Leave future chart months blank until recorded activity; verify tests and signed-in Reports.
+- [x] Add previous day/week/month/year selection with bounded report queries; verified all four signed-in views.
+- [x] Leave future chart months blank until recorded activity; verified yearly graph stops at October with November/December visible, 14 tests passed.
 
 ## Full-year report graph
 - [x] Show all twelve months for Year with zero-filled gaps; verified signed-in graph and passed nine report tests.
