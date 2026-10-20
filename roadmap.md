@@ -1,7 +1,7 @@
 # Roadmap
 
 ## Full-year report graph
-- [ ] Show all twelve months for Year, filling unrecorded months with zero, and verify with real reports.
+- [x] Show all twelve months for Year with zero-filled gaps; verified signed-in graph and passed nine report tests.
 
 ## Paid estimate completion
 - [x] Mark linked estimates Completed after invoice payment; corrected 19 existing estimates, verified signed-in Completed list and passed 12 tests.
