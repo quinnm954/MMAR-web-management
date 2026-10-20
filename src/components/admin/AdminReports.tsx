@@ -526,8 +526,8 @@ export default function AdminReports() {
           </ToggleGroup>
           {preset !== 'custom' ? (
             <ToggleGroup type="single" value={previous ? 'previous' : 'current'} onValueChange={(v) => v && setPrevious(v === 'previous')} className="bg-muted rounded-lg p-0.5">
-              <ToggleGroupItem value="current" className="h-8 px-3 text-xs data-[state=on]:bg-background">Current</ToggleGroupItem>
-              <ToggleGroupItem value="previous" className="h-8 px-3 text-xs data-[state=on]:bg-background">Previous</ToggleGroupItem>
+              <ToggleGroupItem value="current" className="h-8 px-3 text-xs data-[state=on]:bg-background data-[state=on]:text-foreground">Current</ToggleGroupItem>
+              <ToggleGroupItem value="previous" className="h-8 px-3 text-xs data-[state=on]:bg-background data-[state=on]:text-foreground">Previous</ToggleGroupItem>
             </ToggleGroup>
           ) : (
             <div className="flex items-center gap-1">
