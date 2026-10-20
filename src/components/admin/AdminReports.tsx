@@ -5,6 +5,9 @@ import { techHoursForInvoice } from '@/lib/techHours';
 import { isReportSale, reportInvoiceRevenue } from '@/lib/reportInvoice';
 import { fullYearChart } from '@/lib/reportChart';
 import { reportPeriod } from '@/lib/reportPeriod';
+import { DATE_PRESETS, type DateFilter } from '@/lib/dateFilters';
+import { DateRangeFilter } from './DateRangeFilter';
+import { format, subDays } from 'date-fns';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
@@ -18,13 +21,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 
-type Preset = 'd' | 'w' | 'm' | 'y' | 'custom';
 type Granularity = 'day' | 'week' | 'month' | 'year';
-
-const PRESET_DAYS: Record<Exclude<Preset, 'custom'>, number> = { d: 1, w: 7, m: 30, y: 365 };
-const PRESET_GRAIN: Record<Exclude<Preset, 'custom'>, Granularity> = { d: 'day', w: 'day', m: 'week', y: 'month' };
-const PRESET_LABEL: Record<Preset, string> = { d: 'Today', w: 'This Week', m: 'This Month', y: 'This Year', custom: 'Custom' };
-const PREVIOUS_LABEL: Record<Preset, string> = { d: 'Yesterday', w: 'Previous Week', m: 'Previous Month', y: 'Previous Year', custom: 'Custom' };
 
 type LineItem = { quantity?: number; unit_price?: number; unit_cost?: number; amount?: number; kind?: string; labor_hours?: number };
 
@@ -107,22 +104,25 @@ export default function AdminReports({ extras }: { extras?: React.ReactNode } = 
     stripeFeeIsActual: boolean; member: string; plan: string;
   }[]>([]);
   const [defaultRate, setDefaultRate] = useState<number>(35);
-  const [preset, setPreset] = useState<Preset>('m');
+  const [dateFilter, setDateFilter] = useState<DateFilter>('m');
   const [previous, setPrevious] = useState(false);
-  const [customDays, setCustomDays] = useState<number>(30);
-  const days = preset === 'custom' ? customDays : PRESET_DAYS[preset];
-  const periodLabel = (previous && preset !== 'custom' ? PREVIOUS_LABEL : PRESET_LABEL)[preset];
-  const selectedPeriod = reportPeriod(preset, previous, days);
-  const granularity: Granularity = preset === 'custom'
-    ? (customDays <= 2 ? 'day' : customDays <= 31 ? 'week' : customDays <= 180 ? 'month' : 'year')
-    : PRESET_GRAIN[preset];
+  const preset = typeof dateFilter === 'string' ? dateFilter : 'custom';
+  const custom = typeof dateFilter === 'string' ? undefined : dateFilter;
+  const selectedPeriod = reportPeriod(preset, previous, 30, new Date(), custom);
+  const days = Math.max(1, Math.ceil((selectedPeriod.end.getTime() - selectedPeriod.start.getTime()) / 86400000));
+  const periodLabel = custom ? 'Custom dates' : previous
+    ? ({ d: 'Yesterday', wtd: 'Previous week', m: 'Previous month', qtd: 'Previous quarter', y: 'Previous year' } as Record<string, string>)[preset] || `Previous ${preset} days`
+    : DATE_PRESETS.find(p => p.value === preset)?.label || 'Custom dates';
+  const rangeEnd = custom || previous ? subDays(selectedPeriod.end, 1) : selectedPeriod.end;
+  const rangeLabel = `${format(selectedPeriod.start, 'MMM d, yyyy')} – ${format(rangeEnd, 'MMM d, yyyy')}`;
+  const granularity: Granularity = preset === 'y' || preset === 'qtd' ? 'month' : days <= 31 ? 'day' : days <= 90 ? 'week' : days <= 366 ? 'month' : 'year';
   const [techFilter, setTechFilter] = useState<string>('all');
 
   const [syncing, setSyncing] = useState(false);
   const [prevRevenue, setPrevRevenue] = useState(0);
 
   const load = useCallback(async () => {
-      const { start, end, comparisonStart } = reportPeriod(preset, previous, days);
+      const { start, end, comparisonStart } = reportPeriod(preset, previous, 30, new Date(), custom);
       const since = start.toISOString();
       const until = end.toISOString();
       const prevSince = comparisonStart.toISOString();
@@ -316,7 +316,7 @@ export default function AdminReports({ extras }: { extras?: React.ReactNode } = 
         partsMargin,
         partsMarginPct,
       });
-  }, [days, preset, previous, region]);
+  }, [dateFilter, previous, region]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -517,23 +517,12 @@ export default function AdminReports({ extras }: { extras?: React.ReactNode } = 
       {/* Filter bar */}
       <div className="sticky top-0 z-20 -mx-2 px-2 py-2 bg-background/90 backdrop-blur border-b border-border space-y-2">
         <div className="flex items-center gap-2 flex-wrap">
-          <ToggleGroup type="single" value={preset} onValueChange={(v) => v && setPreset(v as Preset)} className="bg-muted rounded-lg p-0.5">
-            {(['d', 'w', 'm', 'y', 'custom'] as Preset[]).map((p) => (
-              <ToggleGroupItem key={p} value={p} className="h-8 px-3 text-xs data-[state=on]:bg-background data-[state=on]:text-foreground">
-                {p === 'custom' ? 'Custom' : p.toUpperCase()}
-              </ToggleGroupItem>
-            ))}
-          </ToggleGroup>
-          {preset !== 'custom' ? (
+          <DateRangeFilter value={dateFilter} onChange={value => { setDateFilter(value); setPrevious(false); }} />
+          {preset !== 'custom' && preset !== 'all' && (
             <ToggleGroup type="single" value={previous ? 'previous' : 'current'} onValueChange={(v) => v && setPrevious(v === 'previous')} className="bg-muted rounded-lg p-0.5">
               <ToggleGroupItem value="current" className="h-8 px-3 text-xs data-[state=on]:bg-background data-[state=on]:text-foreground">Current</ToggleGroupItem>
               <ToggleGroupItem value="previous" className="h-8 px-3 text-xs data-[state=on]:bg-background data-[state=on]:text-foreground">Previous</ToggleGroupItem>
             </ToggleGroup>
-          ) : (
-            <div className="flex items-center gap-1">
-              <Label className="text-xs text-muted-foreground">Days</Label>
-              <Input type="number" value={customDays} onChange={(e) => setCustomDays(Math.max(1, parseInt(e.target.value) || 30))} className="w-20 h-8" />
-            </div>
           )}
           <div className="flex items-center gap-2 ml-auto">
             <Select value={techFilter} onValueChange={setTechFilter}>
@@ -556,6 +545,7 @@ export default function AdminReports({ extras }: { extras?: React.ReactNode } = 
             </DropdownMenu>
           </div>
         </div>
+        <p className="text-xs text-muted-foreground">{rangeLabel}</p>
       </div>
 
       {/* Headline */}
@@ -564,7 +554,7 @@ export default function AdminReports({ extras }: { extras?: React.ReactNode } = 
           <div className="flex items-start justify-between gap-3 flex-wrap">
             <div>
               <p className="text-xs uppercase tracking-wider text-muted-foreground">
-                Revenue · {periodLabel}{preset === 'custom' ? ` · Last ${days} days` : ''}
+                Revenue · {periodLabel}
               </p>
               <p className="font-display text-4xl md:text-5xl mt-1">{fmt(totals.revenue)}</p>
               <p className="text-sm text-muted-foreground mt-1">

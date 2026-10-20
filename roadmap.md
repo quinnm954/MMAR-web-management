@@ -1,5 +1,9 @@
 # Roadmap
 
+## Better date filters
+- [x] Add to-date, rolling and calendar date-range filters to Reports, invoices, estimates, repair orders, appointments and booking requests.
+- [x] Test date boundaries (22 tests passing); verify signed-in presets and custom dates on desktop/phone and all operational date controls, with no page errors or phone overflow.
+
 ## Previous reporting periods and future chart values
 - [x] Add previous day/week/month/year selection with bounded report queries; verified all four signed-in views.
 - [x] Leave future chart months blank until recorded activity; verified yearly graph stops at October with November/December visible, 14 tests passed.

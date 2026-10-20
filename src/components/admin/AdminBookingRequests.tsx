@@ -19,6 +19,8 @@ import { SERVICE_TYPES } from "@/lib/serviceTypes";
 import { toast } from "sonner";
 import { CalendarCheck, CheckCircle2, XCircle, Phone, Loader2, RefreshCw, ExternalLink, Pencil, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { DateRangeFilter } from './DateRangeFilter';
+import { dateInFilter, type DateFilter } from '@/lib/dateFilters';
 
 interface BookingRequest {
   id: string;
@@ -74,6 +76,7 @@ const AdminBookingRequests = () => {
   const [rows, setRows] = useState<BookingRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"pending" | "all">("pending");
+  const [dateFilter, setDateFilter] = useState<DateFilter>('all');
   const [confirming, setConfirming] = useState<BookingRequest | null>(null);
   const [date, setDate] = useState("");
   const [window, setWindow] = useState("");
@@ -225,7 +228,7 @@ const AdminBookingRequests = () => {
   const { match: regionMatch } = useAdminRegion();
   const visible = (filter === "pending"
     ? rows.filter((r) => r.status === "new" || r.status === "contacted")
-    : rows).filter((r) => regionMatch((r as any).region_slug));
+    : rows).filter((r) => regionMatch((r as any).region_slug) && dateInFilter(r.created_at, dateFilter));
 
   return (
     <div className="space-y-4">
@@ -259,6 +262,8 @@ const AdminBookingRequests = () => {
           </Button>
         </div>
       </div>
+
+      <DateRangeFilter value={dateFilter} onChange={setDateFilter} />
 
       {loading ? (
         <div className="flex justify-center py-10">

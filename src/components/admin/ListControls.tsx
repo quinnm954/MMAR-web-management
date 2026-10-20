@@ -1,8 +1,9 @@
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { DateRangeFilter } from './DateRangeFilter';
+import { dateInFilter, type DateFilter } from '@/lib/dateFilters';
 
-export type Range = "all" | "7" | "30" | "90";
+export type Range = DateFilter;
 
 export interface Tab { key: string; label: string; count: number }
 
@@ -13,20 +14,12 @@ export function ListControls(props: {
 }) {
   return (
     <div className="space-y-2">
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
         <div className="relative flex-1 min-w-0">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input value={props.q} onChange={(e) => props.setQ(e.target.value)} placeholder={props.placeholder} className="pl-9" />
         </div>
-        <Select value={props.range} onValueChange={(v) => props.setRange(v as Range)}>
-          <SelectTrigger className="w-[130px] shrink-0"><SelectValue /></SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All time</SelectItem>
-            <SelectItem value="7">Last 7 days</SelectItem>
-            <SelectItem value="30">Last 30 days</SelectItem>
-            <SelectItem value="90">Last 90 days</SelectItem>
-          </SelectContent>
-        </Select>
+        <DateRangeFilter value={props.range} onChange={props.setRange} />
       </div>
       <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-1 px-1">
         {props.tabs.map((t) => (
@@ -46,8 +39,7 @@ export function ListControls(props: {
 }
 
 export function inRange(dateStr: string | null | undefined, range: Range) {
-  if (range === "all" || !dateStr) return true;
-  return Date.now() - new Date(dateStr).getTime() <= Number(range) * 86400000;
+  return dateInFilter(dateStr, range);
 }
 
 export function dateGroup(dateStr: string | null | undefined): string {
