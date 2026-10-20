@@ -1,5 +1,8 @@
 # Roadmap
 
+## Paid estimate completion
+- [x] Mark linked estimates Completed after invoice payment; corrected 19 existing estimates, verified signed-in Completed list and passed 12 tests.
+
 ## PartsTech connection
 - [x] Correct punchout authentication and verify the request format (four tests and authenticated deployed check passed).
 - [ ] Connect and verify a real parts quote. Blocked: PartsTech-issued Garage Ace partner credentials.

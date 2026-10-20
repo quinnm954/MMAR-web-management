@@ -12,6 +12,7 @@ import SignaturePad from '@/components/SignaturePad';
 import BrandedDocLayout from '@/components/BrandedDocLayout';
 import DocReferences from '@/components/DocReferences';
 import { PRODUCT_BRAND } from '@/lib/brand';
+import { isFinalEstimate, estimateStatusLabel } from '@/lib/estimateStatus';
 
 const EstimateApproval = () => {
   const { token } = useParams();
@@ -71,6 +72,7 @@ const EstimateApproval = () => {
   };
 
   const submit = async (decisionOverride = decisions, statusOverride?: 'approved' | 'partially_approved' | 'declined') => {
+    if (!token || isFinalEstimate(est?.status)) return;
     if (!signature) return toast.error('Please sign to confirm your decision');
     const finalDecisions = statusOverride === 'declined' ? getAllDeclinedDecisions() : decisionOverride;
     const nextAllDeclined = statusOverride === 'declined' || (lines.length > 0 && lines.every((_, i) => finalDecisions[i] === 'declined'));
@@ -81,7 +83,7 @@ const EstimateApproval = () => {
     const updatedLines = lines.map((l, i) => ({ ...l, status: finalDecisions[i] ?? (status === 'declined' ? 'declined' : 'approved') }));
 
     const { error } = await supabase.rpc('submit_estimate_decision', {
-      _token: token!,
+      _token: token,
       _line_items: updatedLines,
       _status: status,
       _signature: signature,
@@ -111,7 +113,7 @@ const EstimateApproval = () => {
     toast.success(status === 'declined' ? 'Response recorded' : editing ? 'Decision updated!' : 'Estimate signed!');
     setEditing(false);
     // Refresh decision history
-    const { data: refreshed } = await supabase.rpc('get_estimate_by_token', { _token: token! });
+    const { data: refreshed } = await supabase.rpc('get_estimate_by_token', { _token: token });
     setDecisionLogs(((refreshed as any)?.decision_logs as any[]) ?? []);
 
     // If signed in as the customer, auto-redirect back to portal
@@ -154,7 +156,8 @@ const EstimateApproval = () => {
       </div>
     </div>
   );
-  const submitted = ['approved', 'declined', 'partially_approved'].includes(est.status);
+  const finalized = isFinalEstimate(est.status);
+  const submitted = finalized || ['approved', 'declined', 'partially_approved'].includes(est.status);
   const locked = submitted && !editing;
 
   return (
@@ -163,7 +166,7 @@ const EstimateApproval = () => {
       docNumber={est.estimate_number}
       rightMeta={
         <>
-          <div>Status: <span className="font-medium uppercase">{est.status}</span></div>
+          <div>Status: <span className="font-medium uppercase">{estimateStatusLabel(est.status)}</span></div>
           {est.valid_until && <div>Valid until {est.valid_until}</div>}
         </>
       }
@@ -299,6 +302,7 @@ const EstimateApproval = () => {
           {est.status === 'approved' && <><CheckCircle2 className="text-primary" /> Approved — we'll be in touch shortly.</>}
           {est.status === 'partially_approved' && <><CheckCircle2 className="text-primary" /> Partial approval recorded.</>}
           {est.status === 'declined' && <span className="text-muted-foreground">This estimate was declined.</span>}
+          {finalized && <><CheckCircle2 className="text-primary" /> {estimateStatusLabel(est.status)}</>}
         </div>
       )}
       {locked && (
@@ -308,10 +312,10 @@ const EstimateApproval = () => {
               <Link to="/portal/estimates">Return to your portal</Link>
             </Button>
           )}
-          <Button variant="outline" size="sm" onClick={() => setEditing(true)}>
+          {!finalized && <Button variant="outline" size="sm" onClick={() => setEditing(true)}>
             Change my decision / decline items
-          </Button>
-          {est.status !== 'declined' && (
+          </Button>}
+          {!finalized && est.status !== 'declined' && (
             <p className="text-[11px] text-muted-foreground text-center max-w-xs">
               Need to decline the whole estimate or just some services? Tap above to update each line.
             </p>
