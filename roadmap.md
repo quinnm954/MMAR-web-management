@@ -1,5 +1,9 @@
 # Roadmap
 
+## Previous reporting periods and future chart values
+- [ ] Add previous day/week/month/year selection with bounded report queries.
+- [ ] Leave future chart months blank until recorded activity; verify tests and signed-in Reports.
+
 ## Full-year report graph
 - [x] Show all twelve months for Year with zero-filled gaps; verified signed-in graph and passed nine report tests.
 
