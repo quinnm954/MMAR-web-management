@@ -4250,6 +4250,15 @@ export type Database = {
         }
         Returns: string
       }
+      estimate_has_paid_invoice: {
+        Args: {
+          _appointment_id: string
+          _created_at: string
+          _customer_id: string
+          _invoice_id: string
+        }
+        Returns: boolean
+      }
       estimate_repair_name: { Args: { _line_items: Json }; Returns: string }
       get_appointment_confirmation: { Args: { _token: string }; Returns: Json }
       get_calendar_feed_token: { Args: { _rotate?: boolean }; Returns: string }
