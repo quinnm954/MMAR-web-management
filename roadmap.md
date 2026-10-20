@@ -1,5 +1,9 @@
 # Roadmap
 
+## Better date filters
+- [ ] Add to-date, rolling and calendar date-range filters to Reports and operational lists.
+- [ ] Test date boundaries and verify saved-data filtering on phone and desktop.
+
 ## Previous reporting periods and future chart values
 - [x] Add previous day/week/month/year selection with bounded report queries; verified all four signed-in views.
 - [x] Leave future chart months blank until recorded activity; verified yearly graph stops at October with November/December visible, 14 tests passed.
