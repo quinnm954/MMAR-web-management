@@ -11,6 +11,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Loader2, MapPin, Calendar, Phone } from "lucide-react";
 import { toast } from "sonner";
 import DeleteButton from "@/components/admin/DeleteButton";
+import { DateRangeFilter } from './DateRangeFilter';
+import { dateInFilter, type DateFilter } from '@/lib/dateFilters';
 
 interface Row {
   id: string;
@@ -46,6 +48,7 @@ const AdminAppointments = () => {
   const [techs, setTechs] = useState<Tech[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
+  const [dateFilter, setDateFilter] = useState<DateFilter>('all');
 
   const load = async () => {
     setLoading(true);
@@ -102,14 +105,15 @@ const AdminAppointments = () => {
     load();
   };
 
-  const filtered = (filter === "all" ? rows : rows.filter((r) => r.status === filter)).filter((r) => match((r as any).region_slug));
+  const filtered = (filter === "all" ? rows : rows.filter((r) => r.status === filter)).filter((r) => match((r as any).region_slug) && dateInFilter(r.scheduled_at || (r.requested_date ? `${r.requested_date}T00:00:00` : null), dateFilter));
 
   if (loading) return <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>;
 
   return (
     <div className="space-y-3">
       <RegionSwitch rows={rows as any} />
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2">
+        <DateRangeFilter value={dateFilter} onChange={setDateFilter} />
         <Select value={filter} onValueChange={setFilter}>
           <SelectTrigger className="w-44"><SelectValue /></SelectTrigger>
           <SelectContent>

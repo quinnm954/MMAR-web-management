@@ -115,7 +115,7 @@ export default function AdminReports({ extras }: { extras?: React.ReactNode } = 
     : DATE_PRESETS.find(p => p.value === preset)?.label || 'Custom dates';
   const rangeEnd = custom || previous ? subDays(selectedPeriod.end, 1) : selectedPeriod.end;
   const rangeLabel = `${format(selectedPeriod.start, 'MMM d, yyyy')} – ${format(rangeEnd, 'MMM d, yyyy')}`;
-  const granularity: Granularity = preset === 'y' || preset === 'qtd' ? 'month' : days <= 31 ? 'day' : days <= 366 ? 'month' : 'year';
+  const granularity: Granularity = preset === 'y' || preset === 'qtd' ? 'month' : days <= 31 ? 'day' : days <= 90 ? 'week' : days <= 366 ? 'month' : 'year';
   const [techFilter, setTechFilter] = useState<string>('all');
 
   const [syncing, setSyncing] = useState(false);
