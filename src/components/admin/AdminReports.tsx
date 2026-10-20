@@ -3,6 +3,7 @@ import { useAdminRegion, RegionSwitch, RegionChip } from '@/hooks/useAdminRegion
 import { supabase } from '@/integrations/supabase/client';
 import { techHoursForInvoice } from '@/lib/techHours';
 import { isReportSale, reportInvoiceRevenue } from '@/lib/reportInvoice';
+import { fullYearChart } from '@/lib/reportChart';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
@@ -556,7 +557,9 @@ export default function AdminReports() {
       {(() => {
         const change = prevRevenue > 0 ? ((data.revenue30 - prevRevenue) / prevRevenue) * 100 : null;
         const margin = totals.revenue > 0 ? (totals.netProfit / totals.revenue) * 100 : 0;
-        const chartData = [...summaryRows].reverse().map((r) => ({ label: r.label, revenue: Math.round(r.revenue), profit: Math.round(r.netProfit) }));
+        const chartData = preset === 'y'
+          ? fullYearChart(new Date().getFullYear(), summaryRows)
+          : [...summaryRows].reverse().map((r) => ({ label: r.label, revenue: Math.round(r.revenue), profit: Math.round(r.netProfit) }));
         const exportCsv = () => {
           const head = ['Date', 'Invoice', 'Customer', 'Technician', 'Labor hrs', 'Revenue', 'Parts cost', 'Tech pay', 'Card fee', 'Net profit'];
           const lines = filteredRows.map((r) => [r.date, r.invoice_number ?? '', r.customer, r.technician, r.paidLaborHours.toFixed(2), r.revenue.toFixed(2), r.cogs.toFixed(2), r.employeeCost.toFixed(2), r.stripeFee.toFixed(2), r.netProfit.toFixed(2)]);
@@ -589,7 +592,7 @@ export default function AdminReports() {
                   <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={chartData}>
                       <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                      <XAxis dataKey="label" tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} />
+                      <XAxis dataKey="label" interval={preset === 'y' ? 0 : 'preserveEnd'} tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} />
                       <YAxis tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} width={44} />
                       <Tooltip contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))' }} />
                       <Area type="monotone" dataKey="revenue" name="Revenue" stroke="hsl(var(--primary))" fill="hsl(var(--primary) / 0.2)" />
