@@ -796,8 +796,8 @@ const MobileRow = ({ title, sub, badge, revenue, net, details }: { title: string
           </div>
           <div className="text-right shrink-0 flex items-center gap-2">
             <div>
-              <p className="text-sm font-semibold">{fmt(revenue)}</p>
-              <p className={`text-xs ${net < 0 ? 'text-destructive' : 'text-primary'}`}>net {fmt(net)}</p>
+              <p className="text-sm font-semibold">{fmtUsd(revenue)}</p>
+              <p className={`text-xs ${net < 0 ? 'text-destructive' : 'text-primary'}`}>net {fmtUsd(net)}</p>
             </div>
             <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${open ? 'rotate-180' : ''}`} />
           </div>
@@ -807,7 +807,7 @@ const MobileRow = ({ title, sub, badge, revenue, net, details }: { title: string
             {details.map(([k, v]) => (
               <div key={k}>
                 <p className="text-[11px] text-muted-foreground">{k}</p>
-                <p className="text-sm">{typeof v === 'number' ? fmt(v) : v}</p>
+                <p className="text-sm">{typeof v === 'number' ? fmtUsd(v) : v}</p>
               </div>
             ))}
           </div>
@@ -816,3 +816,4 @@ const MobileRow = ({ title, sub, badge, revenue, net, details }: { title: string
     </Card>
   );
 };
+const fmtUsd = (n: number) => n.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
