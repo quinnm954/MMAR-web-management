@@ -1,15 +1,16 @@
 type MonthlyValue = { key: string; revenue: number; netProfit: number };
 
-/** A yearly chart includes empty and future months, without inventing transactions. */
-export function fullYearChart(year: number, rows: MonthlyValue[]) {
+/** Keep every month visible, but do not plot unrecorded future activity. */
+export function fullYearChart(year: number, rows: MonthlyValue[], now = new Date()) {
   const byMonth = new Map(rows.map(row => [row.key, row]));
   return Array.from({ length: 12 }, (_, month) => {
     const key = `${year}-${String(month + 1).padStart(2, '0')}`;
     const row = byMonth.get(key);
+    const future = new Date(year, month, 1) > now;
     return {
       label: new Date(year, month, 1).toLocaleDateString('en-US', { month: 'short' }),
-      revenue: Math.round(row?.revenue ?? 0),
-      profit: Math.round(row?.netProfit ?? 0),
+      revenue: row ? Math.round(row.revenue) : future ? null : 0,
+      profit: row ? Math.round(row.netProfit) : future ? null : 0,
     };
   });
 }

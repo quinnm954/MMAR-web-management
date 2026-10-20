@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { techHoursForInvoice } from '@/lib/techHours';
 import { isReportSale, reportInvoiceRevenue } from '@/lib/reportInvoice';
 import { fullYearChart } from '@/lib/reportChart';
+import { reportPeriod } from '@/lib/reportPeriod';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
@@ -22,6 +23,7 @@ type Granularity = 'day' | 'week' | 'month' | 'year';
 const PRESET_DAYS: Record<Exclude<Preset, 'custom'>, number> = { d: 1, w: 7, m: 30, y: 365 };
 const PRESET_GRAIN: Record<Exclude<Preset, 'custom'>, Granularity> = { d: 'day', w: 'day', m: 'week', y: 'month' };
 const PRESET_LABEL: Record<Preset, string> = { d: 'Today', w: 'This Week', m: 'This Month', y: 'This Year', custom: 'Custom' };
+const PREVIOUS_LABEL: Record<Preset, string> = { d: 'Yesterday', w: 'Previous Week', m: 'Previous Month', y: 'Previous Year', custom: 'Custom' };
 
 type LineItem = { quantity?: number; unit_price?: number; unit_cost?: number; amount?: number; kind?: string; labor_hours?: number };
 
@@ -105,8 +107,11 @@ export default function AdminReports() {
   }[]>([]);
   const [defaultRate, setDefaultRate] = useState<number>(35);
   const [preset, setPreset] = useState<Preset>('m');
+  const [previous, setPrevious] = useState(false);
   const [customDays, setCustomDays] = useState<number>(30);
   const days = preset === 'custom' ? customDays : PRESET_DAYS[preset];
+  const periodLabel = (previous && preset !== 'custom' ? PREVIOUS_LABEL : PRESET_LABEL)[preset];
+  const selectedPeriod = reportPeriod(preset, previous, days);
   const granularity: Granularity = preset === 'custom'
     ? (customDays <= 2 ? 'day' : customDays <= 31 ? 'week' : customDays <= 180 ? 'month' : 'year')
     : PRESET_GRAIN[preset];
@@ -116,18 +121,10 @@ export default function AdminReports() {
   const [prevRevenue, setPrevRevenue] = useState(0);
 
   const load = useCallback(async () => {
-      // Calendar periods so Reports matches the dashboard (today, last 7 days, this month, this year)
-      const now = new Date();
-      const today0 = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      let start: Date;
-      let prevStart: Date;
-      if (preset === 'd') { start = today0; prevStart = new Date(today0.getTime() - 86400000); }
-      else if (preset === 'w') { start = new Date(today0.getTime() - 6 * 86400000); prevStart = new Date(start.getTime() - 7 * 86400000); }
-      else if (preset === 'm') { start = new Date(now.getFullYear(), now.getMonth(), 1); prevStart = new Date(now.getFullYear(), now.getMonth() - 1, 1); }
-      else if (preset === 'y') { start = new Date(now.getFullYear(), 0, 1); prevStart = new Date(now.getFullYear() - 1, 0, 1); }
-      else { start = new Date(Date.now() - days * 86400000); prevStart = new Date(Date.now() - 2 * days * 86400000); }
+      const { start, end, comparisonStart } = reportPeriod(preset, previous, days);
       const since = start.toISOString();
-      const prevSince = prevStart.toISOString();
+      const until = end.toISOString();
+      const prevSince = comparisonStart.toISOString();
 
       const [inv, completed, members, ests, settings, employeesRes, mpRes, prevInv] = await Promise.all([
         R(supabase
@@ -135,8 +132,9 @@ export default function AdminReports() {
           .select('id, invoice_number, total, subtotal, status, created_at, paid_at, customer_id, service_record_id, technician_id, line_items, stripe_session_id, stripe_payment_intent_id, stripe_fee, stripe_fee_synced_at')
           .in('status', ['paid', 'refunded'])
           .gte('paid_at', since)
+          .lt('paid_at', until)
           .order('paid_at', { ascending: false }),
-        R(supabase.from('appointments').select('id', { count: 'exact', head: true })).eq('status', 'completed').gte('completed_at', since),
+        R(supabase.from('appointments').select('id', { count: 'exact', head: true })).eq('status', 'completed').gte('completed_at', since).lt('completed_at', until),
         supabase.from('memberships').select('id', { count: 'exact', head: true }).eq('status', 'active'),
         R(supabase.from('estimates').select('id', { count: 'exact', head: true })).eq('status', 'sent'),
         supabase.from('shop_settings').select('labor_cost_per_hour').eq('id', 1).single(),
@@ -146,6 +144,7 @@ export default function AdminReports() {
           .select('id, paid_at, kind, amount, stripe_fee, stripe_fee_synced_at, customer_id, membership:memberships(plan:membership_plans(name))')
           .eq('status', 'paid')
           .gte('paid_at', since)
+          .lt('paid_at', until)
           .order('paid_at', { ascending: false }),
         R(supabase.from('invoices').select('total, status')).in('status', ['paid', 'refunded']).gte('paid_at', prevSince).lt('paid_at', since),
       ]);
@@ -316,7 +315,7 @@ export default function AdminReports() {
         partsMargin,
         partsMarginPct,
       });
-  }, [days, preset, region]);
+  }, [days, preset, previous, region]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -496,12 +495,21 @@ export default function AdminReports() {
       <RegionSwitch />
       <div className="flex items-end justify-between flex-wrap gap-3">
         <div>
-          <h2 className="font-display text-xl">{PRESET_LABEL[preset]}{preset === 'custom' ? ` · Last ${days} days` : ''}</h2>
+          <h2 className="font-display text-xl">{periodLabel}{preset === 'custom' ? ` · Last ${days} days` : ''}</h2>
           <p className="text-xs text-muted-foreground">
             Grouped by {granularity} · {filteredSaleCount} paid invoice{filteredSaleCount === 1 ? '' : 's'}
           </p>
         </div>
         <div className="flex items-end gap-2 flex-wrap">
+          {preset !== 'custom' && (
+            <div>
+              <Label className="text-xs">View</Label>
+              <ToggleGroup type="single" value={previous ? 'previous' : 'current'} onValueChange={(v) => v && setPrevious(v === 'previous')} className="h-9">
+                <ToggleGroupItem value="current" className="h-9 px-3">Current</ToggleGroupItem>
+                <ToggleGroupItem value="previous" className="h-9 px-3">Previous</ToggleGroupItem>
+              </ToggleGroup>
+            </div>
+          )}
           <div>
             <Label className="text-xs">Period</Label>
             <ToggleGroup
@@ -558,7 +566,7 @@ export default function AdminReports() {
         const change = prevRevenue > 0 ? ((data.revenue30 - prevRevenue) / prevRevenue) * 100 : null;
         const margin = totals.revenue > 0 ? (totals.netProfit / totals.revenue) * 100 : 0;
         const chartData = preset === 'y'
-          ? fullYearChart(new Date().getFullYear(), summaryRows)
+          ? fullYearChart(selectedPeriod.start.getFullYear(), summaryRows)
           : [...summaryRows].reverse().map((r) => ({ label: r.label, revenue: Math.round(r.revenue), profit: Math.round(r.netProfit) }));
         const exportCsv = () => {
           const head = ['Date', 'Invoice', 'Customer', 'Technician', 'Labor hrs', 'Revenue', 'Parts cost', 'Tech pay', 'Card fee', 'Net profit'];
@@ -575,7 +583,7 @@ export default function AdminReports() {
             <Card className="overflow-hidden">
               <CardContent className="p-5 grid gap-4 md:grid-cols-[1fr_2fr]">
                 <div>
-                  <p className="text-xs uppercase tracking-wide text-muted-foreground">Revenue · {PRESET_LABEL[preset]}</p>
+                  <p className="text-xs uppercase tracking-wide text-muted-foreground">Revenue · {periodLabel}</p>
                   <p className="font-display text-4xl mt-1">{fmt(totals.revenue)}</p>
                   {refundTotal > 0 && <p className="text-sm text-destructive mt-1">Refunds deducted: {fmt(refundTotal)}</p>}
                   {change != null && (
