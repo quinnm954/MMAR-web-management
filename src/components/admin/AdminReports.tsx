@@ -84,7 +84,7 @@ const itemKind = (li: LineItem) => String(li.kind ?? (Number(li.labor_hours ?? 0
 
 const laborHoursFromInvoice = (items: LineItem[], _fallbackRate: number, _fallbackSubtotal: number) => techHoursForInvoice(items);
 
-export default function AdminReports() {
+export default function AdminReports({ extras }: { extras?: React.ReactNode } = {}) {
   const { region } = useAdminRegion();
   const R = (q: any) => (region === 'all' ? q : q.eq('region_slug', region));
   const [data, setData] = useState({
@@ -629,6 +629,8 @@ export default function AdminReports() {
           <Stat label={`Labor hrs${techFilter !== 'all' ? ` · ${techFilter}` : ''}`} value={perfTotals.paidH.toFixed(1)} sub={`${filteredSaleCount ? (perfTotals.paidH / filteredSaleCount).toFixed(1) : '0'} per invoice`} />
         </StatGroup>
       </div>
+
+      {extras}
 
       {/* Detail tabs */}
       <Tabs defaultValue="breakdown" className="w-full">

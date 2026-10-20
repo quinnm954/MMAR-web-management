@@ -41,6 +41,7 @@ import AdminEstimates from '@/components/admin/AdminEstimates';
 import AdminShopSettings from '@/components/admin/AdminShopSettings';
 import AdminRegionsCard from '@/components/admin/AdminRegionsCard';
 import CalendarFeedSettings from '@/components/admin/CalendarFeedSettings';
+import DailyTodo from '@/components/admin/DailyTodo';
 import AdminReports from '@/components/admin/AdminReports';
 import AdminSalesDashboard from '@/components/admin/AdminSalesDashboard';
 import AdConversionsCard from '@/components/admin/AdConversionsCard';
@@ -162,13 +163,10 @@ const AdminDashboard = () => {
               </Suspense>
             ) },
             { value: 'reports', label: 'Reports', icon: BarChart3, roles: ADMIN_ONLY, content: (
-              <div className="space-y-8">
-                <AdminSalesDashboard />
+              <div className="space-y-5">
+                <DailyTodo />
+                <AdminReports extras={<AdminSalesDashboard />} />
                 <AdConversionsCard />
-                <div className="border-t border-border pt-6">
-                  <h2 className="font-display text-xl mb-3">Profit &amp; invoices</h2>
-                  <AdminReports />
-                </div>
               </div>
             ) },
             { value: 'calendar', label: 'Calendar', icon: Calendar, roles: ALL, content: <AdminCalendar /> },

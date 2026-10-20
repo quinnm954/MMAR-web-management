@@ -11,7 +11,6 @@ import { Button } from '@/components/ui/button';
 import { TrendingUp, TrendingDown, Wallet, ClipboardList, Wrench, Target, Pencil, Check } from 'lucide-react';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid, BarChart, Bar, PieChart, Pie, Cell, Legend, Line, ComposedChart } from 'recharts';
 import { toast } from 'sonner';
-import DailyTodo from './DailyTodo';
 
 type Inv = {
   id: string; total: number | null; amount_paid: number | null; status: string; created_at: string;
@@ -250,62 +249,30 @@ export default function AdminSalesDashboard() {
   const pace = (monthRev / dayOfMonth) * daysInMonth;
 
   return (
-    <div className="space-y-5 font-sans">
-      <RegionSwitch />
-      <DailyTodo />
-      {/* Headline */}
-      <Card className="overflow-hidden border-primary/30 bg-gradient-to-br from-primary/10 via-card to-card">
-        <CardContent className="p-5 grid gap-5 lg:grid-cols-[1.3fr_1fr]">
-          <div className="space-y-3">
-            <p className="text-sm text-muted-foreground">Revenue this month</p>
-            <div className="flex flex-wrap items-end gap-3">
-              <span className="text-4xl md:text-5xl font-bold tracking-tight tabular-nums">{fmt0(monthRev)}</span>
-              <Delta pct={momPct} note={`vs ${fmt0(lastMonthToDate)} same point last month`} />
-            </div>
-            <p className="text-xs text-muted-foreground">On pace for {fmt0(pace)} · last month finished at {fmt0(lastMonthRev)}</p>
-            <div className="space-y-1.5 pt-1">
-              <div className="flex items-center justify-between text-xs">
-                <span className="flex items-center gap-1.5 text-muted-foreground"><Target className="h-3.5 w-3.5" />Monthly goal</span>
-                {editGoal ? (
-                  <span className="flex items-center gap-1">
-                    <Input autoFocus value={goalDraft} onChange={e => setGoalDraft(e.target.value)} onKeyDown={e => e.key === 'Enter' && saveGoal()} placeholder="e.g. 10000" className="h-7 w-28 text-xs" inputMode="decimal" />
-                    <Button size="icon" variant="ghost" className="h-7 w-7" onClick={saveGoal} aria-label="Save goal"><Check className="h-4 w-4" /></Button>
-                  </span>
-                ) : (
-                  <button className="flex items-center gap-1 text-foreground hover:text-primary" onClick={() => { setGoalDraft(goal ? String(goal) : ''); setEditGoal(true); }}>
-                    {goal ? `${fmt0(monthRev)} of ${fmt0(goal)} (${goalPct.toFixed(0)}%)` : 'Set a goal'} <Pencil className="h-3 w-3" />
-                  </button>
-                )}
-              </div>
-              <Progress value={goalPct} className="h-2" />
-            </div>
+    <div className="space-y-4 font-sans">
+      <Card>
+        <CardContent className="p-4 space-y-3">
+          <div className="flex items-center justify-between text-xs">
+            <span className="flex items-center gap-1.5 text-muted-foreground"><Target className="h-3.5 w-3.5" />Monthly goal · on pace for {fmt0(pace)}</span>
+            {editGoal ? (
+              <span className="flex items-center gap-1">
+                <Input autoFocus value={goalDraft} onChange={e => setGoalDraft(e.target.value)} onKeyDown={e => e.key === 'Enter' && saveGoal()} placeholder="e.g. 10000" className="h-7 w-28 text-xs" inputMode="decimal" />
+                <Button size="icon" variant="ghost" className="h-7 w-7" onClick={saveGoal} aria-label="Save goal"><Check className="h-4 w-4" /></Button>
+              </span>
+            ) : (
+              <button className="flex items-center gap-1 text-foreground hover:text-primary" onClick={() => { setGoalDraft(goal ? String(goal) : ''); setEditGoal(true); }}>
+                {goal ? `${fmt0(monthRev)} of ${fmt0(goal)} (${goalPct.toFixed(0)}%)` : 'Set a goal'} <Pencil className="h-3 w-3" />
+              </button>
+            )}
           </div>
-          <div className="grid grid-cols-3 gap-3 content-start">
-            <Mini label="Today" value={fmt0(todayRev)} />
-            <Mini label="Last 7 days" value={fmt0(weekRev)} pct={wowPct} />
-            <Mini label="Year to date" value={fmt0(ytdRev)} />
-            <div className="col-span-3 h-16 -mx-1">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={spark7} margin={{ top: 4, right: 0, left: 0, bottom: 0 }}>
-                  <defs><linearGradient id="spark" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={C.primary} stopOpacity={0.5} /><stop offset="100%" stopColor={C.primary} stopOpacity={0} /></linearGradient></defs>
-                  <Area type="monotone" dataKey="revenue" stroke={C.primary} fill="url(#spark)" strokeWidth={2} />
-                </AreaChart>
-              </ResponsiveContainer>
-              <p className="text-[10px] text-muted-foreground text-right">last 14 days</p>
-            </div>
+          <Progress value={goalPct} className="h-2" />
+          <div className="grid grid-cols-2 gap-3 pt-1">
+            <div><p className="text-[11px] text-muted-foreground">Collected vs billed (month)</p><p className="text-lg font-semibold tabular-nums">{fmt0(monthRev)} / {fmt0(billedMTD)}</p><p className="text-[11px] text-muted-foreground">{billedMTD ? `${Math.round((monthRev / billedMTD) * 100)}% collected` : 'Nothing billed yet'}</p></div>
+            <div><p className="text-[11px] text-muted-foreground">Repeat customer revenue</p><p className="text-lg font-semibold tabular-nums">{repeatPct === null ? '—' : `${repeatPct.toFixed(0)}%`}</p><p className="text-[11px] text-muted-foreground">of this month's sales</p></div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Performance */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <Stat label="Collected vs billed (MTD)" value={`${fmt0(monthRev)} / ${fmt0(billedMTD)}`} sub={billedMTD ? `${Math.round((monthRev / billedMTD) * 100)}% collected` : 'Nothing billed yet'} />
-        <Stat label="Avg repair order (MTD)" value={fmt0(aro)} sub={`${monthInv} paid invoice${monthInv === 1 ? '' : 's'}`} />
-        <Stat label="Repeat customer revenue" value={repeatPct === null ? '—' : `${repeatPct.toFixed(0)}%`} sub="of this month's sales" />
-        <Stat label="Labor margin (MTD)" value={laborMargin === null ? '—' : `${laborMargin.toFixed(0)}%`} sub={`${fmt0(laborBilled)} billed · ~${fmt0(laborCostMTD)} tech pay`} />
-      </div>
-
-      {/* Groups */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         <Group icon={Wallet} title="Money owed" href="/admin?tab=invoices">
           <Row k="Unpaid balance" v={`${fmt0(owed.total)}`} strong />
@@ -323,36 +290,10 @@ export default function AdminSalesDashboard() {
           <Row k="Value won" v={fmt0(pipe.wonValue)} />
         </Group>
         <Group icon={Wrench} title="Shop">
-          <Row k="Jobs done this week" v={String(jobStats.week)} strong />
-          <Row k="Jobs done this month" v={`${jobStats.month}${jobStats.revPerJob !== null ? ` · ${fmt0(jobStats.revPerJob)}/job` : ''}`} />
-          <Row k="Labor hours per job" v={jobStats.hrsPerJob === null ? '—' : `${jobStats.hrsPerJob.toFixed(1)} hrs`} />
-          <Row k="Open appointments" v={String(counts.openAppts)} />
-          <Row k="Customers · members" v={`${counts.customers} · ${counts.memberships}`} />
+          <Row k="Open appointments" v={String(counts.openAppts)} strong />
+          <Row k="Customers" v={String(counts.customers)} />
+          <Row k="Members" v={String(counts.memberships)} />
         </Group>
-      </div>
-
-      {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <ChartCard title="Revenue, last 30 days" note="Dashed line = previous 30 days">
-          <ComposedChart data={daily} margin={{ top: 5, right: 8, left: -8, bottom: 0 }}>
-            <defs><linearGradient id="rev" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor={C.primary} stopOpacity={0.45} /><stop offset="95%" stopColor={C.primary} stopOpacity={0.02} /></linearGradient></defs>
-            <CartesianGrid strokeDasharray="3 3" stroke={C.border} vertical={false} />
-            <XAxis dataKey="date" tick={{ fontSize: 11, fill: C.muted }} interval="preserveStartEnd" tickLine={false} axisLine={false} />
-            <YAxis tick={{ fontSize: 11, fill: C.muted }} tickFormatter={yFmt} tickLine={false} axisLine={false} />
-            <Tooltip formatter={(v: any, n: any) => [fmt(Number(v)), n === 'prior' ? 'Previous period' : 'Revenue']} contentStyle={tip} />
-            <Area type="monotone" dataKey="revenue" stroke={C.primary} fill="url(#rev)" strokeWidth={2} />
-            <Line type="monotone" dataKey="prior" stroke={C.muted} strokeDasharray="4 4" dot={false} strokeWidth={1.5} />
-          </ComposedChart>
-        </ChartCard>
-        <ChartCard title="Revenue, last 12 months">
-          <BarChart data={monthly} margin={{ top: 5, right: 8, left: -8, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke={C.border} vertical={false} />
-            <XAxis dataKey="month" tick={{ fontSize: 11, fill: C.muted }} tickLine={false} axisLine={false} />
-            <YAxis tick={{ fontSize: 11, fill: C.muted }} tickFormatter={yFmt} tickLine={false} axisLine={false} />
-            <Tooltip formatter={(v: any) => fmt(Number(v))} contentStyle={tip} cursor={{ fill: 'hsl(var(--muted) / 0.4)' }} />
-            <Bar dataKey="revenue" fill={C.accent} radius={[6, 6, 0, 0]} />
-          </BarChart>
-        </ChartCard>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
