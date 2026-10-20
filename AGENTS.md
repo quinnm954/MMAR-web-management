@@ -2,7 +2,8 @@
 - Subdirectories have their own AGENTS.md (supabase/functions/AGENTS.md: PartsTech auth, email sending, calendar feed, follow-up worker); read it before changing files there.
 
 - Financial reports use shared invoice classification: completed standalone refunds reduce revenue and profit on their recorded completion date, but never count as paid sales, labor or technician pay; why: money returned must not inflate sales or reverse earned labor.
-- Reports year-chart data uses a complete calendar-month series with zero-filled gaps, separate from transaction summaries; why: empty months must remain visible without inventing invoices.
+- Reports year-chart data uses a complete calendar-month series, zero-filling elapsed gaps and leaving unrecorded future months null, separate from transaction summaries; why: keep every month visible without projecting activity.
+- Report date windows use the shared reportPeriod helper with inclusive starts and exclusive ends for current and previous periods; why: historical views must not include later payments or job completions.
 
 - Fleet registration: /fleet/register signs up via auth then calls anon-executable `submit_fleet_registration` RPC, guarded by user id+email match within 15 min of account creation.
 - The Admin Phone workspace is the only screen for calls, texts and email; in-app chat (/messages, message_threads) is retired for every role; why: the owner communicates only by SMS, email and calls.
