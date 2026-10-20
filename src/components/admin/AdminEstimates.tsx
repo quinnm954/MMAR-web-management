@@ -19,6 +19,7 @@ import { format } from 'date-fns';
 import { shareLink } from '@/lib/share';
 import { startRepairOrderFromEstimate } from '@/lib/repairOrders';
 import DeleteButton from './DeleteButton';
+import { estimateStatusLabel } from '@/lib/estimateStatus';
 
 interface LineItem { description: string; quantity: number; unit_price: number; amount: number; catalog_item_id?: string; labor_hours?: number; kind?: 'part' | 'labor' | 'fee'; unit_cost?: number; }
 const PARTS_MARKUP = 1.30; // Imported PDF parts arrive already marked up 30% — divide to recover cost
@@ -42,7 +43,8 @@ const STATUS_COLORS: Record<string, string> = {
   approved: 'bg-green-500/15 text-green-600 border-green-500/30',
   declined: 'bg-red-500/15 text-red-600 border-red-500/30',
   expired: 'bg-yellow-500/15 text-yellow-700 border-yellow-500/30',
-  converted: 'bg-emerald-500/15 text-emerald-600 border-emerald-500/30',
+  converted: 'bg-primary/15 text-primary border-primary/30',
+  completed: 'bg-primary/15 text-primary border-primary/30',
 };
 
 const AdminEstimates = () => {
@@ -534,7 +536,8 @@ const AdminEstimates = () => {
     { key: 'draft', label: 'Draft', test: s => s === 'draft' },
     { key: 'sent', label: 'Sent', test: s => s === 'sent' || s === 'viewed' },
     { key: 'approved', label: 'Approved', test: s => s === 'approved' || s === 'partially_approved' },
-    { key: 'converted', label: 'Complete', test: s => s === 'converted' },
+    { key: 'converted', label: 'In repair', test: s => s === 'converted' },
+    { key: 'completed', label: 'Completed', test: s => s === 'completed' },
     { key: 'declined', label: 'Declined', test: s => s === 'declined' || s === 'expired' },
   ];
   const { match: regionMatch } = useAdminRegion();
@@ -580,14 +583,14 @@ const AdminEstimates = () => {
                 <TableRow>
                   <TableCell className="font-mono text-xs">{e.estimate_number}</TableCell>
                   <TableCell><div>{customerName(e.customer_id)}</div><CustomerAddress customerId={e.customer_id} /></TableCell>
-                  <TableCell><Badge variant="outline" className={STATUS_COLORS[e.status]}>{e.status === 'converted' ? 'complete' : e.status.replace('_', ' ')}</Badge></TableCell>
+                  <TableCell><Badge variant="outline" className={STATUS_COLORS[e.status]}>{estimateStatusLabel(e.status)}</Badge></TableCell>
                   <TableCell className="text-right">${Number(e.total).toFixed(2)}</TableCell>
                   <TableCell className="text-xs text-muted-foreground">{e.valid_until || '—'}</TableCell>
                   <TableCell>
                     <div className="flex gap-1">
                       <Button size="icon" variant="ghost" onClick={() => copyLink(e.approval_token)} title="Copy approval link"><Copy className="h-4 w-4" /></Button>
                       <Button size="icon" variant="ghost" onClick={() => window.open(`/estimate/${e.approval_token}`, '_blank')}><ExternalLink className="h-4 w-4" /></Button>
-                      <Button size="icon" variant="ghost" onClick={() => send(e)} title="Share"><Share2 className="h-4 w-4" /></Button>
+                      {e.status !== 'completed' && <Button size="icon" variant="ghost" onClick={() => send(e)} title="Share"><Share2 className="h-4 w-4" /></Button>}
                       {e.status === 'expired' && (
                         <Button size="sm" variant="outline" onClick={() => reopen(e)} title="Reopen and resend"><RotateCcw className="h-4 w-4 mr-1" />Reopen</Button>
                       )}

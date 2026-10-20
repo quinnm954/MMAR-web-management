@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { FileText, Loader2 } from "lucide-react";
+import { estimateStatusLabel } from '@/lib/estimateStatus';
 
 interface LineItem {
   description?: string;
@@ -169,7 +170,7 @@ const EstimateSummaryCard = ({ className = "" }: { className?: string }) => {
           </div>
           {data.status && (
             <Badge variant="outline" className="capitalize">
-              {data.status === "converted" ? "complete" : data.status.replace(/_/g, " ")}
+              {estimateStatusLabel(data.status)}
             </Badge>
           )}
         </div>

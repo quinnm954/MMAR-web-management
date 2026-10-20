@@ -6,6 +6,7 @@ import PortalLayout from "@/components/portal/PortalLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { findEstimateInvoice, estimateStatusLabel, isFinalEstimate } from '@/lib/estimateStatus';
 import {
   FileText,
   Loader2,
@@ -43,10 +44,13 @@ interface Invoice {
   total: number;
   amount_paid: number;
   service_record_id: string | null;
+  appointment_id: string | null;
+  created_at: string;
 }
 interface ServiceRec { id: string; appointment_id: string | null }
 
 const estStatusColor = (s: string) => {
+  if (s === "completed") return "bg-primary/15 text-primary border-primary/30";
   if (s === "approved") return "bg-primary/15 text-primary border-primary/30";
   if (s === "declined") return "bg-destructive/15 text-destructive border-destructive/30";
   if (s === "partially_approved" || s === "sent") return "bg-accent/15 text-accent-foreground border-accent/30";
@@ -80,7 +84,7 @@ const PortalEstimates = () => {
         .neq("status", "draft")
         .order("created_at", { ascending: false }),
       supabase.from("appointments").select("id, service_type, board_column, status, scheduled_at").eq("customer_id", user.id),
-      supabase.from("invoices").select("id, invoice_number, status, total, amount_paid, service_record_id").eq("customer_id", user.id),
+      supabase.from("invoices").select("id, invoice_number, status, total, amount_paid, service_record_id, appointment_id, created_at").eq("customer_id", user.id),
       supabase.from("service_records").select("id, appointment_id").eq("customer_id", user.id),
     ]).then(([e, a, i, sr]) => {
       setEstimates((e.data as unknown as Estimate[]) ?? []);
@@ -92,13 +96,7 @@ const PortalEstimates = () => {
   }, [user]);
 
   const findInvoiceForEstimate = (e: Estimate): Invoice | undefined => {
-    if (e.converted_to_invoice_id) {
-      return invoices.find((inv) => inv.id === e.converted_to_invoice_id);
-    }
-    if (!e.appointment_id) return undefined;
-    const sr = serviceRecs.find((s) => s.appointment_id === e.appointment_id);
-    if (!sr) return undefined;
-    return invoices.find((inv) => inv.service_record_id === sr.id);
+    return findEstimateInvoice(e, invoices, serviceRecs);
   };
 
   const needsAction = estimates.filter((e) => e.status === "sent").length;
@@ -139,7 +137,7 @@ const PortalEstimates = () => {
             const reviewable = e.status === "sent" && e.approval_token;
             const ro = e.appointment_id ? appts.find((a) => a.id === e.appointment_id) : undefined;
             const inv = findInvoiceForEstimate(e);
-            const approvedFamily = ["approved", "partially_approved"].includes(e.status);
+            const approvedFamily = ["approved", "partially_approved"].includes(e.status) || isFinalEstimate(e.status);
             const due = inv ? Number(inv.total) - Number(inv.amount_paid || 0) : 0;
 
             return (
@@ -150,7 +148,7 @@ const PortalEstimates = () => {
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="font-mono text-sm font-medium">{e.estimate_number || `EST-${e.id.slice(0, 6)}`}</span>
-                        <Badge className={`${estStatusColor(e.status)} uppercase border text-[10px]`}>{e.status === "converted" ? "complete" : e.status.replace("_", " ")}</Badge>
+                        <Badge className={`${estStatusColor(e.status)} uppercase border text-[10px]`}>{estimateStatusLabel(e.status)}</Badge>
                       </div>
                       <div className="text-xs text-muted-foreground mt-0.5">
                         {new Date(e.created_at).toLocaleDateString()}
@@ -164,7 +162,7 @@ const PortalEstimates = () => {
                         <Button size="sm" variant="hero" asChild>
                           <Link to={`/estimate/${e.approval_token}`}>Review &amp; Approve <ChevronRight className="h-4 w-4 ml-1" /></Link>
                         </Button>
-                      ) : approvedFamily && e.approval_token ? (
+                      ) : approvedFamily && !isFinalEstimate(e.status) && e.approval_token ? (
                         <Button size="sm" variant="outline" asChild>
                           <Link to={`/estimate/${e.approval_token}?edit=1`}>Change / Decline Items</Link>
                         </Button>
@@ -187,7 +185,7 @@ const PortalEstimates = () => {
                         e.status === "sent" ? "Awaiting your approval" :
                         e.status === "approved" ? "Approved" :
                         e.status === "partially_approved" ? "Partially approved" :
-                        e.status === "declined" ? "Declined" : e.status
+                        e.status === "declined" ? "Declined" : estimateStatusLabel(e.status)
                       }
                     />
                     {/* Step 2: Repair Order */}

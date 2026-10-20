@@ -58,7 +58,7 @@ export default function AdminRepairOrders() {
       const a = i.appointment_id || srToAppt.get(i.service_record_id);
       if (a && !invByAppt.has(a)) invByAppt.set(a, i);
     });
-    const rank = (s: string) => (["approved", "partially_approved", "converted"].includes(s) ? 0 : s === "declined" ? 2 : 1);
+    const rank = (s: string) => (["approved", "partially_approved", "converted", "completed"].includes(s) ? 0 : s === "declined" ? 2 : 1);
     const estByAppt = new Map<string, any>();
     (ests || []).forEach((e: any) => {
       const cur = estByAppt.get(e.appointment_id);
