@@ -2,6 +2,8 @@ import AdminFinancing from '@/components/admin/AdminFinancing';
 import { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { useNotifications } from '@/hooks/useNotifications';
+import { tabForNotification } from '@/lib/adminTabAlerts';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 
@@ -214,6 +216,18 @@ const AdminDashboard = () => {
             if (tabParam && visible.some(t => t.value === tabParam)) setActiveTab(tabParam);
           }, [tabParam]);
 
+          const { items: notifs, markManyRead } = useNotifications(200);
+          const unreadByTab: Record<string, string[]> = {};
+          for (const n of notifs) {
+            if (n.read_at) continue;
+            const t = tabForNotification(n);
+            (unreadByTab[t] ||= []).push(n.id);
+          }
+          const activeUnread = (unreadByTab[activeTab] || []).join(',');
+          useEffect(() => {
+            if (activeUnread) markManyRead(activeUnread.split(','));
+          }, [activeUnread, markManyRead]);
+
           const selectTab = (value: string) => {
             setActiveTab(value);
             setSearchParams(prev => { const next = new URLSearchParams(prev); next.set('tab', value); return next; }, { replace: true });
@@ -239,15 +253,17 @@ const AdminDashboard = () => {
             const items = visible.filter(t => values.includes(t.value)).sort(sortByUsage);
             if (items.length === 0) return null;
             const isActiveGroup = items.some(t => t.value === activeTab);
+            const groupNew = items.some(t => t.value !== activeTab && (unreadByTab[t.value]?.length || 0) > 0);
             return (
               <DropdownMenu key={label}>
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant={isActiveGroup ? 'default' : 'outline'}
                     size="sm"
-                    className="justify-between"
+                    className="justify-between relative"
                   >
                     {label}
+                    {groupNew && <span aria-label="New" className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-destructive ring-2 ring-background" />}
                     <ChevronDown className="h-4 w-4 ml-1 opacity-70" />
                   </Button>
                 </DropdownMenuTrigger>
@@ -267,7 +283,9 @@ const AdminDashboard = () => {
                         >
                           <Icon className="h-4 w-4 mr-2 shrink-0" />
                           <span className="flex-1">{t.label}</span>
-                          {count > 0 && (
+                          {(unreadByTab[t.value]?.length || 0) > 0 && t.value !== activeTab ? (
+                            <span className="ml-2 min-w-5 h-5 px-1.5 rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold flex items-center justify-center">{unreadByTab[t.value].length}</span>
+                          ) : count > 0 && (
                             <span className="ml-2 text-[10px] text-muted-foreground">{count}</span>
                           )}
                         </DropdownMenuItem>
