@@ -19,6 +19,7 @@ export async function sendFinancingReminders(sb: any, stripe: any, now: Date,
     .not('stripe_customer_id', 'is', null).limit(100);
   if (error) throw new Error(error.message);
   for (const c of contracts || []) {
+    if (c.status !== 'active') continue;
     try {
       const { data: payments, error: paymentError } = await sb.from('financing_payments')
         .select('id,seq,due_date,amount,status,withdrawal_reminder_for_at')

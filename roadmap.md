@@ -1,7 +1,7 @@
 # Roadmap
 
 ## Withdrawal reminders
-- [ ] Add day-before SMS reminders with the next withdrawal date/time; verify timing and duplicate protection.
+- [x] Add day-before withdrawal SMS through the existing hourly worker; ten tests passed, deployed worker returned no errors, and Jose's next Stripe cycle was verified as October 26 at 9 AM Eastern. First reminder is due October 25; actual future SMS delivery remains to occur.
 
 ## Financing installment tracking
 - [x] Synchronize successful Stripe installments and manual charges to financing payments and invoice history without duplicates; deployed and reconciled Jose's real down payment.
