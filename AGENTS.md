@@ -1,5 +1,5 @@
 
-- Subdirectories have their own AGENTS.md (supabase/functions/AGENTS.md: PartsTech auth, email sending, calendar feed, follow-up worker); read it before changing files there.
+- Read subdirectory AGENTS.md before changing files there.
 
 - Reports classify refunds as revenue/profit reductions on completion date, never sales, labor or tech pay; why: refunds must not inflate sales or reverse labor.
 - Reports year charts zero-fill elapsed months and leave unrecorded future months null; why: show every month without projections.
@@ -7,7 +7,7 @@
 
 - Fleet registration signs up then calls `submit_fleet_registration`, guarded by user id/email match within 15 minutes; why: secure public signup.
 
-- Financing receipts use service-only `record_financing_stripe_invoice`, keyed by Stripe invoice and installment date; principal excludes interest, invoices close after all installments clear; why: retries must not duplicate payments or close invoices early.
+- Financing receipts use service-only `record_financing_stripe_invoice`, keyed by Stripe invoice/date; principal excludes interest, invoices close after all installments clear. Day-before SMS uses the existing worker and Stripe billing/retry times; why: no duplicates, early closing or invented charge times.
 - The Admin Phone workspace is the only screen for calls, texts and email; in-app chat (/messages, message_threads) is retired for every role; why: the owner communicates only by SMS, email and calls.
 - Repair-order names derive from approved estimate repair lines, preferring labor descriptions; why: orders must identify the repair rather than the estimate workflow state.
 - Estimate completion is synchronized by invoice/estimate triggers using explicit invoice links first, then appointment/service-record links only for invoices created after the estimate; why: payment must close estimates without an old diagnosis payment closing newer repairs.

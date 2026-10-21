@@ -6,6 +6,7 @@ import { sendAndLog } from '../_shared/send-and-log.ts';
 import { sendSms } from '../_shared/booking-bot.ts';
 import { smsAllowed } from '../_shared/missed-call.ts';
 import { enrollSuffix } from '../_shared/enroll.ts';
+import { sendFinancingReminders } from '../_shared/financing-reminders.ts';
 
 const SITE = 'https://mikesmautorepair.com';
 const H = 3600000, D = 24 * H;
@@ -32,7 +33,7 @@ Deno.serve(async () => {
   if (!lease?.length) return Response.json({ skipped: 'already running' });
 
   const textsOk = await smsAllowed();
-  const out = { estimates: 0, invoices: 0, reminders: 0, reviews: 0, errors: [] as string[] };
+  const out = { estimates: 0, invoices: 0, reminders: 0, financing_reminders: 0, reviews: 0, errors: [] as string[] };
   const profile = async (id: string) =>
     (await sb.from('profiles').select('full_name,email,phone').eq('id', id).maybeSingle()).data as { full_name?: string; email?: string; phone?: string } | null;
 
@@ -130,6 +131,11 @@ Deno.serve(async () => {
     // 2) Invoices: send when created, then remind on day 3 and day 7
     const stripeKey = Deno.env.get('STRIPE_SECRET_KEY');
     const stripe = stripeKey ? new Stripe(stripeKey, { apiVersion: '2025-08-27.basil' }) : null;
+    if (stripe && textsOk) {
+      const financing = await sendFinancingReminders(sb, stripe, now, (phone, text) => sendSms(sb, phone, text));
+      out.financing_reminders = financing.sent;
+      out.errors.push(...financing.errors);
+    }
     const payLink = async (inv: any, email?: string) => {
       if (!stripe) return `${SITE}/portal/invoices/${inv.id}`;
       const dueAmt = Number(inv.total) - Number(inv.amount_paid || 0);
@@ -140,7 +146,8 @@ Deno.serve(async () => {
         metadata: { invoice_id: inv.id, customer_id: inv.customer_id, source: 'auto_followup' },
       });
       await sb.from('invoices').update({ stripe_session_id: s.id }).eq('id', inv.id);
-      return s.url!;
+      if (!s.url) throw new Error('Stripe did not return a payment URL');
+      return s.url;
     };
     const { data: invs } = await sb.from('invoices')
       .select('id,customer_id,invoice_number,total,amount_paid,status,auto_sent_at,reminder_count')

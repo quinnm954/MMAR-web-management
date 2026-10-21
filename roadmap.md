@@ -1,5 +1,8 @@
 # Roadmap
 
+## Withdrawal reminders
+- [x] Add day-before withdrawal SMS through the existing hourly worker; ten tests passed, deployed worker returned no errors, and Jose's next Stripe cycle was verified as October 26 at 9 AM Eastern. First reminder is due October 25; actual future SMS delivery remains to occur.
+
 ## Financing installment tracking
 - [x] Synchronize successful Stripe installments and manual charges to financing payments and invoice history without duplicates; deployed and reconciled Jose's real down payment.
 - [x] Keep the invoice open until the final scheduled payment; ten regression tests passed, live invoice shows Partial with $806.66 paid and $806.66 principal remaining.

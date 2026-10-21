@@ -1484,6 +1484,8 @@ export type Database = {
           stripe_invoice_id: string | null
           stripe_payment_intent_id: string | null
           updated_at: string
+          withdrawal_reminder_for_at: string | null
+          withdrawal_reminder_sent_at: string | null
         }
         Insert: {
           amount: number
@@ -1501,6 +1503,8 @@ export type Database = {
           stripe_invoice_id?: string | null
           stripe_payment_intent_id?: string | null
           updated_at?: string
+          withdrawal_reminder_for_at?: string | null
+          withdrawal_reminder_sent_at?: string | null
         }
         Update: {
           amount?: number
@@ -1518,6 +1522,8 @@ export type Database = {
           stripe_invoice_id?: string | null
           stripe_payment_intent_id?: string | null
           updated_at?: string
+          withdrawal_reminder_for_at?: string | null
+          withdrawal_reminder_sent_at?: string | null
         }
         Relationships: [
           {
