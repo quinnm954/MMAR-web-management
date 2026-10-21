@@ -53,7 +53,7 @@ const PortalInvoiceDetail = () => {
   const [inv, setInv] = useState<Invoice | null>(null);
   const [customer, setCustomer] = useState<any>(null);
   const [vehicle, setVehicle] = useState<any>(null);
-  const [payments, setPayments] = useState<Array<{ id: string; amount: number; method: string; reference: string | null; paid_at: string }>>([]);
+  const [payments, setPayments] = useState<Array<{ id: string; amount: number; method: string; reference: string | null; notes: string | null; paid_at: string }>>([]);
   const [loading, setLoading] = useState(true);
   const [paying, setPaying] = useState(false);
 
@@ -74,7 +74,7 @@ const PortalInvoiceDetail = () => {
         }
         const { data: pays } = await supabase
           .from("invoice_payments" as any)
-          .select("id, amount, method, reference, paid_at")
+          .select("id, amount, method, reference, notes, paid_at")
           .eq("invoice_id", data.id)
           .order("paid_at", { ascending: true });
         setPayments(((pays as any[]) ?? []) as any);
@@ -204,9 +204,15 @@ const PortalInvoiceDetail = () => {
           <div className="mt-4 ml-auto sm:w-72 text-xs space-y-1">
             <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Payment History</div>
             {payments.map((p) => (
-              <div key={p.id} className="flex justify-between border-t border-border/60 pt-1">
-                <span>{new Date(p.paid_at).toLocaleDateString()} · {p.method}{p.reference ? ` · ${p.reference}` : ""}</span>
-                <span className="font-medium">${Number(p.amount).toFixed(2)}</span>
+              <div key={p.id} className="flex justify-between gap-3 border-t border-border/60 pt-2">
+                <div className="min-w-0">
+                  <div>{new Date(p.paid_at).toLocaleDateString()} · {p.method}</div>
+                  {p.notes && <div className="text-muted-foreground break-words mt-1">{p.notes}</div>}
+                </div>
+                <div className="shrink-0 text-right space-y-1">
+                  <div className="font-medium">${Number(p.amount).toFixed(2)}</div>
+                  <Badge variant="outline" className="text-primary border-primary/30">Paid</Badge>
+                </div>
               </div>
             ))}
           </div>
