@@ -1,0 +1,2 @@
+ALTER TABLE public.financing_payments ADD COLUMN IF NOT EXISTS withdrawal_reminder_for_at timestamptz, ADD COLUMN IF NOT EXISTS withdrawal_reminder_sent_at timestamptz;
+COMMENT ON COLUMN public.financing_payments.withdrawal_reminder_for_at IS 'Stripe scheduled billing or retry timestamp successfully reminded by SMS; prevents repeat reminders for the same withdrawal.';
