@@ -3,7 +3,7 @@ import { useAdminRegion, RegionSwitch, RegionChip } from '@/hooks/useAdminRegion
 import { supabase } from '@/integrations/supabase/client';
 import { techHoursForInvoice } from '@/lib/techHours';
 import { isReportSale, reportInvoiceRevenue } from '@/lib/reportInvoice';
-import { fullYearChart } from '@/lib/reportChart';
+import { fullYearChart, filledPeriodChart, chartBucketKey } from '@/lib/reportChart';
 import { reportPeriod } from '@/lib/reportPeriod';
 import { DATE_PRESETS, type DateFilter } from '@/lib/dateFilters';
 import { DateRangeFilter } from './DateRangeFilter';
@@ -413,7 +413,7 @@ export default function AdminReports({ extras }: { extras?: React.ReactNode } = 
   const bucketKey = (iso: string): { key: string; label: string; sortKey: string } => {
     const d = new Date(iso);
     if (granularity === 'day') {
-      const k = d.toISOString().slice(0, 10);
+      const k = chartBucketKey(d, 'day');
       return { key: k, label: d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }), sortKey: k };
     }
     if (granularity === 'week') {
@@ -423,7 +423,7 @@ export default function AdminReports({ extras }: { extras?: React.ReactNode } = 
       monday.setHours(0, 0, 0, 0);
       const sunday = new Date(monday);
       sunday.setDate(monday.getDate() + 6);
-      const k = monday.toISOString().slice(0, 10);
+      const k = chartBucketKey(d, 'week');
       return {
         key: k,
         label: `${monday.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} – ${sunday.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`,
@@ -495,7 +495,9 @@ export default function AdminReports({ extras }: { extras?: React.ReactNode } = 
   const change = prevRevenue > 0 ? ((data.revenue30 - prevRevenue) / prevRevenue) * 100 : null;
   const chartData = preset === 'y'
     ? fullYearChart(selectedPeriod.start.getFullYear(), summaryRows)
-    : [...summaryRows].reverse().map((r) => ({ label: r.label, revenue: Math.round(r.revenue), profit: Math.round(r.netProfit) }));
+    : filledPeriodChart(
+        preset === 'all' && summaryRows.length ? new Date(`${summaryRows[summaryRows.length - 1].sortKey.slice(0, 4)}-01-01T00:00:00`) : selectedPeriod.start,
+        selectedPeriod.end, granularity, summaryRows);
   const exportCsv = () => {
     const head = ['Date', 'Invoice', 'Customer', 'Technician', 'Labor hrs', 'Revenue', 'Parts cost', 'Tech pay', 'Card fee', 'Net profit'];
     const lines = filteredRows.map((r) => [r.date, r.invoice_number ?? '', r.customer, r.technician, r.paidLaborHours.toFixed(2), r.revenue.toFixed(2), r.cogs.toFixed(2), r.employeeCost.toFixed(2), r.stripeFee.toFixed(2), r.netProfit.toFixed(2)]);
@@ -590,8 +592,8 @@ export default function AdminReports({ extras }: { extras?: React.ReactNode } = 
                 <XAxis dataKey="label" interval={preset === 'y' ? 0 : 'preserveEnd'} tickLine={false} axisLine={false} tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} />
                 <YAxis tickFormatter={money} tickLine={false} axisLine={false} tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} width={44} />
                 <Tooltip formatter={(v: number) => fmt(v)} contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 8, fontSize: 12 }} />
-                <Area type="monotone" dataKey="revenue" name="Revenue" stroke="hsl(var(--primary))" strokeWidth={2} fill="url(#revFill)" />
-                <Area type="monotone" dataKey="profit" name="Net profit" stroke="hsl(var(--accent))" strokeWidth={2} fill="url(#profFill)" />
+                <Area type="monotone" dataKey="revenue" name="Revenue" stroke="hsl(var(--primary))" strokeWidth={2} fill="url(#revFill)" dot={chartData.length <= 2} />
+                <Area type="monotone" dataKey="profit" name="Net profit" stroke="hsl(var(--accent))" strokeWidth={2} fill="url(#profFill)" dot={chartData.length <= 2} />
               </AreaChart>
             </ResponsiveContainer>
           </div>
