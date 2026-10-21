@@ -46,7 +46,7 @@ import AdminReports from '@/components/admin/AdminReports';
 import AdminSalesDashboard from '@/components/admin/AdminSalesDashboard';
 import AdConversionsCard from '@/components/admin/AdConversionsCard';
 import { lazy, Suspense } from 'react';
-const StreetRun3D = lazy(() => import('@/components/admin/StreetRun3D'));
+import AdminHomeLaunchpad from '@/components/admin/AdminHomeLaunchpad';
 import AdminCustomerShare from '@/components/admin/AdminCustomerShare';
 import AdminGarage from '@/components/admin/AdminGarage';
 import AdminDeclinedWork from '@/components/admin/AdminDeclinedWork';
@@ -158,10 +158,7 @@ const AdminDashboard = () => {
         {(() => {
           const tabs: TabDef[] = [
             { value: 'dashboard', label: 'Home', icon: LayoutDashboard, roles: ADMIN_ONLY, content: (
-              <Suspense fallback={<div className="h-[60vh] rounded-xl border border-border bg-card animate-pulse" />}>
-                <StreetRun3D />
-              </Suspense>
-            ) },
+<></>) },
             { value: 'reports', label: 'Reports', icon: BarChart3, roles: ADMIN_ONLY, content: (
               <div className="space-y-5">
                 <DailyTodo />
@@ -197,6 +194,8 @@ const AdminDashboard = () => {
             { value: 'settings', label: 'Settings', icon: Settings, roles: OWNER_ADMIN, content: <div className="space-y-6"><PushNotificationCard /><CalendarFeedSettings /><AdminRegionsCard /><AdminShopSettings /></div> },
           ];
           const visible = tabs.filter(t => hasAnyRole(t.roles));
+          const home = visible.find(t => t.value === 'dashboard');
+          if (home) home.content = <AdminHomeLaunchpad allowed={visible.map(t => t.value)} />;
           if (visible.length === 0) {
             return <p className="text-sm text-muted-foreground">No sections available for your role ({roles.join(', ') || 'none'}).</p>;
           }
