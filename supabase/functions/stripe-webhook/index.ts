@@ -1,4 +1,5 @@
 import { sendAndLog } from '../_shared/send-and-log.ts';
+import { syncFinancingInvoice } from '../_shared/financing-invoice.ts';
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import Stripe from "https://esm.sh/stripe@17.7.0?target=deno";
 const SITE_URL = "https://shop-flow-home.lovable.app";
@@ -221,8 +222,9 @@ Deno.serve(async (req) => {
         .eq("stripe_subscription_id", sub.id);
     }
 
-    if (event.type === "invoice.payment_succeeded") {
+    if (event.type === "invoice.payment_succeeded" || event.type === "invoice.paid") {
       const inv = event.data.object as Stripe.Invoice;
+      await syncFinancingInvoice(admin, stripe, inv);
       if (inv.subscription) {
         // Look up membership by stripe_subscription_id
         const { data: m } = await admin
