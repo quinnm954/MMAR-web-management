@@ -1,5 +1,8 @@
 # Roadmap
 
+## Withdrawal reminders
+- [ ] Add day-before SMS reminders with the next withdrawal date/time; verify timing and duplicate protection.
+
 ## Financing installment tracking
 - [x] Synchronize successful Stripe installments and manual charges to financing payments and invoice history without duplicates; deployed and reconciled Jose's real down payment.
 - [x] Keep the invoice open until the final scheduled payment; ten regression tests passed, live invoice shows Partial with $806.66 paid and $806.66 principal remaining.
