@@ -1,5 +1,9 @@
 # Roadmap
 
+## Financing installment tracking
+- [ ] Synchronize successful Stripe installments and manual charges to financing payments and invoice history without duplicates.
+- [ ] Keep the invoice open until the final scheduled payment; test and verify Jose's real invoice.
+
 ## Better date filters
 - [x] Add to-date, rolling and calendar date-range filters to Reports, invoices, estimates, repair orders, appointments and booking requests.
 - [x] Test date boundaries (22 tests passing); verify signed-in presets and custom dates on desktop/phone and all operational date controls, with no page errors or phone overflow.
