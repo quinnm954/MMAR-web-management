@@ -40,7 +40,7 @@ const AdminHomeLaunchpad = ({ allowed }: { allowed: string[] }) => {
       const { start, end } = easternDayBounds();
       const c = (q: any) => q.then((r: any) => r.count ?? 0);
       const [cal, book, est, ros, inv] = await Promise.all([
-        c(supabase.from('appointments').select('id', { count: 'exact', head: true }).gte('scheduled_date', start).lt('scheduled_date', end).neq('status', 'cancelled')),
+        c(supabase.from('appointments').select('id', { count: 'exact', head: true }).gte('scheduled_at', start).lt('scheduled_at', end).neq('status', 'cancelled')),
         c(supabase.from('booking_requests').select('id', { count: 'exact', head: true }).in('status', ['new', 'contacted'])),
         c(supabase.from('estimates').select('id', { count: 'exact', head: true }).in('status', ['draft', 'sent'])),
         c(supabase.from('appointments').select('id', { count: 'exact', head: true }).eq('status', 'in_progress')),
@@ -122,7 +122,7 @@ const AdminHomeLaunchpad = ({ allowed }: { allowed: string[] }) => {
           );
         })}
         <button
-          onClick={() => document.querySelector<HTMLElement>('[data-admin-menu]')?.click()}
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
           className="rounded-xl border border-dashed border-border p-4 text-left text-muted-foreground hover:border-primary"
         >
           <LayoutGrid className="h-6 w-6" />
