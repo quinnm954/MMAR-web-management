@@ -1481,6 +1481,7 @@ export type Database = {
           paid_at: string | null
           seq: number
           status: string
+          stripe_invoice_id: string | null
           stripe_payment_intent_id: string | null
           updated_at: string
         }
@@ -1497,6 +1498,7 @@ export type Database = {
           paid_at?: string | null
           seq: number
           status?: string
+          stripe_invoice_id?: string | null
           stripe_payment_intent_id?: string | null
           updated_at?: string
         }
@@ -1513,6 +1515,7 @@ export type Database = {
           paid_at?: string | null
           seq?: number
           status?: string
+          stripe_invoice_id?: string | null
           stripe_payment_intent_id?: string | null
           updated_at?: string
         }
@@ -4290,6 +4293,18 @@ export type Database = {
           _unit_price?: number
         }
         Returns: Json
+      }
+      record_financing_stripe_invoice: {
+        Args: {
+          _amount: number
+          _contract_id: string
+          _down_payment: boolean
+          _due_date: string
+          _paid_at: string
+          _payment_intent_id?: string
+          _stripe_invoice_id: string
+        }
+        Returns: string
       }
       redeem_mileage_token: {
         Args: { _miles: number; _token: string }
