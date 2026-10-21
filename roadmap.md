@@ -1,8 +1,8 @@
 # Roadmap
 
 ## Financing installment tracking
-- [ ] Synchronize successful Stripe installments and manual charges to financing payments and invoice history without duplicates.
-- [ ] Keep the invoice open until the final scheduled payment; test and verify Jose's real invoice.
+- [x] Synchronize successful Stripe installments and manual charges to financing payments and invoice history without duplicates; deployed and reconciled Jose's real down payment.
+- [x] Keep the invoice open until the final scheduled payment; ten regression tests passed, live invoice shows Partial with $806.66 paid and $806.66 principal remaining.
 
 ## Better date filters
 - [x] Add to-date, rolling and calendar date-range filters to Reports, invoices, estimates, repair orders, appointments and booking requests.

@@ -1,7 +1,7 @@
-import { createClient } from "npm:@supabase/supabase-js@2.57.2";
+import { createClient } from "npm:@supabase/supabase-js@2.99.2";
 import Stripe from "npm:stripe@18.5.0";
 import { syncFinancingInvoice } from '../_shared/financing-invoice.ts';
-import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
+import { corsHeaders } from 'npm:@supabase/supabase-js@2.99.2/cors';
 
 const cors = corsHeaders;
 const json = (b: unknown, status = 200) =>

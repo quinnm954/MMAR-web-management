@@ -1,11 +1,13 @@
 
 - Subdirectories have their own AGENTS.md (supabase/functions/AGENTS.md: PartsTech auth, email sending, calendar feed, follow-up worker); read it before changing files there.
 
-- Financial reports use shared invoice classification: completed standalone refunds reduce revenue and profit on their recorded completion date, but never count as paid sales, labor or technician pay; why: money returned must not inflate sales or reverse earned labor.
-- Reports year-chart data uses a complete calendar-month series, zero-filling elapsed gaps and leaving unrecorded future months null, separate from transaction summaries; why: keep every month visible without projecting activity.
+- Reports classify refunds as revenue/profit reductions on completion date, never sales, labor or tech pay; why: refunds must not inflate sales or reverse labor.
+- Reports year charts zero-fill elapsed months and leave unrecorded future months null; why: show every month without projections.
 - Reports use reportPeriod; lists share dateFilters/DateRangeFilter. Starts are inclusive, ends exclusive, custom end days included, WTD starts Monday; why: consistent historical filtering.
 
-- Fleet registration: /fleet/register signs up via auth then calls anon-executable `submit_fleet_registration` RPC, guarded by user id+email match within 15 min of account creation.
+- Fleet registration signs up then calls `submit_fleet_registration`, guarded by user id/email match within 15 minutes; why: secure public signup.
+
+- Financing receipts use service-only `record_financing_stripe_invoice`, keyed by Stripe invoice and installment date; principal excludes interest, invoices close after all installments clear; why: retries must not duplicate payments or close invoices early.
 - The Admin Phone workspace is the only screen for calls, texts and email; in-app chat (/messages, message_threads) is retired for every role; why: the owner communicates only by SMS, email and calls.
 - Repair-order names derive from approved estimate repair lines, preferring labor descriptions; why: orders must identify the repair rather than the estimate workflow state.
 - Estimate completion is synchronized by invoice/estimate triggers using explicit invoice links first, then appointment/service-record links only for invoices created after the estimate; why: payment must close estimates without an old diagnosis payment closing newer repairs.
