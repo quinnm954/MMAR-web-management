@@ -1,11 +1,9 @@
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
 import Stripe from "npm:stripe@18.5.0";
+import { syncFinancingInvoice } from '../_shared/financing-invoice.ts';
+import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
 
-const cors = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
-};
+const cors = corsHeaders;
 const json = (b: unknown, status = 200) =>
   new Response(JSON.stringify(b), { status, headers: { ...cors, "Content-Type": "application/json" } });
 
@@ -22,6 +20,10 @@ Deno.serve(async (req) => {
 
     const body = await req.json().catch(() => ({}));
     const action = String(body.action || "");
+    if (!['setup_bank', 'confirm_bank', 'run', 'refresh'].includes(action)) return json({ error: 'Unknown action' }, 400);
+    const id = action === 'run' ? body.payment_id : body.contract_id;
+    if (action !== 'confirm_bank' && (typeof id !== 'string' || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id))) return json({ error: 'Invalid payment or contract ID' }, 400);
+    if (action === 'confirm_bank' && (typeof body.session_id !== 'string' || !/^cs_[A-Za-z0-9_]{1,250}$/.test(body.session_id))) return json({ error: 'Invalid checkout session' }, 400);
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY")!, { apiVersion: "2025-08-27.basil" });
     const origin = req.headers.get("origin") || "https://mikesmautorepair.com";
 
@@ -108,10 +110,17 @@ Deno.serve(async (req) => {
 
     if (action === "refresh") {
       const c = await loadContract(body.contract_id);
+      // Reconcile completed subscription invoices without charging the card.
+      if (c.stripe_customer_id) {
+        for await (const invoice of stripe.invoices.list({ customer: c.stripe_customer_id, status: 'paid', limit: 100 })) {
+          await syncFinancingInvoice(admin, stripe, invoice, c.id);
+        }
+      }
       const { data: pending } = await admin.from("financing_payments").select("id,stripe_payment_intent_id")
         .eq("contract_id", c.id).eq("status", "processing").not("stripe_payment_intent_id", "is", null);
       for (const p of pending || []) {
-        const pi = await stripe.paymentIntents.retrieve(p.stripe_payment_intent_id!);
+        if (!p.stripe_payment_intent_id) continue;
+        const pi = await stripe.paymentIntents.retrieve(p.stripe_payment_intent_id);
         if (pi.status === "succeeded") {
           await admin.from("financing_payments").update({ status: "paid", paid_at: new Date().toISOString() }).eq("id", p.id);
         } else if (pi.status === "requires_payment_method" || pi.status === "canceled") {
