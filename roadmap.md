@@ -1,8 +1,8 @@
 # Roadmap
 
 ## Text booking requests
-- [ ] Offer checked times while gathering customer details; persist selected date/time pending Mike's approval, including updates to existing requests.
-- [ ] Test slot validation, failure handling and pending request saves; deploy the text handler and verify readback.
+- [x] Offer checked times while gathering customer details; persist selected date/time pending Mike's approval, including updates to existing requests.
+- [x] Twenty-four tests passed; deployed the text handler and verified a temporary Oct 23 noon request reads back in the signed-in Pending screen with Confirm control and no appointment; removed test data. A new live AI/carrier text conversation was not performed.
 
 ## Receptionist reliability and afternoon times
 - [x] Recent real calls/texts are answering; corrected conflicting scheduling prompts, automated-SMS suppression, missing diagnosis-draft import and fail-open calendar reads.
