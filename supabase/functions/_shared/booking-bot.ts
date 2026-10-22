@@ -1,6 +1,7 @@
 // Booking follow-up bot: texts website bookers, agrees on a 10am–5pm slot, then converts to an appointment.
 const TWILIO_GW = 'https://connector-gateway.lovable.dev/twilio';
 import { buildLaborQuote, createDraftEstimate, quoteSentence, quoteNote } from './labor-quote.ts';
+import { oilChangeBlocked, OIL_CHANGE_MEMBERSHIP_REPLY, OIL_CHANGE_MEMBERSHIP_REPLY_ES } from './oil-change-eligibility.ts';
 const AI_URL = 'https://ai.gateway.lovable.dev/v1/responses';
 
 export const digits = (p: string) => (p || '').replace(/\D/g, '').slice(-10);
@@ -195,6 +196,10 @@ export async function startBot(sb: any, id: string) {
     .gte('created_at', new Date(Date.now() - 30 * 60_000).toISOString())
     .select('*').maybeSingle();
   if (!req || !req.customer_phone) return { skipped: true };
+  if (await oilChangeBlocked(sb, req)) {
+    await handoffOilChange(sb, req);
+    return { started: false, membershipRequired: true };
+  }
   if (NOT_OFFERED.test(req.service_type || '')) {
     const first = (req.customer_name || '').trim().split(/\s+/)[0];
     const text = `Hi${first ? ` ${first}` : ''}, this is Mike's Mobile Auto Repair. Thanks for reaching out! We don't offer tire service, sorry. If there's other work you need, like brakes, Mike will review it and text you. Reply STOP to opt out.`;
@@ -244,6 +249,19 @@ async function askAi(system: string, history: { role: string; content: string }[
   return JSON.parse(m[0]) as { reply: string; confirmed: boolean; date?: string; time?: string; handoff?: boolean; price_ok?: boolean };
 }
 
+async function handoffOilChange(sb: any, req: any, incoming = '') {
+  const reply = /aceite|cambio|espa[ñn]ol/i.test(incoming) ? OIL_CHANGE_MEMBERSHIP_REPLY_ES : OIL_CHANGE_MEMBERSHIP_REPLY;
+  await sendSms(sb, req.customer_phone, reply);
+  await sb.from('booking_requests').update({
+    bot_status: 'handoff',
+    bot_history: [...(req.bot_history || []), ...(incoming ? [{ role: 'user', content: incoming }] : []), { role: 'assistant', content: reply }],
+    bot_updated_at: new Date().toISOString(),
+    requested_date: null,
+    requested_time_window: null,
+  }).eq('id', req.id);
+  await sb.rpc('_notify_staff_customer_action', { _title: 'Oil change — subscription required', _body: `${req.customer_name || req.customer_phone}: no active MMAR Care subscription verified; no time offered.`, _link: '/admin/dashboard?tab=booking-requests' }).then(() => {}, () => {});
+}
+
 // Returns true if the text was handled by the bot.
 export async function handleBotReply(sb: any, from: string, body: string) {
   if (/^\s*(stop|cancel|unsubscribe|quit|end)\s*$/i.test(body)) {
@@ -256,6 +274,11 @@ export async function handleBotReply(sb: any, from: string, body: string) {
     .gte('created_at', new Date(Date.now() - 14 * 86400_000).toISOString()).order('created_at', { ascending: false });
   const req = (list || []).find((r: any) => digits(r.customer_phone) === digits(from));
   if (!req) return false;
+
+  if (await oilChangeBlocked(sb, req, body)) {
+    await handoffOilChange(sb, req, body);
+    return true;
+  }
 
   const avail = await openSlots(sb, null, 10, req.converted_appointment_id).catch(() => []);
   const availText = avail.map((d) => `${d.date} (${friendlyDate(d.date)}): ${d.slots.length ? d.slots.map(label12).join(', ') : 'FULLY BOOKED'}`).join('\n');

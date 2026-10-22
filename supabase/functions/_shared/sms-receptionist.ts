@@ -1,6 +1,7 @@
 // AI text receptionist: answers any inbound text that the booking bot isn't already handling.
 import { sendSms, digits } from './booking-bot.ts';
 import { smsAllowed } from './missed-call.ts';
+import { oilChangeBlocked, OIL_CHANGE_MEMBERSHIP_REPLY, OIL_CHANGE_MEMBERSHIP_REPLY_ES } from './oil-change-eligibility.ts';
 
 const AI_URL = 'https://ai.gateway.lovable.dev/v1/responses';
 
@@ -64,6 +65,17 @@ export async function handleReceptionistText(sb: any, from: string, body: string
   })).filter((m) => m.content);
   if (!history.length || history[history.length - 1].role !== 'user') history.push({ role: 'user', content: text });
 
+  const blockOilChange = async (description: string) => {
+    if (!(await oilChangeBlocked(sb, { customer_phone: from, customer_id: prof?.id, description }))) return false;
+    const reply = /aceite|cambio/i.test(text) ? OIL_CHANGE_MEMBERSHIP_REPLY_ES : OIL_CHANGE_MEMBERSHIP_REPLY;
+    if (await smsAllowed()) {
+      await sendSms(sb, from, reply);
+      await sb.from('sms_messages').update({ status: 'ai' }).eq('thread_id', threadId).eq('direction', 'outbound').eq('body', reply).eq('status', 'sent');
+    }
+    return true;
+  };
+  if (await blockOilChange(text)) return;
+
   const system = `You are the text receptionist for MMAR — Mike's Mobile Auto Repair, a mobile mechanic (we come to the customer). Now: ${nowEt()} Eastern.
 Reply in the customer's language (English or Spanish). Warm, casual, very brief: 1–2 short sentences. Never claim to be Mike; you text for the shop.
 Service areas:
@@ -84,6 +96,8 @@ Respond ONLY with JSON: {"reply": string, "handoff": boolean, "booking": null or
   let ai;
   try { ai = await askAi(system, history); }
   catch (e) { console.error('sms receptionist ai', e); return; }
+
+  if (ai.booking?.description && await blockOilChange(ai.booking.description)) return;
 
   if (ai.booking && ai.booking.description) {
     const { data: existing } = await sb.from('booking_requests').select('id, customer_phone, status')

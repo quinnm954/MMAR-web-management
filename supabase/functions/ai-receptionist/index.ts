@@ -9,6 +9,7 @@ import { geocodeRow } from '../_shared/geocode-region.ts';
 import { sendMissedCallFollowup } from '../_shared/missed-call.ts';
 import { isSlotOpen, openSlots, label12 } from '../_shared/booking-bot.ts';
 import { buildLaborQuote, quoteSentence } from '../_shared/labor-quote.ts';
+import { hasOilChangeMembership, oilChangeBlocked, OIL_CHANGE_MEMBERSHIP_REPLY } from '../_shared/oil-change-eligibility.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -81,7 +82,7 @@ Facts:
 - Service area: ONLY ${cities.join(' and ')}. If the caller is outside those areas, politely say we don't currently service their area.${waitlist.length ? `
 - Coming soon (NOT booking yet): ${waitlist.join(', ')} and the rest of Broward and Palm Beach counties. For callers there, say "We're expanding there soon but we aren't booking appointments yet." Offer to put them on the list: take their name, number, vehicle and what they need, and save a request with no date or time. Never quote any price, never offer or check open times, and never promise a start date.` : ''}
 - Services: diagnostics and check-engine lights, brakes, batteries and starting/charging, alternators and starters, AC repair, cooling system, suspension and steering, belts and hoses, tune-ups, fleet service for dealerships and companies. We do NOT offer pre-purchase or used-car inspections — if asked, politely say it's not a service we offer and ask if anything else is wrong with their vehicle.
-- Oil changes are ONLY for MMAR Care members (our maintenance membership). If someone asks for an oil change, don't book it as a one-off; briefly pitch MMAR Care: "We only do oil changes for MMAR Care members — it's our maintenance plan that covers your routine service and we come to you. Want Mike to text you the details to sign up?" If they're interested, save a request noting "MMAR Care interest - oil change". Existing MMAR Care members can book oil changes normally.
+- Oil changes are ONLY for active MMAR Care subscribers verified by lookup_caller. A customer's claim is not verification. Without verified membership, never check or offer times or save an oil-change appointment request; briefly pitch MMAR Care and offer to connect them to Mike for sign-up details. If membership is verified, collect their request for Mike to approve.
 - Parts sourcing: whenever parts come up (buying a part, or a repair that needs parts), FIRST suggest the customer order them from the Advance Auto Parts website (advanceautoparts.com), which offers same-day delivery, and we install them. If the customer insists we provide the parts, agree — we will source them and Mike includes them in the written quote.
 - Pricing: the ONLY price you may ever give is the diagnosis fee, and only when the caller needs a diagnosis. Never quote labor, parts, or repair prices — for a specific repair say Mike will review it and send a written quote by text or email.
 - We book appointments starting the next day. Phone and text: 813-501-7572.
@@ -320,7 +321,8 @@ Deno.serve(async (req) => {
       const { data: vs } = await sb.from('vehicles').select('year, make, model, engine').eq('owner_id', p.id).eq('is_active', true).limit(5);
       const veh = [...new Set((vs || []).map((v: any) => [v.year, v.make, v.model, v.engine].filter(Boolean).join(' ').toLowerCase()))].join('; ');
       const addr = [p.address_line1, p.city].filter(Boolean).join(', ');
-      return json({ result: `Existing customer on file. Name: ${p.full_name || 'unknown'}. Vehicles: ${veh || 'none on file'}. Service address: ${addr || 'none on file'}. Verify these with the caller instead of asking from scratch; only ask for what is missing or changed.` });
+      const member = await hasOilChangeMembership(sb, String(body.caller_number || ''), p.id);
+      return json({ result: `Existing customer on file. Name: ${p.full_name || 'unknown'}. Vehicles: ${veh || 'none on file'}. Service address: ${addr || 'none on file'}. MMAR Care active subscription: ${member ? 'verified' : 'NOT verified — no oil-change times or booking'}. Verify these with the caller instead of asking from scratch; only ask for what is missing or changed.` });
     }
 
     if (action === 'quote') {
@@ -345,6 +347,9 @@ Deno.serve(async (req) => {
       if (!phone && sid) {
         const { data: c } = await sb.from('call_logs').select('from_number').eq('twilio_call_sid', sid).maybeSingle();
         phone = c?.from_number || '';
+      }
+      if (await oilChangeBlocked(sb, { customer_phone: phone, description: body.description, notes: body.notes })) {
+        return json({ result: OIL_CHANGE_MEMBERSHIP_REPLY, membershipRequired: true });
       }
       { const extra = [body.service_city, body.service_zip].filter(Boolean).map(String).join(' ');
         if (extra && !String(body.service_address || '').includes(String(body.service_zip || '~'))) body.service_address = [body.service_address, extra].filter(Boolean).join(', '); }

@@ -1,5 +1,8 @@
 # Roadmap
 
+## Subscriber-only oil changes
+- [ ] Enforce membership before automated oil-change time offers and booking conversion; cover phone, text, and website follow-ups with regression tests and live validation.
+
 ## Financed receipts in Reports
 - [x] Include received down payments and installments on payment date without counting the financed invoice total again; 24 tests passed, preview builds cleanly, signed-in October revenue verified at $3,902.82 including Jose’s $806.66 receipt.
 
