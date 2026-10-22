@@ -1,5 +1,9 @@
 # Roadmap
 
+## Text booking requests
+- [ ] Offer checked times while gathering customer details; persist selected date/time pending Mike's approval, including updates to existing requests.
+- [ ] Test slot validation, failure handling and pending request saves; deploy the text handler and verify readback.
+
 ## Receptionist reliability and afternoon times
 - [x] Recent real calls/texts are answering; corrected conflicting scheduling prompts, automated-SMS suppression, missing diagnosis-draft import and fail-open calendar reads.
 - [x] Default to noon–5 PM Eastern; mornings only when requested, retaining owner approval and service eligibility.
