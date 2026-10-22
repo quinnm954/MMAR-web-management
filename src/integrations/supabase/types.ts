@@ -4288,9 +4288,14 @@ export type Database = {
       }
       invoice_tech_hours: { Args: { _items: Json }; Returns: number }
       is_office_staff: { Args: { _user_id: string }; Returns: boolean }
+      is_oil_change_request: { Args: { _text: string }; Returns: boolean }
       is_staff: { Args: { _user_id: string }; Returns: boolean }
       my_tech_agreement: { Args: never; Returns: Json }
       my_tech_earnings: { Args: { _from: string; _to: string }; Returns: Json }
+      oil_change_eligible: {
+        Args: { _customer_id?: string; _phone?: string }
+        Returns: boolean
+      }
       recommend_checklist_item: {
         Args: {
           _item_id: string
