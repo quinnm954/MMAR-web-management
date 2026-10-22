@@ -2,6 +2,7 @@
 - Read subdirectory AGENTS.md before changing files there.
 
 - Reports classify refunds as revenue/profit reductions on completion date, never sales, labor or tech pay; why: refunds must not inflate sales or reverse labor.
+- Reports recognize financing cash from paid financing_payments on paid_at (including interest), excluding financed invoice totals and mirrored invoice_payments; receipt rows do not repeat sales, parts or labor costs, because one collection must count once.
 - Reports year charts zero-fill elapsed months and leave unrecorded future months null; why: show every month without projections.
 - Reports use reportPeriod; lists share dateFilters/DateRangeFilter. Starts are inclusive, ends exclusive, custom end days included, WTD starts Monday; why: consistent historical filtering.
 

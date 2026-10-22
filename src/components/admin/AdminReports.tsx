@@ -3,6 +3,7 @@ import { useAdminRegion, RegionSwitch, RegionChip } from '@/hooks/useAdminRegion
 import { supabase } from '@/integrations/supabase/client';
 import { techHoursForInvoice } from '@/lib/techHours';
 import { isReportSale, reportInvoiceRevenue } from '@/lib/reportInvoice';
+import { financingReportReceipts } from '@/lib/reportFinancing';
 import { fullYearChart, filledPeriodChart, chartBucketKey } from '@/lib/reportChart';
 import { reportPeriod } from '@/lib/reportPeriod';
 import { DATE_PRESETS, type DateFilter } from '@/lib/dateFilters';
@@ -45,6 +46,7 @@ type InvoiceRow = {
 type ProfitRow = {
   id: string;
   isRefund: boolean;
+  isReceipt: boolean;
   invoice_number: string | null;
   date: string;
   createdAt: string;
@@ -127,10 +129,10 @@ export default function AdminReports({ extras }: { extras?: React.ReactNode } = 
       const until = end.toISOString();
       const prevSince = comparisonStart.toISOString();
 
-      const [inv, completed, members, ests, settings, employeesRes, mpRes, prevInv] = await Promise.all([
+      const [inv, completed, members, ests, settings, employeesRes, mpRes, prevInv, receipts, prevReceipts] = await Promise.all([
         R(supabase
           .from('invoices'))
-          .select('id, invoice_number, total, subtotal, status, created_at, paid_at, customer_id, service_record_id, technician_id, line_items, stripe_session_id, stripe_payment_intent_id, stripe_fee, stripe_fee_synced_at')
+          .select('id, invoice_number, total, subtotal, status, is_financed, created_at, paid_at, customer_id, service_record_id, technician_id, line_items, stripe_session_id, stripe_payment_intent_id, stripe_fee, stripe_fee_synced_at')
           .in('status', ['paid', 'refunded'])
           .gte('paid_at', since)
           .lt('paid_at', until)
@@ -147,13 +149,15 @@ export default function AdminReports({ extras }: { extras?: React.ReactNode } = 
           .gte('paid_at', since)
           .lt('paid_at', until)
           .order('paid_at', { ascending: false }),
-        R(supabase.from('invoices').select('total, status')).in('status', ['paid', 'refunded']).gte('paid_at', prevSince).lt('paid_at', since),
+        R(supabase.from('invoices').select('total, status, is_financed')).in('status', ['paid', 'refunded']).gte('paid_at', prevSince).lt('paid_at', since),
+        financingReportReceipts(since, until, region),
+        financingReportReceipts(prevSince, since, region),
       ]);
-      setPrevRevenue(((prevInv.data ?? []) as any[]).reduce((s, i) => s + reportInvoiceRevenue(i), 0));
+      setPrevRevenue(((prevInv.data ?? []) as any[]).reduce((s, i) => s + reportInvoiceRevenue(i), 0) + prevReceipts.reduce((s, r) => s + r.total, 0));
 
       const allInvoices = ((inv.data ?? []) as any[]).map((i) => ({ ...i, created_at: i.paid_at || i.created_at })) as InvoiceRow[];
-      const paid = allInvoices;
-      const revenue = paid.reduce((s, i) => s + reportInvoiceRevenue(i), 0);
+      const paid: InvoiceRow[] = [...allInvoices, ...receipts];
+      const revenue = allInvoices.reduce((s, i) => s + reportInvoiceRevenue(i), 0) + receipts.reduce((s, r) => s + r.total, 0);
       const sales = paid.filter(isReportSale);
 
       const configuredRate = Number((settings.data as any)?.labor_cost_per_hour);
@@ -229,7 +233,8 @@ export default function AdminReports({ extras }: { extras?: React.ReactNode } = 
 
       const rows: ProfitRow[] = paid.map((inv) => {
         const isRefund = inv.status === 'refunded';
-        const items = !isRefund && Array.isArray(inv.line_items) ? inv.line_items : [];
+        const isReceipt = inv.status === 'financing_receipt';
+        const items = !isRefund && !isReceipt && Array.isArray(inv.line_items) ? inv.line_items : [];
         const cogs = items.reduce((s, li) => {
           const kind = itemKind(li);
           return kind === 'part' ? s + partCost(li) : s;
@@ -245,9 +250,9 @@ export default function AdminReports({ extras }: { extras?: React.ReactNode } = 
         const techRate = tech?.hourly_rate != null ? Number(tech.hourly_rate) : rate;
         // Pay technicians on PAID labor hours (from the estimate), not clocked time
         const employeeCost = paidLaborHours * techRate;
-        const revenueRow = reportInvoiceRevenue(inv);
+        const revenueRow = isReceipt ? inv.total : reportInvoiceRevenue(inv);
         const hasStripe = Boolean(inv.stripe_session_id || inv.stripe_payment_intent_id);
-        const isPaid = inv.status === 'paid';
+        const isPaid = inv.status === 'paid' || isReceipt;
         const actualFee = isRefund ? 0 : inv.stripe_fee != null ? Number(inv.stripe_fee) : null;
         const stripeFee = actualFee != null
           ? actualFee
@@ -258,6 +263,7 @@ export default function AdminReports({ extras }: { extras?: React.ReactNode } = 
         return {
           id: inv.id,
           isRefund,
+          isReceipt,
           invoice_number: inv.invoice_number,
           date: new Date(inv.created_at).toLocaleDateString(),
           createdAt: inv.created_at,
@@ -327,6 +333,7 @@ export default function AdminReports({ extras }: { extras?: React.ReactNode } = 
     const ch = supabase.channel('reports-live')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'invoices' }, kick)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'invoice_payments' }, kick)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'financing_payments' }, kick)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'appointments' }, kick)
       .subscribe();
     const vis = () => { if (document.visibilityState === 'visible') kick(); };
@@ -365,7 +372,7 @@ export default function AdminReports({ extras }: { extras?: React.ReactNode } = 
     () => (techFilter === 'all' ? profitRows : profitRows.filter((r) => r.technician === techFilter)),
     [profitRows, techFilter],
   );
-  const filteredSaleCount = filteredRows.filter((r) => !r.isRefund).length;
+  const filteredSaleCount = filteredRows.filter((r) => !r.isRefund && !r.isReceipt).length;
   const refundTotal = -filteredRows.filter((r) => r.isRefund).reduce((sum, r) => sum + r.revenue, 0);
 
   const perfTotals = useMemo(() => {
@@ -462,7 +469,7 @@ export default function AdminReports({ extras }: { extras?: React.ReactNode } = 
         invoices: 0, paidLaborHours: 0, revenue: 0, cogs: 0,
         grossProfit: 0, employeeCost: 0, stripeFee: 0, netProfit: 0,
       };
-      cur.invoices += r.isRefund ? 0 : 1;
+      cur.invoices += r.isRefund || r.isReceipt ? 0 : 1;
       cur.paidLaborHours += r.paidLaborHours;
       cur.revenue += r.revenue;
       cur.cogs += r.cogs;

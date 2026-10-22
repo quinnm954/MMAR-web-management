@@ -3,6 +3,7 @@ import { useAdminRegion, RegionSwitch, RegionChip } from '@/hooks/useAdminRegion
 import { supabase } from '@/integrations/supabase/client';
 import { techHoursForInvoice, techHoursForLine, isDiagnosisLine } from '@/lib/techHours';
 import { isReportTransaction, reportInvoiceRevenue } from '@/lib/reportInvoice';
+import { financingReportReceipts } from '@/lib/reportFinancing';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Progress } from '@/components/ui/progress';
@@ -14,7 +15,7 @@ import { toast } from 'sonner';
 
 type Inv = {
   id: string; total: number | null; amount_paid: number | null; status: string; created_at: string;
-  paid_at: string | null; customer_id: string | null; line_items: any; appointment_id?: string | null;
+  paid_at: string | null; customer_id: string | null; line_items: any; appointment_id?: string | null; is_financed?: boolean | null;
 };
 type Est = { id: string; total: number | null; status: string; sent_at: string | null; approved_at: string | null; created_at: string };
 
@@ -40,6 +41,7 @@ export default function AdminSalesDashboard() {
   const R = (q: any) => (region === 'all' ? q : q.eq('region_slug', region));
   const [loading, setLoading] = useState(true);
   const [invoices, setInvoices] = useState<Inv[]>([]);
+  const [receipts, setReceipts] = useState<Awaited<ReturnType<typeof financingReportReceipts>>>([]);
   const [estimates, setEstimates] = useState<Est[]>([]);
   const [counts, setCounts] = useState({ customers: 0, memberships: 0, openAppts: 0, doneWeek: 0, doneMonth: 0 });
   const [doneJobs, setDoneJobs] = useState<{ id: string; completed_at: string }[]>([]);
@@ -63,6 +65,7 @@ export default function AdminSalesDashboard() {
     const ch = supabase.channel('dashboard-live')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'invoices' }, kick)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'invoice_payments' }, kick)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'financing_payments' }, kick)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'appointments' }, kick)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'estimates' }, kick)
       .subscribe();
@@ -76,9 +79,9 @@ export default function AdminSalesDashboard() {
     (async () => {
       const since = startOf(new Date(now.getFullYear(), now.getMonth() - 12, 1)).toISOString();
       const mondayish = addDays(todayStart, -6).toISOString();
-      const [inv, est, cust, mem, appts, dw, dm, shop] = await Promise.all([
+      const [inv, est, cust, mem, appts, dw, dm, shop, financingReceipts] = await Promise.all([
         // Include invoices created OR paid in the window, so an old invoice paid today still counts today
-        R(supabase.from('invoices').select('id,total,amount_paid,status,created_at,paid_at,customer_id,line_items,appointment_id')).or(`created_at.gte.${since},paid_at.gte.${since}`).order('created_at', { ascending: false }).limit(3000),
+        R(supabase.from('invoices').select('id,total,amount_paid,status,is_financed,created_at,paid_at,customer_id,line_items,appointment_id')).or(`created_at.gte.${since},paid_at.gte.${since}`).order('created_at', { ascending: false }).limit(3000),
         R(supabase.from('estimates').select('id,total,status,sent_at,approved_at,created_at')).gte('created_at', addDays(todayStart, -90).toISOString()).limit(2000),
         supabase.from('profiles').select('id', { count: 'exact', head: true }),
         supabase.from('memberships').select('id', { count: 'exact', head: true }).eq('status', 'active'),
@@ -86,9 +89,11 @@ export default function AdminSalesDashboard() {
         R(supabase.from('appointments').select('id, completed_at')).eq('status', 'completed').gte('completed_at', mondayish < monthStart.toISOString() ? mondayish : monthStart.toISOString()).limit(2000),
         Promise.resolve(null),
         supabase.from('shop_settings').select('labor_cost_per_hour, monthly_revenue_goal').limit(1).maybeSingle(),
+        financingReportReceipts(since, now.toISOString(), region),
       ]);
       const invs = (inv.data ?? []) as Inv[];
       setInvoices(invs);
+      setReceipts(financingReceipts);
       setEstimates((est.data ?? []) as Est[]);
       setCounts({ customers: cust.count ?? 0, memberships: mem.count ?? 0, openAppts: appts.count ?? 0, doneWeek: 0, doneMonth: 0 });
       setDoneJobs(((dw as any).data ?? []) as { id: string; completed_at: string }[]);
@@ -115,7 +120,8 @@ export default function AdminSalesDashboard() {
 
   const paid = useMemo(() => invoices.filter(i => i.status === 'paid'), [invoices]);
   const transactions = useMemo(() => invoices.filter(isReportTransaction), [invoices]);
-  const sumIn = (from: Date, to?: Date) => transactions.reduce((s, i) => { const d = paidDate(i); return d >= from && (!to || d < to) ? s + reportInvoiceRevenue(i) : s; }, 0);
+  const sumIn = (from: Date, to?: Date) => transactions.reduce((s, i) => { const d = paidDate(i); return d >= from && (!to || d < to) ? s + reportInvoiceRevenue(i) : s; }, 0)
+    + receipts.reduce((s, r) => { const d = new Date(r.paid_at); return d >= from && (!to || d < to) ? s + r.total : s; }, 0);
   const countIn = (from: Date, to?: Date) => paid.filter(i => { const d = paidDate(i); return d >= from && (!to || d < to); }).length;
 
   const todayRev = sumIn(todayStart);
@@ -218,13 +224,13 @@ export default function AdminSalesDashboard() {
     const i = 29 - k; const d = addDays(todayStart, -i); const n = addDays(d, 1);
     const pd = addDays(d, -30), pn = addDays(n, -30);
     return { date: d.toLocaleDateString(undefined, { month: 'numeric', day: 'numeric' }), revenue: Math.round(sumIn(d, n)), prior: Math.round(sumIn(pd, pn)) };
-  }), [transactions]);
+  }), [transactions, receipts]);
   const monthly = useMemo(() => Array.from({ length: 12 }, (_, k) => {
     const i = 11 - k;
     const s = startOf(new Date(now.getFullYear(), now.getMonth() - i, 1));
     const e = startOf(new Date(now.getFullYear(), now.getMonth() - i + 1, 1));
     return { month: s.toLocaleDateString(undefined, { month: 'short' }), revenue: Math.round(sumIn(s, e)) };
-  }), [transactions]);
+  }), [transactions, receipts]);
   const spark7 = daily.slice(-14);
 
   const topCustomers = useMemo(() => {

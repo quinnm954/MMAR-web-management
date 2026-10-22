@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { isReportSale, isReportTransaction, reportInvoiceRevenue } from '../src/lib/reportInvoice';
+import { financingReceiptRevenue, isReportSale, isReportTransaction, reportInvoiceRevenue } from '../src/lib/reportInvoice';
 
 describe('completed refund reporting', () => {
   const alexRefund = { status: 'refunded', total: -600 };
@@ -14,6 +14,23 @@ describe('completed refund reporting', () => {
   });
   test('positive refund values still represent money out', () => {
     expect(reportInvoiceRevenue({ status: 'refunded', total: 600 })).toBe(-600);
+  });
+});
+
+describe('financed cash revenue', () => {
+  test('Jose’s received down payment adds $806.66 while the invoice stays partial', () => {
+    expect(reportInvoiceRevenue({ status: 'partial', total: 1613.32, is_financed: true }) + financingReceiptRevenue({ status: 'paid', amount: 806.66, paid_at: '2026-10-13T14:01:19.764Z' })).toBe(806.66);
+  });
+  test('a received weekly installment includes the full $63.60 collected', () => {
+    expect(financingReceiptRevenue({ status: 'paid', amount: 63.60, paid_at: '2026-10-26T13:00:00Z' })).toBe(63.60);
+  });
+  test('a failed or scheduled installment contributes nothing', () => {
+    for (const status of ['failed', 'scheduled', 'pending']) {
+      expect(financingReceiptRevenue({ status, amount: 63.60, paid_at: null })).toBe(0);
+    }
+  });
+  test('closing the $1,613.32 financed invoice does not count its total again', () => {
+    expect(reportInvoiceRevenue({ status: 'paid', total: 1613.32, is_financed: true })).toBe(0);
   });
 });
 import { invoiceBalanceDue, isPayableInvoice } from '../src/lib/reportInvoice';
