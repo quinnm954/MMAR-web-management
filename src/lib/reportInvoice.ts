@@ -1,4 +1,4 @@
-type ReportInvoice = { status: string; total: number | null };
+type ReportInvoice = { status: string; total: number | null; is_financed?: boolean | null };
 
 export const isReportSale = (invoice: ReportInvoice) => invoice.status === 'paid';
 export const isReportTransaction = (invoice: ReportInvoice) =>
@@ -8,8 +8,12 @@ export const isReportTransaction = (invoice: ReportInvoice) =>
 export const reportInvoiceRevenue = (invoice: ReportInvoice) => {
   const total = Number(invoice.total || 0);
   if (invoice.status === 'refunded') return -Math.abs(total);
-  return isReportSale(invoice) ? total : 0;
+  // Financed sales are recognized through received installments, never the full invoice again.
+  return isReportSale(invoice) && !invoice.is_financed ? total : 0;
 };
+
+export const financingReceiptRevenue = (receipt: { status: string; amount: number | null; paid_at: string | null }) =>
+  receipt.status === 'paid' && receipt.paid_at ? Number(receipt.amount || 0) : 0;
 
 type PayInvoice = ReportInvoice & { amount_paid?: number | null; is_financed?: boolean | null };
 
