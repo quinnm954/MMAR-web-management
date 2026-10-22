@@ -1,6 +1,6 @@
 import { expect, test } from 'bun:test';
 import { receptionistSlots, requestsMorning } from '../supabase/functions/_shared/receptionist-times';
-import { buildOpener } from '../supabase/functions/_shared/booking-bot';
+import { buildOpener, openSlots } from '../supabase/functions/_shared/booking-bot';
 
 const times = [{ date: '2099-01-05', slots: [600, 630, 690, 720, 750, 1020, 1050] }];
 test('default receptionist offers are noon through 5 PM', () => {
@@ -18,4 +18,12 @@ test('filter never restores unavailable or blocked times', () => {
 });
 test('booking opener selects noon rather than an earlier morning', () => {
   expect(buildOpener({}, times)).toContain('12:00 PM');
+});
+test('unavailable calendar reads never produce open offers', async () => {
+  const sb = { from() {
+    const query: any = { then(resolve: any) { return Promise.resolve({ data: null, error: { message: 'unavailable' } }).then(resolve); } };
+    for (const method of ['select', 'gte', 'lte', 'not']) query[method] = () => query;
+    return query;
+  } };
+  await expect(openSlots(sb, '2099-01-05', 1)).rejects.toThrow('Could not check appointments');
 });

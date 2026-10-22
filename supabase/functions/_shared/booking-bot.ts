@@ -84,15 +84,17 @@ export async function openSlots(sb: any, fromDate: string | null, days = 7, excl
   const now = etParts(new Date());
   const start = fromDate && fromDate > now.date ? fromDate : now.date;
   const end = addDays(start, days);
-  const { data } = await sb.from('appointments').select('id, scheduled_at, status, service_type')
+  const { data, error: appointmentsError } = await sb.from('appointments').select('id, scheduled_at, status, service_type')
     .gte('scheduled_at', new Date(`${addDays(start, -1)}T00:00:00Z`).toISOString())
     .lte('scheduled_at', new Date(`${addDays(end, 1)}T23:59:59Z`).toISOString())
     .not('status', 'in', '(cancelled,canceled,declined,no_show)');
+  if (appointmentsError) throw new Error('Could not check appointments');
   // Real job length, same rule as the calendar: estimate labor hours (diagnosis = 1h, else 2h default).
   const ids = (data || []).map((a: any) => a.id);
-  const { data: ests } = ids.length
+  const { data: ests, error: estimatesError } = ids.length
     ? await sb.from('estimates').select('appointment_id, status, line_items, updated_at').in('appointment_id', ids).order('updated_at', { ascending: false })
     : { data: [] };
+  if (estimatesError) throw new Error('Could not check appointment durations');
   const rank = (s: string) => (s === 'approved' || s === 'converted' ? 0 : s === 'declined' ? 9 : 1);
   const best: Record<string, any> = {};
   for (const e of ests || []) if (!best[e.appointment_id] || rank(e.status) < rank(best[e.appointment_id].status)) best[e.appointment_id] = e;
@@ -114,9 +116,10 @@ export async function openSlots(sb: any, fromDate: string | null, days = 7, excl
     (busy[p.date] ||= []).push([p.mins, p.mins + lengthOf(a) + TRAVEL_MIN]);
   }
   // Admin-blocked time (calendar_blocks) — a slot is unavailable if its job would overlap a block.
-  const { data: blocks } = await sb.from('calendar_blocks').select('starts_at, ends_at')
+  const { data: blocks, error: blocksError } = await sb.from('calendar_blocks').select('starts_at, ends_at')
     .lt('starts_at', new Date(`${addDays(end, 1)}T23:59:59Z`).toISOString())
     .gt('ends_at', new Date(`${addDays(start, -1)}T00:00:00Z`).toISOString());
+  if (blocksError) throw new Error('Could not check blocked time');
   const out: { date: string; slots: number[] }[] = [];
   for (let i = 0; i < days; i++) {
     const date = addDays(start, i);
