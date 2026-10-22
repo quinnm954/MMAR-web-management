@@ -1,5 +1,6 @@
 
 - Read subdirectory AGENTS.md before changing files there.
+- Oil-change eligibility is enforced by the service-only `oil_change_eligible` RPC, booking/appointment validation triggers, and shared edge guards before automated time offers; why: a receptionist prompt alone cannot enforce subscriber-only service.
 
 - Reports classify refunds as revenue/profit reductions on completion date, never sales, labor or tech pay; why: refunds must not inflate sales or reverse labor.
 - Reports recognize financing cash from paid financing_payments on paid_at (including interest), excluding financed invoice totals and mirrored invoice_payments; receipt rows do not repeat sales, parts or labor costs, because one collection must count once.

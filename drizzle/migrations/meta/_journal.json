@@ -379,6 +379,13 @@
       "when": 1792601580720,
       "tag": "0053_financing_withdrawal_reminders",
       "breakpoints": true
+    },
+    {
+      "idx": 54,
+      "version": "7",
+      "when": 1792679595498,
+      "tag": "0054_enforce_subscriber_only_oil_changes",
+      "breakpoints": true
     }
   ]
 }
