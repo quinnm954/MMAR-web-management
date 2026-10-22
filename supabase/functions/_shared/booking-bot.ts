@@ -1,13 +1,14 @@
-// Booking follow-up bot: texts website bookers, agrees on a 10am–5pm slot, then converts to an appointment.
+// Booking follow-up bot: proposes afternoon times and saves requests for staff approval.
 const TWILIO_GW = 'https://connector-gateway.lovable.dev/twilio';
 import { buildLaborQuote, createDraftEstimate, quoteSentence, quoteNote } from './labor-quote.ts';
 import { oilChangeBlocked, OIL_CHANGE_MEMBERSHIP_REPLY, OIL_CHANGE_MEMBERSHIP_REPLY_ES } from './oil-change-eligibility.ts';
+import { receptionistSlots, requestsMorning } from './receptionist-times.ts';
 const AI_URL = 'https://ai.gateway.lovable.dev/v1/responses';
 
 export const digits = (p: string) => (p || '').replace(/\D/g, '').slice(-10);
 const toE164 = (p: string) => `+1${digits(p)}`;
 
-export async function sendSms(sb: any, to: string, body: string) {
+export async function sendSms(sb: any, to: string, body: string, status = 'sent') {
   const KEY = Deno.env.get('LOVABLE_API_KEY');
   const TW = Deno.env.get('TWILIO_API_KEY');
   const FROM = Deno.env.get('TWILIO_FROM_NUMBER');
@@ -23,7 +24,7 @@ export async function sendSms(sb: any, to: string, body: string) {
   let { data: thread } = await sb.from('sms_threads').select('id').eq('phone', phone).maybeSingle();
   if (!thread) thread = (await sb.from('sms_threads').insert({ phone, last_message_preview: body.slice(0, 80) }).select('id').single()).data;
   if (thread) {
-    await sb.from('sms_messages').insert({ thread_id: thread.id, direction: 'outbound', body, twilio_sid: msg?.sid ?? null, status: 'sent' });
+    await sb.from('sms_messages').insert({ thread_id: thread.id, direction: 'outbound', body, twilio_sid: msg?.sid ?? null, status });
     await sb.from('sms_threads').update({ last_message_at: new Date().toISOString(), last_message_preview: body.slice(0, 80) }).eq('id', thread.id);
   }
   return true;
@@ -71,7 +72,7 @@ export const NOT_OFFERED = /\btire|\btpms|mount (and|&) balanc|wheel alignment|p
 
 function etParts(d: Date) {
   const f = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false }).formatToParts(d);
-  const g = (t: string) => f.find((x) => x.type === t)!.value;
+  const g = (t: string) => f.find((x) => x.type === t)?.value || '';
   return { date: `${g('year')}-${g('month')}-${g('day')}`, mins: (Number(g('hour')) % 24) * 60 + Number(g('minute')) };
 }
 export const hhmm = (m: number) => `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
@@ -83,15 +84,17 @@ export async function openSlots(sb: any, fromDate: string | null, days = 7, excl
   const now = etParts(new Date());
   const start = fromDate && fromDate > now.date ? fromDate : now.date;
   const end = addDays(start, days);
-  const { data } = await sb.from('appointments').select('id, scheduled_at, status, service_type')
+  const { data, error: appointmentsError } = await sb.from('appointments').select('id, scheduled_at, status, service_type')
     .gte('scheduled_at', new Date(`${addDays(start, -1)}T00:00:00Z`).toISOString())
     .lte('scheduled_at', new Date(`${addDays(end, 1)}T23:59:59Z`).toISOString())
     .not('status', 'in', '(cancelled,canceled,declined,no_show)');
+  if (appointmentsError) throw new Error('Could not check appointments');
   // Real job length, same rule as the calendar: estimate labor hours (diagnosis = 1h, else 2h default).
   const ids = (data || []).map((a: any) => a.id);
-  const { data: ests } = ids.length
+  const { data: ests, error: estimatesError } = ids.length
     ? await sb.from('estimates').select('appointment_id, status, line_items, updated_at').in('appointment_id', ids).order('updated_at', { ascending: false })
     : { data: [] };
+  if (estimatesError) throw new Error('Could not check appointment durations');
   const rank = (s: string) => (s === 'approved' || s === 'converted' ? 0 : s === 'declined' ? 9 : 1);
   const best: Record<string, any> = {};
   for (const e of ests || []) if (!best[e.appointment_id] || rank(e.status) < rank(best[e.appointment_id].status)) best[e.appointment_id] = e;
@@ -113,9 +116,10 @@ export async function openSlots(sb: any, fromDate: string | null, days = 7, excl
     (busy[p.date] ||= []).push([p.mins, p.mins + lengthOf(a) + TRAVEL_MIN]);
   }
   // Admin-blocked time (calendar_blocks) — a slot is unavailable if its job would overlap a block.
-  const { data: blocks } = await sb.from('calendar_blocks').select('starts_at, ends_at')
+  const { data: blocks, error: blocksError } = await sb.from('calendar_blocks').select('starts_at, ends_at')
     .lt('starts_at', new Date(`${addDays(end, 1)}T23:59:59Z`).toISOString())
     .gt('ends_at', new Date(`${addDays(start, -1)}T00:00:00Z`).toISOString());
+  if (blocksError) throw new Error('Could not check blocked time');
   const out: { date: string; slots: number[] }[] = [];
   for (let i = 0; i < days; i++) {
     const date = addDays(start, i);
@@ -165,6 +169,7 @@ function cityFrom(addr?: string | null) {
 }
 
 export function buildOpener(req: any, avail: { date: string; slots: number[] }[] = [], quote = '') {
+  avail = receptionistSlots(avail, requestsMorning(String(req.requested_time_window || '')));
   const first = (req.customer_name || '').trim().split(/\s+/)[0];
   const svc = cleanService(req.service_type);
   const vehicle = (req.vehicle_info || '').trim();
@@ -183,9 +188,9 @@ export function buildOpener(req: any, avail: { date: string; slots: number[] }[]
   if (day && win && inWin !== undefined) ask = `I see you asked for ${day} in the ${win.label}. Would ${label12(inWin)} work to lock that in?${sooner}`;
   else if (day && reqDay && reqDay.slots.length) ask = `I see you asked for ${day}. Our next opening that day is ${label12(reqDay.slots[0])} — would that work?`;
   else if (day && nextOpen) ask = `${day} is all booked up, sorry! The next opening is ${friendlyDate(nextOpen.d)} at ${label12(nextOpen.m)} — would that work?`;
-  else if (day) ask = `I see you asked for ${day}. What time works best? We're out any time between 10am and 5pm.`;
+  else if (day) ask = `I see you asked for ${day}. We normally offer noon to 5 PM; if you need a morning, Mike can review that request.`;
   else if (nextOpen) ask = `Our next opening is ${friendlyDate(nextOpen.d)} at ${label12(nextOpen.m)} — would that work, or is another day better?`;
-  else ask = `What day and time work best for you? We come out any day between 10am and 5pm.`;
+  else ask = `What day works best for you? We normally offer noon to 5 PM; mornings are available on request, subject to Mike's approval.`;
   return `Hi${first ? ` ${first}` : ''}, this is Mike's Mobile Auto Repair! Got ${what}${forCar}${where}. ${quote ? `${quote} ` : ''}${ask} Reply STOP to opt out.`;
 }
 
@@ -203,7 +208,7 @@ export async function startBot(sb: any, id: string) {
   if (NOT_OFFERED.test(req.service_type || '')) {
     const first = (req.customer_name || '').trim().split(/\s+/)[0];
     const text = `Hi${first ? ` ${first}` : ''}, this is Mike's Mobile Auto Repair. Thanks for reaching out! We don't offer tire service, sorry. If there's other work you need, like brakes, Mike will review it and text you. Reply STOP to opt out.`;
-    await sendSms(sb, req.customer_phone, text);
+    await sendSms(sb, req.customer_phone, text, 'ai');
     await sb.from('booking_requests').update({ bot_status: 'handoff', bot_history: [{ role: 'assistant', content: text }] }).eq('id', id);
     await sb.rpc('_notify_staff_customer_action', { _title: 'Tire request — not offered', _body: `${req.customer_name || req.customer_phone}: no time offered`, _link: '/admin/dashboard?tab=bookings' }).then(() => {}, () => {});
     return { started: false, notOffered: true };
@@ -215,7 +220,7 @@ export async function startBot(sb: any, id: string) {
   // Estimates are only created once staff confirm the booking (estimate-for-appointment).
   const estId = null;
   const text = buildOpener(req, avail, q ? quoteSentence(q) : '');
-  await sendSms(sb, req.customer_phone, text);
+  await sendSms(sb, req.customer_phone, text, 'ai');
   const note = q ? quoteNote(q, estId) : '';
   await sb.from('booking_requests').update({ bot_history: [{ role: 'assistant', content: text }], ...(note ? { notes: [req.notes, note].filter(Boolean).join('\n') } : {}) }).eq('id', id);
   return { started: true };
@@ -251,7 +256,7 @@ async function askAi(system: string, history: { role: string; content: string }[
 
 async function handoffOilChange(sb: any, req: any, incoming = '') {
   const reply = /aceite|cambio|espa[ñn]ol/i.test(incoming) ? OIL_CHANGE_MEMBERSHIP_REPLY_ES : OIL_CHANGE_MEMBERSHIP_REPLY;
-  await sendSms(sb, req.customer_phone, reply);
+  await sendSms(sb, req.customer_phone, reply, 'ai');
   await sb.from('booking_requests').update({
     bot_status: 'handoff',
     bot_history: [...(req.bot_history || []), ...(incoming ? [{ role: 'user', content: incoming }] : []), { role: 'assistant', content: reply }],
@@ -280,16 +285,17 @@ export async function handleBotReply(sb: any, from: string, body: string) {
     return true;
   }
 
-  const avail = await openSlots(sb, null, 10, req.converted_appointment_id).catch(() => []);
-  const availText = avail.map((d) => `${d.date} (${friendlyDate(d.date)}): ${d.slots.length ? d.slots.map(label12).join(', ') : 'FULLY BOOKED'}`).join('\n');
   const history = [...(req.bot_history || []), { role: 'user', content: body }].slice(-20);
+  const morningRequested = requestsMorning(String(req.requested_time_window || '')) || history.some((m: any) => m.role === 'user' && requestsMorning(m.content));
+  const avail = receptionistSlots(await openSlots(sb, null, 10, req.converted_appointment_id).catch(() => []), morningRequested);
+  const availText = avail.map((d) => `${d.date} (${friendlyDate(d.date)}): ${d.slots.length ? d.slots.map(label12).join(', ') : 'FULLY BOOKED'}`).join('\n');
   const system = `You text customers for Mike's Mobile Auto Repair (mobile mechanic, Southwest Florida) to set an appointment for their booking request.
 Now: ${nowEastern()} (Eastern).
 Request: service "${req.service_type || ''}", vehicle "${req.vehicle_info || ''}", issue "${req.description || ''}", address "${req.service_address || ''}".
 Customer's requested date/window: ${req.requested_date || 'none'} ${req.requested_time_window || ''}.
 OPEN start times (already account for existing appointments, drive time, and at least ${LEAD_MIN} minutes notice):
 ${availText}
-Speed matters: customers who wait call someone else. Always lead with the EARLIEST open time (today if any), then their requested day if different. Don't ask open-ended 'what time works?' — propose a specific time.
+Always lead with the earliest listed open time tomorrow or later. Default to noon–5 PM Eastern; mornings only when the customer explicitly asks. Every time is a REQUEST for Mike's approval, never a confirmed booking. Don't ask open-ended 'what time works?' — propose a specific listed time.
 Rules: ONLY offer or confirm times from the OPEN list above — never any other time, and never a time that's about to start. If they ask for a time that isn't listed, say it's taken and offer the closest open times. You are a text assistant for the shop: warm, casual, human, and VERY brief — one short sentence when possible, two max. No small talk, no restating details, get straight to the time. Never claim to personally be Mike — you text on behalf of the shop; if the customer asks for Mike or the owner by name, set handoff=true and say Mike will reach out. If the vehicle above has no engine size (like 1.4L or V6) and they want a specific repair, ask for it once in the same message as the time offer; if they don't know, skip it. Never re-ask for info already given above or in the chat. Write dates like "Monday, Oct 5th" and times like "10:30 AM" — never raw formats like 2026-10-05 or 14:00. Never paste page titles or system wording. We do NOT offer tire work (mounting, balancing, rotation, flats, TPMS), alignments or pre-purchase inspections: say so briefly, never offer a time for them, and set handoff=true. Never quote any price except the diagnosis fee — never quote labor or repair prices; if asked, say Mike will send a written quote after reviewing it. Diagnosis fee: if the customer has a problem to figure out (a warning light, noise, no-start, electrical issue, 'not sure what's wrong') rather than asking for a specific part replacement, tell them BEFORE confirming a time: there's a $100 diagnosis fee, and $50 of it is credited toward the repair labor if they go ahead. Say it once, plainly, and make sure they're okay with it. Skip it for specific repairs like 'replace my alternator'. Shop notes: ${req.notes || 'none'}. Parts are extra; the customer may supply their own or the shop sources them. Once the customer clearly agrees to one specific date and time, set confirmed=true. Set price_ok=true only if they clearly accepted the price quoted (labor quote in shop notes or the diagnosis fee); if there was no price to accept, price_ok=false. If they ask for a person, are upset, or it's urgent/unsafe, set handoff=true and say Mike will reach out.
 Respond ONLY with JSON: {"reply": string, "confirmed": boolean, "date": "YYYY-MM-DD" or null, "time": "HH:MM" 24h or null, "handoff": boolean, "price_ok": boolean}`;
 
@@ -306,9 +312,11 @@ Respond ONLY with JSON: {"reply": string, "confirmed": boolean, "date": "YYYY-MM
   let status = ai.handoff ? 'handoff' : 'active';
   let requested = false;
   if (ai.confirmed && ai.date && ai.time) {
-    const open = await isSlotOpen(sb, ai.date, ai.time, req.converted_appointment_id).catch(() => false);
+    const minutes = Number(ai.time.split(':')[0]) * 60 + Number(ai.time.split(':')[1]);
+    const allowed = avail.some(day => day.date === ai.date && day.slots.includes(minutes));
+    const open = allowed && await isSlotOpen(sb, ai.date, ai.time, req.converted_appointment_id).catch(() => false);
     if (!open) {
-      const day = avail.find((d) => d.date === ai.date)?.slots.length ? avail.find((d) => d.date === ai.date)! : avail.find((d) => d.slots.length);
+      const day = avail.find((d) => d.date === ai.date && d.slots.length) || avail.find((d) => d.slots.length);
       reply = day ? `Sorry, that time's already taken. I can do ${friendlyDate(day.date)} at ${day.slots.slice(0, 3).map(label12).join(', ')} — which works best?` : "Sorry, that time's already taken. What other day works for you?";
     } else {
       // Price accepted -> auto-confirm (draft estimate for staff); otherwise save as a request for manual OK.
@@ -327,7 +335,7 @@ Respond ONLY with JSON: {"reply": string, "confirmed": boolean, "date": "YYYY-MM
       }
     }
   }
-  await sendSms(sb, from, reply);
+  await sendSms(sb, from, reply, 'ai');
   const update: Record<string, unknown> = { bot_history: [...history, { role: 'assistant', content: reply }], bot_updated_at: new Date().toISOString() };
   if (status !== 'confirmed') update.bot_status = status;
   await sb.from('booking_requests').update(update).eq('id', req.id);

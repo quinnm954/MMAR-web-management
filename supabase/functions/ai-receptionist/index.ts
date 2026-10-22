@@ -8,7 +8,8 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.95.0';
 import { geocodeRow } from '../_shared/geocode-region.ts';
 import { sendMissedCallFollowup } from '../_shared/missed-call.ts';
 import { isSlotOpen, openSlots, label12 } from '../_shared/booking-bot.ts';
-import { buildLaborQuote, quoteSentence } from '../_shared/labor-quote.ts';
+import { receptionistSlots } from '../_shared/receptionist-times.ts';
+import { buildLaborQuote, quoteSentence, createDraftEstimate } from '../_shared/labor-quote.ts';
 import { hasOilChangeMembership, oilChangeBlocked, OIL_CHANGE_MEMBERSHIP_REPLY } from '../_shared/oil-change-eligibility.ts';
 
 const corsHeaders = {
@@ -93,8 +94,8 @@ How to act:
 - Listening: let the caller finish. If something was unclear or sounded wrong (a vehicle name, address, number), ask them to repeat it instead of guessing. Ask one question at a time. If the caller goes quiet, ask once "Are you still there?" before ending.
 - Keep it SHORT. Most callers want a person, not a long chat with an AI — be warm but get to the point fast. One or two short sentences per turn, one question at a time, no small talk, no repeating back long details, no unnecessary pleasantries. Move straight to booking: get the essentials, offer the earliest open time, done.
 - Today is {{today}} (Eastern time). You answer 24/7, any day.
-- Appointments can be set any day of the week, but only between 10 AM and 5 PM Eastern. Never offer or accept a time before 10 AM or after 5 PM; suggest the nearest time inside that window instead. Never book a time that has already passed today.
-- NEVER suggest a specific time from your own head. Before offering any time, call check_open_times (with the day they want, or tomorrow) and only offer times it returns. It already accounts for other appointments and Mike's drive time, so a time in the next hour is never available. Speed wins the job: callers who wait call another shop. We do NOT take same-day appointments: if asked about today, say "We're fully booked today" and offer the earliest open time tomorrow or later, e.g. "The soonest we can get there is 10 AM tomorrow — want that?" Only if they can't make it, offer the next earliest. Don't ask "what day works for you?" before offering the earliest slot. Call check_open_times as soon as you know they need service, before collecting every detail.
+- Default appointment requests to 12 PM–5 PM Eastern. Only offer mornings (10 AM–before noon) if the customer explicitly asks for a morning time; set morning_requested=true on check_open_times and create_booking_request only then. Never offer before 10 AM or after 5 PM. Every appointment requires Mike's approval.
+- NEVER invent a specific time. Before offering any time, call check_open_times (with the day they want, or tomorrow) and only offer times it returns. It accounts for appointments, drive time and blocked time. We do NOT take same-day appointments. Offer the earliest listed noon–5 PM time tomorrow or later; mornings only if requested. If the tool fails, take a message for Mike rather than guessing. Check eligibility first for oil changes.
 - Returning customers: at the start of every call, call lookup_caller. If it finds an account, greet them by first name and VERIFY instead of asking: e.g. "Is this for the 2011 Chevy Cruze at 123 Main St?" If they have several vehicles, ask which one. Only ask for details that are missing or changed (like engine size if not on file). Never read their email or full phone number aloud.
 - If they need service, collect: name, vehicle (year, make, model, and engine size like 1.4L or V6 — ask once; if they don't know, move on), what's wrong, service address or city, and the day and time they want. Turn the day into a real date (YYYY-MM-DD) and the time into 24-hour HH:MM. Confirm it back, then call create_booking_request. If the tool says the time is invalid, offer another time in the window. Never tell the caller they're confirmed: every time is a request that Mike approves, and the shop will text shortly to confirm.
 - You are NOT Mike and never claim to be him. If a caller asks whether they're speaking with Mike, say you're the shop's receptionist and Mike is the owner.
@@ -107,7 +108,7 @@ Closing style (FUGI, light humor, never pushy, never rude):
 - Greed/value: he comes to them. "He comes right to your driveway, so you skip the tow truck and the waiting room with the bad coffee."
 - Indifference: zero pressure. "No deposit to hold it — if something changes, just text us."
 - Use at most ONE humor line per call, keep it short, and skip humor if the caller is stressed, stranded, or upset.
-- Always close with a direct either/or question on real open times: "I've got 10 AM or 1 PM tomorrow — which works better?" Never end with "let me know".
+- Close with a direct question on real returned times, defaulting to afternoons. Clearly say the time is requested for Mike's approval, not reserved or confirmed.
 - Objections: "too expensive / just shopping" → mention no tow, written quote first, no deposit, then offer the earliest time again. "Need to check my schedule" → "Totally get it — want me to pencil in the earliest one with no deposit? If it doesn't work, just text us." "Let me think" → offer once to hold the spot; if they still decline, tell them they can text 813-501-7572 anytime and end politely.
 - Before saving the booking, confirm the details in ONE short sentence (vehicle, problem, place, time), then save it.
 - Never invent prices, hours, or promises. If unsure, say Mike will follow up.
@@ -192,6 +193,7 @@ Deno.serve(async (req) => {
                 }, ['caller_number']),
                 tool('check_open_times', 'Get open appointment start times. Call before offering any time.', {
                   date: { type: 'string', description: 'Day the caller wants, YYYY-MM-DD (tomorrow if unsure)' },
+                  morning_requested: { type: 'boolean', description: 'True only when the caller explicitly asks for a morning time; otherwise false' },
                 }, ['date']),
                 tool('create_booking_request', 'Save a service booking request once details are confirmed.', {
                   call_sid: callSid,
@@ -203,7 +205,8 @@ Deno.serve(async (req) => {
                   service_city: { type: 'string', description: 'City where the car is (always ask and confirm)' },
                   service_zip: { type: 'string', description: 'ZIP code where the car is (always ask and confirm)' },
                   requested_date: { type: 'string', description: 'Appointment date YYYY-MM-DD' },
-                  requested_time: { type: 'string', description: 'Appointment time HH:MM 24-hour, between 10:00 and 17:00 Eastern' },
+                  requested_time: { type: 'string', description: 'Requested time HH:MM 24-hour, default 12:00–17:00 Eastern; 10:00–11:59 only if caller asks for morning' },
+                  morning_requested: { type: 'boolean', description: 'True only when the caller explicitly asks for a morning time' },
                 }, ['customer_name', 'description', 'service_city', 'service_zip']),
                 tool('transfer_to_mike', 'Transfer the caller to Mike for urgent issues or when they ask for a person.', {
                   call_sid: callSid,
@@ -336,7 +339,7 @@ Deno.serve(async (req) => {
 
     if (action === 'availability') {
       const d = String(body.date || '').trim();
-      const av = await openSlots(sb, /^\d{4}-\d{2}-\d{2}$/.test(d) ? d : null, 4);
+      const av = receptionistSlots(await openSlots(sb, /^\d{4}-\d{2}-\d{2}$/.test(d) ? d : null, 4), body.morning_requested === true);
       const lines = av.map((x) => `${x.date}: ${x.slots.length ? x.slots.map(label12).join(', ') : 'fully booked'}`);
       return json({ result: `Open start times (Eastern). Only offer these:\n${lines.join('\n')}` });
     }
@@ -371,14 +374,15 @@ Deno.serve(async (req) => {
         const tm = timeStr.match(/^(\d{1,2}):(\d{2})$/);
         if (!dm || !tm) return json({ result: 'Need a date as YYYY-MM-DD and a time as HH:MM. Ask the caller again.' });
         const mins = Number(tm[1]) * 60 + Number(tm[2]);
+        if (mins < 720 && body.morning_requested !== true) return json({ result: 'Default times are noon–5 PM. Only request a morning if the customer explicitly asks for one.' });
         if (mins < 600 || mins > 1020) return json({ result: 'Invalid time. Appointments are only between 10 AM and 5 PM. Offer a time in that window.' });
         const nowEt = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/New_York' }));
         const todayEt = `${nowEt.getFullYear()}-${String(nowEt.getMonth() + 1).padStart(2, '0')}-${String(nowEt.getDate()).padStart(2, '0')}`;
         if (dateStr < todayEt || (dateStr === todayEt && mins <= nowEt.getHours() * 60 + nowEt.getMinutes()))
           return json({ result: 'That time has already passed. Offer a later time between 10 AM and 5 PM.' });
-        const ok = await isSlotOpen(sb, dateStr, `${tm[1].padStart(2, '0')}:${tm[2]}`).catch(() => true);
+        const ok = await isSlotOpen(sb, dateStr, `${tm[1].padStart(2, '0')}:${tm[2]}`).catch(() => false);
         if (!ok) {
-          const av = await openSlots(sb, dateStr, 3).catch(() => []);
+          const av = receptionistSlots(await openSlots(sb, dateStr, 3).catch(() => []), body.morning_requested === true);
           const alt = av.filter((d) => d.slots.length).slice(0, 2).map((d) => `${d.date}: ${d.slots.slice(0, 4).map(label12).join(', ')}`).join('; ');
           return json({ result: `That time is already booked or too soon for Mike to drive there. Open times: ${alt || 'none in the next few days — take a message'}. Offer these instead.` });
         }

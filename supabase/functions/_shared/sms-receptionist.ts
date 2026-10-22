@@ -1,5 +1,6 @@
 // AI text receptionist: answers any inbound text that the booking bot isn't already handling.
-import { sendSms, digits } from './booking-bot.ts';
+import { sendSms, digits, openSlots, label12 } from './booking-bot.ts';
+import { receptionistSlots, requestsMorning } from './receptionist-times.ts';
 import { smsAllowed } from './missed-call.ts';
 import { oilChangeBlocked, OIL_CHANGE_MEMBERSHIP_REPLY, OIL_CHANGE_MEMBERSHIP_REPLY_ES } from './oil-change-eligibility.ts';
 
@@ -69,12 +70,18 @@ export async function handleReceptionistText(sb: any, from: string, body: string
     if (!(await oilChangeBlocked(sb, { customer_phone: from, customer_id: prof?.id, description }))) return false;
     const reply = /aceite|cambio/i.test(text) ? OIL_CHANGE_MEMBERSHIP_REPLY_ES : OIL_CHANGE_MEMBERSHIP_REPLY;
     if (await smsAllowed()) {
-      await sendSms(sb, from, reply);
-      await sb.from('sms_messages').update({ status: 'ai' }).eq('thread_id', threadId).eq('direction', 'outbound').eq('body', reply).eq('status', 'sent');
+      await sendSms(sb, from, reply, 'ai');
     }
     return true;
   };
   if (await blockOilChange(text)) return;
+
+  const morningRequested = history.some(m => m.role === 'user' && requestsMorning(m.content));
+  let availability = 'Availability could not be checked. Take the preferred day and ask Mike to follow up; do not invent a time.';
+  try {
+    const days = receptionistSlots(await openSlots(sb, null, 10), morningRequested);
+    availability = days.map(day => `${day.date}: ${day.slots.length ? day.slots.map(label12).join(', ') : 'no openings'}`).join('\n');
+  } catch (error) { console.error('sms availability', error); }
 
   const system = `You are the text receptionist for MMAR — Mike's Mobile Auto Repair, a mobile mechanic (we come to the customer). Now: ${nowEt()} Eastern.
 Reply in the customer's language (English or Spanish). Warm, casual, very brief: 1–2 short sentences. Never claim to be Mike; you text for the shop.
@@ -85,7 +92,9 @@ Rules:
 - Oil changes ONLY for MMAR Care members (our maintenance plan); pitch it briefly and offer to have Mike text sign-up details.
 - Parts sourcing: whenever parts come up, FIRST suggest they order from the Advance Auto Parts website (advanceautoparts.com) with same-day delivery, and we install. If they insist we provide the parts, agree — we'll source them and Mike includes them in the written quote.
 - The only price you may give is the diagnosis fee, only for unknown problems (warning light, noise, no-start, "not sure"): $100, with $50 credited to repair labor if they go ahead. Never quote labor, parts or repair prices — Mike sends a written quote.
-- Never offer, book, or confirm appointment times. Collect a preferred day; Mike reviews and texts to confirm. Appointments start the next day at the earliest.
+- Default to noon–5 PM Eastern; morning times only when the customer explicitly asks. Propose the earliest appropriate time ONLY from the checked OPEN list below. Never book or confirm an appointment: all times are requests that Mike reviews and texts to confirm. Appointments start the next day at the earliest. If no suitable time is listed, take a preference for Mike rather than guessing.
+OPEN times (Eastern, accounting for appointments, travel and blocked time):
+${availability}
 - For service, gather: name, vehicle (year/make/model + engine size, ask once), the problem, service address or city, preferred day. Don't re-ask what's already known. When you have name, vehicle, problem and address, fill "booking" and tell them Mike will review and text to confirm.
 - If they ask for Mike/a person, are upset, or it's urgent/unsafe, set handoff=true and say Mike will reach out shortly.
 - Payment: cash is not accepted; customers pay the invoice, not the technician.
@@ -123,7 +132,5 @@ Respond ONLY with JSON: {"reply": string, "handoff": boolean, "booking": null or
   }
   const reply = String(ai.reply || '').trim();
   if (!reply || !(await smsAllowed())) return;
-  await sendSms(sb, from, reply);
-  // Tag the receptionist's reply so it isn't mistaken for Mike texting.
-  await sb.from('sms_messages').update({ status: 'ai' }).eq('thread_id', threadId).eq('direction', 'outbound').eq('body', reply.slice(0, 1500)).eq('status', 'sent');
+  await sendSms(sb, from, reply, 'ai');
 }

@@ -1,5 +1,10 @@
 # Roadmap
 
+## Receptionist reliability and afternoon times
+- [x] Recent real calls/texts are answering; corrected conflicting scheduling prompts, automated-SMS suppression, missing diagnosis-draft import and fail-open calendar reads.
+- [x] Default to noon–5 PM Eastern; mornings only when requested, retaining owner approval and service eligibility.
+- [x] Seventeen tests passed; deployed affected handlers, synchronized the live agent and phone routing, verified real afternoon availability and rejection of unrequested mornings. A new live caller conversation was not performed.
+
 ## Subscriber-only oil changes
 - [x] Enforce membership before automated oil-change time offers and booking conversion across phone, text, and website follow-ups; 11 tests passed, deployed guards and synced the live receptionist, and a signed-in attempt to schedule Nerittza was rejected without saving an appointment.
 
@@ -43,7 +48,7 @@
 - [x] Remove their service-area pages, links, and generated city coverage.
 - [x] Verify no references remain and the site builds cleanly.
 
-- [ ] When the 813-501-7572 port from Google Voice to Twilio completes, wire it to the AI receptionist: run the ai-receptionist setup action (auto-links every number on the account) or point the number's VoiceUrl at twilio-voice-incoming and SmsUrl at twilio-inbound-sms. Blocked: waiting on the port (1-4 weeks).
+- [x] Business number ported and connected to call/text receptionist handlers; routing reverified during October 22 synchronization.
 
 ## Fleet Prospecting
 - [x] Connect Google Maps; tables + RLS

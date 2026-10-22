@@ -60,7 +60,7 @@ export async function sendMissedCallFollowup(sb: any, caller: string, fromNumber
         let { data: thread } = await sb.from('sms_threads').select('id').eq('phone', to).maybeSingle();
         if (!thread) thread = (await sb.from('sms_threads').insert({ phone: to, customer_id: prof?.id ?? null, last_message_preview: body.slice(0, 80) }).select('id').single()).data;
         if (thread) {
-          await sb.from('sms_messages').insert({ thread_id: thread.id, direction: 'outbound', body, twilio_sid: JSON.parse(txt)?.sid ?? null, status: 'sent' });
+          await sb.from('sms_messages').insert({ thread_id: thread.id, direction: 'outbound', body, twilio_sid: JSON.parse(txt)?.sid ?? null, status: 'ai' });
           await sb.from('sms_threads').update({ last_message_at: new Date().toISOString(), last_message_preview: body.slice(0, 80) }).eq('id', thread.id);
         }
       } catch (e) { console.error('sms mirror failed', e); }
