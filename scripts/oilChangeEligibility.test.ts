@@ -1,6 +1,12 @@
-import { expect, test } from 'bun:test';
+import { afterAll, beforeAll, expect, test } from 'bun:test';
 import { isOilChange, oilChangeBlocked, hasOilChangeMembership } from '../supabase/functions/_shared/oil-change-eligibility';
 import { startBot, handleBotReply } from '../supabase/functions/_shared/booking-bot';
+
+// No credentials or external messages in regression tests.
+const globals = globalThis as any;
+const originalDeno = globals.Deno;
+beforeAll(() => { globals.Deno = { env: { get: () => undefined } }; });
+afterAll(() => { globals.Deno = originalDeno; });
 
 const req = { id: 'test', customer_phone: '+12397899190', customer_name: 'Test', service_type: 'Mobile Oil Change', description: '', bot_history: [] };
 function client(eligible = false) {
