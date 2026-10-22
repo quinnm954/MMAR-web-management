@@ -1,7 +1,7 @@
 # Roadmap
 
 ## Subscriber-only oil changes
-- [ ] Enforce membership before automated oil-change time offers and booking conversion; cover phone, text, and website follow-ups with regression tests and live validation.
+- [x] Enforce membership before automated oil-change time offers and booking conversion across phone, text, and website follow-ups; 11 tests passed, deployed guards and synced the live receptionist, and a signed-in attempt to schedule Nerittza was rejected without saving an appointment.
 
 ## Financed receipts in Reports
 - [x] Include received down payments and installments on payment date without counting the financed invoice total again; 24 tests passed, preview builds cleanly, signed-in October revenue verified at $3,902.82 including Jose’s $806.66 receipt.
