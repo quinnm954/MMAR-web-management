@@ -2,6 +2,7 @@
 - Read subdirectory AGENTS.md before changing files there.
 - Receptionist offer windows use shared `receptionistSlots` separately from physical `openSlots`; voice tools guard morning requests and availability failures fail closed; why: customer preferences must not change staff calendar hours or permit unchecked times.
 - Automated booking and receptionist SMS are tagged `ai` at insertion; why: system replies must not trigger the human-text two-hour suppression window.
+- General SMS intake validates offered and accepted slots against checked availability and rechecks before saving structured date/time on new or existing pending requests, never appointments; why: owner approval requires an actionable request without invented or auto-confirmed times.
 - Oil-change eligibility is enforced by the service-only `oil_change_eligible` RPC, booking/appointment validation triggers, and shared edge guards before automated time offers; why: a receptionist prompt alone cannot enforce subscriber-only service.
 
 - Reports classify refunds as revenue/profit reductions on completion date, never sales, labor or tech pay; why: refunds must not inflate sales or reverse labor.
