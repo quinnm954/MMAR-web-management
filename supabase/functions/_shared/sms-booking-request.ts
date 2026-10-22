@@ -21,19 +21,19 @@ export function checkedTextSlot(value: unknown, days: OpenDay[]): TextSlot | nul
 export async function saveTextBookingRequest(sb: any, phone: string, booking: TextBooking, slot: TextSlot | null,
   profile?: { full_name?: string; email?: string; address_line1?: string; address_line2?: string }) {
   const { data: requests, error: lookupError } = await sb.from('booking_requests')
-    .select('id, customer_phone, notes').gte('created_at', new Date(Date.now() - 3 * 86400_000).toISOString())
+    .select('id, customer_phone, customer_name, customer_email, vehicle_info, description, service_address, notes').gte('created_at', new Date(Date.now() - 3 * 86400_000).toISOString())
     .in('status', ['new', 'contacted']).order('created_at', { ascending: false });
   if (lookupError) throw new Error('Could not check existing text requests');
   const key = phone.replace(/\D/g, '').slice(-10);
   const existing = (requests || []).find((r: any) => String(r.customer_phone || '').replace(/\D/g, '').slice(-10) === key);
   const chosen = slot?.accepted ? slot : null;
   const payload = {
-    customer_name: String(booking.customer_name || profile?.full_name || 'Text customer').slice(0, 200),
-    customer_phone: phone, customer_email: profile?.email || null,
-    vehicle_info: booking.vehicle_info ? String(booking.vehicle_info).slice(0, 200) : null,
-    description: String(booking.description || '').slice(0, 2000),
+    customer_name: String(booking.customer_name || profile?.full_name || existing?.customer_name || 'Text customer').slice(0, 200),
+    customer_phone: phone, customer_email: profile?.email || existing?.customer_email || null,
+    vehicle_info: String(booking.vehicle_info || existing?.vehicle_info || '').slice(0, 200) || null,
+    description: String(booking.description || existing?.description || '').slice(0, 2000),
     service_address: booking.service_address ? String(booking.service_address).slice(0, 300) :
-      ([profile?.address_line1, profile?.address_line2].filter(Boolean).join(', ') || null),
+      ([profile?.address_line1, profile?.address_line2].filter(Boolean).join(', ') || existing?.service_address || null),
     ...(chosen ? { requested_date: chosen.date, requested_time_window: label12(Number(chosen.time.slice(0, 2)) * 60 + Number(chosen.time.slice(3))) } : {}),
     bot_status: 'handoff',
     notes: [existing?.notes, 'Requested through AI text receptionist; pending Mike’s approval',
