@@ -1,5 +1,10 @@
 # Roadmap
 
+## Receptionist reliability and afternoon times
+- [ ] Diagnose current call/text receptionist failures and repair verified causes.
+- [ ] Default to noon–5 PM Eastern; mornings only when requested, retaining owner approval and service eligibility.
+- [ ] Test and deploy the affected receptionist paths.
+
 ## Subscriber-only oil changes
 - [x] Enforce membership before automated oil-change time offers and booking conversion across phone, text, and website follow-ups; 11 tests passed, deployed guards and synced the live receptionist, and a signed-in attempt to schedule Nerittza was rejected without saving an appointment.
 
