@@ -1,8 +1,9 @@
 // AI text receptionist: answers any inbound text that the booking bot isn't already handling.
-import { sendSms, digits, openSlots, label12 } from './booking-bot.ts';
+import { sendSms, digits, openSlots, label12, isSlotOpen, friendlyDate } from './booking-bot.ts';
 import { receptionistSlots, requestsMorning } from './receptionist-times.ts';
 import { smsAllowed } from './missed-call.ts';
 import { oilChangeBlocked, OIL_CHANGE_MEMBERSHIP_REPLY, OIL_CHANGE_MEMBERSHIP_REPLY_ES } from './oil-change-eligibility.ts';
+import { checkedTextSlot, saveTextBookingRequest, type TextBooking, type OpenDay } from './sms-booking-request.ts';
 
 const AI_URL = 'https://ai.gateway.lovable.dev/v1/responses';
 
@@ -19,7 +20,8 @@ async function askAi(system: string, input: { role: string; content: string }[])
   if (!m) throw new Error('AI returned no JSON');
   return JSON.parse(m[0]) as {
     reply: string; handoff?: boolean;
-    booking?: { customer_name?: string; vehicle_info?: string; description?: string; service_address?: string; preferred_day?: string } | null;
+    booking?: TextBooking | null;
+    slot?: { date: string; time: string; accepted: boolean } | null;
   };
 }
 
@@ -78,8 +80,9 @@ export async function handleReceptionistText(sb: any, from: string, body: string
 
   const morningRequested = history.some(m => m.role === 'user' && requestsMorning(m.content));
   let availability = 'Availability could not be checked. Take the preferred day and ask Mike to follow up; do not invent a time.';
+  let days: OpenDay[] = [];
   try {
-    const days = receptionistSlots(await openSlots(sb, null, 10), morningRequested);
+    days = receptionistSlots(await openSlots(sb, null, 10), morningRequested);
     availability = days.map(day => `${day.date}: ${day.slots.length ? day.slots.map(label12).join(', ') : 'no openings'}`).join('\n');
   } catch (error) { console.error('sms availability', error); }
 
@@ -92,15 +95,16 @@ Rules:
 - Oil changes ONLY for MMAR Care members (our maintenance plan); pitch it briefly and offer to have Mike text sign-up details.
 - Parts sourcing: whenever parts come up, FIRST suggest they order from the Advance Auto Parts website (advanceautoparts.com) with same-day delivery, and we install. If they insist we provide the parts, agree — we'll source them and Mike includes them in the written quote.
 - The only price you may give is the diagnosis fee, only for unknown problems (warning light, noise, no-start, "not sure"): $100, with $50 credited to repair labor if they go ahead. Never quote labor, parts or repair prices — Mike sends a written quote.
-- Default to noon–5 PM Eastern; morning times only when the customer explicitly asks. Propose the earliest appropriate time ONLY from the checked OPEN list below. Never book or confirm an appointment: all times are requests that Mike reviews and texts to confirm. Appointments start the next day at the earliest. If no suitable time is listed, take a preference for Mike rather than guessing.
+- Default to noon–5 PM Eastern; morning times only when the customer explicitly asks. When asked for tomorrow (or another day), OFFER the earliest checked time on that day in the same reply as any missing-detail question. Do not just call it a preferred day or wait for a name/address before offering. If that day has no openings, say so and offer the next listed day. All offers are pending Mike's final approval, NOT confirmed appointments. Appointments start the next day at the earliest. If availability failed, do not invent a time.
+- Whenever offering or discussing a specific time, fill "slot" with its OPEN date/time. Set accepted=true ONLY when the customer chooses or agrees to that specific time, never just because they ask for tomorrow. Save an accepted time as a pending booking request even while collecting missing details. Never say a request was saved before it is saved. Use natural dates/times in the reply, not raw JSON formats.
 OPEN times (Eastern, accounting for appointments, travel and blocked time):
 ${availability}
-- For service, gather: name, vehicle (year/make/model + engine size, ask once), the problem, service address or city, preferred day. Don't re-ask what's already known. When you have name, vehicle, problem and address, fill "booking" and tell them Mike will review and text to confirm.
+- For service, gather: name, vehicle (year/make/model + engine size, ask once), the problem, service address or city, preferred day. Don't re-ask what's already known. Fill "booking" using ALL known details when the customer accepts a specific slot (even if name/address is still missing), or when all intake details are collected. Do not replace known details with blanks. Mike must review and confirm every request.
 - If they ask for Mike/a person, are upset, or it's urgent/unsafe, set handoff=true and say Mike will reach out shortly.
 - Payment: cash is not accepted; customers pay the invoice, not the technician.
 - If the message needs no reply (e.g. "thanks", "ok", emoji), reply with an empty string.
 Customer: ${ctx}
-Respond ONLY with JSON: {"reply": string, "handoff": boolean, "booking": null or {"customer_name": string, "vehicle_info": string, "description": string, "service_address": string, "preferred_day": string}}`;
+Respond ONLY with JSON: {"reply": string, "handoff": boolean, "slot": null or {"date": "YYYY-MM-DD", "time": "HH:MM", "accepted": boolean}, "booking": null or {"customer_name": string, "vehicle_info": string, "description": string, "service_address": string, "preferred_day": string}}`;
 
   let ai;
   try { ai = await askAi(system, history); }
@@ -108,29 +112,33 @@ Respond ONLY with JSON: {"reply": string, "handoff": boolean, "booking": null or
 
   if (ai.booking?.description && await blockOilChange(ai.booking.description)) return;
 
-  if (ai.booking && ai.booking.description) {
-    const { data: existing } = await sb.from('booking_requests').select('id, customer_phone, status')
-      .gte('created_at', new Date(Date.now() - 3 * 86400_000).toISOString()).in('status', ['new', 'contacted']);
-    if (!(existing || []).some((r: any) => digits(r.customer_phone) === key)) {
-      const b = ai.booking;
-      const { error } = await sb.from('booking_requests').insert({
-        customer_name: String(b.customer_name || prof?.full_name || 'Text customer').slice(0, 200),
-        customer_phone: from,
-        customer_email: prof?.email || null,
-        vehicle_info: b.vehicle_info ? String(b.vehicle_info).slice(0, 200) : null,
-        description: String(b.description).slice(0, 2000),
-        service_address: b.service_address ? String(b.service_address).slice(0, 300) : ([prof?.address_line1, prof?.address_line2].filter(Boolean).join(', ') || null),
-        service_type: 'General Repair',
-        source: 'ai_phone',
-        notes: ['Booked by AI text receptionist', b.preferred_day && `Preferred day: ${b.preferred_day}`].filter(Boolean).join('\n'),
-      });
-      if (error) console.error('sms booking insert', error);
+  const slot = checkedTextSlot(ai.slot, days);
+  let reply = String(ai.reply || '').trim();
+  if (ai.slot && (!slot || !(await isSlotOpen(sb, slot.date, slot.time).catch(() => false)))) {
+    reply = /mañana|puedes|nombre|dirección/i.test(text)
+      ? 'No pude verificar ese horario; Mike revisará la disponibilidad. ¿Cuál es tu nombre y dirección de servicio?'
+      : "I couldn't verify that time; Mike will check availability. What's your name and service address?";
+  } else if (ai.booking?.description) {
+    try {
+      await saveTextBookingRequest(sb, from, ai.booking, slot, prof);
+      if (slot?.accepted) {
+        const time = label12(Number(slot.time.slice(0, 2)) * 60 + Number(slot.time.slice(3)));
+        reply = /mañana|puedes|nombre|dirección/i.test(text)
+          ? `Solicitud guardada para ${friendlyDate(slot.date)} a las ${time}; Mike debe aprobar y confirmar la hora.`
+          : `I've requested ${friendlyDate(slot.date)} at ${time}; Mike will review and text to confirm.`;
+        if (!ai.booking.customer_name || !ai.booking.service_address) reply += /mañana|puedes|nombre|dirección/i.test(text)
+          ? ' ¿Cuál es tu nombre y dirección de servicio?' : " What's your name and service address?";
+      }
+    } catch (error) {
+      console.error('sms booking save', error);
+      reply = "I couldn't save your request yet; Mike will follow up to confirm availability.";
     }
+  } else if (slot?.accepted) {
+    reply = "I can request that time for Mike's approval—what's your name, vehicle, repair and service address?";
   }
   if (ai.handoff) {
     await sb.rpc('_notify_staff_customer_action', { _title: 'Texter wants Mike', _body: `${prof?.full_name || from}: ${text.slice(0, 120)}`, _link: '/admin/phone' }).then(() => {}, () => {});
   }
-  const reply = String(ai.reply || '').trim();
   if (!reply || !(await smsAllowed())) return;
   await sendSms(sb, from, reply, 'ai');
 }
