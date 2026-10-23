@@ -196,7 +196,7 @@ const AdminServiceRecords = () => {
                 <div className="flex flex-wrap items-start justify-between gap-2 mb-1">
                   <div>
                     <div className="flex items-center gap-2 font-bold"><Wrench className="h-4 w-4 text-primary" /> {r.service_type}</div>
-                    <div className="text-xs text-muted-foreground"><CustomerName id={r.customer_id} phone={r.customer?.phone}>{r.customer?.full_name || r.customer?.email}</CustomerName></div>
+                    <div className="text-xs text-muted-foreground"><CustomerName id={r.customer_id}>{r.customer?.full_name || r.customer?.email}</CustomerName></div>
                     {r.vehicle && <div className="text-xs">{r.vehicle.year} {r.vehicle.make} {r.vehicle.model}</div>}
                   </div>
                   <div className="text-right text-sm">

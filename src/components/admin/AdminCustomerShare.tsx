@@ -120,7 +120,7 @@ export default function AdminCustomerShare() {
               onClick={() => openCustomer(c)}
               className={`w-full text-left p-2 rounded ${active?.id === c.id ? 'bg-primary/10' : 'hover:bg-muted'}`}
             >
-              <div className="font-semibold text-sm truncate"><CustomerName id={c.id} phone={c.phone}>{c.full_name || '(no name)'}</CustomerName></div>
+              <div className="font-semibold text-sm truncate"><CustomerName id={c.id}>{c.full_name || '(no name)'}</CustomerName></div>
               <div className="text-xs text-muted-foreground truncate">{c.email}</div>
             </button>
           ))}

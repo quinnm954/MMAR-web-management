@@ -101,7 +101,7 @@ const AdminMemberships = () => {
           <CardContent className="p-4">
             <div className="grid grid-cols-1 md:grid-cols-5 gap-3 items-center">
               <div className="md:col-span-2">
-                <div className="font-semibold"><CustomerName id={r.customer_id} phone={r.customer?.phone}>{r.customer?.full_name || r.customer?.email || "—"}</CustomerName></div>
+                <div className="font-semibold"><CustomerName id={r.customer_id}>{r.customer?.full_name || r.customer?.email || "—"}</CustomerName></div>
                 <div className="text-xs text-muted-foreground truncate">{r.customer?.email}</div>
                 {r.vehicle && <div className="text-xs mt-1">{r.vehicle.year} {r.vehicle.make} {r.vehicle.model}</div>}
               </div>

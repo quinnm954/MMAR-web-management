@@ -460,7 +460,7 @@ const AdminInvoices = () => {
                     <div>
                       <div className="font-mono text-sm">{i.invoice_number}{(i as any).is_financed && <span className="ml-2 rounded border border-accent/40 bg-accent/15 px-1.5 py-0.5 text-[10px] font-sans font-semibold uppercase text-accent">Financed</span>}</div>
                       {(i as any).is_financed && <div className="text-[10px] text-muted-foreground">Paid ${Number((i as any).amount_paid || 0).toFixed(2)} · balance on weekly financing</div>}
-                      <div className="text-xs text-muted-foreground"><CustomerName id={i.customer_id} phone={i.customer?.phone}>{i.customer?.full_name || i.customer?.email}</CustomerName></div>
+                      <div className="text-xs text-muted-foreground"><CustomerName id={i.customer_id}>{i.customer?.full_name || i.customer?.email}</CustomerName></div>
                       <CustomerAddress customerId={i.customer_id} />
                       <div className="text-[10px] text-muted-foreground">
                         {new Date(i.created_at).toLocaleDateString()}{i.due_date && ` • Due ${i.due_date}`}
