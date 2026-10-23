@@ -67,7 +67,7 @@ export default function SatisfactionFeedback({ context, customerId }: { context?
       <div className="border-t border-border pt-5 space-y-3">
         <h2 className="font-semibold">Share your experience on Google</h2>
         <p className="text-sm text-muted-foreground">To leave a public review, write it on Google and tap Post.</p>
-        <Button asChild variant="accent" className="w-full">
+        <Button asChild variant="outline" className="w-full">
           <a href={GOOGLE_REVIEW_URL} target="_blank" rel="noopener noreferrer">Write a Google review <ExternalLink className="ml-2 h-4 w-4" /></a>
         </Button>
       </div>

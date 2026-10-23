@@ -18,10 +18,10 @@ const ReviewRequestEmail = ({ customerName, customerId }: Props) => (
           <Heading style={h1}>How did we do?</Heading>
           <Text style={text}>{customerName ? `Hi ${customerName},` : 'Hi there,'}</Text>
           <Text style={text}>
-            Thanks for trusting {SITE_NAME} with your vehicle. If we did a good job, a quick Google review helps other drivers find a mechanic who comes to them. It takes about 30 seconds.
+            Thanks for trusting {SITE_NAME} with your vehicle. Were you happy with your service? Share a private Yes/No answer with Mike. You can also choose to write an honest Google review — your private answer does not post a review.
           </Text>
           <Section style={{ textAlign: 'center', margin: '24px 0' }}>
-            <Button href={`https://mikesmautorepair.com/review${customerId ? `?c=${customerId}` : ''}`} style={button}>Leave a review</Button>
+            <Button href={`https://mikesmautorepair.com/review${customerId ? `?c=${customerId}` : ''}`} style={button}>Share your experience</Button>
           </Section>
           <Text style={text}>Questions? Call or text <strong>813-501-7572</strong>.</Text>
           <Hr style={hr} />
