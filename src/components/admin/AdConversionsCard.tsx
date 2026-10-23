@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Phone, MessageSquare, ClipboardList, Megaphone } from "lucide-react";
+import { quoteFunnel, type Funnel, type QuoteRow } from "@/lib/adQuoteFunnel";
 
 type Row = { id: string; event_type: string; from_google_ad: boolean; page_path: string | null; utm_campaign: string | null; created_at: string };
 
@@ -10,11 +11,32 @@ const ICON: Record<string, typeof Phone> = { phone_call: Phone, text_click: Mess
 
 export default function AdConversionsCard() {
   const [rows, setRows] = useState<Row[]>([]);
+  const [quotes, setQuotes] = useState<QuoteRow[]>([]);
   useEffect(() => {
     const since = new Date(Date.now() - 30 * 864e5).toISOString();
     supabase.from("ad_conversion_events" as never).select("*").gte("created_at", since).order("created_at", { ascending: false }).limit(500)
       .then(({ data }) => setRows((data as unknown as Row[]) ?? []));
+    (async () => {
+      const { data } = await supabase.from("booking_requests").select("source, gclid, utm_source, utm_medium, converted_appointment_id")
+        .gte("created_at", since).limit(1000);
+      const list = (data ?? []) as QuoteRow[];
+      const ids = list.map((q) => q.converted_appointment_id).filter(Boolean) as string[];
+      const status = new Map<string, string>();
+      if (ids.length) {
+        const { data: appts } = await supabase.from("appointments").select("id, status").in("id", ids);
+        (appts ?? []).forEach((a) => status.set(a.id, a.status as string));
+      }
+      setQuotes(list.map((q) => ({ ...q, appointment_status: q.converted_appointment_id ? status.get(q.converted_appointment_id) ?? null : null })));
+    })();
   }, []);
+  const funnel = quoteFunnel(quotes);
+  const pct = (f: Funnel) => (f.rate === null ? "—" : `${Math.round(f.rate * 100)}%`);
+  const funnelStat = (label: string, f: Funnel) => (
+    <div className="rounded-lg border border-border/50 p-3">
+      <p className="text-xs text-muted-foreground mb-1">{label}</p>
+      <p className="text-sm"><span className="font-semibold text-foreground">{f.quotes}</span> quote requests → <span className="font-semibold text-foreground">{f.confirmed}</span> booked · <span className="font-semibold text-accent">{pct(f)}</span></p>
+    </div>
+  );
   const ads = rows.filter((r) => r.from_google_ad);
   const count = (list: Row[], t: string) => list.filter((r) => r.event_type === t).length;
   const stat = (label: string, list: Row[]) => (
@@ -32,6 +54,11 @@ export default function AdConversionsCard() {
         <div className="grid sm:grid-cols-2 gap-3">
           {stat("From Google ads", ads)}
           {stat("All website visitors", rows)}
+        </div>
+        <p className="text-xs font-medium text-muted-foreground pt-1">Quote requests that became booked appointments</p>
+        <div className="grid sm:grid-cols-2 gap-3">
+          {funnelStat("From Google ads", funnel.ad)}
+          {funnelStat("All website visitors", funnel.all)}
         </div>
         <ul className="divide-y divide-border/40 max-h-64 overflow-y-auto">
           {rows.slice(0, 30).map((r) => {
