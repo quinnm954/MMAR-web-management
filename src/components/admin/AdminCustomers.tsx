@@ -64,7 +64,7 @@ const AdminCustomers = () => {
     setLoading(true);
     const { data: profiles } = await supabase
       .from("profiles")
-      .select("id, email, full_name, phone, address_line1, address_line2, city, state, postal_code, created_at")
+      .select("id, email, full_name, phone, address_line1, address_line2, city, state, postal_code, created_at, do_not_contact_at")
       .order("created_at", { ascending: false });
 
     const ids = (profiles ?? []).map((p) => p.id);
