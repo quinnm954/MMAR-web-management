@@ -55,6 +55,11 @@ export default function AdConversionsCard() {
           {stat("From Google ads", ads)}
           {stat("All website visitors", rows)}
         </div>
+        <p className="text-xs font-medium text-muted-foreground pt-1">Quote requests that became booked appointments</p>
+        <div className="grid sm:grid-cols-2 gap-3">
+          {funnelStat("From Google ads", funnel.ad)}
+          {funnelStat("All website visitors", funnel.all)}
+        </div>
         <ul className="divide-y divide-border/40 max-h-64 overflow-y-auto">
           {rows.slice(0, 30).map((r) => {
             const Icon = ICON[r.event_type] ?? Phone;
