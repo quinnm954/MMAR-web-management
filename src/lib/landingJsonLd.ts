@@ -110,10 +110,9 @@ export function buildLandingJsonLd(input: LandingLdInput): object[] {
         "Thursday",
         "Friday",
         "Saturday",
-        "Sunday",
       ],
-      opens: "09:00",
-      closes: "17:00",
+      opens: "08:00",
+      closes: "20:00",
     },
     offers: {
       "@type": "Offer",

@@ -239,7 +239,7 @@ function buildPage(categoryId: string, citySlug: string): LocalLandingPage | nul
     citySlug: city.slug,
     categoryId,
     h1: `${serviceLabel} in ${city.name}, ${city.state}`,
-    metaTitle: `${serviceLabel} in ${city.name}, ${city.state} | Mike's Mobile Auto Repair`,
+    metaTitle: `${serviceLabel} in ${city.name}, ${city.state} | Mike's Mobile`,
     metaDescription: `${serviceLabel} in ${city.name}, ${city.state}. Mobile mechanic comes to you across ${zipList}. Up-front quotes, 12-mo/12k warranty. Call (813) 501-7572.`,
     canonical: `${SITE}/${slug}`,
     intro,

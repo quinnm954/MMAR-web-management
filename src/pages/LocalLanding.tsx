@@ -16,6 +16,7 @@ import { getCategoryBySlug } from "@/data/serviceCategories";
 import { useSeo } from "@/lib/useSeo";
 import { buildLandingJsonLd } from "@/lib/landingJsonLd";
 import NotFound from "./NotFound";
+import { redirectForOldPath } from "@/data/livePaths";
 
 const SITE = "https://mikesmautorepair.com";
 
@@ -76,8 +77,11 @@ const LocalLanding = () => {
     return () => script.remove();
   }, [page, city, category]);
 
-  const redirectTo = LANDING_REDIRECTS[landingSlug];
-  if (redirectTo) return <Navigate to={`/${redirectTo}`} replace />;
+  const redirectTo =
+    (LANDING_REDIRECTS[landingSlug] && LANDING_REDIRECTS[landingSlug] !== landingSlug
+      ? `/${LANDING_REDIRECTS[landingSlug]}`
+      : null) ?? (!page ? redirectForOldPath(`/${landingSlug}`) : null);
+  if (redirectTo) return <Navigate to={redirectTo} replace />;
   if (!page) return <NotFound />;
 
   const siblings = localLandingPages

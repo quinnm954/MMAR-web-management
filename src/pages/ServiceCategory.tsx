@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, Navigate, useParams, useLocation } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
@@ -11,8 +11,10 @@ import { cities, getCityBySlug } from "@/data/cities";
 import { localLandingPages } from "@/data/localLandingPages";
 import { useSeo } from "@/lib/useSeo";
 import NotFound from "./NotFound";
+import { redirectForOldPath } from "@/data/livePaths";
 
 const ServiceCategory = () => {
+  const { pathname } = useLocation();
   const { slug = "" } = useParams();
   const category = getCategoryBySlug(slug);
   const [selectedService, setSelectedService] = useState<string | null>(null);
@@ -74,7 +76,10 @@ const ServiceCategory = () => {
       : undefined,
   });
 
-  if (!category) return <NotFound />;
+  if (!category) {
+    const to = redirectForOldPath(pathname);
+    return to ? <Navigate to={to} replace /> : <NotFound />;
+  }
 
   const handleClick = (name: string) => {
     setSelectedService(name);
