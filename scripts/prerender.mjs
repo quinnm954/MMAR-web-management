@@ -657,7 +657,7 @@ let redirected = 0;
 for (const [from, to] of Object.entries(DATA.legacyRedirects || {})) {
   if (routes.some((r) => r.path === from)) continue;
   const target = `${SITE}${to}`;
-  const html = `<!doctype html><html lang="en"><head><meta charset="UTF-8"><title>Moved</title><link rel="canonical" href="${target}"><meta name="robots" content="noindex,follow"><meta http-equiv="refresh" content="0; url=${to}"><script>location.replace(${JSON.stringify(to)} + location.search)</script></head><body><a href="${to}">This page moved</a></body></html>`;
+  const html = `<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="x-redirect-stub" content="1"><title>Moved</title><link rel="canonical" href="${target}"><meta name="robots" content="noindex,follow"><meta http-equiv="refresh" content="0; url=${to}"><script>location.replace(${JSON.stringify(to)} + location.search)</script></head><body><a href="${to}">This page moved</a></body></html>`;
   const outDir = join(DIST, from.replace(/^\//, ""));
   mkdirSync(outDir, { recursive: true });
   writeFileSync(join(outDir, "index.html"), html);
