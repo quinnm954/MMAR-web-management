@@ -522,10 +522,10 @@ for (const lp of DATA.landingPages) {
       hoursAvailable: {
         "@type": "OpeningHoursSpecification",
         dayOfWeek: [
-          "Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday",
+          "Monday","Tuesday","Wednesday","Thursday","Friday","Saturday",
         ],
-        opens: "09:00",
-        closes: "17:00",
+        opens: "08:00",
+        closes: "20:00",
       },
       offers: {
         "@type": "Offer",
@@ -651,4 +651,17 @@ for (const route of routes) {
   written++;
 }
 
-console.log(`[prerender] wrote ${written} static HTML files with JSON-LD.`);
+// Old addresses Google still lists: tiny pages that point crawlers and
+// visitors at the closest live page (canonical + instant refresh).
+let redirected = 0;
+for (const [from, to] of Object.entries(DATA.legacyRedirects || {})) {
+  if (routes.some((r) => r.path === from)) continue;
+  const target = `${SITE}${to}`;
+  const html = `<!doctype html><html lang="en"><head><meta charset="UTF-8"><title>Moved</title><link rel="canonical" href="${target}"><meta name="robots" content="noindex,follow"><meta http-equiv="refresh" content="0; url=${to}"><script>location.replace(${JSON.stringify(to)} + location.search)</script></head><body><a href="${to}">This page moved</a></body></html>`;
+  const outDir = join(DIST, from.replace(/^\//, ""));
+  mkdirSync(outDir, { recursive: true });
+  writeFileSync(join(outDir, "index.html"), html);
+  redirected++;
+}
+
+console.log(`[prerender] wrote ${written} static HTML files with JSON-LD, ${redirected} redirect pages.`);

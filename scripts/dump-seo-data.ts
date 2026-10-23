@@ -7,6 +7,8 @@ import { categories } from "../src/data/serviceCategories";
 import { localLandingPages } from "../src/data/localLandingPages";
 import { blogPosts } from "../src/data/blogPosts";
 import { REVIEWS_META } from "../src/data/reviewsMeta";
+import { KNOWN_LEGACY_PATHS } from "../src/lib/legacyRedirects";
+import { redirectForOldPath } from "../src/data/livePaths";
 
 const out = {
   cities: cities.map((c) => ({
@@ -46,6 +48,9 @@ const out = {
     faqs: p.faqs ?? [],
   })),
   reviews: REVIEWS_META,
+  legacyRedirects: Object.fromEntries(
+    KNOWN_LEGACY_PATHS.map((p) => [p, redirectForOldPath(p)]).filter(([, to]) => to),
+  ),
 };
 
 const path = resolve(import.meta.dir, "..", ".prerender-data.json");
