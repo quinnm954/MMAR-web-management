@@ -15,10 +15,18 @@ export default function AdConversionsCard() {
     const since = new Date(Date.now() - 30 * 864e5).toISOString();
     supabase.from("ad_conversion_events" as never).select("*").gte("created_at", since).order("created_at", { ascending: false }).limit(500)
       .then(({ data }) => setRows((data as unknown as Row[]) ?? []));
-    supabase.from("booking_requests").select("source, gclid, utm_source, utm_medium, converted_appointment_id, appointments:converted_appointment_id(status)")
-      .gte("created_at", since).limit(1000)
-      .then(({ data }) => setQuotes(((data ?? []) as unknown as (QuoteRow & { appointments: { status: string } | null })[])
-        .map((q) => ({ ...q, appointment_status: q.appointments?.status ?? null }))));
+    (async () => {
+      const { data } = await supabase.from("booking_requests").select("source, gclid, utm_source, utm_medium, converted_appointment_id")
+        .gte("created_at", since).limit(1000);
+      const list = (data ?? []) as QuoteRow[];
+      const ids = list.map((q) => q.converted_appointment_id).filter(Boolean) as string[];
+      const status = new Map<string, string>();
+      if (ids.length) {
+        const { data: appts } = await supabase.from("appointments").select("id, status").in("id", ids);
+        (appts ?? []).forEach((a) => status.set(a.id, a.status as string));
+      }
+      setQuotes(list.map((q) => ({ ...q, appointment_status: q.converted_appointment_id ? status.get(q.converted_appointment_id) ?? null : null })));
+    })();
   }, []);
   const funnel = quoteFunnel(quotes);
   const pct = (f: Funnel) => (f.rate === null ? "—" : `${Math.round(f.rate * 100)}%`);
