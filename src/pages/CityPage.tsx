@@ -1,4 +1,4 @@
-import { Link, useParams } from "react-router-dom";
+import { Link, Navigate, useParams, useLocation } from "react-router-dom";
 import { MapPin, ArrowLeft, ChevronRight, Home } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
@@ -11,10 +11,12 @@ import { categories } from "@/data/serviceCategories";
 import { localLandingPages } from "@/data/localLandingPages";
 import { useSeo } from "@/lib/useSeo";
 import NotFound from "./NotFound";
+import { redirectForOldPath } from "@/data/livePaths";
 
 const SITE = "https://mikesmautorepair.com";
 
 const CityPage = () => {
+  const { pathname } = useLocation();
   const { city: slug = "" } = useParams();
   const city = getCityBySlug(slug);
 
@@ -96,7 +98,10 @@ const CityPage = () => {
       : undefined,
   });
 
-  if (!city) return <NotFound />;
+  if (!city) {
+    const to = redirectForOldPath(pathname);
+    return to ? <Navigate to={to} replace /> : <NotFound />;
+  }
 
   const nearby = cities.filter((c) => c.slug !== city.slug).slice(0, 5);
   // Centered map of the city
