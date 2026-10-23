@@ -1,3 +1,4 @@
+import { useAutoRefresh } from '@/hooks/useAutoRefresh';
 import AdminFinancing from '@/components/admin/AdminFinancing';
 import { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';

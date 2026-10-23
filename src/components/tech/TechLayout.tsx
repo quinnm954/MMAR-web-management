@@ -1,3 +1,4 @@
+import { useAutoRefresh } from '@/hooks/useAutoRefresh';
 import { ReactNode } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { Wrench, ClipboardCheck, LogOut, LayoutDashboard, Users, History, Bell, MessageCircle } from "lucide-react";
