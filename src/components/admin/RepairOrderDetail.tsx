@@ -1,3 +1,4 @@
+import { CustomerName } from '@/hooks/useCustomerHappiness';
 import { useEffect, useState } from "react";
 import { CustomerAddress, formatAddress } from "@/components/admin/CustomerAddress";
 import { RegionChip, REGION_OPTIONS } from '@/hooks/useAdminRegion';
@@ -367,7 +368,7 @@ export default function RepairOrderDetail({ appointmentId, open, onClose }: Prop
                   <CardTitle className="text-sm flex items-center gap-2"><User className="h-4 w-4" /> Customer</CardTitle>
                 </CardHeader>
                 <CardContent className="text-sm space-y-1">
-                  <div className="font-medium">{customer?.full_name || "—"}</div>
+                  <div className="font-medium"><CustomerName id={customer?.id} phone={customer?.phone}>{customer?.full_name || "—"}</CustomerName></div>
                   {customer?.email && <div className="text-muted-foreground text-xs">{customer.email}</div>}
                   <CustomerAddress customerId={customer?.id} fallback={formatAddress(customer) || appt?.service_address} />
                   {customer?.phone && (

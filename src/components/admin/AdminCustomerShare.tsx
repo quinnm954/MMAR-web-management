@@ -1,3 +1,4 @@
+import { CustomerName } from '@/hooks/useCustomerHappiness';
 import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -119,7 +120,7 @@ export default function AdminCustomerShare() {
               onClick={() => openCustomer(c)}
               className={`w-full text-left p-2 rounded ${active?.id === c.id ? 'bg-primary/10' : 'hover:bg-muted'}`}
             >
-              <div className="font-semibold text-sm truncate">{c.full_name || '(no name)'}</div>
+              <div className="font-semibold text-sm truncate"><CustomerName id={c.id}>{c.full_name || '(no name)'}</CustomerName></div>
               <div className="text-xs text-muted-foreground truncate">{c.email}</div>
             </button>
           ))}

@@ -1,3 +1,4 @@
+import { CustomerName } from '@/hooks/useCustomerHappiness';
 import { useEffect, useState } from "react";
 import { CustomerAddress, formatAddress } from "@/components/admin/CustomerAddress";
 import { useAdminRegion, RegionSwitch, RegionChip } from '@/hooks/useAdminRegion';
@@ -134,7 +135,7 @@ const AdminAppointments = () => {
                   <Badge className={statusColor(r.status)}>{r.status}</Badge>
                 </div>
                 <div className="text-xs text-muted-foreground flex flex-wrap items-center gap-x-2 gap-y-0.5">
-                  <span>{r.customer?.full_name || r.customer?.email}</span>
+                  <CustomerName id={r.customer_id} phone={r.customer?.phone}>{r.customer?.full_name || r.customer?.email}</CustomerName>
                   {r.customer?.phone && (
                     <a href={`tel:${r.customer.phone}`} className="text-primary inline-flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
                       <Phone className="h-3 w-3" /> {r.customer.phone}

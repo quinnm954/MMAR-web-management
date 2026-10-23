@@ -1,3 +1,4 @@
+import { CustomerName } from '@/hooks/useCustomerHappiness';
 import { useEffect, useState, Fragment } from "react";
 import { CustomerAddress, formatAddress } from "@/components/admin/CustomerAddress";
 import { useAdminRegion, RegionSwitch, RegionChip } from '@/hooks/useAdminRegion';
@@ -120,7 +121,7 @@ export default function AdminRepairOrders() {
                           </div>
                           <div className="font-medium mt-1 truncate">{r.service_type}</div>
                           <div className="text-xs text-muted-foreground truncate">
-                            {r.customer?.full_name || "Unknown"} · {r.vehicle ? `${r.vehicle.year} ${r.vehicle.make} ${r.vehicle.model}` : "No vehicle"}
+                            <CustomerName id={r.customer_id} phone={r.customer?.phone}>{r.customer?.full_name || "Unknown"}</CustomerName> · {r.vehicle ? `${r.vehicle.year} ${r.vehicle.make} ${r.vehicle.model}` : "No vehicle"}
                           </div>
                           <CustomerAddress customerId={r.customer_id} />
                         </div>

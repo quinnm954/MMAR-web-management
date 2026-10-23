@@ -1,3 +1,4 @@
+import { CustomerName } from '@/hooks/useCustomerHappiness';
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
@@ -100,7 +101,7 @@ const AdminMemberships = () => {
           <CardContent className="p-4">
             <div className="grid grid-cols-1 md:grid-cols-5 gap-3 items-center">
               <div className="md:col-span-2">
-                <div className="font-semibold">{r.customer?.full_name || r.customer?.email || "—"}</div>
+                <div className="font-semibold"><CustomerName id={r.customer_id}>{r.customer?.full_name || r.customer?.email || "—"}</CustomerName></div>
                 <div className="text-xs text-muted-foreground truncate">{r.customer?.email}</div>
                 {r.vehicle && <div className="text-xs mt-1">{r.vehicle.year} {r.vehicle.make} {r.vehicle.model}</div>}
               </div>

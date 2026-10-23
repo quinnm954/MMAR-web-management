@@ -4313,6 +4313,14 @@ export type Database = {
         }
         Returns: string
       }
+      customer_happiness: {
+        Args: never
+        Returns: {
+          customer_id: string
+          happy: boolean
+          phone: string
+        }[]
+      }
       estimate_has_paid_invoice: {
         Args: {
           _appointment_id: string
