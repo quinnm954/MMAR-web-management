@@ -1,3 +1,4 @@
+import { contactBlocked } from '../_shared/contact-block.ts';
 // Admin-only: generate a Stripe payment link/checkout session for any of:
 //   - invoice (uses outstanding balance)
 //   - membership_deposit (uses plan.deposit_amount or plan.total_at_signup)
@@ -193,6 +194,9 @@ Deno.serve(async (req) => {
     }
 
     if (!phone) return json(400, { error: "No phone number available. Provide one." });
+    if (await contactBlocked({ phone, jobIds: [metadata.invoice_id] })) {
+      return json(409, { error: "This customer said they were unhappy, so automated texts are off. Copy the link and text them yourself from the Phone screen if you choose.", url: session.url, message });
+    }
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     const TWILIO_API_KEY = Deno.env.get("TWILIO_API_KEY");

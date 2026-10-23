@@ -1,3 +1,4 @@
+import { contactBlocked } from './contact-block.ts';
 import { sendAndLog } from './send-and-log.ts';
 // Missed-call follow-up: one text (and an email for account holders) per caller per 12 hours.
 const TWILIO_GW = 'https://connector-gateway.lovable.dev/twilio';
@@ -45,6 +46,7 @@ export async function sendMissedCallFollowup(sb: any, caller: string, fromNumber
   let err: string | undefined;
   const LK = Deno.env.get('LOVABLE_API_KEY'); const TK = Deno.env.get('TWILIO_API_KEY');
   const FROM = fromNumber || Deno.env.get('TWILIO_FROM_NUMBER');
+  if (await contactBlocked({ phone: to })) return;
   const canText = await smsAllowed();
   if (!canText) err = 'Texting paused until carrier campaign is approved';
   else if (LK && TK && FROM) {

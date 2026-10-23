@@ -1,3 +1,4 @@
+import { contactBlocked } from '../_shared/contact-block.ts';
 // Sends MMAR Care appointment reminders 24h and 2h before each scheduled appointment.
 // Triggered hourly by pg_cron — see the migration that schedules it.
 //
@@ -132,7 +133,7 @@ Deno.serve(async (req) => {
             .maybeSingle(),
         ]);
 
-        if (pref && pref.appointment_reminders === false) {
+        if ((pref && pref.appointment_reminders === false) || await contactBlocked({ customerId: a.customer_id, jobIds: [a.id] })) {
           summary.skipped++;
           await supabase
             .from("appointments")

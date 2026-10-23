@@ -1,3 +1,4 @@
+import { contactBlocked } from '../_shared/contact-block.ts';
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
 import Stripe from "npm:stripe@18.5.0";
 
@@ -129,6 +130,10 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ ok: true, url: session.url, message: msg }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
+    }
+
+    if (await contactBlocked({ phone, customerId: invoice.customer_id, jobIds: [invoice.id, (invoice as any).appointment_id] })) {
+      return new Response(JSON.stringify({ error: "This customer said they were unhappy, so automated texts are off. Copy the link and text them yourself from the Phone screen if you choose.", url: session.url, message: msg }), { status: 409, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     // Find / create thread for outbound logging

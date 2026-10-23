@@ -1,3 +1,4 @@
+import { contactBlocked } from './contact-block.ts';
 import { createClient } from 'npm:@supabase/supabase-js@2'
 import { EmailAPIError } from 'npm:@lovable.dev/email-js@0.1.0'
 import { sendTemplateEmail } from './transactional-email-templates/send-email.ts'
@@ -14,6 +15,9 @@ export interface SendAndLogParams {
   idempotencyKey: string
   templateData?: Record<string, unknown>
   metadata?: Record<string, unknown> | null
+  /** Staff typed this by hand: skip the unhappy-customer block. */
+  manual?: boolean
+  jobIds?: string[]
 }
 
 export interface SendAndLogResult {
@@ -50,6 +54,14 @@ export async function sendAndLog(p: SendAndLogParams): Promise<SendAndLogResult>
     template_name: p.templateName,
     recipient_email: recipient,
     metadata: p.metadata ?? null,
+  }
+  if (!p.manual && !TEMPLATES[p.templateName]?.to) {
+    // Jobs open when the customer said they were unhappy may still finish; ids come from the key.
+    const jobIds = [...(p.jobIds ?? []), ...(p.idempotencyKey.match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi) ?? [])]
+    if (await contactBlocked({ email: p.recipientEmail, jobIds })) {
+      await log({ ...base, status: 'suppressed', error_message: 'unhappy customer: automated messages off' })
+      return { sent: false, suppressed: true }
+    }
   }
   try {
     const r = await sendTemplateEmail(p.templateName, p.recipientEmail, {

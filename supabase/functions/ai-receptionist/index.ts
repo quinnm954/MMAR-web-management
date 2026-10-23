@@ -1,3 +1,4 @@
+import { contactBlocked } from '../_shared/contact-block.ts';
 // AI receptionist (ElevenLabs Agents) for missed calls.
 // Actions (via ?action=):
 //   setup     – admin only: create/update the ElevenLabs agent
@@ -31,6 +32,7 @@ function toE164(p: string) {
 }
 
 async function sendSms(to: string, body: string, sb?: any, fromOverride?: string) {
+  if (await contactBlocked({ phone: to })) return;
   const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
   const TWILIO_API_KEY = Deno.env.get('TWILIO_API_KEY');
   const FROM = fromOverride || Deno.env.get('TWILIO_FROM_NUMBER');

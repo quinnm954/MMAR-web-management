@@ -1,3 +1,4 @@
+import { contactBlocked } from '../_shared/contact-block.ts';
 import { enrollSuffix } from '../_shared/enroll.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.95.0';
 
@@ -10,6 +11,7 @@ const GATEWAY_URL = 'https://connector-gateway.lovable.dev/twilio';
 const SHOP_NAME = 'MMAR Care';
 
 async function sendSms(to: string, body: string): Promise<{ ok: boolean; error?: string; sid?: string }> {
+  if (await contactBlocked({ phone: to })) return { ok: false, error: 'suppressed: unhappy customer' };
   const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
   const TWILIO_API_KEY = Deno.env.get('TWILIO_API_KEY');
   const TWILIO_FROM = Deno.env.get('TWILIO_FROM_NUMBER');

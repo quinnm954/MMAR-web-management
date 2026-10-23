@@ -1,3 +1,4 @@
+import { contactBlocked } from './contact-block.ts';
 // Booking follow-up bot: proposes afternoon times and saves requests for staff approval.
 const TWILIO_GW = 'https://connector-gateway.lovable.dev/twilio';
 import { buildLaborQuote, createDraftEstimate, quoteSentence, quoteNote } from './labor-quote.ts';
@@ -9,6 +10,7 @@ export const digits = (p: string) => (p || '').replace(/\D/g, '').slice(-10);
 const toE164 = (p: string) => `+1${digits(p)}`;
 
 export async function sendSms(sb: any, to: string, body: string, status = 'sent') {
+  if (await contactBlocked({ phone: to })) return false;
   const KEY = Deno.env.get('LOVABLE_API_KEY');
   const TW = Deno.env.get('TWILIO_API_KEY');
   const FROM = Deno.env.get('TWILIO_FROM_NUMBER');
