@@ -1,3 +1,4 @@
+import { useAutoRefresh } from '@/hooks/useAutoRefresh';
 import { useEffect, useState } from 'react';
 import { Share, X } from 'lucide-react';
 import AdminPhoneHub from '@/components/admin/AdminPhoneHub';
@@ -19,6 +20,7 @@ const isStandalone = () =>
   window.matchMedia?.('(display-mode: standalone)').matches || (navigator as any).standalone === true;
 
 export default function AdminPhoneApp() {
+  useAutoRefresh();
   const [showTip, setShowTip] = useState(false);
   const { user } = useAuth();
   const [askPush, setAskPush] = useState(false);

@@ -1,3 +1,4 @@
+import { useAutoRefresh } from '@/hooks/useAutoRefresh';
 import AdminFinancing from '@/components/admin/AdminFinancing';
 import { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
@@ -75,6 +76,7 @@ const AdminDashboard = () => {
   const { signOut, user, hasAnyRole, roles } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   useNativePushRegistration();
+  useAutoRefresh();
   const [stats, setStats] = useState({ customers: 0, activeMemberships: 0, openAppointments: 0, unpaidInvoices: 0 });
   const [warranties, setWarranties] = useState<any[]>([]);
   const [refreshing, setRefreshing] = useState(false);

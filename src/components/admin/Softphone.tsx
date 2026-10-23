@@ -1,3 +1,4 @@
+import { setCallActive } from '@/hooks/useAutoRefresh';
 import { useEffect, useRef, useState } from 'react';
 import { Device, Call } from '@twilio/voice-sdk';
 import { supabase } from '@/integrations/supabase/client';
@@ -80,6 +81,7 @@ export default function Softphone() {
   // Keep the screen awake during a call: iOS mutes the mic when a web app's screen locks.
   useEffect(() => {
     const active = status === 'in-call' || status === 'connecting' || status === 'incoming';
+    setCallActive(active);
     if (!active) return;
     let lock: any = null;
     let dead = false;

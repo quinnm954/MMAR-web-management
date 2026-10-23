@@ -30,3 +30,4 @@
 - New appointments auto-assign the region's only tech by trigger; with several techs `needs_tech_choice` is set and staff are alerted, never overwriting a manual pick; why: one-tech regions need no dispatch step.
 - Regional home pages (/ and /south-florida) share `RegionHome`; sections read `useHomeRegion()` to swap only local copy, and `SOUTH_FLORIDA_BOOKING_OPEN` in `src/lib/regions.ts` hides the website waitlist notes; why: identical design per region without duplicating the page.
 - Old URLs Google still lists are mapped to the closest live page by `src/lib/legacyRedirects.ts` (client Navigate plus prerendered canonical/refresh stubs), because Lovable hosting ignores `public/_redirects`; why: keep ranking value from removed cities and services.
+- Garage Ace staff shells (admin, tech, phone app) full-reload via useAutoRefresh every 30s and on new notifications, deferred while typing, dialogs, calls or hidden; why: most screens fetch once on open.

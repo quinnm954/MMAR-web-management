@@ -1,3 +1,4 @@
+import { useAutoRefresh } from '@/hooks/useAutoRefresh';
 import { ReactNode } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { Wrench, ClipboardCheck, LogOut, LayoutDashboard, Users, History, Bell, MessageCircle } from "lucide-react";
@@ -29,6 +30,7 @@ const TechLayout = ({ children }: { children: ReactNode }) => {
   const navigate = useNavigate();
   useSwipeTabNav(primary);
   useNativePushRegistration();
+  useAutoRefresh();
   return (
     <main className="min-h-screen bg-background">
       <header className="border-b border-border bg-card safe-pt">
