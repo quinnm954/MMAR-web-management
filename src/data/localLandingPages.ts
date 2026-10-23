@@ -31,7 +31,7 @@ const _allLocalLandingPages: LocalLandingPage[] = [
     citySlug: "lehigh-acres",
     categoryId: "brakes",
     h1: "Brake Repair in Lehigh Acres, FL",
-    metaTitle: "Brake Repair in Lehigh Acres, FL | Mobile Same-Day Service",
+    metaTitle: "Mobile Brake Repair in Lehigh Acres, FL | Pads & Rotors",
     metaDescription:
       "Mobile brake repair in Lehigh Acres, FL. Pads, rotors, calipers, and brake fluid done in your driveway. Next-day service. Call (813) 501-7572.",
     intro:
@@ -77,7 +77,7 @@ const _allLocalLandingPages: LocalLandingPage[] = [
     citySlug: "fort-myers",
     categoryId: "brakes",
     h1: "Mobile Brake Repair in Fort Myers, FL",
-    metaTitle: "Brake Repair in Fort Myers, FL | Mobile Same-Day Pads, Rotors & Calipers",
+    metaTitle: "Mobile Brake Repair in Fort Myers, FL | Pads & Rotors",
     metaDescription:
       "Mobile brake repair in Fort Myers, FL. Coastal corrosion-resistant hardware, ABS diagnosis, pad-and-rotor service in your driveway. Call (813) 501-7572.",
     intro:
@@ -219,7 +219,7 @@ const _allLocalLandingPages: LocalLandingPage[] = [
     citySlug: "fort-myers",
     categoryId: "electrical",
     h1: "Alternator Repair in Fort Myers, FL",
-    metaTitle: "Alternator Repair in Fort Myers, FL | Mobile Same-Day Service",
+    metaTitle: "Mobile Alternator Replacement in Fort Myers, FL",
     metaDescription:
       "Mobile alternator repair in Fort Myers, FL. Diode testing, ground-strap analysis, output-amperage matching. Call (813) 501-7572.",
     intro:
@@ -265,7 +265,7 @@ const _allLocalLandingPages: LocalLandingPage[] = [
     citySlug: "lehigh-acres",
     categoryId: "electrical",
     h1: "Mobile Alternator Repair in Lehigh Acres, FL",
-    metaTitle: "Alternator Repair in Lehigh Acres, FL | Mobile Charging-System Service",
+    metaTitle: "Mobile Alternator Replacement in Lehigh Acres, FL",
     metaDescription:
       "Mobile alternator repair in Lehigh Acres, FL. Smart-charging system reset, battery monitor calibration, load-tested install. Call (813) 501-7572.",
     intro:
@@ -406,7 +406,7 @@ const _allLocalLandingPages: LocalLandingPage[] = [
     categoryId: "electrical",
     h1: "Mobile Car Battery Replacement in Lehigh Acres and Fort Myers",
     metaTitle:
-      "Mobile Battery Replacement in Lehigh Acres and Fort Myers | Same-Day Delivery & Install",
+      "Mobile Battery Replacement in Lehigh Acres and Fort Myers",
     metaDescription:
       "Mobile car battery delivery and install across Lehigh Acres and Fort Myers. AGM, EFB, and flooded options. Call (813) 501-7572.",
     canonical: "https://mikesmautorepair.com/battery-replacement",
@@ -452,7 +452,7 @@ const _allLocalLandingPages: LocalLandingPage[] = [
     service: "Car Battery Replacement",
     categoryId: "electrical",
     h1: "Car Battery Replacement in Lehigh Acres and Fort Myers",
-    metaTitle: "Car Battery Replacement in Lehigh Acres and Fort Myers | Same-Day Mobile Install",
+    metaTitle: "Car Battery Replacement in Lehigh Acres and Fort Myers | Mobile Install",
     metaDescription:
       "Mobile car battery replacement across Lehigh Acres and Fort Myers. Parasitic-draw test included. Call (813) 501-7572.",
     intro:
@@ -498,7 +498,7 @@ const _allLocalLandingPages: LocalLandingPage[] = [
     citySlug: "lehigh-acres",
     categoryId: "electrical",
     h1: "Car Battery Replacement in Lehigh Acres, FL",
-    metaTitle: "Car Battery Replacement in Lehigh Acres, FL | Mobile Same-Day",
+    metaTitle: "Mobile Car Battery Replacement in Lehigh Acres, FL",
     metaDescription:
       "Mobile car battery delivery and installation in Lehigh Acres, FL. Parasitic draw test, charging-system verification. Call (813) 501-7572.",
     intro:
@@ -544,7 +544,7 @@ const _allLocalLandingPages: LocalLandingPage[] = [
     citySlug: "fort-myers",
     categoryId: "electrical",
     h1: "Mobile Battery Replacement in Fort Myers, FL",
-    metaTitle: "Battery Replacement in Fort Myers, FL | Same-Day Mobile Install",
+    metaTitle: "Mobile Car Battery Replacement in Fort Myers, FL",
     metaDescription:
       "Mobile car battery delivery and install in Fort Myers, FL. AGM, EFB, flooded. Smart-charging reset. Call (813) 501-7572.",
     intro:
@@ -736,7 +736,7 @@ const _allLocalLandingPages: LocalLandingPage[] = [
     citySlug: "lehigh-acres",
     categoryId: "engine",
     h1: "Mobile Vehicle Diagnostics in Lehigh Acres, FL",
-    metaTitle: "Vehicle Diagnostics in Lehigh Acres, FL | Mobile OBD-II Scan",
+    metaTitle: "Check Engine Light Diagnostics in Lehigh Acres, FL | Mobile",
     metaDescription:
       "Mobile vehicle diagnostics in Lehigh Acres, FL — Mode-6 data, bidirectional scan, live data graphing. Call (813) 501-7572.",
     intro:
@@ -829,7 +829,7 @@ const _allLocalLandingPages: LocalLandingPage[] = [
     citySlug: "fort-myers",
     categoryId: "engine",
     h1: "Mobile Engine Diagnostics in Fort Myers, FL",
-    metaTitle: "Engine Diagnostics in Fort Myers, FL | Mobile Check-Engine-Light Testing",
+    metaTitle: "Check Engine Light Diagnostics in Fort Myers, FL | Mobile",
     metaDescription:
       "Mobile engine diagnostics in Fort Myers, FL. Misfire isolation, fuel-trim analysis, EVAP smoke testing. Call (813) 501-7572.",
     intro:
@@ -1205,7 +1205,7 @@ const _allLocalLandingPages: LocalLandingPage[] = [
     citySlug: "fort-myers",
     categoryId: "engine",
     h1: "Mobile Oil Change in Fort Myers, FL",
-    metaTitle: "Mobile Oil Change in Fort Myers, FL | At Your Driveway in 30 Minutes",
+    metaTitle: "Mobile Oil Change in Fort Myers, FL | At Your Driveway",
     metaDescription:
       "Mobile oil change in Fort Myers, FL. OEM-approved synthetic oils, dealer-grade filters, multi-point. Call (813) 501-7572.",
     intro:
@@ -1305,7 +1305,7 @@ const _allLocalLandingPages: LocalLandingPage[] = [
     citySlug: "fort-myers",
     categoryId: "ac-heating",
     h1: "Mobile AC Repair in Fort Myers, FL",
-    metaTitle: "Mobile AC Repair in Fort Myers, FL | Same-Day Recharge & Compressor Service",
+    metaTitle: "Mobile Car AC Repair in Fort Myers, FL | Recharge & Compressor",
     metaDescription:
       "Mobile auto AC repair in Fort Myers, FL. Leak detection, evacuation, recharge by weight, compressor service. Call (813) 501-7572.",
     intro:
@@ -1351,7 +1351,7 @@ const _allLocalLandingPages: LocalLandingPage[] = [
     citySlug: "lehigh-acres",
     categoryId: "ac-heating",
     h1: "Mobile AC Repair in Lehigh Acres, FL",
-    metaTitle: "Mobile AC Repair in Lehigh Acres, FL | Same-Day Recharge & Compressor Service",
+    metaTitle: "Mobile Car AC Repair in Lehigh Acres, FL | Recharge & Compressor",
     metaDescription:
       "Mobile auto AC repair in Lehigh Acres, FL. Proper evacuation, charge by weight, compressor service. Call (813) 501-7572.",
     intro:
