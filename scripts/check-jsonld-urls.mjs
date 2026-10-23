@@ -163,6 +163,8 @@ let routes = 0;
 const failures = [];
 
 for (const file of walk(DIST)) {
+  // Redirect stubs for old URLs intentionally point elsewhere.
+  if (readFileSync(file, "utf8").includes('name="x-redirect-stub"')) continue;
   const route =
     "/" +
     relative(DIST, file)
