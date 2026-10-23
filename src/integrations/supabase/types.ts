@@ -2653,6 +2653,8 @@ export type Database = {
           address_line2: string | null
           city: string | null
           created_at: string
+          do_not_contact_at: string | null
+          do_not_contact_open_job_ids: string[]
           email: string | null
           full_name: string | null
           id: string
@@ -2669,6 +2671,8 @@ export type Database = {
           address_line2?: string | null
           city?: string | null
           created_at?: string
+          do_not_contact_at?: string | null
+          do_not_contact_open_job_ids?: string[]
           email?: string | null
           full_name?: string | null
           id: string
@@ -2685,6 +2689,8 @@ export type Database = {
           address_line2?: string | null
           city?: string | null
           created_at?: string
+          do_not_contact_at?: string | null
+          do_not_contact_open_job_ids?: string[]
           email?: string | null
           full_name?: string | null
           id?: string
@@ -4242,10 +4248,15 @@ export type Database = {
       }
     }
     Functions: {
+      _customer_for_feedback: {
+        Args: { _customer_id: string; _phone: string }
+        Returns: string
+      }
       _notify_staff_customer_action: {
         Args: { _body: string; _link: string; _title: string }
         Returns: undefined
       }
+      _open_job_ids: { Args: { _customer_id: string }; Returns: string[] }
       _send_push: {
         Args: {
           _body: string
@@ -4285,6 +4296,15 @@ export type Database = {
       bot_confirm_booking_request: {
         Args: { _date: string; _id: string; _time: string }
         Returns: Json
+      }
+      contact_blocked: {
+        Args: {
+          _customer_id?: string
+          _email?: string
+          _job_ids?: string[]
+          _phone?: string
+        }
+        Returns: boolean
       }
       create_checklist_from_template: {
         Args: {
@@ -4408,6 +4428,10 @@ export type Database = {
       }
       set_booking_location: {
         Args: { _lat: number; _lng: number; _token: string }
+        Returns: undefined
+      }
+      set_customer_contact_block: {
+        Args: { _blocked: boolean; _customer_id: string }
         Returns: undefined
       }
       sign_technician_agreement: {
