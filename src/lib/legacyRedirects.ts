@@ -23,6 +23,14 @@ const EXACT: Record<string, string> = {
   "/mobile-alternator-repair-fort-myers": "/alternator-repair-fort-myers",
 };
 
+/** Fort Myers pages for services whose Fort Myers page has a different address. */
+const FORT_MYERS_PAGE: Record<string, string> = {
+  "mobile-ac-repair": "/ac-repair-fort-myers-fl",
+  "mobile-brake-repair": "/brake-repair-fort-myers-fl",
+  "mobile-electrical-repair": "/battery-replacement-fort-myers-fl",
+  "mobile-engine-repair": "/engine-diagnostics-fort-myers-fl",
+};
+
 /** Old addresses seen in Search Console, used to pre-build redirect pages. */
 export const KNOWN_LEGACY_PATHS = [
   "/mobile-electrical-repair-estero",
@@ -79,8 +87,11 @@ export function legacyRedirect(path: string, exists: (p: string) => boolean): st
   // <service>-<removed city> → same service in Fort Myers.
   for (const city of REMOVED_CITY_SLUGS) {
     if (clean.endsWith(`-${city}`)) {
-      const swapped = `${clean.slice(0, -city.length - 1)}-fort-myers`;
-      return exists(swapped) ? swapped : "/services";
+      const service = clean.slice(1, -city.length - 1);
+      const swapped = `/${service}-fort-myers`;
+      if (exists(swapped)) return swapped;
+      const alias = FORT_MYERS_PAGE[service];
+      return alias && exists(alias) ? alias : "/services";
     }
   }
   return null;
