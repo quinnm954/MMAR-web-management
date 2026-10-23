@@ -1,5 +1,6 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
+import { canReadServiceUsage } from './access.ts';
 
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), {
   status, headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
@@ -20,7 +21,7 @@ Deno.serve(async (req) => {
     if (error || !data?.claims?.sub) return json({ error: 'Unauthorized' }, 401);
     const admin = createClient(url, service);
     const { data: roles, error: roleError } = await admin.from('user_roles').select('role').eq('user_id', data.claims.sub);
-    if (roleError || !roles?.some(r => ['admin', 'owner'].includes(r.role))) return json({ error: 'Forbidden' }, 403);
+    if (roleError || !canReadServiceUsage((roles ?? []).map(r => r.role))) return json({ error: 'Forbidden' }, 403);
 
     const gatewayKey = Deno.env.get('LOVABLE_API_KEY');
     const twilioKey = Deno.env.get('TWILIO_API_KEY');
