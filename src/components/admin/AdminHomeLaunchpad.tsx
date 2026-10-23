@@ -7,6 +7,7 @@ import { tabForNotification } from '@/lib/adminTabAlerts';
 import { orderShortcuts } from '@/lib/homeShortcuts';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import AdminServiceUsage from './AdminServiceUsage';
 
 type Shortcut = { value: string; label: string; icon: any; hint?: string };
 
@@ -68,6 +69,7 @@ const AdminHomeLaunchpad = ({ allowed }: { allowed: string[] }) => {
 
   return (
     <div className="space-y-5">
+      <AdminServiceUsage />
       <Card>
         <CardContent className="p-4 space-y-3">
           <div className="flex items-center justify-between">

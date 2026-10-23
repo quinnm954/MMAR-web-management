@@ -1,5 +1,8 @@
 # Roadmap
 
+## Admin service balances
+- [x] Show live Twilio balance and ElevenLabs usage with refresh and account links; deployed, two access tests passed, unauthenticated requests rejected, and signed-in desktop/phone verified at $12.74 and 60,646 characters remaining with no overflow or page errors.
+
 ## Text booking requests
 - [x] Offer checked times while gathering customer details; persist selected date/time pending Mike's approval, including updates to existing requests.
 - [x] Twenty-four tests passed; deployed the text handler and verified a temporary Oct 23 noon request reads back in the signed-in Pending screen with Confirm control and no appointment; removed test data. A new live AI/carrier text conversation was not performed.
