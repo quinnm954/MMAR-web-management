@@ -945,9 +945,11 @@ function CallDetail({ call, name, tag, onBack, onCall, onText, onMail, onDelete 
 
 function TextDetail({ thread, name, tag, messages, reply, sending, onReply, onSend, onBack, onCall, onDelete, onDeleteMessage, onAddCustomer }: { thread: TextThread; name: string; tag?: string; messages: SmsMessage[]; reply: string; sending: boolean; onReply: (value: string) => void; onSend: () => void; onBack: () => void; onCall: () => void; onDelete: () => void; onDeleteMessage: (m: SmsMessage) => void; onAddCustomer?: () => void }) {
   const sticky = useStickyBottom(messages, thread.id);
+  const unhappy = useCustomerHappiness()(thread.customer_id, thread.phone) === 'text-destructive';
   return (
     <>
       <NavBar onBack={onBack} right={<><button onClick={onCall} title="Call" className="p-1"><Phone className="h-5 w-5" /></button><button onClick={onDelete} title="Delete conversation" aria-label="Delete conversation" className="p-1 text-[hsl(var(--ios-red))]"><Trash2 className="h-5 w-5" /></button></>}><ContactHead name={name} sub={tag || thread.phone} /></NavBar>
+      {unhappy && <div role="alert" className="mx-3 mt-2 rounded-lg bg-destructive/15 px-3 py-2 text-[13px] text-destructive">This customer said they were unhappy. Automated messages are off.</div>}
       {onAddCustomer && (
         <button onClick={onAddCustomer} className="mx-4 mt-1 mb-1 shrink-0 rounded-xl bg-[hsl(var(--ios-fill))] py-2 text-[15px] font-medium text-[hsl(var(--ios-blue))]">Add to customers</button>
       )}

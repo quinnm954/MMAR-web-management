@@ -310,6 +310,17 @@ const AdminCustomers = () => {
             <DialogTitle className="flex items-center justify-between gap-2 flex-wrap">
               <CustomerName id={selected?.id} phone={selected?.phone}>{selected?.full_name || "Customer"}</CustomerName>
               {selected && (
+                <Button size="sm" variant={(selected as any).do_not_contact_at ? "destructive" : "outline"} onClick={async () => {
+                  const block = !(selected as any).do_not_contact_at;
+                  const { error } = await (supabase.rpc as any)("set_customer_contact_block", { _customer_id: selected.id, _blocked: block });
+                  if (error) return toast.error(error.message);
+                  setSelected({ ...selected, do_not_contact_at: block ? new Date().toISOString() : null } as any);
+                  toast.success(block ? "Automated messages turned off" : "Automated messages turned back on");
+                }}>
+                  {(selected as any).do_not_contact_at ? "Automated messages off" : "Automated messages on"}
+                </Button>
+              )}
+              {selected && (
                 <Button size="sm" variant="outline" onClick={() => { const c = selected; setSelected(null); openEdit(c); }} className="gap-1.5">
                   <Pencil className="h-3.5 w-3.5" /> Edit
                 </Button>
