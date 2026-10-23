@@ -1,5 +1,8 @@
 # Roadmap
 
+## Admin service balances
+- [ ] Show live Twilio balance and ElevenLabs subscription usage on the admin home, with refresh and account links; verify authenticated access and real values.
+
 ## Text booking requests
 - [x] Offer checked times while gathering customer details; persist selected date/time pending Mike's approval, including updates to existing requests.
 - [x] Twenty-four tests passed; deployed the text handler and verified a temporary Oct 23 noon request reads back in the signed-in Pending screen with Confirm control and no appointment; removed test data. A new live AI/carrier text conversation was not performed.
