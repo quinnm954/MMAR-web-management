@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Phone, MessageSquare, ClipboardList, Megaphone } from "lucide-react";
+import { quoteFunnel, type Funnel, type QuoteRow } from "@/lib/adQuoteFunnel";
 
 type Row = { id: string; event_type: string; from_google_ad: boolean; page_path: string | null; utm_campaign: string | null; created_at: string };
 
