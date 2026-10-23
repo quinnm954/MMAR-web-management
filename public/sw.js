@@ -54,6 +54,10 @@ async function handlePush(event) {
   }
 
   await self.registration.showNotification(title, options);
+  try {
+    const cs = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
+    cs.forEach((c) => { try { c.postMessage({ type: "push-received" }); } catch { /* ignore */ } });
+  } catch { /* ignore */ }
 }
 
 self.addEventListener("notificationclick", (event) => {

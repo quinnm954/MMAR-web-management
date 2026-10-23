@@ -66,6 +66,8 @@ export function useNotifications(limit = 50) {
           try {
             toast(row.title, { description: row.body ?? undefined });
           } catch {}
+          // Let the auto-refresh hook reload the app (it waits until safe).
+          setTimeout(() => window.dispatchEvent(new Event("ga-auto-refresh")), 1500);
         },
       )
       .on(

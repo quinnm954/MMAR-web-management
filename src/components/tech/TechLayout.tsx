@@ -29,6 +29,7 @@ const TechLayout = ({ children }: { children: ReactNode }) => {
   const navigate = useNavigate();
   useSwipeTabNav(primary);
   useNativePushRegistration();
+  useAutoRefresh();
   return (
     <main className="min-h-screen bg-background">
       <header className="border-b border-border bg-card safe-pt">

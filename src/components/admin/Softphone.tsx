@@ -80,6 +80,7 @@ export default function Softphone() {
   // Keep the screen awake during a call: iOS mutes the mic when a web app's screen locks.
   useEffect(() => {
     const active = status === 'in-call' || status === 'connecting' || status === 'incoming';
+    setCallActive(active);
     if (!active) return;
     let lock: any = null;
     let dead = false;
