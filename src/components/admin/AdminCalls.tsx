@@ -40,7 +40,7 @@ export default function AdminCalls() {
       .select('*')
       .order('created_at', { ascending: false })
       .limit(200);
-    setCalls((data ?? []) as unknown as CallLog[]);
+    setCalls(((data ?? []) as any[]).map((row) => ({ ...row, ai_transcript: Array.isArray(row.ai_transcript) ? row.ai_transcript.filter((t: any) => typeof t?.message === 'string' && t.message.trim() && t.message.trim() !== '...') : null })) as CallLog[]);
     setLoading(false);
   };
 

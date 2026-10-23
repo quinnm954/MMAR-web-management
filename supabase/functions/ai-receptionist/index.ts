@@ -458,7 +458,10 @@ Deno.serve(async (req) => {
       const sid = String(vars.call_sid || d.metadata?.phone_call?.call_sid || '');
       const caller = String(vars.caller_number || d.metadata?.phone_call?.external_number || '');
       const summary = d.analysis?.transcript_summary || '';
-      const transcript = (d.transcript || []).map((t: { role: string; message: string }) => ({ role: t.role, message: t.message }));
+      // Tool-call steps arrive with no spoken text; keep only real speech.
+      const transcript = (d.transcript || [])
+        .filter((t: { message?: string | null }) => typeof t.message === 'string' && t.message.trim() && t.message.trim() !== '...')
+        .map((t: { role: string; message: string }) => ({ role: t.role, message: t.message.trim() }));
       let dialedNumber = '';
       if (sid) {
         await sb.from('call_logs').upsert({
