@@ -1,3 +1,4 @@
+import { setCallActive } from '@/hooks/useAutoRefresh';
 import { useEffect, useRef, useState } from 'react';
 import { Device, Call } from '@twilio/voice-sdk';
 import { supabase } from '@/integrations/supabase/client';
