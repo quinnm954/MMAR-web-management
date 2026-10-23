@@ -155,7 +155,7 @@ export default function AdminPhoneHub({ fullscreen = false }: { fullscreen?: boo
       if (key && row.full_name) nextNames[key] = { name: row.full_name, tag: roleByUser[row.user_id] || 'employee' };
     });
     setNames(nextNames);
-    setCalls((callResult.data ?? []).map((row: any) => ({ ...row, ai_transcript: Array.isArray(row.ai_transcript) ? row.ai_transcript : null })) as CallRow[]);
+    setCalls((callResult.data ?? []).map((row: any) => ({ ...row, ai_transcript: Array.isArray(row.ai_transcript) ? row.ai_transcript.filter((t: any) => typeof t?.message === 'string' && t.message.trim() && t.message.trim() !== '...') : null })) as CallRow[]);
     setThreads((threadResult.data ?? []) as TextThread[]);
 
     const inbound: EmailItem[] = (inboundResult.data ?? []).map((row: any) => ({
