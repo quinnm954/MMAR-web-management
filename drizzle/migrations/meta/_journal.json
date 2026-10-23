@@ -386,6 +386,20 @@
       "when": 1792679595498,
       "tag": "0054_enforce_subscriber_only_oil_changes",
       "breakpoints": true
+    },
+    {
+      "idx": 55,
+      "version": "7",
+      "when": 1792797233757,
+      "tag": "0055_customer_satisfaction_feedback",
+      "breakpoints": true
+    },
+    {
+      "idx": 56,
+      "version": "7",
+      "when": 1792797341774,
+      "tag": "0056_fix_anonymous_satisfaction_feedback",
+      "breakpoints": true
     }
   ]
 }

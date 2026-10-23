@@ -811,6 +811,60 @@ export type Database = {
           },
         ]
       }
+      customer_satisfaction_feedback: {
+        Row: {
+          admin_notes: string | null
+          comments: string | null
+          created_at: string
+          customer_id: string | null
+          email: string | null
+          id: string
+          name: string | null
+          phone: string | null
+          satisfied: boolean
+          status: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          comments?: string | null
+          created_at?: string
+          customer_id?: string | null
+          email?: string | null
+          id?: string
+          name?: string | null
+          phone?: string | null
+          satisfied: boolean
+          status?: string
+        }
+        Update: {
+          admin_notes?: string | null
+          comments?: string | null
+          created_at?: string
+          customer_id?: string | null
+          email?: string | null
+          id?: string
+          name?: string | null
+          phone?: string | null
+          satisfied?: boolean
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_satisfaction_feedback_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customer_marketing_export"
+            referencedColumns: ["customer_id"]
+          },
+          {
+            foreignKeyName: "customer_satisfaction_feedback_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customer_shares: {
         Row: {
           created_at: string
@@ -4409,6 +4463,17 @@ export type Database = {
           _name: string
           _phone: string
           _rating: number
+        }
+        Returns: string
+      }
+      submit_satisfaction_feedback: {
+        Args: {
+          _comments?: string
+          _customer_id?: string
+          _email?: string
+          _name?: string
+          _phone?: string
+          _satisfied: boolean
         }
         Returns: string
       }

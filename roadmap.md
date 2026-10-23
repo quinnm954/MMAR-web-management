@@ -1,5 +1,9 @@
 # Roadmap
 
+## Yes/no satisfaction feedback
+- [x] Replace star prompts on review page and invoices with shared Yes/No feedback; Google posting is a clearly separate action available to everyone. Updated and deployed follow-up SMS/email copy.
+- [x] Save actual boolean answers separately from historical stars; four tests pass, both live public submissions read back in signed-in Admin Feedback with no page errors, and preview build is clean. Temporary verification entries removed after checking.
+
 ## Admin service balances
 - [x] Show live Twilio balance and ElevenLabs usage with refresh and account links; deployed, two access tests passed, unauthenticated requests rejected, and signed-in desktop/phone verified at $12.74 and 60,646 characters remaining with no overflow or page errors.
 
