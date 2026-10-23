@@ -1,3 +1,4 @@
+import { useCustomerHappiness } from '@/hooks/useCustomerHappiness';
 import AddCustomerFromThread from '@/components/admin/AddCustomerFromThread';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { format, formatDistanceToNow } from 'date-fns';
@@ -80,6 +81,7 @@ type FeedItem = {
   kind: Kind;
   id: string;
   title: string;
+  phone?: string | null;
   subtitle: string;
   at: string;
   unread: boolean;
@@ -274,6 +276,7 @@ export default function AdminPhoneHub({ fullscreen = false }: { fullscreen?: boo
 
   const displayPhone = (phone?: string | null) => names[phoneKey(phone)]?.name || phone || 'Unknown caller';
   const displayTag = (phone?: string | null) => names[phoneKey(phone)]?.tag;
+  const happyCls = useCustomerHappiness();
 
   const chatTitle = (t: ChatThread) => {
     const who = t.customer_id ? chatNames[t.customer_id] : t.tech_id ? chatNames[t.tech_id] : chatNames[t.created_by];
@@ -287,12 +290,12 @@ export default function AdminPhoneHub({ fullscreen = false }: { fullscreen?: boo
 
   const feed = useMemo<FeedItem[]>(() => {
     const callItems: FeedItem[] = calls.map(call => ({
-      kind: 'call', id: call.id, title: displayPhone(call.direction === 'outbound' ? call.to_number : call.from_number),
+      kind: 'call', id: call.id, phone: call.direction === 'outbound' ? call.to_number : call.from_number, title: displayPhone(call.direction === 'outbound' ? call.to_number : call.from_number),
       subtitle: `${call.status === 'missed' || call.status === 'no-answer' ? 'Missed' : call.direction === 'outbound' ? 'Outgoing' : 'Incoming'} call${call.ai_handled ? ' · AI answered' : ''}`,
       at: call.created_at, unread: !call.read_at,
     }));
     const textItems: FeedItem[] = threads.map(thread => ({
-      kind: 'text', id: thread.id, title: displayPhone(thread.phone), subtitle: thread.last_message_preview || 'Text conversation',
+      kind: 'text', id: thread.id, phone: thread.phone, title: displayPhone(thread.phone), subtitle: thread.last_message_preview || 'Text conversation',
       at: thread.last_message_at, unread: thread.unread_count > 0,
     }));
     const chatItems: FeedItem[] = chats.map(t => chatFeed(t));
@@ -500,9 +503,9 @@ export default function AdminPhoneHub({ fullscreen = false }: { fullscreen?: boo
   const listContent = mode === 'inbox'
     ? visibleFeed
     : mode === 'calls'
-      ? visibleCalls.map(call => ({ kind: 'call' as const, id: call.id, title: displayPhone(call.direction === 'outbound' ? call.to_number : call.from_number), subtitle: `${call.status === 'missed' || call.status === 'no-answer' ? 'Missed' : call.direction === 'outbound' ? 'Outgoing' : 'Incoming'} call · ${formatDuration(call.duration_seconds)}`, at: call.created_at, unread: !call.read_at }))
+      ? visibleCalls.map(call => ({ kind: 'call' as const, id: call.id, phone: call.direction === 'outbound' ? call.to_number : call.from_number, title: displayPhone(call.direction === 'outbound' ? call.to_number : call.from_number), subtitle: `${call.status === 'missed' || call.status === 'no-answer' ? 'Missed' : call.direction === 'outbound' ? 'Outgoing' : 'Incoming'} call · ${formatDuration(call.duration_seconds)}`, at: call.created_at, unread: !call.read_at }))
       : mode === 'texts'
-        ? visibleThreads.map(thread => ({ kind: 'text' as const, id: thread.id, title: displayPhone(thread.phone), subtitle: thread.last_message_preview || 'New conversation', at: thread.last_message_at, unread: thread.unread_count > 0 }))
+        ? visibleThreads.map(thread => ({ kind: 'text' as const, id: thread.id, phone: thread.phone, title: displayPhone(thread.phone), subtitle: thread.last_message_preview || 'New conversation', at: thread.last_message_at, unread: thread.unread_count > 0 }))
         : mode === 'chat'
         ? chats.map(chatFeed).filter(item => !q || `${item.title} ${item.subtitle}`.toLowerCase().includes(q))
         : visibleEmails.map(email => ({ kind: 'email' as const, id: email.id, title: email.kind === 'sent' ? email.to : email.from, subtitle: `${email.subject} · ${email.snippet}`, at: email.at, unread: !!email.unread }));
@@ -595,7 +598,7 @@ export default function AdminPhoneHub({ fullscreen = false }: { fullscreen?: boo
                     <Avatar name={item.title} />
                     <span className="min-w-0 flex-1 py-2.5 pr-4 border-b border-[hsl(var(--ios-separator))]">
                       <span className="flex items-baseline justify-between gap-2">
-                        <span className={cn('truncate text-[17px] font-semibold', missed && 'text-[hsl(var(--ios-red))]')}>{item.title}</span>
+                        <span className={cn('truncate text-[17px] font-semibold', missed && 'text-[hsl(var(--ios-red))]', item.phone && happyCls(null, item.phone))}>{item.title}</span>
                         <span className="flex items-center gap-1 text-[15px] text-[hsl(var(--ios-label-2))] shrink-0">{shortTime(item.at)}<ChevronRight className="h-4 w-4 opacity-60" /></span>
                       </span>
                       <span className="block text-[15px] leading-snug text-[hsl(var(--ios-label-2))] line-clamp-2">{item.kind === 'call' && (missed ? <PhoneMissed className="inline h-3.5 w-3.5 mr-1 -mt-0.5" /> : <PhoneIncoming className="inline h-3.5 w-3.5 mr-1 -mt-0.5" />)}{item.subtitle}</span>

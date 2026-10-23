@@ -1,3 +1,4 @@
+import { CustomerName } from '@/hooks/useCustomerHappiness';
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -52,7 +53,7 @@ export default function AdminDeclinedWork() {
             <CardContent className="space-y-2 text-sm">
               <div className="text-muted-foreground">
                 {rec.vehicles?.year} {rec.vehicles?.make} {rec.vehicles?.model} •{' '}
-                {rec.profiles?.full_name || rec.profiles?.email}
+                <CustomerName id={rec.customer_id}>{rec.profiles?.full_name || rec.profiles?.email}</CustomerName>
               </div>
               {rec.estimated_cost && <div>Estimated: ${Number(rec.estimated_cost).toFixed(2)}</div>}
               {rec.due_date && <div className="text-xs">Due: {new Date(rec.due_date).toLocaleDateString()}</div>}

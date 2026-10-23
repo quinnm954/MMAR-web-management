@@ -16,7 +16,7 @@ export function indexHappiness(rows: HappinessRow[]) {
 }
 
 export function happinessFor(idx: ReturnType<typeof indexHappiness>, id?: string | null, phone?: string | null): Happiness {
-  const v = (id && idx.byId.get(id)) ?? idx.byPhone.get(phoneTail(phone));
+  const v = id && idx.byId.has(id) ? idx.byId.get(id) : idx.byPhone.get(phoneTail(phone));
   return v === undefined ? null : v ? "happy" : "unhappy";
 }
 
