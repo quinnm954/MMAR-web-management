@@ -1,3 +1,4 @@
+import { contactBlocked } from '../_shared/contact-block.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.95.0';
 import { handleBotReply } from '../_shared/booking-bot.ts';
 import { handleReceptionistText } from '../_shared/sms-receptionist.ts';
@@ -84,9 +85,11 @@ Deno.serve(async (req) => {
 
     // Booking follow-up bot replies if this customer has an active booking conversation
     let botHandled = false;
-    if (body) try { botHandled = await handleBotReply(sb, from, body); } catch (e) { console.error('booking bot', e); }
+    // Unhappy customers get no automated replies; staff still see the text and get alerted.
+    const silent = await contactBlocked({ phone: from });
+    if (body && !silent) try { botHandled = await handleBotReply(sb, from, body); } catch (e) { console.error('booking bot', e); }
     // Otherwise the AI text receptionist answers (in the background so Twilio gets a fast reply).
-    if (body && !botHandled) {
+    if (body && !botHandled && !silent) {
       const job = handleReceptionistText(sb, from, body, thread.id).catch((e) => console.error('sms receptionist', e));
       // @ts-ignore EdgeRuntime is provided by the runtime
       if (typeof EdgeRuntime !== 'undefined') EdgeRuntime.waitUntil(job); else await job;

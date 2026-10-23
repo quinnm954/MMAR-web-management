@@ -1,3 +1,4 @@
+import { contactBlocked } from '../_shared/contact-block.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.95.0';
 
 const corsHeaders = {
@@ -98,6 +99,7 @@ Deno.serve(async (req) => {
   const tryAi = async (): Promise<Response | null> => {
     const elKey = Deno.env.get('ELEVENLABS_API_KEY');
     if (!(settings.ai_enabled && settings.ai_agent_id && elKey)) return null;
+    if (await contactBlocked({ phone: from })) return null; // unhappy: rings Mike / voicemail, no receptionist
     try {
       const today = new Date().toLocaleDateString('en-US', { timeZone: 'America/New_York', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
       const r = await fetch('https://api.elevenlabs.io/v1/convai/twilio/register-call', {

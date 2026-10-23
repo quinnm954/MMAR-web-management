@@ -1,3 +1,4 @@
+import { contactBlocked } from '../_shared/contact-block.ts';
 import { prospectEmail } from '../_shared/prospect-copy.ts';
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
@@ -45,7 +46,7 @@ Deno.serve(async (req) => {
         continue;
       }
       const { data: sup } = await sb.from('suppressed_emails').select('id').eq('email', p.email).maybeSingle();
-      if (sup) { await sb.from('prospects').update({ email_status: 'done', do_not_contact: true, stage: 'do_not_contact' }).eq('id', p.id); continue; }
+      if (sup || await contactBlocked({ email: p.email, phone: p.phone })) { await sb.from('prospects').update({ email_status: 'done', do_not_contact: true, stage: 'do_not_contact' }).eq('id', p.id); continue; }
       const step = p.email_step + 1;
       const c = prospectEmail(p.category, p.name, step);
       const subject = step === 1 && p.email_subject?.trim() && !/fleet partner/i.test(p.email_subject) ? p.email_subject : c.subject;

@@ -19,6 +19,7 @@ Deno.serve(async (req) => {
   const { to, subject, body, threadId } = parsed.data
   const r = await sendAndLog({
     templateName: 'admin-message',
+    manual: true,
     recipientEmail: to,
     idempotencyKey: `admin-msg-${crypto.randomUUID()}`,
     templateData: { subject, body },

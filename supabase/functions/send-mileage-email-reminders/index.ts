@@ -1,3 +1,4 @@
+import { contactBlocked } from '../_shared/contact-block.ts';
 import { enrollSuffix } from '../_shared/enroll.ts';
 import { sendAndLog } from '../_shared/send-and-log.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.95.0';
@@ -62,6 +63,7 @@ function toE164(p: string) {
   return '';
 }
 async function sendSms(sb: any, to: string, body: string): Promise<string | undefined> {
+  if (await contactBlocked({ phone: to })) return 'suppressed: unhappy customer';
   const LK = Deno.env.get('LOVABLE_API_KEY'); const TK = Deno.env.get('TWILIO_API_KEY'); const FROM = Deno.env.get('TWILIO_FROM_NUMBER');
   if (!LK || !TK || !FROM) return 'Twilio not configured';
   const r = await fetch(`${TWILIO_GW}/Messages.json`, {
