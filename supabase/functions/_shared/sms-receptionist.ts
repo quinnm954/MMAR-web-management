@@ -3,7 +3,7 @@ import { sendSms, digits, openSlots, label12, isSlotOpen, friendlyDate } from '.
 import { receptionistSlots, requestsMorning } from './receptionist-times.ts';
 import { smsAllowed } from './missed-call.ts';
 import { oilChangeBlocked, OIL_CHANGE_MEMBERSHIP_REPLY, OIL_CHANGE_MEMBERSHIP_REPLY_ES } from './oil-change-eligibility.ts';
-import { checkedTextSlot, saveTextBookingRequest, type TextBooking, type OpenDay } from './sms-booking-request.ts';
+import { checkedTextSlot, saveTextBookingRequest, resolvedTextBooking, missingTextContact, deferKnownCustomerDetails, type TextBooking, type OpenDay } from './sms-booking-request.ts';
 
 const AI_URL = 'https://ai.gateway.lovable.dev/v1/responses';
 
@@ -67,6 +67,7 @@ export async function handleReceptionistText(sb: any, from: string, body: string
     role: m.direction === 'inbound' ? 'user' : 'assistant', content: String(m.body || '').slice(0, 800),
   })).filter((m) => m.content);
   if (!history.length || history[history.length - 1].role !== 'user') history.push({ role: 'user', content: text });
+  const deferDetails = history.some(m => m.role === 'user' && deferKnownCustomerDetails(m.content, Boolean(prof)));
 
   const blockOilChange = async (description: string) => {
     if (!(await oilChangeBlocked(sb, { customer_phone: from, customer_id: prof?.id, description }))) return false;
@@ -100,6 +101,7 @@ Rules:
 OPEN times (Eastern, accounting for appointments, travel and blocked time):
 ${availability}
 - For service, gather: name, vehicle (year/make/model + engine size, ask once), the problem, service address or city, preferred day. Don't re-ask what's already known. Fill "booking" using ALL known details when the customer accepts a specific slot (even if name/address is still missing), or when all intake details are collected. Do not replace known details with blanks. Mike must review and confirm every request.
+- For a saved customer who says Mike already knows their details, acknowledge that and leave missing details to Mike. Do not ask the same intake questions again or invent their address. ${deferDetails ? 'This customer already said Mike knows: do not ask for name or address again; hand off missing details to Mike.' : ''}
 - If they ask for Mike/a person, are upset, or it's urgent/unsafe, set handoff=true and say Mike will reach out shortly.
 - Payment: cash is not accepted; customers pay the invoice, not the technician.
 - If the message needs no reply (e.g. "thanks", "ok", emoji), reply with an empty string.
@@ -114,27 +116,37 @@ Respond ONLY with JSON: {"reply": string, "handoff": boolean, "slot": null or {"
 
   const slot = checkedTextSlot(ai.slot, days);
   let reply = String(ai.reply || '').trim();
+  const spanish = /mañana|puedes|nombre|dirección|ya sabe|ya lo sabe/i.test(text);
+  const contactQuestion = (booking: TextBooking) => {
+    const missing = missingTextContact(booking);
+    if (deferDetails || !missing.length) return '';
+    return spanish ? ` ¿Cuál es ${missing.map(f => f === 'name' ? 'tu nombre' : 'la dirección de servicio').join(' y ')}?`
+      : ` What's your ${missing.join(' and ')}?`;
+  };
   if (ai.slot && (!slot || !(await isSlotOpen(sb, slot.date, slot.time).catch(() => false)))) {
-    reply = /mañana|puedes|nombre|dirección/i.test(text)
-      ? 'No pude verificar ese horario; Mike revisará la disponibilidad. ¿Cuál es tu nombre y dirección de servicio?'
-      : "I couldn't verify that time; Mike will check availability. What's your name and service address?";
+    reply = (spanish ? 'No pude verificar ese horario; Mike revisará la disponibilidad.'
+      : "I couldn't verify that time; Mike will check availability.") + contactQuestion(resolvedTextBooking(ai.booking || {}, prof));
   } else if (ai.booking?.description) {
     try {
-      await saveTextBookingRequest(sb, from, ai.booking, slot, prof);
+      const saved = await saveTextBookingRequest(sb, from, ai.booking, slot, prof);
       if (slot?.accepted) {
         const time = label12(Number(slot.time.slice(0, 2)) * 60 + Number(slot.time.slice(3)));
         reply = /mañana|puedes|nombre|dirección/i.test(text)
           ? `Solicitud guardada para ${friendlyDate(slot.date)} a las ${time}; Mike debe aprobar y confirmar la hora.`
           : `I've requested ${friendlyDate(slot.date)} at ${time}; Mike will review and text to confirm.`;
-        if (!ai.booking.customer_name || !ai.booking.service_address) reply += /mañana|puedes|nombre|dirección/i.test(text)
-          ? ' ¿Cuál es tu nombre y dirección de servicio?' : " What's your name and service address?";
+        reply += contactQuestion(saved);
       }
     } catch (error) {
       console.error('sms booking save', error);
       reply = "I couldn't save your request yet; Mike will follow up to confirm availability.";
     }
   } else if (slot?.accepted) {
-    reply = "I can request that time for Mike's approval—what's your name, vehicle, repair and service address?";
+    reply = "Mike will follow up about that time; it isn't confirmed yet." + contactQuestion(resolvedTextBooking({}, prof));
+  }
+  if (deferKnownCustomerDetails(text, Boolean(prof))) {
+    reply = spanish ? 'Entendido, dejaré que Mike revise los detalles que faltan y te confirme.'
+      : "Got it—I'll leave the remaining details to Mike and have him follow up to confirm.";
+    ai.handoff = true;
   }
   if (ai.handoff) {
     await sb.rpc('_notify_staff_customer_action', { _title: 'Texter wants Mike', _body: `${prof?.full_name || from}: ${text.slice(0, 120)}`, _link: '/admin/phone' }).then(() => {}, () => {});

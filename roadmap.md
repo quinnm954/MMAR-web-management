@@ -1,5 +1,9 @@
 # Roadmap
 
+## Returning-customer receptionist
+- [ ] Reuse saved details in booking acknowledgments and stop repeated intake when a returning customer says Mike knows.
+- [ ] Test the returning-customer path and deploy the text receptionist.
+
 ## Yes/no satisfaction feedback
 - [x] Replace star prompts on review page and invoices with shared Yes/No feedback; Google posting is a clearly separate action available to everyone. Updated and deployed follow-up SMS/email copy.
 - [x] Save actual boolean answers separately from historical stars; four tests pass, both live public submissions read back in signed-in Admin Feedback with no page errors, and preview build is clean. Temporary verification entries removed after checking.

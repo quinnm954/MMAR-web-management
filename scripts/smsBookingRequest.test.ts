@@ -1,8 +1,26 @@
 import { expect, test } from 'bun:test';
-import { checkedTextSlot, saveTextBookingRequest } from '../supabase/functions/_shared/sms-booking-request';
+import { checkedTextSlot, saveTextBookingRequest, resolvedTextBooking, missingTextContact, deferKnownCustomerDetails } from '../supabase/functions/_shared/sms-booking-request';
 import { receptionistSlots } from '../supabase/functions/_shared/receptionist-times';
 
 const days = receptionistSlots([{ date: '2099-01-05', slots: [600, 720, 750, 1020] }]);
+test('returning customer with saved name is asked only for a missing address', () => {
+  expect(missingTextContact(resolvedTextBooking({}, { full_name: 'David Case' }))).toEqual(['service address']);
+});
+test('returning customer with saved contact details needs neither question', () => {
+  expect(missingTextContact(resolvedTextBooking({}, { full_name: 'David Case', address_line1: '123 Test Street' }))).toEqual([]);
+});
+test('Mike already knows defers intake for a previous customer, not an unknown number', () => {
+  expect(deferKnownCustomerDetails('He knows it', true)).toBe(true);
+  expect(deferKnownCustomerDetails('He knows it', false)).toBe(false);
+  expect(deferKnownCustomerDetails('Yes, Monday noon will be perfect', true)).toBe(false);
+});
+test('resolved saved request retains known contact details omitted by AI', async () => {
+  const sb = client([{ id: 'request-1', customer_phone: '(555) 555-0101', customer_name: 'David Case', service_address: '123 Test Street' }]);
+  const saved = await saveTextBookingRequest(sb, '+15555550101', { description: 'Vacuum pump replacement' }, null);
+  expect(missingTextContact(saved)).toEqual([]);
+  expect(sb.writes[0].payload.customer_name).toBe('David Case');
+  expect(sb.writes[0].payload.service_address).toBe('123 Test Street');
+});
 test('accepted noon request uses the checked date and time', () => {
   expect(checkedTextSlot({ date: '2099-01-05', time: '12:00', accepted: true }, days))
     .toEqual({ date: '2099-01-05', time: '12:00', accepted: true });
