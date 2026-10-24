@@ -1,8 +1,8 @@
 # Roadmap
 
 ## Returning-customer receptionist
-- [ ] Reuse saved details in booking acknowledgments and stop repeated intake when a returning customer says Mike knows.
-- [ ] Test the returning-customer path and deploy the text receptionist.
+- [x] Reuse resolved saved details in booking acknowledgments; a known customer saying Mike knows hands missing details to staff instead of repeating intake.
+- [x] Deployed twilio-inbound-sms; 18 tests passed, including David's exact handler path with isolated AI/SMS delivery. No new carrier text was sent; actual next-customer delivery remains unverified.
 
 ## Yes/no satisfaction feedback
 - [x] Replace star prompts on review page and invoices with shared Yes/No feedback; Google posting is a clearly separate action available to everyone. Updated and deployed follow-up SMS/email copy.
