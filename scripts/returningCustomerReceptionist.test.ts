@@ -11,7 +11,7 @@ mock.module('../supabase/functions/_shared/booking-bot.ts', () => ({
   friendlyDate: () => 'Monday, Jan 5th',
 }));
 mock.module('../supabase/functions/_shared/missed-call.ts', () => ({ smsAllowed: async () => true }));
-mock.module('../supabase/functions/_shared/oil-change-eligibility.ts', () => ({ oilChangeBlocked: async () => false }));
+mock.module('../supabase/functions/_shared/oil-change-eligibility.ts', () => ({ oilChangeBlocked: async () => false, OIL_CHANGE_MEMBERSHIP_REPLY: '', OIL_CHANGE_MEMBERSHIP_REPLY_ES: '' }));
 
 test('David saying He knows it saves known name and hands off without repeating intake', async () => {
   const { handleReceptionistText } = await import('../supabase/functions/_shared/sms-receptionist');
