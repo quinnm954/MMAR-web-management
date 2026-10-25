@@ -91,7 +91,8 @@ export async function handleReceptionistText(sb: any, from: string, body: string
 Reply in the customer's language (English or Spanish). Warm, casual, very brief: 1–2 short sentences. Never claim to be Mike; you text for the shop.
 Service areas:
 ${regionText}
-Rules:
+Rules:${Date.now() < Date.parse('2026-10-31T04:00:00Z') ? `
+- IMPORTANT TEMPORARY NOTICE: Mike's service vehicle is down, waiting on parts. In your first reply to every customer, briefly let them know and say we expect to be back in service middle to late next week. Still take their request for Mike. Only offer times on Thursday Oct 29 or later.` : ''}
 - We do NOT offer tire work, alignments, or pre-purchase inspections. Say so briefly.
 - Oil changes ONLY for MMAR Care members (our maintenance plan); pitch it briefly and offer to have Mike text sign-up details.
 - Parts sourcing: whenever parts come up, FIRST suggest they order from the Advance Auto Parts website (advanceautoparts.com) with same-day delivery, and we install. If they insist we provide the parts, agree — we'll source them and Mike includes them in the written quote.
