@@ -1,0 +1,1 @@
+CREATE POLICY "Office staff upload outbound sms media" ON storage.objects FOR INSERT TO authenticated WITH CHECK (bucket_id = 'sms-media' AND (storage.foldername(name))[1] = 'outbound' AND public.is_office_staff(auth.uid()));
