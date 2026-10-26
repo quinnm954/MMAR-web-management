@@ -362,13 +362,24 @@ export default function AdminPhoneHub({ fullscreen = false }: { fullscreen?: boo
     await openItem('chat', activeChat.id);
   };
 
+  const [photos, setPhotos] = useState<File[]>([]);
   const sendText = async () => {
-    if (!activeThread || !reply.trim()) return;
+    if (!activeThread || (!reply.trim() && !photos.length)) return;
+    if (photos.some(f => f.size > 5 * 1024 * 1024)) return toast.error('Each photo must be under 5 MB');
     setSending(true);
-    const { data, error } = await supabase.functions.invoke('send-sms', { body: { thread_id: activeThread.id, to: activeThread.phone, body: reply } });
+    const media: { path: string; type: string }[] = [];
+    for (const f of photos) {
+      const ext = (f.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg';
+      const path = `outbound/${activeThread.id}/${crypto.randomUUID()}.${ext}`;
+      const up = await supabase.storage.from('sms-media').upload(path, f, { contentType: f.type || 'image/jpeg' });
+      if (up.error) { setSending(false); return toast.error(`Photo upload failed: ${up.error.message}`); }
+      media.push({ path, type: f.type || 'image/jpeg' });
+    }
+    const { data, error } = await supabase.functions.invoke('send-sms', { body: { thread_id: activeThread.id, to: activeThread.phone, body: reply, media } });
     setSending(false);
     if (error || data?.error) return toast.error(error?.message || data?.error || 'Text failed');
     setReply('');
+    setPhotos([]);
     await openItem('text', activeThread.id);
   };
 
@@ -632,7 +643,7 @@ export default function AdminPhoneHub({ fullscreen = false }: { fullscreen?: boo
             {activeCall ? (
               <CallDetail call={activeCall} name={displayPhone(activeCall.direction === 'outbound' ? activeCall.to_number : activeCall.from_number)} tag={displayTag(activeCall.from_number)} onBack={() => setSelected(null)} onCall={() => { const n = activeCall.direction === 'outbound' ? activeCall.to_number : activeCall.from_number; if (n) dialInApp(n); else toast.error('No phone number on this call'); }} onText={() => { const n = activeCall.direction === 'outbound' ? activeCall.to_number : activeCall.from_number; if (n) startText(n); else toast.error('No phone number on this call'); }} onMail={() => openEmailCompose()} onDelete={() => deleteItem('call', activeCall.id)} />
             ) : activeThread ? (
-              <TextDetail thread={activeThread} name={displayPhone(activeThread.phone)} tag={displayTag(activeThread.phone)} messages={messages} reply={reply} sending={sending} onReply={setReply} onSend={sendText} onBack={() => setSelected(null)} onCall={() => dialInApp(activeThread.phone)} onDelete={() => deleteItem('text', activeThread.id)} onDeleteMessage={deleteSms} onAddCustomer={!activeThread.customer_id && !names[phoneKey(activeThread.phone)] ? () => setAddOpen(true) : undefined} />
+              <TextDetail photos={photos} onPhotos={setPhotos} thread={activeThread} name={displayPhone(activeThread.phone)} tag={displayTag(activeThread.phone)} messages={messages} reply={reply} sending={sending} onReply={setReply} onSend={sendText} onBack={() => setSelected(null)} onCall={() => dialInApp(activeThread.phone)} onDelete={() => deleteItem('text', activeThread.id)} onDeleteMessage={deleteSms} onAddCustomer={!activeThread.customer_id && !names[phoneKey(activeThread.phone)] ? () => setAddOpen(true) : undefined} />
             ) : activeChat ? (
               <ChatDetail title={chatTitle(activeChat)} subtitle={activeChat.subject || (activeChat.tech_id ? 'tech chat' : 'app chat')} me={me} messages={chatMsgs} names={chatNames} reply={reply} sending={sending} onReply={setReply} onSend={sendChat} onBack={() => setSelected(null)} onDelete={() => deleteItem('chat', activeChat.id)} />
             ) : activeEmail ? (
@@ -825,13 +836,34 @@ function Bubbles<T extends { id: string; created_at: string }>({ items, mine, re
   );
 }
 
-function Composer({ value, onChange, onSend, sending, placeholder }: { value: string; onChange: (v: string) => void; onSend: () => void; sending: boolean; placeholder: string }) {
+function Composer({ value, onChange, onSend, sending, placeholder, files, onFiles }: { value: string; onChange: (v: string) => void; onSend: () => void; sending: boolean; placeholder: string; files?: File[]; onFiles?: (f: File[]) => void }) {
+  const pick = useRef<HTMLInputElement>(null);
+  const previews = useMemo(() => (files ?? []).map(f => URL.createObjectURL(f)), [files]);
+  useEffect(() => () => previews.forEach(u => URL.revokeObjectURL(u)), [previews]);
+  const ready = value.trim() || (files?.length ?? 0) > 0;
   return (
-    <div className="shrink-0 px-2 pt-1.5 pb-3 lg:pb-8 flex items-end gap-2 bg-[hsl(var(--ios-bg))]">
-      <span className="h-9 w-9 shrink-0 rounded-full bg-[hsl(var(--ios-fill))] grid place-items-center text-[hsl(var(--ios-label-2))]"><Plus className="h-5 w-5" /></span>
-      <div className="flex-1 flex items-end rounded-[20px] border border-[hsl(var(--ios-separator))] pl-3 pr-1 py-1 min-h-9">
-        <textarea value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} rows={1} onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); if (value.trim()) onSend(); } }} className="flex-1 bg-transparent outline-none resize-none text-[17px] leading-[22px] py-0.5 max-h-28 placeholder:text-[hsl(var(--ios-label-2))]" />
-        {value.trim() && <button onClick={onSend} disabled={sending} className="h-7 w-7 shrink-0 rounded-full bg-[hsl(var(--ios-blue))] grid place-items-center disabled:opacity-50" title="Send"><ArrowUp className="h-[18px] w-[18px]" strokeWidth={3} /></button>}
+    <div className="shrink-0 bg-[hsl(var(--ios-bg))]">
+      {!!files?.length && (
+        <div className="flex gap-2 overflow-x-auto px-3 pt-2">
+          {previews.map((u, i) => (
+            <div key={u} className="relative shrink-0">
+              <img src={u} alt="Photo to send" className="h-20 w-20 rounded-xl object-cover" />
+              <button type="button" aria-label="Remove photo" onClick={() => onFiles?.(files.filter((_, j) => j !== i))} className="absolute -top-1.5 -right-1.5 h-6 w-6 rounded-full bg-[hsl(var(--ios-fill))] grid place-items-center text-[13px]">✕</button>
+            </div>
+          ))}
+        </div>
+      )}
+      <div className="px-2 pt-1.5 pb-3 lg:pb-8 flex items-end gap-2">
+        {onFiles ? (
+          <>
+            <button type="button" onClick={() => pick.current?.click()} aria-label="Add photo" title="Add photo" className="h-9 w-9 shrink-0 rounded-full bg-[hsl(var(--ios-fill))] grid place-items-center text-[hsl(var(--ios-label-2))]"><Plus className="h-5 w-5" /></button>
+            <input ref={pick} type="file" accept="image/*" multiple hidden onChange={e => { const add = Array.from(e.target.files ?? []); e.target.value = ''; onFiles([...(files ?? []), ...add].slice(0, 10)); }} />
+          </>
+        ) : <span className="h-9 w-9 shrink-0 rounded-full bg-[hsl(var(--ios-fill))] grid place-items-center text-[hsl(var(--ios-label-2))]"><Plus className="h-5 w-5" /></span>}
+        <div className="flex-1 flex items-end rounded-[20px] border border-[hsl(var(--ios-separator))] pl-3 pr-1 py-1 min-h-9">
+          <textarea value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} rows={1} onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); if (ready) onSend(); } }} className="flex-1 bg-transparent outline-none resize-none text-[17px] leading-[22px] py-0.5 max-h-28 placeholder:text-[hsl(var(--ios-label-2))]" />
+          {ready && <button onClick={onSend} disabled={sending} className="h-7 w-7 shrink-0 rounded-full bg-[hsl(var(--ios-blue))] grid place-items-center disabled:opacity-50" title="Send"><ArrowUp className="h-[18px] w-[18px]" strokeWidth={3} /></button>}
+        </div>
       </div>
     </div>
   );
@@ -943,7 +975,7 @@ function CallDetail({ call, name, tag, onBack, onCall, onText, onMail, onDelete 
   );
 }
 
-function TextDetail({ thread, name, tag, messages, reply, sending, onReply, onSend, onBack, onCall, onDelete, onDeleteMessage, onAddCustomer }: { thread: TextThread; name: string; tag?: string; messages: SmsMessage[]; reply: string; sending: boolean; onReply: (value: string) => void; onSend: () => void; onBack: () => void; onCall: () => void; onDelete: () => void; onDeleteMessage: (m: SmsMessage) => void; onAddCustomer?: () => void }) {
+function TextDetail({ thread, name, tag, messages, reply, sending, onReply, onSend, onBack, onCall, onDelete, onDeleteMessage, onAddCustomer, photos, onPhotos }: { thread: TextThread; name: string; tag?: string; messages: SmsMessage[]; reply: string; sending: boolean; onReply: (value: string) => void; onSend: () => void; onBack: () => void; onCall: () => void; onDelete: () => void; onDeleteMessage: (m: SmsMessage) => void; onAddCustomer?: () => void; photos: File[]; onPhotos: (f: File[]) => void }) {
   const sticky = useStickyBottom(messages, thread.id);
   const unhappy = useCustomerHappiness()(thread.customer_id, thread.phone) === 'text-destructive';
   return (
@@ -960,7 +992,7 @@ function TextDetail({ thread, name, tag, messages, reply, sending, onReply, onSe
           {m.direction === 'outbound' && m.status && /fail|undeliver/i.test(m.status) && <p className="text-[10px] opacity-70 mt-0.5 capitalize">{m.status}</p>}
         </>
       )} />
-      <Composer value={reply} onChange={onReply} onSend={onSend} sending={sending} placeholder="Text Message" />
+      <Composer value={reply} onChange={onReply} onSend={onSend} sending={sending} placeholder="Text Message" files={photos} onFiles={onPhotos} />
     </>
   );
 }
