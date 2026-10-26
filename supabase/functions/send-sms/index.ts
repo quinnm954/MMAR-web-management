@@ -15,8 +15,13 @@ Deno.serve(async (req) => {
   if (auth instanceof Response) return new Response(await auth.text(), { status: auth.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
 
   try {
-    const { thread_id, to, body } = await req.json();
-    if (!thread_id || !to || !body) {
+    const { thread_id, to, body: rawBody, media } = await req.json();
+    const body = typeof rawBody === 'string' ? rawBody : '';
+    const items = (Array.isArray(media) ? media : [])
+      .filter((m: any) => typeof m?.path === 'string' && m.path.startsWith('outbound/') && !m.path.includes('..'))
+      .slice(0, 10)
+      .map((m: any) => ({ path: m.path as string, type: typeof m.type === 'string' ? m.type : 'image/jpeg' }));
+    if (!thread_id || !to || (!body.trim() && !items.length)) {
       return new Response(JSON.stringify({ error: 'Missing fields' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
 
@@ -27,6 +32,18 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ error: 'Twilio not configured. Connect Twilio and set TWILIO_FROM_NUMBER.' }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
 
+    const sb = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
+    const params = new URLSearchParams({ To: to, From: TWILIO_FROM });
+    if (body) params.set('Body', body);
+    for (const m of items) {
+      // Temporary private link Twilio fetches once to deliver the photo.
+      const { data, error } = await sb.storage.from('sms-media').createSignedUrl(m.path, 60 * 60 * 24);
+      if (error || !data?.signedUrl) {
+        return new Response(JSON.stringify({ error: 'Photo upload not found' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      }
+      params.append('MediaUrl', data.signedUrl);
+    }
+
     const tw = await fetch(`${GATEWAY_URL}/Messages.json`, {
       method: 'POST',
       headers: {
@@ -34,19 +51,18 @@ Deno.serve(async (req) => {
         'X-Connection-Api-Key': TWILIO_API_KEY,
         'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: new URLSearchParams({ To: to, From: TWILIO_FROM, Body: body }),
+      body: params,
     });
     const twData = await tw.json();
     if (!tw.ok) {
       return new Response(JSON.stringify({ error: twData?.message || 'Twilio error', details: twData }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
 
-    const sb = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
     await sb.from('sms_messages').insert({
-      thread_id, direction: 'outbound', body, twilio_sid: twData.sid, status: twData.status,
+      thread_id, direction: 'outbound', body, media_urls: items, twilio_sid: twData.sid, status: twData.status,
     });
     await sb.from('sms_threads').update({
-      last_message_at: new Date().toISOString(), last_message_preview: body.slice(0, 80),
+      last_message_at: new Date().toISOString(), last_message_preview: (body || '📷 Photo').slice(0, 80),
     }).eq('id', thread_id);
 
     return new Response(JSON.stringify({ ok: true, sid: twData.sid }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
