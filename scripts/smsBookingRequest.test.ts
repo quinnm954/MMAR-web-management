@@ -2,7 +2,7 @@ import { expect, test } from 'bun:test';
 import { checkedTextSlot, saveTextBookingRequest, resolvedTextBooking, missingTextContact, deferKnownCustomerDetails } from '../supabase/functions/_shared/sms-booking-request';
 import { receptionistSlots } from '../supabase/functions/_shared/receptionist-times';
 
-const days = receptionistSlots([{ date: '2099-01-05', slots: [600, 720, 750, 1020] }]);
+const days = receptionistSlots([{ date: '2099-01-05', slots: [720, 750, 1020] }, { date: '2026-10-30', slots: [600, 720] }]);
 test('returning customer with saved name is asked only for a missing address', () => {
   expect(missingTextContact(resolvedTextBooking({}, { full_name: 'David Case' }))).toEqual(['service address']);
 });
@@ -26,7 +26,7 @@ test('accepted noon request uses the checked date and time', () => {
     .toEqual({ date: '2099-01-05', time: '12:00', accepted: true });
 });
 test('unrequested morning cannot become a text booking request', () => {
-  expect(checkedTextSlot({ date: '2099-01-05', time: '10:00', accepted: true }, days)).toBeNull();
+  expect(checkedTextSlot({ date: '2026-10-30', time: '10:00', accepted: true }, days)).toBeNull();
 });
 test('blocked or failed availability cannot become a text booking request', () => {
   expect(checkedTextSlot({ date: '2099-01-05', time: '13:00', accepted: true }, days)).toBeNull();
