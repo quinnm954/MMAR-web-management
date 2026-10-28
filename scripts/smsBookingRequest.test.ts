@@ -2,7 +2,7 @@ import { expect, test } from 'bun:test';
 import { checkedTextSlot, saveTextBookingRequest, resolvedTextBooking, missingTextContact, deferKnownCustomerDetails } from '../supabase/functions/_shared/sms-booking-request';
 import { receptionistSlots } from '../supabase/functions/_shared/receptionist-times';
 
-const days = receptionistSlots([{ date: '2099-01-05', slots: [600, 720, 750, 1020] }]);
+const days = receptionistSlots([{ date: '2099-01-05', slots: [720, 750, 1020] }, { date: '2026-10-30', slots: [600, 720] }]);
 test('returning customer with saved name is asked only for a missing address', () => {
   expect(missingTextContact(resolvedTextBooking({}, { full_name: 'David Case' }))).toEqual(['service address']);
 });
