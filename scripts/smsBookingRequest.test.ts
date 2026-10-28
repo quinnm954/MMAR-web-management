@@ -2,7 +2,7 @@ import { expect, test } from 'bun:test';
 import { checkedTextSlot, saveTextBookingRequest, resolvedTextBooking, missingTextContact, deferKnownCustomerDetails } from '../supabase/functions/_shared/sms-booking-request';
 import { receptionistSlots } from '../supabase/functions/_shared/receptionist-times';
 
-const days = receptionistSlots([{ date: '2026-10-30', slots: [600, 720, 750, 1020] }]);
+const days = receptionistSlots([{ date: '2099-01-05', slots: [600, 720, 750, 1020] }]);
 test('returning customer with saved name is asked only for a missing address', () => {
   expect(missingTextContact(resolvedTextBooking({}, { full_name: 'David Case' }))).toEqual(['service address']);
 });
@@ -22,15 +22,15 @@ test('resolved saved request retains known contact details omitted by AI', async
   expect(sb.writes[0].payload.service_address).toBe('123 Test Street');
 });
 test('accepted noon request uses the checked date and time', () => {
-  expect(checkedTextSlot({ date: '2026-10-30', time: '12:00', accepted: true }, days))
-    .toEqual({ date: '2026-10-30', time: '12:00', accepted: true });
+  expect(checkedTextSlot({ date: '2099-01-05', time: '12:00', accepted: true }, days))
+    .toEqual({ date: '2099-01-05', time: '12:00', accepted: true });
 });
 test('unrequested morning cannot become a text booking request', () => {
   expect(checkedTextSlot({ date: '2026-10-30', time: '10:00', accepted: true }, days)).toBeNull();
 });
 test('blocked or failed availability cannot become a text booking request', () => {
-  expect(checkedTextSlot({ date: '2026-10-30', time: '13:00', accepted: true }, days)).toBeNull();
-  expect(checkedTextSlot({ date: '2026-10-30', time: '12:00', accepted: true }, [])).toBeNull();
+  expect(checkedTextSlot({ date: '2099-01-05', time: '13:00', accepted: true }, days)).toBeNull();
+  expect(checkedTextSlot({ date: '2099-01-05', time: '12:00', accepted: true }, [])).toBeNull();
 });
 function client(existing: any[] = [], failure = false) {
   const writes: { table: string; operation: string; payload: any }[] = [];
@@ -47,16 +47,16 @@ function client(existing: any[] = [], failure = false) {
 test('chosen date/time is saved as new pending request, never an appointment', async () => {
   const sb = client();
   await saveTextBookingRequest(sb, '+15555550101', { description: 'Battery replacement', vehicle_info: '2020 Chevrolet Traverse' },
-    { date: '2026-10-30', time: '12:00', accepted: true });
+    { date: '2099-01-05', time: '12:00', accepted: true });
   expect(sb.writes).toHaveLength(1);
   expect(sb.writes[0].table).toBe('booking_requests');
-  expect(sb.writes[0].payload).toMatchObject({ requested_date: '2026-10-30', requested_time_window: '12:00 PM', status: 'new', bot_status: 'handoff' });
+  expect(sb.writes[0].payload).toMatchObject({ requested_date: '2099-01-05', requested_time_window: '12:00 PM', status: 'new', bot_status: 'handoff' });
   expect(sb.notices).toHaveLength(1);
 });
 test('existing pending request receives the chosen time rather than suppressing the save', async () => {
   const sb = client([{ id: 'request-1', customer_phone: '(555) 555-0101', notes: 'Existing note' }]);
   await saveTextBookingRequest(sb, '+15555550101', { description: 'Battery replacement' },
-    { date: '2026-10-30', time: '12:30', accepted: true });
+    { date: '2099-01-05', time: '12:30', accepted: true });
   expect(sb.writes[0].operation).toBe('update');
   expect(sb.writes[0].payload.requested_time_window).toBe('12:30 PM');
   expect(sb.writes[0].payload.notes).toContain('Existing note');
@@ -64,7 +64,7 @@ test('existing pending request receives the chosen time rather than suppressing 
 test('offering tomorrow at noon does not save a selected time without customer acceptance', async () => {
   const sb = client();
   await saveTextBookingRequest(sb, '+15555550101', { description: 'Battery replacement', preferred_day: 'tomorrow' },
-    { date: '2026-10-30', time: '12:00', accepted: false });
+    { date: '2099-01-05', time: '12:00', accepted: false });
   expect(sb.writes[0].payload.requested_date).toBeUndefined();
   expect(sb.notices).toHaveLength(0);
 });
