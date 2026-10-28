@@ -37,23 +37,43 @@ async function shopRate(sb: any) {
 // A named part/repair in the request means a specific job, even if the service type is generic ("General Repair").
 const PARTS = /starter|alternator|battery|brake|rotor|caliper|pads?\b|water pump|thermostat|radiator|serpentine|timing belt|timing chain|belt|timing|spark plug|ignition coil|fuel pump|o2 sensor|oxygen sensor|shocks?|struts?|tie rod|ball joint|control arm|wheel bearing|cv axle|axle|motor mount|oil change|tune.?up|ac compressor|condenser|blower motor|window regulator|headlight|tail ?light|hose|gasket|catalytic|muffler|exhaust/i;
 
-function specificJob(text: string): string | null {
+// Everyday wording: "breaks" means brakes, "back" means rear.
+export const normalizeRequest = (t: string) => t.replace(/\bbreaks?\b/gi, 'brakes').replace(/\bback\b/gi, 'rear');
+// Brake components only quoted when the customer names them.
+const NAMED_ONLY = ['booster', 'master cylinder', 'line', 'hose', 'abs', 'caliper', 'fluid', 'bleed', 'proportioning', 'drum', 'shoe', 'parking', 'switch', 'sensor'];
+
+export function specificJob(text: string): string | null {
   const m = text.match(PARTS);
   if (!m) return null;
   if (/not sure|no idea|don'?t know|diagnos|check (it|out)|figure out|suspect|maybe|possibly/i.test(text)) return null;
   const part = m[0].toLowerCase();
+  if (part === 'brake' || part === 'pad' || part === 'pads') return 'brake pads';
   return /oil change|tune.?up|repair/.test(part) ? part : `${part} replacement`;
+}
+
+// Drop labor-guide jobs that don't name the requested part, or that name components the customer never mentioned.
+export function pickRequestedJobs<T extends { job: string }>(jobs: T[], svc: string, text: string): T[] {
+  const lower = text.toLowerCase();
+  const words = svc.toLowerCase().replace(/ replacement$/, '').split(/\s+/).map((w) => w.replace(/s$/, '')).filter((w) => w.length > 2);
+  const core = words.filter((w) => w !== 'brake');
+  return jobs.filter((j) => {
+    const name = j.job.toLowerCase();
+    if (NAMED_ONLY.some((w) => new RegExp(`\\b${w}`).test(name) && !new RegExp(`\\b${w}`).test(lower))) return false;
+    return (core.length ? core : words).some((w) => name.includes(w));
+  });
 }
 
 export async function buildLaborQuote(sb: any, req: any): Promise<LaborQuote> {
   const rate = await shopRate(sb);
-  const text = `${req.service_type || ''} ${req.description || ''}`;
-  const named = specificJob(text);
+  const desc = normalizeRequest(String(req.description || ''));
+  const text = normalizeRequest(`${req.service_type || ''} ${req.description || ''}`);
   const generic = cleanService(req.service_type);
+  const fromDesc = specificJob(desc);
   // A specific service type ("Timing Belt Replacement") wins over a single part word found in it.
   // Broad categories ("Suspension & Steering", "Brake Service") are NEVER sent to the labor guide —
   // only a named part/repair gets a labor quote; otherwise we clarify or use the diagnosis fee.
-  const svc = (generic && !DIAG.test(generic) && PARTS.test(generic) && !BROAD.test(generic) ? generic : null) || named;
+  // The customer's own description wins; the website service name is only a fallback.
+  const svc = fromDesc || (generic && !DIAG.test(generic) && PARTS.test(generic) && !BROAD.test(generic) ? generic : null) || specificJob(text);
   if (!svc) return { kind: 'diagnosis', rate, vague: true } as LaborQuote;
   const veh = parseVehicle(req.vehicle_info);
   const key = Deno.env.get('OPEN_LABOR_API_KEY');
@@ -85,6 +105,8 @@ export async function buildLaborQuote(sb: any, req: any): Promise<LaborQuote> {
     const byJob = new Map<string, number>();
     for (const x of pick) byJob.set(x.job, Math.max(byJob.get(x.job) ?? 0, x.hours));
     let jobs = [...byJob].map(([job, hours]) => ({ job, hours }));
+    jobs = pickRequestedJobs(jobs, svc, text);
+    if (!jobs.length) return { kind: 'none', rate, job: svc };
     if (jobs.length > 1) {
       // Prefer the job named exactly like the requested part (Starter, not Starter Solenoid).
       const base = svc.toLowerCase().replace(/ replacement$/, '').replace(/s$/, '');
