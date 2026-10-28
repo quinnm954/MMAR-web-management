@@ -9,7 +9,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.95.0';
 import { geocodeRow } from '../_shared/geocode-region.ts';
 import { sendMissedCallFollowup } from '../_shared/missed-call.ts';
 import { isSlotOpen, openSlots, label12 } from '../_shared/booking-bot.ts';
-import { receptionistSlots } from '../_shared/receptionist-times.ts';
+import { receptionistSlots, defaultStartMinute } from '../_shared/receptionist-times.ts';
 import { buildLaborQuote, quoteSentence, createDraftEstimate } from '../_shared/labor-quote.ts';
 import { hasOilChangeMembership, oilChangeBlocked, OIL_CHANGE_MEMBERSHIP_REPLY } from '../_shared/oil-change-eligibility.ts';
 
@@ -377,7 +377,7 @@ Deno.serve(async (req) => {
         const tm = timeStr.match(/^(\d{1,2}):(\d{2})$/);
         if (!dm || !tm) return json({ result: 'Need a date as YYYY-MM-DD and a time as HH:MM. Ask the caller again.' });
         const mins = Number(tm[1]) * 60 + Number(tm[2]);
-        if (mins < defaultStartMinute(String(body.date || body.requested_date || '').slice(0, 10)) && body.morning_requested !== true) return json({ result: 'Default times are noon–5 PM. Only request a morning if the customer explicitly asks for one.' });
+        if (mins < defaultStartMinute(dateStr) && body.morning_requested !== true) return json({ result: 'Default times are noon–5 PM. Only request a morning if the customer explicitly asks for one.' });
         if (mins < 600 || mins > 1020) return json({ result: 'Invalid time. Appointments are only between 10 AM and 5 PM. Offer a time in that window.' });
         const nowEt = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/New_York' }));
         const todayEt = `${nowEt.getFullYear()}-${String(nowEt.getMonth() + 1).padStart(2, '0')}-${String(nowEt.getDate()).padStart(2, '0')}`;
