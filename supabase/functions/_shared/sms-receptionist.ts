@@ -1,6 +1,6 @@
 // AI text receptionist: answers any inbound text that the booking bot isn't already handling.
 import { sendSms, digits, openSlots, label12, isSlotOpen, friendlyDate } from './booking-bot.ts';
-import { receptionistSlots, requestsMorning } from './receptionist-times.ts';
+import { receptionistSlots, receptionistFromDate, requestsMorning } from './receptionist-times.ts';
 import { smsAllowed } from './missed-call.ts';
 import { oilChangeBlocked, OIL_CHANGE_MEMBERSHIP_REPLY, OIL_CHANGE_MEMBERSHIP_REPLY_ES } from './oil-change-eligibility.ts';
 import { checkedTextSlot, saveTextBookingRequest, resolvedTextBooking, missingTextContact, deferKnownCustomerDetails, type TextBooking, type OpenDay } from './sms-booking-request.ts';
@@ -83,7 +83,7 @@ export async function handleReceptionistText(sb: any, from: string, body: string
   let availability = 'Availability could not be checked. Take the preferred day and ask Mike to follow up; do not invent a time.';
   let days: OpenDay[] = [];
   try {
-    days = receptionistSlots(await openSlots(sb, null, 10), morningRequested);
+    days = receptionistSlots(await openSlots(sb, receptionistFromDate(null), 10), morningRequested);
     availability = days.map(day => `${day.date}: ${day.slots.length ? day.slots.map(label12).join(', ') : 'no openings'}`).join('\n');
   } catch (error) { console.error('sms availability', error); }
 
@@ -91,8 +91,9 @@ export async function handleReceptionistText(sb: any, from: string, body: string
 Reply in the customer's language (English or Spanish). Warm, casual, very brief: 1–2 short sentences. Never claim to be Mike; you text for the shop.
 Service areas:
 ${regionText}
-Rules:${Date.now() < Date.parse('2026-10-31T04:00:00Z') ? `
-- IMPORTANT TEMPORARY NOTICE: Mike's service vehicle is down, waiting on parts. In your first reply to every customer, briefly let them know and say we expect to be back in service middle to late next week. Still take their request for Mike. Only offer times on Thursday Oct 29 or later.` : ''}
+Rules:${Date.now() < Date.parse('2026-11-02T05:00:00Z') ? `
+- IMPORTANT TEMPORARY NOTICE: Mike's service vehicle is down, waiting on parts. In your first reply, briefly let the customer know we are taking requests for next week, with Monday Nov 2 the earliest possible day. Mike must confirm the time.` : ''}
+- Never offer appointments before Monday Nov 2, 2026. After that date, continue the next-day minimum, not a rolling next-week delay.
 - We do NOT offer tire work, alignments, or pre-purchase inspections. Say so briefly.
 - Oil changes ONLY for MMAR Care members (our maintenance plan); pitch it briefly and offer to have Mike text sign-up details.
 - Parts sourcing: whenever parts come up, FIRST suggest they order from the Advance Auto Parts website (advanceautoparts.com) with same-day delivery, and we install. If they insist we provide the parts, agree — we'll source them and Mike includes them in the written quote.

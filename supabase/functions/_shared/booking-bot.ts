@@ -3,7 +3,7 @@ import { contactBlocked } from './contact-block.ts';
 const TWILIO_GW = 'https://connector-gateway.lovable.dev/twilio';
 import { buildLaborQuote, createDraftEstimate, quoteSentence, quoteNote } from './labor-quote.ts';
 import { oilChangeBlocked, OIL_CHANGE_MEMBERSHIP_REPLY, OIL_CHANGE_MEMBERSHIP_REPLY_ES } from './oil-change-eligibility.ts';
-import { receptionistSlots, requestsMorning } from './receptionist-times.ts';
+import { receptionistSlots, receptionistFromDate, requestsMorning } from './receptionist-times.ts';
 const AI_URL = 'https://ai.gateway.lovable.dev/v1/responses';
 
 export const digits = (p: string) => (p || '').replace(/\D/g, '').slice(-10);
@@ -215,7 +215,7 @@ export async function startBot(sb: any, id: string) {
     await sb.rpc('_notify_staff_customer_action', { _title: 'Tire request — not offered', _body: `${req.customer_name || req.customer_phone}: no time offered`, _link: '/admin/dashboard?tab=bookings' }).then(() => {}, () => {});
     return { started: false, notOffered: true };
   }
-  const avail = await openSlots(sb, req.requested_date ? String(req.requested_date).slice(0, 10) : null, 7).catch(() => []);
+  const avail = await openSlots(sb, receptionistFromDate(req.requested_date ? String(req.requested_date).slice(0, 10) : null), 7).catch(() => []);
   // Only the diagnosis fee is quoted automatically; labor quotes are left to Mike.
   const q0 = await buildLaborQuote(sb, req).catch((e) => { console.error('quote', e); return null; });
   const q = q0 && q0.kind === 'diagnosis' ? q0 : null;
@@ -289,7 +289,7 @@ export async function handleBotReply(sb: any, from: string, body: string) {
 
   const history = [...(req.bot_history || []), { role: 'user', content: body }].slice(-20);
   const morningRequested = requestsMorning(String(req.requested_time_window || '')) || history.some((m: any) => m.role === 'user' && requestsMorning(m.content));
-  const avail = receptionistSlots(await openSlots(sb, null, 10, req.converted_appointment_id).catch(() => []), morningRequested);
+  const avail = receptionistSlots(await openSlots(sb, receptionistFromDate(null), 10, req.converted_appointment_id).catch(() => []), morningRequested);
   const availText = avail.map((d) => `${d.date} (${friendlyDate(d.date)}): ${d.slots.length ? d.slots.map(label12).join(', ') : 'FULLY BOOKED'}`).join('\n');
   const system = `You text customers for Mike's Mobile Auto Repair (mobile mechanic, Southwest Florida) to set an appointment for their booking request.
 Now: ${nowEastern()} (Eastern).
@@ -297,7 +297,7 @@ Request: service "${req.service_type || ''}", vehicle "${req.vehicle_info || ''}
 Customer's requested date/window: ${req.requested_date || 'none'} ${req.requested_time_window || ''}.
 OPEN start times (already account for existing appointments, drive time, and at least ${LEAD_MIN} minutes notice):
 ${availText}
-Always lead with the earliest listed open time tomorrow or later. Default to noon–5 PM Eastern (10 AM–5 PM from Monday Nov 2, 2026 on); earlier mornings only when the customer explicitly asks. Every time is a REQUEST for Mike's approval, never a confirmed booking. Don't ask open-ended 'what time works?' — propose a specific listed time.
+Never offer a date before Monday Nov 2, 2026. Always lead with the earliest listed open time on or after that date and tomorrow, whichever is later. Offer 10 AM–5 PM Eastern, earliest opening first. Every time is a REQUEST for Mike's approval, never a confirmed booking. Don't ask open-ended 'what time works?' — propose a specific listed time.
 Rules: ONLY offer or confirm times from the OPEN list above — never any other time, and never a time that's about to start. If they ask for a time that isn't listed, say it's taken and offer the closest open times. You are a text assistant for the shop: warm, casual, human, and VERY brief — one short sentence when possible, two max. No small talk, no restating details, get straight to the time. Never claim to personally be Mike — you text on behalf of the shop; if the customer asks for Mike or the owner by name, set handoff=true and say Mike will reach out. If the vehicle above has no engine size (like 1.4L or V6) and they want a specific repair, ask for it once in the same message as the time offer; if they don't know, skip it. Never re-ask for info already given above or in the chat. Write dates like "Monday, Oct 5th" and times like "10:30 AM" — never raw formats like 2026-10-05 or 14:00. Never paste page titles or system wording. We do NOT offer tire work (mounting, balancing, rotation, flats, TPMS), alignments or pre-purchase inspections: say so briefly, never offer a time for them, and set handoff=true. Never quote any price except the diagnosis fee — never quote labor or repair prices; if asked, say Mike will send a written quote after reviewing it. Diagnosis fee: if the customer has a problem to figure out (a warning light, noise, no-start, electrical issue, 'not sure what's wrong') rather than asking for a specific part replacement, tell them BEFORE confirming a time: there's a $100 diagnosis fee, and $50 of it is credited toward the repair labor if they go ahead. Say it once, plainly, and make sure they're okay with it. Skip it for specific repairs like 'replace my alternator'. Shop notes: ${req.notes || 'none'}. Parts are extra; the customer may supply their own or the shop sources them. Once the customer clearly agrees to one specific date and time, set confirmed=true. Set price_ok=true only if they clearly accepted the price quoted (labor quote in shop notes or the diagnosis fee); if there was no price to accept, price_ok=false. If they ask for a person, are upset, or it's urgent/unsafe, set handoff=true and say Mike will reach out.
 Respond ONLY with JSON: {"reply": string, "confirmed": boolean, "date": "YYYY-MM-DD" or null, "time": "HH:MM" 24h or null, "handoff": boolean, "price_ok": boolean}`;
 
