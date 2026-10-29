@@ -1,5 +1,9 @@
 # Roadmap
 
+## Monday receptionist reopening
+- [ ] Enforce Monday Nov 2 as the earliest voice/text offer, retaining checked availability and pending owner approval.
+- [ ] Text the active diagnosis requester that Monday is the earliest; verify the message in Phone.
+
 ## Returning-customer receptionist
 - [x] Reuse resolved saved details in booking acknowledgments; a known customer saying Mike knows hands missing details to staff instead of repeating intake.
 - [x] Deployed twilio-inbound-sms; 18 tests passed, including David's exact handler path with isolated AI/SMS delivery. No new carrier text was sent; actual next-customer delivery remains unverified.

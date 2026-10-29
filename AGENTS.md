@@ -1,7 +1,7 @@
 
 - Read subdirectory AGENTS.md before changing files there.
 - Admin provider balances are fetched by the admin-only `admin-service-usage` edge function, with independent service results and server-only connector credentials; why: account billing data must not reach technicians or customers and one unavailable service must not hide the other.
-- Receptionist offer windows use shared `receptionistSlots` separately from physical `openSlots`; voice tools guard morning requests and availability failures fail closed; why: customer preferences must not change staff calendar hours or permit unchecked times.
+- Receptionist offer windows and reopening floor use shared `receptionistSlots`/`receptionistFromDate` separately from physical `openSlots`; voice booking validates the floor and availability failures fail closed; why: customer preferences must not change staff calendar hours or permit unchecked times.
 - Automated booking and receptionist SMS are tagged `ai` at insertion; why: system replies must not trigger the human-text two-hour suppression window.
 - General SMS intake validates offered and accepted slots against checked availability and rechecks before saving structured date/time on new or existing pending requests, never appointments; why: owner approval requires an actionable request without invented or auto-confirmed times.
 - SMS acknowledgments use resolved saved booking/profile details, not raw AI fields, and defer intake to staff when a known customer says Mike knows; why: omitted AI fields must not cause repeated questions to returning customers.
