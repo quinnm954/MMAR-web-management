@@ -9,7 +9,7 @@
 
 - Reports classify refunds as revenue/profit reductions on completion date, never sales, labor or tech pay; why: refunds must not inflate sales or reverse labor.
 - Reports recognize financing cash from paid financing_payments on paid_at (including interest), excluding financed invoice totals and mirrored invoice_payments; receipt rows do not repeat sales, parts or labor costs, because one collection must count once.
-- Reports year charts zero-fill elapsed months and leave unrecorded future months null; why: show every month without projections.
+- Reports year charts zero-fill elapsed months and leave future months null; why: no projections. CSV exports use `src/lib/csv.ts` to neutralize formulas.
 - Reports use reportPeriod; lists share dateFilters/DateRangeFilter. Starts are inclusive, ends exclusive, custom end days included, WTD starts Monday; why: consistent historical filtering.
 
 - Fleet registration signs up then calls `submit_fleet_registration`, guarded by user id/email match within 15 minutes; why: secure public signup.
@@ -27,7 +27,7 @@
 - Techs finish jobs through the `tech_finish_job` RPC (marks complete, logs mileage, creates the invoice, alerts admins), then `send-invoice-payment-link` lets the assigned tech trigger the send without ever receiving the price or link; why: one tap at job end keeps completion times and invoicing accurate.
 - Blocked-off time lives in `calendar_blocks` (admin-only RLS), managed through the admin Calendar's create/edit/remove dialog using Eastern time; new blocks are global because receptionist availability currently spans all regions; open-slot suggestions, the admin calendar and the ICS feed all honor it; why: one source for when the shop is unavailable.
 - Service regions live in `service_regions` (active = launched) with `user_service_regions` for techs; a launched region with no tech is waitlist-only (receptionist takes details, no slots/prices); bookings/appointments get `region_slug` by trigger from the service address; South Florida website pages are always indexable while booking stays gated by `SOUTH_FLORIDA_BOOKING_OPEN`; why: launch regions without code changes while never booking work nobody can do.
-- The AI receptionist auto-syncs: triggers on phone_settings/service_regions/user_service_regions set `ai_sync_requested_at` and call `ai-receptionist?action=setup&auto=1` (allowed only while a sync is pending); followup-worker retries hourly; why: the owner shouldn't have to press an update button.
+- Receptionist auto-sync triggers mark `ai_sync_requested_at` and call setup only while pending; followup-worker retries hourly. All selected internal workers use `_shared/internal-auth.ts` and service-only dispatch headers; why: preserve automation without public access.
 - New appointments auto-assign the region's only tech by trigger; with several techs `needs_tech_choice` is set and staff are alerted, never overwriting a manual pick; why: one-tech regions need no dispatch step.
 - Regional home pages (/ and /south-florida) share `RegionHome`; sections read `useHomeRegion()` to swap only local copy, and `SOUTH_FLORIDA_BOOKING_OPEN` in `src/lib/regions.ts` hides the website waitlist notes; why: identical design per region without duplicating the page.
 - Old URLs Google still lists are mapped to the closest live page by `src/lib/legacyRedirects.ts` (client Navigate plus prerendered canonical/refresh stubs), because Lovable hosting ignores `public/_redirects`; why: keep ranking value from removed cities and services.
