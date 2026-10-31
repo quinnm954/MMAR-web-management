@@ -3,7 +3,7 @@ import { sendSms, digits, openSlots, label12, isSlotOpen, friendlyDate } from '.
 import { receptionistSlots, receptionistFromDate, requestsMorning } from './receptionist-times.ts';
 import { smsAllowed } from './missed-call.ts';
 import { oilChangeBlocked, OIL_CHANGE_MEMBERSHIP_REPLY, OIL_CHANGE_MEMBERSHIP_REPLY_ES } from './oil-change-eligibility.ts';
-import { checkedTextSlot, saveTextBookingRequest, resolvedTextBooking, missingTextContact, deferKnownCustomerDetails, type TextBooking, type OpenDay } from './sms-booking-request.ts';
+import { checkedTextSlot, saveTextBookingRequest, resolvedTextBooking, missingTextIntake, deferKnownCustomerDetails, type TextBooking, type OpenDay } from './sms-booking-request.ts';
 
 const AI_URL = 'https://ai.gateway.lovable.dev/v1/responses';
 
@@ -91,8 +91,8 @@ export async function handleReceptionistText(sb: any, from: string, body: string
 Reply in the customer's language (English or Spanish). Warm, casual, very brief: 1–2 short sentences. Never claim to be Mike; you text for the shop.
 Service areas:
 ${regionText}
-Rules:${Date.now() < Date.parse('2026-11-02T05:00:00Z') ? `
-- IMPORTANT TEMPORARY NOTICE: Mike's service vehicle is down, waiting on parts. In your first reply, briefly let the customer know we are taking requests for next week, with Monday Nov 2 the earliest possible day. Mike must confirm the time.` : ''}
+Rules:
+- Do not mention Mike's service vehicle being down or waiting on parts, even if earlier messages mention it. That notice has ended.
 - Never offer appointments before Monday Nov 2, 2026. After that date, continue the next-day minimum, not a rolling next-week delay.
 - We do NOT offer tire work, alignments, or pre-purchase inspections. Say so briefly.
 - Oil changes ONLY for MMAR Care members (our maintenance plan); pitch it briefly and offer to have Mike text sign-up details.
@@ -102,7 +102,7 @@ Rules:${Date.now() < Date.parse('2026-11-02T05:00:00Z') ? `
 - Whenever offering or discussing a specific time, fill "slot" with its OPEN date/time. Set accepted=true ONLY when the customer chooses or agrees to that specific time, never just because they ask for tomorrow. Save an accepted time as a pending booking request even while collecting missing details. Never say a request was saved before it is saved. Use natural dates/times in the reply, not raw JSON formats.
 OPEN times (Eastern, accounting for appointments, travel and blocked time):
 ${availability}
-- For service, gather: name, vehicle (year/make/model + engine size, ask once), the problem, service address or city, preferred day. Don't re-ask what's already known. Fill "booking" using ALL known details when the customer accepts a specific slot (even if name/address is still missing), or when all intake details are collected. Do not replace known details with blanks. Mike must review and confirm every request.
+- For every potential customer requesting service, collect their actual name, service street address with city and ZIP (city alone is NOT an address), vehicle year/make/model, problem and preferred day. Ask engine size once; if unknown, move on. Ask the next missing detail in each reply and continue intake after a time is chosen; do not end with just a time acknowledgment. Don't re-ask known details. Always fill "booking" with ALL details known from the conversation on each service-intake turn, even when incomplete, so new answers are saved. Never use a city as the name or invent details. Mike must review and confirm every request.
 - For a saved customer who says Mike already knows their details, acknowledge that and leave missing details to Mike. Do not ask the same intake questions again or invent their address. ${deferDetails ? 'This customer already said Mike knows: do not ask for name or address again; hand off missing details to Mike.' : ''}
 - If they ask for Mike/a person, are upset, or it's urgent/unsafe, set handoff=true and say Mike will reach out shortly.
 - Payment: cash is not accepted; customers pay the invoice, not the technician.
@@ -120,9 +120,9 @@ Respond ONLY with JSON: {"reply": string, "handoff": boolean, "slot": null or {"
   let reply = String(ai.reply || '').trim();
   const spanish = /mañana|puedes|nombre|dirección|ya sabe|ya lo sabe/i.test(text);
   const contactQuestion = (booking: TextBooking) => {
-    const missing = missingTextContact(booking);
+    const missing = missingTextIntake(booking);
     if (deferDetails || !missing.length) return '';
-    return spanish ? ` ¿Cuál es ${missing.map(f => f === 'name' ? 'tu nombre' : 'la dirección de servicio').join(' y ')}?`
+    return spanish ? ` ¿Me das ${missing.map(f => f === 'name' ? 'tu nombre' : f === 'service street address' ? 'la dirección donde está el vehículo' : 'el año, marca y modelo del vehículo').join(' y ')}?`
       : ` What's your ${missing.join(' and ')}?`;
   };
   if (ai.slot && (!slot || !(await isSlotOpen(sb, slot.date, slot.time).catch(() => false)))) {
@@ -137,6 +137,9 @@ Respond ONLY with JSON: {"reply": string, "handoff": boolean, "slot": null or {"
           ? `Solicitud guardada para ${friendlyDate(slot.date)} a las ${time}; Mike debe aprobar y confirmar la hora.`
           : `I've requested ${friendlyDate(slot.date)} at ${time}; Mike will review and text to confirm.`;
         reply += contactQuestion(saved);
+      } else if (!ai.handoff && !deferDetails && missingTextIntake(saved).length) {
+        // Do not let a generic acknowledgment end an incomplete prospect intake.
+        reply = contactQuestion(saved).trim();
       }
     } catch (error) {
       console.error('sms booking save', error);
