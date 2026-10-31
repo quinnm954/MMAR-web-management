@@ -60,6 +60,8 @@ Deno.serve(async (req) => {
       if (!appt || appt.assigned_technician_id !== userId || copyOnly) {
         return new Response(JSON.stringify({ error: "Admin only" }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
       }
+      // A technician can trigger delivery, never choose a different recipient.
+      phone = undefined;
     }
     if (invoice.status === "paid") {
       return new Response(JSON.stringify({ error: "Invoice already paid" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });

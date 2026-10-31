@@ -1,4 +1,5 @@
 import { contactBlocked } from '../_shared/contact-block.ts';
+import { requireInternal } from '../_shared/internal-auth.ts';
 // AI receptionist (ElevenLabs Agents) for missed calls.
 // Actions (via ?action=):
 //   setup     – admin only: create/update the ElevenLabs agent
@@ -147,6 +148,8 @@ Deno.serve(async (req) => {
       // Auto-sync: database triggers / hourly worker call with auto=1; only allowed while a sync is pending.
       const auto = url.searchParams.get('auto') === '1';
       if (auto) {
+        const denied = await requireInternal(req);
+        if (denied) return denied;
         const { data: ps } = await sb.from('phone_settings').select('ai_agent_id, ai_sync_requested_at, ai_synced_at').eq('id', 1).maybeSingle();
         if (!ps?.ai_agent_id) return json({ skipped: 'not set up' });
         if (!ps.ai_sync_requested_at || (ps.ai_synced_at && ps.ai_synced_at >= ps.ai_sync_requested_at)) return json({ skipped: 'up to date' });

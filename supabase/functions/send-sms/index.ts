@@ -33,6 +33,10 @@ Deno.serve(async (req) => {
     }
 
     const sb = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
+    const { data: thread, error: threadError } = await sb.from('sms_threads').select('phone').eq('id', thread_id).maybeSingle();
+    if (threadError || !thread || String(thread.phone).replace(/\D/g, '') !== String(to).replace(/\D/g, '')) {
+      return new Response(JSON.stringify({ error: 'Recipient must match the selected conversation' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
     const params = new URLSearchParams({ To: to, From: TWILIO_FROM });
     if (body) params.set('Body', body);
     for (const m of items) {
