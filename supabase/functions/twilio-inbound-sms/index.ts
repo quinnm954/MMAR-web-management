@@ -1,4 +1,5 @@
 import { contactBlocked } from '../_shared/contact-block.ts';
+import { twilioMediaPath, mediaExtension, boundedMedia } from '../_shared/inbound-media.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.95.0';
 import { handleBotReply } from '../_shared/booking-bot.ts';
 import { handleReceptionistText } from '../_shared/sms-receptionist.ts';
@@ -26,19 +27,18 @@ Deno.serve(async (req) => {
     for (let i = 0; i < numMedia; i++) {
       const url = String(form.get(`MediaUrl${i}`) || '');
       const type = String(form.get(`MediaContentType${i}`) || 'application/octet-stream');
-      if (!url) continue;
+      const pathInTwilio = twilioMediaPath(url, Deno.env.get('TWILIO_ACCOUNT_SID') || '', sid);
+      const ext = mediaExtension(type);
+      if (!pathInTwilio || !ext) continue;
       try {
-        let res = await fetch(url);
-        if (!res.ok) {
-          // Media auth enforced: fetch through the Twilio gateway instead.
-          const m = url.match(/\/Messages\/[^/]+\/Media\/[^/?]+/);
-          const lk = Deno.env.get('LOVABLE_API_KEY'), tk = Deno.env.get('TWILIO_API_KEY');
-          if (m && lk && tk) res = await fetch(`https://connector-gateway.lovable.dev/twilio${m[0]}`, { headers: { Authorization: `Bearer ${lk}`, 'X-Connection-Api-Key': tk } });
-        }
+        const lk = Deno.env.get('LOVABLE_API_KEY'), tk = Deno.env.get('TWILIO_API_KEY');
+        if (!lk || !tk) continue;
+        const res = await fetch(`https://connector-gateway.lovable.dev/twilio${pathInTwilio}`, { headers: { Authorization: `Bearer ${lk}`, 'X-Connection-Api-Key': tk } });
         if (!res.ok) { console.error('media fetch failed', res.status); continue; }
-        const ext = (type.split('/')[1] || 'bin').split(';')[0].replace('jpeg', 'jpg');
+        const actualType = (res.headers.get('Content-Type') || '').split(';')[0].trim().toLowerCase();
+        if (!mediaExtension(actualType) || actualType !== type.toLowerCase().split(';')[0].trim()) continue;
         const path = `${from.replace(/\D/g, '')}/${sid || crypto.randomUUID()}-${i}.${ext}`;
-        const up = await sb.storage.from('sms-media').upload(path, await res.arrayBuffer(), { contentType: type, upsert: true });
+        const up = await sb.storage.from('sms-media').upload(path, await boundedMedia(res), { contentType: actualType, upsert: true });
         if (up.error) { console.error('media upload', up.error.message); continue; }
         media.push({ path, type });
       } catch (e) { console.error('media error', e); }
