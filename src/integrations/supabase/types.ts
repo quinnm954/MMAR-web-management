@@ -2568,6 +2568,8 @@ export type Database = {
       }
       partstech_quotes: {
         Row: {
+          callback_expires_at: string | null
+          callback_token_hash: string | null
           created_at: string
           created_by: string | null
           estimate_id: string | null
@@ -2578,6 +2580,8 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          callback_expires_at?: string | null
+          callback_token_hash?: string | null
           created_at?: string
           created_by?: string | null
           estimate_id?: string | null
@@ -2588,6 +2592,8 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          callback_expires_at?: string | null
+          callback_token_hash?: string | null
           created_at?: string
           created_by?: string | null
           estimate_id?: string | null
