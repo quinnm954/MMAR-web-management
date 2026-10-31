@@ -50,7 +50,9 @@ Deno.serve(async (req) => {
   try {
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY missing");
     const { pdf_base64, mime_type } = await req.json();
-    if (!pdf_base64) throw new Error("pdf_base64 required");
+    if (typeof pdf_base64 !== 'string' || !pdf_base64 || pdf_base64.length > 14 * 1024 * 1024 || !/^[A-Za-z0-9+/\r\n]*={0,2}$/.test(pdf_base64) || (mime_type && mime_type !== 'application/pdf')) {
+      return new Response(JSON.stringify({ error: 'Provide a PDF smaller than 10 MB' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
 
     const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",

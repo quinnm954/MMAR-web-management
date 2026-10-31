@@ -4,6 +4,11 @@ import { buildPartsTechAuth, PartsTechSetupError } from './auth.ts'
 
 const PT_BASE = 'https://api.partstech.com'
 
+async function capabilityHash(token: string): Promise<string> {
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(token))
+  return Array.from(new Uint8Array(digest), b => b.toString(16).padStart(2, '0')).join('')
+}
+
 async function getToken(): Promise<string> {
   const auth = buildPartsTechAuth({
     userId: Deno.env.get('PARTSTECH_USER'),
@@ -41,8 +46,10 @@ Deno.serve(async (req) => {
   const action = url.searchParams.get('action') ?? ''
 
   // PartsTech calls this when the user clicks "Submit Quote" in the punchout
-  // session. No staff auth — PartsTech is the caller. Store the quote payload.
+  // session. A one-session capability authenticates the provider callback.
   if (action === 'callback') {
+    const capability = url.searchParams.get('capability') || ''
+    if (!/^[0-9a-f-]{72}$/i.test(capability)) return json({ error: 'Unauthorized' }, 401)
     let payload: unknown = null
     let sessionId = url.searchParams.get('sessionId') ?? url.searchParams.get('session_id') ?? ''
     try {
@@ -53,10 +60,13 @@ Deno.serve(async (req) => {
     }
     if (!sessionId) return json({ error: 'Missing sessionId' }, 400)
     const admin = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!)
-    const { error } = await admin.from('partstech_quotes').upsert(
-      { session_id: sessionId, payload, updated_at: new Date().toISOString() },
-      { onConflict: 'session_id' },
-    )
+    const hash = await capabilityHash(capability)
+    const { data: session } = await admin.from('partstech_quotes').select('id').eq('session_id', sessionId)
+      .eq('callback_token_hash', hash).gt('callback_expires_at', new Date().toISOString()).maybeSingle()
+    if (!session) return json({ error: 'Unauthorized' }, 401)
+    const { error } = await admin.from('partstech_quotes').update(
+      { payload, updated_at: new Date().toISOString() },
+    ).eq('id', session.id).eq('callback_token_hash', hash).gt('callback_expires_at', new Date().toISOString())
     if (error) return json({ error: error.message }, 500)
     return json({ ok: true })
   }
@@ -77,7 +87,8 @@ Deno.serve(async (req) => {
       if (!searchParams.vin && !searchParams.vehicleParams && !searchParams.keyword) {
         return json({ error: 'Provide a VIN, vehicle (year/make/model), or keyword' }, 400)
       }
-      const callbackUrl = `${Deno.env.get('SUPABASE_URL')}/functions/v1/partstech-gateway?action=callback`
+      const capability = crypto.randomUUID() + crypto.randomUUID()
+      const callbackUrl = `${Deno.env.get('SUPABASE_URL')}/functions/v1/partstech-gateway?action=callback&capability=${capability}`
       const token = await getToken()
       const { ok, status, data } = await ptFetch(token, '/punchout/quote/create', {
         searchParams,
@@ -95,6 +106,8 @@ Deno.serve(async (req) => {
         session_id: sessionId,
         estimate_id: estimateId ?? null,
         created_by: staff.userId,
+        callback_token_hash: await capabilityHash(capability),
+        callback_expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
         payload: null,
         updated_at: new Date().toISOString(),
       }, { onConflict: 'session_id' })
