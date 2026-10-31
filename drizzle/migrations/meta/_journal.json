@@ -421,6 +421,13 @@
       "when": 1793020972045,
       "tag": "0059_sms_media_staff_upload",
       "breakpoints": true
+    },
+    {
+      "idx": 60,
+      "version": "7",
+      "when": 1793485027683,
+      "tag": "0060_secure_selected_dispatch_and_rpc_access",
+      "breakpoints": true
     }
   ]
 }

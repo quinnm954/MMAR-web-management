@@ -1850,6 +1850,21 @@ export type Database = {
           },
         ]
       }
+      internal_dispatch_credentials: {
+        Row: {
+          id: number
+          token: string
+        }
+        Insert: {
+          id?: number
+          token?: string
+        }
+        Update: {
+          id?: number
+          token?: string
+        }
+        Relationships: []
+      }
       invoice_payments: {
         Row: {
           amount: number
@@ -4368,6 +4383,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      internal_dispatch_headers: { Args: never; Returns: Json }
       invoice_tech_hours: { Args: { _items: Json }; Returns: number }
       is_office_staff: { Args: { _user_id: string }; Returns: boolean }
       is_oil_change_request: { Args: { _text: string }; Returns: boolean }
