@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState, useCallback } from 'react';
+import DOMPurify from 'dompurify';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent } from '@/components/ui/card';
@@ -404,7 +405,7 @@ const AdminEmails = () => {
               </div>
               <ScrollArea className="flex-1 p-4">
                 {selected.body_html ? (
-                  <div className="prose prose-sm max-w-none dark:prose-invert" dangerouslySetInnerHTML={{ __html: selected.body_html }} />
+                  <div className="prose prose-sm max-w-none dark:prose-invert" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(selected.body_html, { USE_PROFILES: { html: true } }) }} />
                 ) : selected.body_text ? (
                   <pre className="whitespace-pre-wrap font-sans text-sm text-foreground">{selected.body_text}</pre>
                 ) : (
