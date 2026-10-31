@@ -1,8 +1,8 @@
 # Roadmap
 
 ## Receptionist customer intake
-- [ ] Remove the outage notice and collect new callers' and texters' name, street address and vehicle information.
-- [ ] Test both intake paths and synchronize the live phone receptionist without contacting customers.
+- [x] Removed the outage notice; voice rejects missing new-prospect details, SMS continues collecting name/street address/vehicle and incomplete active threads route to intake.
+- [x] Intake and returning-customer tests passed; deployed five handlers and live voice setup returned success. No real caller/carrier conversation was initiated, so future real-customer delivery is not verified.
 
 ## Monday receptionist reopening
 - [ ] Enforce Monday Nov 2 as the earliest voice/text offer, retaining checked availability and pending owner approval.
