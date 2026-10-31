@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { csvCell } from '@/lib/csv';
 import { useAdminRegion, RegionSwitch, RegionChip } from '@/hooks/useAdminRegion';
 import { supabase } from '@/integrations/supabase/client';
 import { techHoursForInvoice } from '@/lib/techHours';
@@ -509,7 +510,7 @@ export default function AdminReports({ extras }: { extras?: React.ReactNode } = 
     const head = ['Date', 'Invoice', 'Customer', 'Technician', 'Labor hrs', 'Revenue', 'Parts cost', 'Tech pay', 'Card fee', 'Net profit'];
     const lines = filteredRows.map((r) => [r.date, r.invoice_number ?? '', r.customer, r.technician, r.paidLaborHours.toFixed(2), r.revenue.toFixed(2), r.cogs.toFixed(2), r.employeeCost.toFixed(2), r.stripeFee.toFixed(2), r.netProfit.toFixed(2)]);
     memberRows.forEach((m) => lines.push([new Date(m.paid_at).toLocaleDateString(), 'Membership', m.member, '', '', m.amount.toFixed(2), '0', '0', m.stripeFee.toFixed(2), (m.amount - m.stripeFee).toFixed(2)]));
-    const csv = [head, ...lines].map((l) => l.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
+    const csv = [head, ...lines].map((l) => l.map(csvCell).join(',')).join('\n');
     const a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
     a.download = `mmar-report-${new Date().toISOString().slice(0, 10)}.csv`;

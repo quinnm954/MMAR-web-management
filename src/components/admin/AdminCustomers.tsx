@@ -1,4 +1,5 @@
 import { CustomerName } from '@/hooks/useCustomerHappiness';
+import { csvCell } from '@/lib/csv';
 import { useEffect, useState } from "react";
 import { CustomerAddress, formatAddress } from "@/components/admin/CustomerAddress";
 import { supabase } from "@/integrations/supabase/client";
@@ -220,12 +221,7 @@ const AdminCustomers = () => {
       "marketing_opt_in","customer_since","service_count","last_service_date","last_service_type",
       "lifetime_spend","vehicles",
     ];
-    const esc = (v: unknown) => {
-      if (v === null || v === undefined) return "";
-      const s = typeof v === "object" ? JSON.stringify(v) : String(v);
-      return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
-    };
-    const csv = [headers.join(","), ...rows.map((r) => headers.map((h) => esc(r[h])).join(","))].join("\n");
+    const csv = [headers.join(","), ...rows.map((r) => headers.map((h) => csvCell(r[h])).join(","))].join("\n");
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");

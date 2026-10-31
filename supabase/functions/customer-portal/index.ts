@@ -1,3 +1,4 @@
+import { PAYMENT_ORIGIN } from '../_shared/payment-origin.ts';
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import Stripe from "https://esm.sh/stripe@17.7.0?target=deno";
 
@@ -26,7 +27,7 @@ Deno.serve(async (req) => {
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });
     if (!customers.data.length) throw new Error("No Stripe customer for this account yet");
 
-    const origin = req.headers.get("origin") || "https://shop-flow-home.lovable.app";
+    const origin = PAYMENT_ORIGIN;
     const portal = await stripe.billingPortal.sessions.create({
       customer: customers.data[0].id,
       return_url: `${origin}/portal/membership`,

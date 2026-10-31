@@ -1,3 +1,4 @@
+import { requireInternal } from '../_shared/internal-auth.ts';
 // Send a push notification to one user's registered devices via Firebase Cloud Messaging.
 // FCM HTTP v1 is used for both Android and iOS (APNs is bridged inside Firebase).
 //
@@ -106,6 +107,8 @@ interface PushRequest {
 }
 
 Deno.serve(async (req) => {
+  const denied = await requireInternal(req);
+  if (denied) return denied;
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {

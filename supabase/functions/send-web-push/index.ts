@@ -1,3 +1,4 @@
+import { requireInternal } from '../_shared/internal-auth.ts';
 // Sends a Web Push notification (VAPID / aes128gcm) to every browser
 // subscription belonging to a user. Independent of the FCM `send-push`
 // function which handles native (Capacitor) devices.
@@ -22,6 +23,8 @@ type Body = {
 };
 
 Deno.serve(async (req) => {
+  const denied = await requireInternal(req);
+  if (denied) return denied;
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {

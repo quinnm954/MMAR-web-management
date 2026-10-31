@@ -1,3 +1,4 @@
+import { PAYMENT_ORIGIN } from '../_shared/payment-origin.ts';
 import { contactBlocked } from '../_shared/contact-block.ts';
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
 import Stripe from "npm:stripe@18.5.0";
@@ -59,6 +60,8 @@ Deno.serve(async (req) => {
       if (!appt || appt.assigned_technician_id !== userId || copyOnly) {
         return new Response(JSON.stringify({ error: "Admin only" }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
       }
+      // A technician can trigger delivery, never choose a different recipient.
+      phone = undefined;
     }
     if (invoice.status === "paid") {
       return new Response(JSON.stringify({ error: "Invoice already paid" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
@@ -100,7 +103,7 @@ Deno.serve(async (req) => {
 
     // Create Stripe checkout session
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY")!, { apiVersion: "2025-08-27.basil" });
-    const origin = req.headers.get("origin") || "https://shop-flow-home.lovable.app";
+    const origin = PAYMENT_ORIGIN;
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       payment_method_types: ["card"],

@@ -1850,6 +1850,21 @@ export type Database = {
           },
         ]
       }
+      internal_dispatch_credentials: {
+        Row: {
+          id: number
+          token: string
+        }
+        Insert: {
+          id?: number
+          token?: string
+        }
+        Update: {
+          id?: number
+          token?: string
+        }
+        Relationships: []
+      }
       invoice_payments: {
         Row: {
           amount: number
@@ -2553,6 +2568,8 @@ export type Database = {
       }
       partstech_quotes: {
         Row: {
+          callback_expires_at: string | null
+          callback_token_hash: string | null
           created_at: string
           created_by: string | null
           estimate_id: string | null
@@ -2563,6 +2580,8 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          callback_expires_at?: string | null
+          callback_token_hash?: string | null
           created_at?: string
           created_by?: string | null
           estimate_id?: string | null
@@ -2573,6 +2592,8 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          callback_expires_at?: string | null
+          callback_token_hash?: string | null
           created_at?: string
           created_by?: string | null
           estimate_id?: string | null
@@ -4368,6 +4389,18 @@ export type Database = {
         }
         Returns: boolean
       }
+      internal_create_notification: {
+        Args: {
+          _body: string
+          _category?: string
+          _data?: Json
+          _link?: string
+          _title: string
+          _user_id: string
+        }
+        Returns: string
+      }
+      internal_dispatch_headers: { Args: never; Returns: Json }
       invoice_tech_hours: { Args: { _items: Json }; Returns: number }
       is_office_staff: { Args: { _user_id: string }; Returns: boolean }
       is_oil_change_request: { Args: { _text: string }; Returns: boolean }

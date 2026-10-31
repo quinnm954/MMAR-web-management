@@ -1,3 +1,4 @@
+import { requireInternal } from '../_shared/internal-auth.ts';
 import { contactBlocked } from '../_shared/contact-block.ts';
 import { prospectEmail } from '../_shared/prospect-copy.ts';
 import { createClient } from 'npm:@supabase/supabase-js@2';
@@ -9,6 +10,8 @@ const FOLLOWUP_DAYS = [4, 6]; // step1 -> +4d, step2 -> +6d (day 10)
 const json = (b: unknown, s = 200) => new Response(JSON.stringify(b), { status: s, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
 
 Deno.serve(async (req) => {
+  const denied = await requireInternal(req);
+  if (denied) return denied;
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
   const url = Deno.env.get('SUPABASE_URL')!;
   const srk = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;

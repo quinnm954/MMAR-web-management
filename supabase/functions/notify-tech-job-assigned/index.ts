@@ -1,3 +1,4 @@
+import { requireInternal } from '../_shared/internal-auth.ts';
 // Called by the database when a technician is assigned to an appointment.
 // Everything is looked up server-side from the appointment id.
 import { createClient } from 'npm:@supabase/supabase-js@2'
@@ -8,6 +9,8 @@ import { corsHeaders, json } from '../_shared/staff-auth.ts'
 const Body = z.object({ appointmentId: z.string().uuid() })
 
 Deno.serve(async (req) => {
+  const denied = await requireInternal(req);
+  if (denied) return denied;
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders })
   const parsed = Body.safeParse(await req.json().catch(() => ({})))
   if (!parsed.success) return json({ error: 'Invalid request' }, 400)
