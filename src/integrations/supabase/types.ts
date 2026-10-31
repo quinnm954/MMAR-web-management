@@ -4389,6 +4389,17 @@ export type Database = {
         }
         Returns: boolean
       }
+      internal_create_notification: {
+        Args: {
+          _body: string
+          _category?: string
+          _data?: Json
+          _link?: string
+          _title: string
+          _user_id: string
+        }
+        Returns: string
+      }
       internal_dispatch_headers: { Args: never; Returns: Json }
       invoice_tech_hours: { Args: { _items: Json }; Returns: number }
       is_office_staff: { Args: { _user_id: string }; Returns: boolean }

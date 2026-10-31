@@ -435,6 +435,13 @@
       "when": 1793485111927,
       "tag": "0061_protect_partstech_callback_capabilities",
       "breakpoints": true
+    },
+    {
+      "idx": 62,
+      "version": "7",
+      "when": 1793485247863,
+      "tag": "0062_preserve_authorized_internal_notifications",
+      "breakpoints": true
     }
   ]
 }
