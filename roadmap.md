@@ -1,5 +1,9 @@
 # Roadmap
 
+## Receptionist customer intake
+- [ ] Remove the outage notice and collect new callers' and texters' name, street address and vehicle information.
+- [ ] Test both intake paths and synchronize the live phone receptionist without contacting customers.
+
 ## Monday receptionist reopening
 - [ ] Enforce Monday Nov 2 as the earliest voice/text offer, retaining checked availability and pending owner approval.
 - [ ] Text the active diagnosis requester that Monday is the earliest; verify the message in Phone.

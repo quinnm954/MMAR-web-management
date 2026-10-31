@@ -4,6 +4,7 @@ const TWILIO_GW = 'https://connector-gateway.lovable.dev/twilio';
 import { buildLaborQuote, createDraftEstimate, quoteSentence, quoteNote } from './labor-quote.ts';
 import { oilChangeBlocked, OIL_CHANGE_MEMBERSHIP_REPLY, OIL_CHANGE_MEMBERSHIP_REPLY_ES } from './oil-change-eligibility.ts';
 import { receptionistSlots, receptionistFromDate, requestsMorning } from './receptionist-times.ts';
+import { missingReceptionistDetails } from './receptionist-intake.ts';
 const AI_URL = 'https://ai.gateway.lovable.dev/v1/responses';
 
 export const digits = (p: string) => (p || '').replace(/\D/g, '').slice(-10);
@@ -281,6 +282,9 @@ export async function handleBotReply(sb: any, from: string, body: string) {
     .gte('created_at', new Date(Date.now() - 14 * 86400_000).toISOString()).order('created_at', { ascending: false });
   const req = (list || []).find((r: any) => digits(r.customer_phone) === digits(from));
   if (!req) return false;
+
+  // The general receptionist extracts and saves intake details; this bot only negotiates times.
+  if (missingReceptionistDetails(req).length) return false;
 
   if (await oilChangeBlocked(sb, req, body)) {
     await handoffOilChange(sb, req, body);

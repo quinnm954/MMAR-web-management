@@ -1,4 +1,5 @@
 import { hhmm, label12 } from './booking-bot.ts';
+import { missingReceptionistDetails } from './receptionist-intake.ts';
 
 export type TextSlot = { date: string; time: string; accepted: boolean };
 export type TextBooking = {
@@ -12,7 +13,7 @@ type CustomerDetails = { full_name?: string; email?: string; address_line1?: str
 export function resolvedTextBooking(booking: TextBooking, profile?: CustomerDetails, existing?: TextBooking): TextBooking {
   const known = (value?: string) => value?.trim() || '';
   return {
-    customer_name: known(booking.customer_name) || known(profile?.full_name) || known(existing?.customer_name),
+    customer_name: known(booking.customer_name) || known(profile?.full_name) || (/^(?:Text customer|Phone caller|unknown)$/i.test(known(existing?.customer_name)) ? '' : known(existing?.customer_name)),
     service_address: known(booking.service_address) || [profile?.address_line1, profile?.address_line2].filter(Boolean).join(', ') || known(existing?.service_address),
     vehicle_info: known(booking.vehicle_info) || known(existing?.vehicle_info),
     description: known(booking.description) || known(existing?.description),
@@ -23,6 +24,8 @@ export function resolvedTextBooking(booking: TextBooking, profile?: CustomerDeta
 export function missingTextContact(booking: TextBooking): ('name' | 'service address')[] {
   return [!booking.customer_name?.trim() && 'name', !booking.service_address?.trim() && 'service address'].filter(Boolean) as ('name' | 'service address')[];
 }
+
+export const missingTextIntake = (booking: TextBooking) => missingReceptionistDetails(booking);
 
 export function deferKnownCustomerDetails(text: string, savedCustomer: boolean): boolean {
   return savedCustomer && /\b(?:he|mike|you)\s+(?:already\s+)?know(?:s)?\b|\bon file\b|\bsame (?:address|place|location)\b|\b(?:ya sabe|ya lo sabe|misma direcci[oó]n)\b/i.test(text);

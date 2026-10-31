@@ -12,6 +12,7 @@ import { isSlotOpen, openSlots, label12 } from '../_shared/booking-bot.ts';
 import { receptionistSlots, receptionistFromDate, RECEPTIONIST_RESUME_DATE, defaultStartMinute } from '../_shared/receptionist-times.ts';
 import { buildLaborQuote, quoteSentence, createDraftEstimate } from '../_shared/labor-quote.ts';
 import { hasOilChangeMembership, oilChangeBlocked, OIL_CHANGE_MEMBERSHIP_REPLY } from '../_shared/oil-change-eligibility.ts';
+import { missingReceptionistDetails } from '../_shared/receptionist-intake.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -78,10 +79,10 @@ function buildPrompt(cities: string[], waitlist: string[] = []) {
   return `You are the friendly phone receptionist for Mike's Mobile Auto Repair (MMAR), a mobile mechanic in Southwest Florida. You answer every call for the shop.
 
 Opening: the call starts with a greeting that ends by asking English or Spanish. After the caller chooses, continue entirely in that language (switch with language_detection for Spanish). If they skip the choice and just start talking, answer in the language they spoke. Do not repeat the greeting.
-Location: before saving any request, ask for the city and ZIP code where the car is (or a cross street), repeat it back to confirm, and pass service_city and service_zip.
+Location: collect the service street address, city and ZIP where the car is, repeat it back to confirm, and pass service_address, service_city and service_zip. City alone is not a service address.
 
-Facts:${Date.now() < Date.parse('2026-11-02T05:00:00Z') ? `
-- IMPORTANT TEMPORARY NOTICE: Mike's service vehicle is down, waiting on parts. Early in every call, briefly tell the caller we are taking requests for next week, with Monday Nov 2 the earliest possible day. Mike must confirm the time.` : ''}
+Facts:
+- Do not mention Mike's service vehicle being down or waiting on parts. That notice has ended.
 - Never offer appointments before Monday Nov 2, 2026. After that date, continue the next-day minimum, not a rolling next-week delay.
 - We come to the customer's home, work, or lot. No need to tow to a shop.
 - Service area: ONLY ${cities.join(' and ')}. If the caller is outside those areas, politely say we don't currently service their area.${waitlist.length ? `
@@ -101,7 +102,7 @@ How to act:
 - Default appointment requests to 10 AM–5 PM Eastern from Monday Nov 2, 2026, earliest returned time first, mornings included. Never offer before 10 AM or after 5 PM. Every appointment requires Mike's approval.
 - NEVER invent a specific time. Before offering any time, call check_open_times and only offer times it returns. It accounts for appointments, drive time and blocked time. We do NOT take same-day appointments or appointments before Monday Nov 2. If the tool fails, take a message for Mike rather than guessing. Check eligibility first for oil changes.
 - Returning customers: at the start of every call, call lookup_caller. If it finds an account, greet them by first name and VERIFY instead of asking: e.g. "Is this for the 2011 Chevy Cruze at 123 Main St?" If they have several vehicles, ask which one. Only ask for details that are missing or changed (like engine size if not on file). Never read their email or full phone number aloud.
-- If they need service, collect: name, vehicle (year, make, model, and engine size like 1.4L or V6 — ask once; if they don't know, move on), what's wrong, service address or city, and the day and time they want. Turn the day into a real date (YYYY-MM-DD) and the time into 24-hour HH:MM. Confirm it back, then call create_booking_request. If the tool says the time is invalid, offer another time in the window. Never tell the caller they're confirmed: every time is a request that Mike approves, and the shop will text shortly to confirm.
+- For every potential customer who needs service, collect their actual name, vehicle year/make/model, service street address with city and ZIP, what's wrong, and preferred day/time while still on the call. Ask engine size once; if they don't know, move on. Ask one missing detail per turn, and do not close the call or save a new customer's request with just a city, placeholder name or missing vehicle. Confirm details back, then call create_booking_request. If the tool reports missing details, ask and retry. Returning customers who say Mike already knows may hand off missing details to Mike; never repeat intake or invent details. Turn the day into YYYY-MM-DD and time into HH:MM. Never tell the caller they're confirmed: Mike approves every request.
 - You are NOT Mike and never claim to be him. If a caller asks whether they're speaking with Mike, say you're the shop's receptionist and Mike is the owner.
 - Handle everything yourself, but call transfer_to_mike IMMEDIATELY (no extra questions first) when the caller asks for Mike, the owner, the mechanic, a manager, "a real person", "a human", or "someone", or says they don't want to talk to a machine, or asks a second time after you offered to help. Say "Sure, connecting you to Mike now" and call the tool in the same turn. Never refuse or stall a transfer request. If the transfer doesn't connect, apologize, take their name and reason, and say Mike will call back shortly.
 - Diagnosis fee: ONLY when the customer doesn't know what's wrong (a warning light, noise, no-start with no known cause, electrical issue, 'not sure'). If they name a part or repair ("replace my alternator", "need a starter", "brakes"), there is NO diagnosis fee — never mention it; say "Since you already know it's the alternator, there's no diagnosis fee." For unknown problems, say once BEFORE confirming a time: "$100 diagnosis, and $50 of it goes toward the repair if you go ahead — so it really only costs you fifty." Make sure they're okay with it.
@@ -205,13 +206,13 @@ Deno.serve(async (req) => {
                   customer_phone: { type: 'string', description: 'Best phone number' },
                   vehicle_info: { type: 'string', description: 'Year make model engine, e.g. 2011 Chevy Cruze 1.4L' },
                   description: { type: 'string', description: 'What is wrong with the vehicle' },
-                  service_address: { type: 'string', description: 'Street address or cross street where the car is' },
+                  service_address: { type: 'string', description: 'Service street address where the car is, not just the city' },
                   service_city: { type: 'string', description: 'City where the car is (always ask and confirm)' },
                   service_zip: { type: 'string', description: 'ZIP code where the car is (always ask and confirm)' },
                   requested_date: { type: 'string', description: 'Appointment date YYYY-MM-DD' },
                   requested_time: { type: 'string', description: 'Requested time HH:MM 24-hour, default 12:00–17:00 Eastern; 10:00–11:59 only if caller asks for morning' },
                   morning_requested: { type: 'boolean', description: 'True only when the caller explicitly asks for a morning time' },
-                }, ['customer_name', 'description', 'service_city', 'service_zip']),
+                }, ['customer_name', 'vehicle_info', 'service_address', 'description', 'service_city', 'service_zip']),
                 tool('transfer_to_mike', 'Transfer the caller to Mike for urgent issues or when they ask for a person.', {
                   call_sid: callSid,
                   reason: { type: 'string', description: 'Why transferring' },
@@ -357,6 +358,15 @@ Deno.serve(async (req) => {
       }
       if (await oilChangeBlocked(sb, { customer_phone: phone, description: body.description, notes: body.notes })) {
         return json({ result: OIL_CHANGE_MEMBERSHIP_REPLY, membershipRequired: true });
+      }
+      const missing = missingReceptionistDetails(body);
+      if (missing.length) {
+        const key = phone.replace(/\D/g, '').slice(-10);
+        const { data: profiles, error: profileError } = key.length === 10
+          ? await sb.from('profiles').select('phone').ilike('phone', `%${key.slice(-4)}%`).limit(50)
+          : { data: [], error: null };
+        const savedCustomer = !profileError && (profiles || []).some((p: any) => String(p.phone || '').replace(/\D/g, '').slice(-10) === key);
+        if (!savedCustomer) return json({ result: `Before saving this new customer's request, ask for: ${missing.join('; ')}. City alone is not an address. Collect the missing details on this call, then retry.`, missing_details: missing });
       }
       { const extra = [body.service_city, body.service_zip].filter(Boolean).map(String).join(' ');
         if (extra && !String(body.service_address || '').includes(String(body.service_zip || '~'))) body.service_address = [body.service_address, extra].filter(Boolean).join(', '); }
