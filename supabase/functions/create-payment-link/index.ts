@@ -1,3 +1,4 @@
+import { PAYMENT_ORIGIN } from '../_shared/payment-origin.ts';
 import { contactBlocked } from '../_shared/contact-block.ts';
 // Admin-only: generate a Stripe payment link/checkout session for any of:
 //   - invoice (uses outstanding balance)
@@ -159,7 +160,7 @@ Deno.serve(async (req) => {
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY")!, {
       apiVersion: "2025-08-27.basil",
     });
-    const origin = req.headers.get("origin") || "https://shop-flow-home.lovable.app";
+    const origin = PAYMENT_ORIGIN;
 
     const session = await stripe.checkout.sessions.create({
       mode,

@@ -1,3 +1,4 @@
+import { requireStaff } from '../_shared/staff-auth.ts';
 import { corsHeaders } from "https://esm.sh/@supabase/supabase-js@2.95.0/cors";
 
 const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
@@ -42,6 +43,9 @@ const tool = {
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+
+  const auth = await requireStaff(req);
+  if (auth instanceof Response) return auth;
 
   try {
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY missing");

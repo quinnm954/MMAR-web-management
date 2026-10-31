@@ -1,3 +1,4 @@
+import { requireInternal } from '../_shared/internal-auth.ts';
 import { contactBlocked } from '../_shared/contact-block.ts';
 import { enrollSuffix } from '../_shared/enroll.ts';
 import { sendAndLog } from '../_shared/send-and-log.ts';
@@ -144,6 +145,8 @@ const REMINDER_TYPE = 'mileage_email_reminder';
 const REMINDER_COOLDOWN_DAYS = 30;
 
 Deno.serve(async (req) => {
+  const denied = await requireInternal(req);
+  if (denied) return denied;
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
   const sb = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);

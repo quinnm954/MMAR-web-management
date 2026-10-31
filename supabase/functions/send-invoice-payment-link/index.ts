@@ -1,3 +1,4 @@
+import { PAYMENT_ORIGIN } from '../_shared/payment-origin.ts';
 import { contactBlocked } from '../_shared/contact-block.ts';
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
 import Stripe from "npm:stripe@18.5.0";
@@ -100,7 +101,7 @@ Deno.serve(async (req) => {
 
     // Create Stripe checkout session
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY")!, { apiVersion: "2025-08-27.basil" });
-    const origin = req.headers.get("origin") || "https://shop-flow-home.lovable.app";
+    const origin = PAYMENT_ORIGIN;
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       payment_method_types: ["card"],

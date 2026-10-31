@@ -1,3 +1,4 @@
+import { requireInternal } from '../_shared/internal-auth.ts';
 // Pulls new Outlook inbox mail into inbound_messages (dedup by Graph message id). Runs every 5 min via cron.
 import { createClient } from 'npm:@supabase/supabase-js@2'
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors'
@@ -5,6 +6,8 @@ import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors'
 const GATEWAY_URL = 'https://connector-gateway.lovable.dev/microsoft_outlook'
 
 Deno.serve(async (req) => {
+  const denied = await requireInternal(req);
+  if (denied) return denied;
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders })
   const json = (b: unknown, status = 200) =>
     new Response(JSON.stringify(b), { status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })

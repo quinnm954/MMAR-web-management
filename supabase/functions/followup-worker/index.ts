@@ -1,3 +1,4 @@
+import { requireInternal } from '../_shared/internal-auth.ts';
 // Hourly (pg_cron): estimate nudges (24h, 72h), invoice auto-send + reminders (day 3, day 7),
 // and a review request 2h after payment. Email always; text only once the A2P campaign is approved.
 import { createClient } from 'npm:@supabase/supabase-js@2';
@@ -14,13 +15,15 @@ const BATCH = 25;
 const money = (n: unknown) => `$${Number(n || 0).toFixed(2)}`;
 const first = (n?: string | null) => (n || '').trim().split(/\s+/)[0] || '';
 
-Deno.serve(async () => {
+Deno.serve(async (req) => {
+  const denied = await requireInternal(req);
+  if (denied) return denied;
   const sb = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
   const now = new Date();
 
   // Retry any pending AI receptionist auto-sync (runs any hour; the function skips if up to date).
   try {
-    await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/ai-receptionist?action=setup&auto=1`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${Deno.env.get('SUPABASE_ANON_KEY')}` }, body: '{}' });
+    await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/ai-receptionist?action=setup&auto=1`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}` }, body: '{}' });
   } catch (e) { console.error('receptionist sync', String(e)); }
 
   // Quiet hours: only reach out 9am–7pm Eastern.

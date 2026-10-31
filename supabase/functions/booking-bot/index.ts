@@ -1,3 +1,4 @@
+import { requireInternal } from '../_shared/internal-auth.ts';
 // Starts the SMS follow-up for a new website booking request (called by a database trigger).
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.95.0';
 import { startBot } from '../_shared/booking-bot.ts';
@@ -5,6 +6,8 @@ import { startBot } from '../_shared/booking-bot.ts';
 const cors = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type' };
 
 Deno.serve(async (req) => {
+  const denied = await requireInternal(req);
+  if (denied) return denied;
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors });
   try {
     const { id } = await req.json().catch(() => ({}));
