@@ -48,6 +48,7 @@ export function useAutoRefresh() {
     let retry: ReturnType<typeof setTimeout> | null = null;
     const attempt = () => {
       if (retry) { clearTimeout(retry); retry = null; }
+      if (touching && Date.now() - lastScrollAt > 30_000) touching = false;
       if (!touching && Date.now() - lastScrollAt >= 15_000 && isSafeToReload()) {
         try { sessionStorage.setItem(SCROLL_KEY(location.pathname + location.search), String(window.scrollY)); } catch {}
         window.location.reload();

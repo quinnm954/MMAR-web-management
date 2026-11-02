@@ -575,7 +575,7 @@ export default function AdminPhoneHub({ fullscreen = false }: { fullscreen?: boo
   const screen = (
       <>
         {/* Screen stack: list (base) + detail (slides in) */}
-        <div data-auto-refresh-blocked={hasDetail || scrolled || bellOpen || composeOpen || newTextOpen || dialOpen} className="relative h-full w-full overflow-hidden">
+        <div data-auto-refresh-blocked={hasDetail || bellOpen || composeOpen || newTextOpen || dialOpen} className="relative h-full w-full overflow-hidden">
           <section style={dragging ? { transform: `translateX(calc(-25% + ${dragX}px * 0.25))`, opacity: 0.6 + 0.4 * Math.min(1, dragX! / 390), transition: 'none' } : undefined} className={cn('absolute inset-0 flex flex-col transition-transform duration-300 ease-out', hasDetail && '-translate-x-1/4 opacity-60 pointer-events-none')}>
             <StatusBar />
             {/* Compact nav bar */}
