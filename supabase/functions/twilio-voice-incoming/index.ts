@@ -1,4 +1,5 @@
 import { contactBlocked } from '../_shared/contact-block.ts';
+import { requireTwilio } from '../_shared/twilio-webhook.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.95.0';
 
 const corsHeaders = {
@@ -31,6 +32,8 @@ function isWithinHours(hours: Record<string, { open: string; close: string } | n
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
+  const verifiedForm = await requireTwilio(req, 'twilio-voice-incoming');
+  if (verifiedForm instanceof Response) return verifiedForm;
 
   const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
   const sb = createClient(supabaseUrl, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
@@ -41,7 +44,7 @@ Deno.serve(async (req) => {
   let callSid = '';
   let form: FormData | null = null;
   try {
-    form = await req.formData();
+    form = verifiedForm;
     from = String(form.get('From') || '');
     to = String(form.get('To') || '');
     callSid = String(form.get('CallSid') || '');
