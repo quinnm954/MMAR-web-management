@@ -9,7 +9,7 @@
 
 - Reports classify refunds as revenue/profit reductions on completion date, never sales, labor or tech pay; why: refunds must not inflate sales or reverse labor.
 - Reports recognize financing cash from paid financing_payments on paid_at (including interest), excluding financed invoice totals and mirrored invoice_payments; receipt rows do not repeat sales, parts or labor costs, because one collection must count once.
-- Reports year charts zero-fill elapsed months and leave future months null; why: no projections. CSV exports use `src/lib/csv.ts` to neutralize formulas.
+- Reports year charts zero-fill elapsed months; future months stay null (no projections). CSV exports use `src/lib/csv.ts` to neutralize formulas except strict negative decimals, keeping losses summable.
 - Reports use reportPeriod; lists share dateFilters/DateRangeFilter. Starts are inclusive, ends exclusive, custom end days included, WTD starts Monday; why: consistent historical filtering.
 
 - Fleet registration signs up then calls `submit_fleet_registration`, guarded by user id/email match within 15 minutes; why: secure public signup.
