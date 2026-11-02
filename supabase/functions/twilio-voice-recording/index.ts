@@ -1,4 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.95.0';
+import { requireTwilio } from '../_shared/twilio-webhook.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -9,7 +10,8 @@ Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
   try {
-    const form = await req.formData();
+    const form = await requireTwilio(req, 'twilio-voice-recording');
+    if (form instanceof Response) return form;
     const sid = String(form.get('CallSid') || '');
     const recordingSid = String(form.get('RecordingSid') || '');
     const recordingUrl = String(form.get('RecordingUrl') || '');

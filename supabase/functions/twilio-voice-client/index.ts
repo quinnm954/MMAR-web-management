@@ -1,4 +1,5 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
+import { requireTwilio } from '../_shared/twilio-webhook.ts';
 
 const xml = (body: string) =>
   new Response(`<?xml version="1.0" encoding="UTF-8"?>${body}`, { headers: { 'Content-Type': 'text/xml' } });
@@ -6,7 +7,8 @@ const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replac
 
 // Handles calls placed from the Garage Ace in-app phone.
 Deno.serve(async (req) => {
-  const form = await req.formData().catch(() => null);
+  const form = await requireTwilio(req, 'twilio-voice-client');
+  if (form instanceof Response) return form;
   const from = String(form?.get('From') || '');
   const to = String(form?.get('To') || '').replace(/[^\d+]/g, '');
   const callSid = String(form?.get('CallSid') || '');

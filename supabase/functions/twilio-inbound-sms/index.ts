@@ -1,4 +1,5 @@
 import { contactBlocked } from '../_shared/contact-block.ts';
+import { requireTwilio } from '../_shared/twilio-webhook.ts';
 import { twilioMediaPath, mediaExtension, boundedMedia } from '../_shared/inbound-media.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.95.0';
 import { handleBotReply } from '../_shared/booking-bot.ts';
@@ -13,7 +14,8 @@ Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
   try {
-    const form = await req.formData();
+    const form = await requireTwilio(req, 'twilio-inbound-sms');
+    if (form instanceof Response) return form;
     const from = String(form.get('From') || '');
     const body = String(form.get('Body') || '');
     const sid = String(form.get('MessageSid') || '');

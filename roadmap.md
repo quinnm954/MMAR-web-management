@@ -1,7 +1,7 @@
 # Roadmap
 
 ## Remaining selected security findings
-- [ ] Protect all six Twilio webhook handlers (10 findings). Blocked: TWILIO_AUTH_TOKEN request declined; leave live handlers unchanged to avoid disrupting calls/texts.
+- [ ] Protect all six Twilio webhook handlers (10 findings). Verification credential securely supplied; validate signatures and deploy all six handlers.
 - [x] Restrict manual SMS/email to owner/admin and bind email/payment recipients to saved contacts (3 findings).
 - [x] Five security tests and 11 regression tests passed; deployed three senders and verified signed-in rejection of unrelated recipients with HTTP 400. Marked those three findings fixed; no real messages sent. Remaining 10 stay active pending the verification credential.
 
