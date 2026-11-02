@@ -3,7 +3,7 @@
 ## What you get
 - When a customer has a quote from another shop or service (Valyou or anyone), they must send a **picture or screenshot showing the line items**. A total with no breakdown doesn't qualify.
 - The receptionist (text and phone) will say: "We can review it. Text a photo or screenshot of the itemized quote to 813-501-7572." It never promises a match and never mentions price until you approve.
-- When a photo arrives, AI reads the line items (part, labor, price) and attaches them to the customer's estimate as a **Competitor Quote**.
+- When a photo arrives, AI reads the line items (part, labor, price), plus the customer's name, address and vehicle (year, make, model). It fills in only details missing from the customer's saved info and attaches everything to the customer's estimate as a **Competitor Quote**.
 - On the estimate screen you see **their lines next to your lines** with both totals and the difference. Buttons:
   - **Match total**: adjusts your labor so the total matches theirs. Parts stay at your cost because AI can't know what you pay for parts.
   - **Ignore**: leaves your price as it is.
