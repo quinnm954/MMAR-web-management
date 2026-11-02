@@ -237,7 +237,7 @@ const QuoteRequestDialog = ({
 
     toast.success(
       isSignedIn
-        ? "Request received! We'll text you to confirm your day & time."
+        ? "Booking request received — not confirmed yet. Mike will text you to confirm."
         : "Request received! Check your email to finish setting up your account.",
     );
     onOpenChange(false);

@@ -328,15 +328,11 @@ Respond ONLY with JSON: {"reply": string, "confirmed": boolean, "date": "YYYY-MM
       // Price accepted -> auto-confirm (draft estimate for staff); otherwise save as a request for manual OK.
       const h = Number(ai.time.split(':')[0]);
       const label = `${((h + 11) % 12) + 1}:${ai.time.split(':')[1]} ${h < 12 ? 'AM' : 'PM'}`;
-      // Auto-booking is off: every request waits for staff approval.
-      const auto = { ok: false };
-      if (auto.ok) {
-        status = 'confirmed'; requested = true;
-        reply = `You're all set for ${friendlyDate(ai.date)} at ${label}! We'll send your written estimate shortly.`;
-      } else {
+      // Every request waits for staff approval.
+      {
       await sb.from('booking_requests').update({ requested_date: ai.date, requested_time_window: label }).eq('id', req.id);
       status = 'handoff'; requested = true;
-      reply = `Got it — I've requested ${friendlyDate(ai.date)} at ${label} for you. We'll text you shortly to confirm.`;
+      reply = `Got it — I've sent a booking request for ${friendlyDate(ai.date)} at ${label}. This is not a confirmed appointment yet; Mike will text you to confirm.`;
         await sb.rpc('_notify_staff_customer_action', { _title: 'Booking needs your OK', _body: `${req.customer_name || from} wants ${friendlyDate(ai.date)} at ${label}`, _link: '/admin/dashboard?tab=bookings' }).then(() => {}, () => {});
       }
     }

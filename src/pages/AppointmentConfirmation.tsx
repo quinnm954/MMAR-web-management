@@ -137,7 +137,7 @@ const AppointmentConfirmation = () => {
                       )}
                     </div>
                     <h1 className="text-3xl font-bold">
-                      {isConfirmed ? "You're confirmed" : isDeclined ? "Request closed" : "Request received"}
+                      {isConfirmed ? "You're confirmed" : isDeclined ? "Request closed" : "Booking request received"}
                     </h1>
                     <p className="text-muted-foreground mt-1">
                       {data.customer_name ? `Thanks, ${data.customer_name}.` : "Thanks!"}{" "}
@@ -145,7 +145,7 @@ const AppointmentConfirmation = () => {
                         ? "We'll see you at your scheduled time."
                         : isDeclined
                         ? "Please call us if you'd like to reschedule."
-                        : "Our team is verifying your preferred day & time — we'll text you shortly to confirm."}
+                        : "This is a booking request, not a confirmed appointment yet. Mike will text you to confirm."}
                     </p>
                   </div>
                 );
