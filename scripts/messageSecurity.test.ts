@@ -108,6 +108,19 @@ test('invoice, membership and custom payment SMS rejects unknown phones before c
   expect(queries.filter(q => q.table === 'profiles').every(q => q.filters.id === 'customer-1')).toBe(true);
 });
 
+test('a valid invoice payment text uses its customer rather than the supplied customer override', async () => {
+  const fn = await load('payment');
+  globalThis.fetch = (async (_url, options) => {
+    expect(new URLSearchParams(String(options?.body)).get('To')).toBe('+15555550100');
+    sends++; return Response.json({ sid: 'test-sid', status: 'queued' });
+  }) as typeof fetch;
+  const response = await request(fn, { kind: 'invoice', reference_id: 'invoice-1', customer_id: 'wrong-customer', send_sms: true });
+  expect(response.status).toBe(200);
+  expect(sessions).toBe(1);
+  expect(sends).toBe(1);
+  expect(queries.find(q => q.table === 'profiles')?.filters.id).toBe('customer-1');
+});
+
 test('payment phone resolver chooses stored contact and rejects overrides', () => {
   expect(savedPhone(undefined, ['+15555550100'])).toBe('+15555550100');
   expect(savedPhone('(555) 555-0100', ['+15555550100'])).toBe('+15555550100');
