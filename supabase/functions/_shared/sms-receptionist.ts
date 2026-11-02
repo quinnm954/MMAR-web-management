@@ -98,7 +98,7 @@ Rules:
 - Oil changes ONLY for MMAR Care members (our maintenance plan); pitch it briefly and offer to have Mike text sign-up details.
 - Parts sourcing: whenever parts come up, FIRST suggest they order from the Advance Auto Parts website (advanceautoparts.com) with same-day delivery, and we install. If they insist we provide the parts, agree — we'll source them and Mike includes them in the written quote.
 - The only price you may give is the diagnosis fee, only for unknown problems (warning light, noise, no-start, "not sure"): $100, with $50 credited to repair labor if they go ahead. Never quote labor, parts or repair prices — Mike sends a written quote.
-- Default to noon–5 PM Eastern, except from Monday Nov 2, 2026 on the default is 10 AM–5 PM; before that, morning times only when the customer explicitly asks. When asked for tomorrow (or another day), OFFER the earliest checked time on that day in the same reply as any missing-detail question. Do not just call it a preferred day or wait for a name/address before offering. If that day has no openings, say so and offer the next listed day. All offers are pending Mike's final approval, NOT confirmed appointments. Appointments start the next day at the earliest. If availability failed, do not invent a time.
+- Default to noon–5 PM Eastern, except from Monday Nov 2, 2026 on the default is 10 AM–5 PM; before that, morning times only when the customer explicitly asks. When asked for tomorrow (or another day), OFFER the earliest checked time on that day in the same reply as any missing-detail question. Do not just call it a preferred day or wait for a name/address before offering. If that day has no openings, say so and offer the next listed day. All offers are pending Mike's final approval, NOT confirmed appointments. Call them booking requests; never say booked, scheduled, confirmed, "you're set" or "see you" about a request. Appointments start the next day at the earliest. If availability failed, do not invent a time.
 - Whenever offering or discussing a specific time, fill "slot" with its OPEN date/time. Set accepted=true ONLY when the customer chooses or agrees to that specific time, never just because they ask for tomorrow. Save an accepted time as a pending booking request even while collecting missing details. Never say a request was saved before it is saved. Use natural dates/times in the reply, not raw JSON formats.
 OPEN times (Eastern, accounting for appointments, travel and blocked time):
 ${availability}
@@ -134,8 +134,8 @@ Respond ONLY with JSON: {"reply": string, "handoff": boolean, "slot": null or {"
       if (slot?.accepted) {
         const time = label12(Number(slot.time.slice(0, 2)) * 60 + Number(slot.time.slice(3)));
         reply = /mañana|puedes|nombre|dirección/i.test(text)
-          ? `Solicitud guardada para ${friendlyDate(slot.date)} a las ${time}; Mike debe aprobar y confirmar la hora.`
-          : `I've requested ${friendlyDate(slot.date)} at ${time}; Mike will review and text to confirm.`;
+          ? `Listo, envié una solicitud de cita para ${friendlyDate(slot.date)} a las ${time}. Todavía no es una cita confirmada; Mike le enviará un texto para confirmar.`
+          : `Got it — I've sent a booking request for ${friendlyDate(slot.date)} at ${time}. This is not a confirmed appointment yet; Mike will text you to confirm.`;
         reply += contactQuestion(saved);
       } else if (!ai.handoff && !deferDetails && missingTextIntake(saved).length) {
         // Keep answers and checked offers; add intake only when no intake question is present.
