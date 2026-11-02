@@ -1,8 +1,8 @@
 # Roadmap
 
 ## Selected monitoring fixes
-- [ ] Preserve numeric losses in CSV exports while retaining formula neutralization.
-- [ ] Preserve receptionist answers and checked time offers while continuing missing-detail intake; test and deploy affected handlers.
+- [x] Preserve numeric losses in CSV exports while retaining formula neutralization; signed-in report download verified 26 rows including numeric -100.00 and -600.00.
+- [x] Preserve receptionist answers and checked time offers while continuing missing-detail intake; 23 regression tests passed and twilio-inbound-sms deployed. No real customer/carrier text was sent.
 
 ## Receptionist customer intake
 - [x] Removed the outage notice; voice rejects missing new-prospect details, SMS continues collecting name/street address/vehicle and incomplete active threads route to intake.
