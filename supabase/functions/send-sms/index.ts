@@ -1,5 +1,6 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.95.0';
 import { requireStaff } from '../_shared/staff-auth.ts';
+import { savedPhone } from '../_shared/message-recipient.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -10,8 +11,8 @@ const GATEWAY_URL = 'https://connector-gateway.lovable.dev/twilio';
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
-  // Only signed-in staff may text from the business line.
-  const auth = await requireStaff(req);
+  // Only the owner/admin may manually text from the business line.
+  const auth = await requireStaff(req, ['owner', 'admin']);
   if (auth instanceof Response) return new Response(await auth.text(), { status: auth.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
 
   try {
@@ -32,12 +33,16 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ error: 'Twilio not configured. Connect Twilio and set TWILIO_FROM_NUMBER.' }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
 
-    const sb = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
+    const url = Deno.env.get('SUPABASE_URL');
+    const key = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+    if (!url || !key) return new Response(JSON.stringify({ error: 'Service unavailable' }), { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    const sb = createClient(url, key);
     const { data: thread, error: threadError } = await sb.from('sms_threads').select('phone').eq('id', thread_id).maybeSingle();
-    if (threadError || !thread || String(thread.phone).replace(/\D/g, '') !== String(to).replace(/\D/g, '')) {
+    const recipient = thread ? savedPhone(to, [thread.phone]) : undefined;
+    if (threadError || !recipient) {
       return new Response(JSON.stringify({ error: 'Recipient must match the selected conversation' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
-    const params = new URLSearchParams({ To: to, From: TWILIO_FROM });
+    const params = new URLSearchParams({ To: recipient, From: TWILIO_FROM });
     if (body) params.set('Body', body);
     for (const m of items) {
       // Temporary private link Twilio fetches once to deliver the photo.

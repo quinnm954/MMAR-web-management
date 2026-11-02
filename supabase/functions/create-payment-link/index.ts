@@ -1,5 +1,6 @@
 import { PAYMENT_ORIGIN } from '../_shared/payment-origin.ts';
 import { contactBlocked } from '../_shared/contact-block.ts';
+import { savedPhone } from '../_shared/message-recipient.ts';
 // Admin-only: generate a Stripe payment link/checkout session for any of:
 //   - invoice (uses outstanding balance)
 //   - membership_deposit (uses plan.deposit_amount or plan.total_at_signup)
@@ -68,7 +69,8 @@ Deno.serve(async (req) => {
     const amountInput = body?.amount as number | undefined;
     const descriptionInput = body?.description as string | undefined;
     const sendSms = body?.send_sms === true;
-    let phone: string | undefined = body?.phone;
+    const requestedPhone: unknown = body?.phone;
+    let phone: string | undefined;
     let customerId: string | undefined = body?.customer_id;
     let customerEmail: string | undefined;
     let customerName: string | undefined;
@@ -135,27 +137,29 @@ Deno.serve(async (req) => {
       return json(400, { error: "Invalid kind" });
     }
 
-    // Look up customer profile (email, phone via SMS thread if available)
+    // Resolve recipients from the payment's customer, never a caller-selected destination.
     if (customerId) {
-      const { data: profile } = await admin
+      const { data: profile, error: profileError } = await admin
         .from("profiles")
-        .select("email, full_name")
+        .select("email, full_name, phone")
         .eq("id", customerId)
         .maybeSingle();
+      if (profileError) return json(503, { error: "Could not verify customer" });
+      if (!profile) return json(404, { error: "Customer not found" });
       customerEmail = profile?.email || customerEmail;
       customerName = customerName || profile?.full_name || undefined;
-      if (sendSms && !phone) {
-        const { data: thread } = await admin
+      if (sendSms) {
+        const { data: threads, error: threadError } = await admin
           .from("sms_threads")
           .select("phone")
           .eq("customer_id", customerId)
-          .order("updated_at", { ascending: false })
-          .limit(1)
-          .maybeSingle();
-        if (thread) phone = thread.phone;
+          .order("updated_at", { ascending: false });
+        if (threadError) return json(503, { error: "Could not verify customer phone" });
+        phone = savedPhone(requestedPhone, [profile.phone, ...(threads || []).map((thread: { phone: string }) => thread.phone)]);
       }
       metadata.customer_id = customerId;
     }
+    if (sendSms && !phone) return json(400, { error: "Payment texts require a saved phone belonging to this customer" });
 
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY")!, {
       apiVersion: "2025-08-27.basil",
@@ -194,7 +198,7 @@ Deno.serve(async (req) => {
       return json(200, { ok: true, url: session.url, message });
     }
 
-    if (!phone) return json(400, { error: "No phone number available. Provide one." });
+    if (!phone) return json(400, { error: "No saved customer phone available" });
     if (await contactBlocked({ phone, jobIds: [metadata.invoice_id] })) {
       return json(409, { error: "This customer said they were unhappy, so automated texts are off. Copy the link and text them yourself from the Phone screen if you choose.", url: session.url, message });
     }
