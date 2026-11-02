@@ -1,5 +1,9 @@
 # Roadmap
 
+## Selected monitoring fixes
+- [ ] Preserve numeric losses in CSV exports while retaining formula neutralization.
+- [ ] Preserve receptionist answers and checked time offers while continuing missing-detail intake; test and deploy affected handlers.
+
 ## Receptionist customer intake
 - [x] Removed the outage notice; voice rejects missing new-prospect details, SMS continues collecting name/street address/vehicle and incomplete active threads route to intake.
 - [x] Intake and returning-customer tests passed; deployed five handlers and live voice setup returned success. No real caller/carrier conversation was initiated, so future real-customer delivery is not verified.
