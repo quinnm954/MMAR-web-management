@@ -2,8 +2,8 @@
 
 ## Remaining selected security findings
 - [ ] Protect all six Twilio webhook handlers (10 findings). Blocked: TWILIO_AUTH_TOKEN request declined; leave live handlers unchanged to avoid disrupting calls/texts.
-- [ ] Restrict manual messaging permissions and bind email/payment recipients to saved contacts (3 findings).
-- [ ] Run targeted regression checks, deploy and verify protection, then mark only the 13 selected findings fixed.
+- [x] Restrict manual SMS/email to owner/admin and bind email/payment recipients to saved contacts (3 findings).
+- [x] Five security tests and 11 regression tests passed; deployed three senders and verified signed-in rejection of unrelated recipients with HTTP 400. Marked those three findings fixed; no real messages sent. Remaining 10 stay active pending the verification credential.
 
 ## Higher-margin SEO priorities
 - [x] Record alternator, starter and brake repair searches as higher priority than battery replacement because margins are higher; no SEO page or ad changes requested yet.
