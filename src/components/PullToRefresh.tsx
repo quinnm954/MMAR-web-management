@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { RefreshCw } from "lucide-react";
+import { canStartPullToRefresh } from '@/lib/pullToRefresh';
 
 const THRESHOLD = 70; // px to trigger
 const MAX_PULL = 120; // px max visual stretch
@@ -36,13 +37,22 @@ const PullToRefresh = () => {
     if (!enabled) return;
 
     const onTouchStart = (e: TouchEvent) => {
-      if (window.scrollY > 0 || refreshing) return;
+      active.current = false;
+      startY.current = null;
+      setPull(0);
+      if (refreshing || !canStartPullToRefresh(e.target, window.scrollY)) return;
       startY.current = e.touches[0].clientY;
       active.current = true;
     };
 
     const onTouchMove = (e: TouchEvent) => {
       if (!active.current || startY.current == null) return;
+      if (!canStartPullToRefresh(e.target, window.scrollY)) {
+        active.current = false;
+        startY.current = null;
+        setPull(0);
+        return;
+      }
       const dy = e.touches[0].clientY - startY.current;
       if (dy <= 0) {
         setPull(0);
@@ -53,11 +63,11 @@ const PullToRefresh = () => {
       setPull(resisted);
     };
 
-    const onTouchEnd = () => {
+    const onTouchEnd = (e: TouchEvent) => {
       if (!active.current) return;
       active.current = false;
       startY.current = null;
-      if (pull >= THRESHOLD) {
+      if (pull >= THRESHOLD && canStartPullToRefresh(e.target, window.scrollY)) {
         setRefreshing(true);
         setPull(THRESHOLD);
         // Small delay so the spinner is visible
@@ -66,17 +76,22 @@ const PullToRefresh = () => {
         setPull(0);
       }
     };
+    const onTouchCancel = () => {
+      active.current = false;
+      startY.current = null;
+      setPull(0);
+    };
 
     window.addEventListener("touchstart", onTouchStart, { passive: true });
     window.addEventListener("touchmove", onTouchMove, { passive: true });
     window.addEventListener("touchend", onTouchEnd, { passive: true });
-    window.addEventListener("touchcancel", onTouchEnd, { passive: true });
+    window.addEventListener("touchcancel", onTouchCancel, { passive: true });
 
     return () => {
       window.removeEventListener("touchstart", onTouchStart);
       window.removeEventListener("touchmove", onTouchMove);
       window.removeEventListener("touchend", onTouchEnd);
-      window.removeEventListener("touchcancel", onTouchEnd);
+      window.removeEventListener("touchcancel", onTouchCancel);
     };
   }, [enabled, pull, refreshing]);
 
