@@ -18,6 +18,7 @@ function hasUnsavedText() {
 
 export function isSafeToReload() {
   if (document.hidden) return false;
+  if (document.querySelector('[data-auto-refresh-blocked="true"]')) return false;
   if ((window as any).__gaCallActive) return false;
   const a = document.activeElement as HTMLElement | null;
   if (a && (a.tagName === "INPUT" || a.tagName === "TEXTAREA" || a.tagName === "SELECT" || a.isContentEditable)) return false;
@@ -39,10 +40,15 @@ export function useAutoRefresh() {
     }
 
     let pending = false;
+    let lastScrollAt = 0;
+    let touching = false;
+    const onScroll = () => { lastScrollAt = Date.now(); };
+    const onTouchStart = () => { touching = true; onScroll(); };
+    const onTouchEnd = () => { touching = false; onScroll(); };
     let retry: ReturnType<typeof setTimeout> | null = null;
     const attempt = () => {
       if (retry) { clearTimeout(retry); retry = null; }
-      if (isSafeToReload()) {
+      if (!touching && Date.now() - lastScrollAt >= 15_000 && isSafeToReload()) {
         try { sessionStorage.setItem(SCROLL_KEY(location.pathname + location.search), String(window.scrollY)); } catch {}
         window.location.reload();
         return;
@@ -57,12 +63,22 @@ export function useAutoRefresh() {
       if (e.data?.type === "push-received" || e.data?.type === "badge-refresh") attempt();
     };
     window.addEventListener(AUTO_REFRESH_EVENT, onNotify);
+    document.addEventListener('scroll', onScroll, { capture: true, passive: true });
+    document.addEventListener('wheel', onScroll, { passive: true });
+    document.addEventListener('touchstart', onTouchStart, { passive: true });
+    document.addEventListener('touchend', onTouchEnd, { passive: true });
+    document.addEventListener('touchcancel', onTouchEnd, { passive: true });
     document.addEventListener("visibilitychange", onVis);
     navigator.serviceWorker?.addEventListener?.("message", onSw);
     return () => {
       clearInterval(interval);
       if (retry) clearTimeout(retry);
       window.removeEventListener(AUTO_REFRESH_EVENT, onNotify);
+      document.removeEventListener('scroll', onScroll, true);
+      document.removeEventListener('wheel', onScroll);
+      document.removeEventListener('touchstart', onTouchStart);
+      document.removeEventListener('touchend', onTouchEnd);
+      document.removeEventListener('touchcancel', onTouchEnd);
       document.removeEventListener("visibilitychange", onVis);
       navigator.serviceWorker?.removeEventListener?.("message", onSw);
     };

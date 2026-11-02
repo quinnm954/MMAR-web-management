@@ -18,6 +18,7 @@ import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { clearAppBadge } from '@/lib/appBadge';
+import { clearCommunicationUnread, NOTIFICATIONS_CLEARED_EVENT } from '@/lib/clearCommunicationUnread';
 
 type Mode = 'inbox' | 'calls' | 'texts' | 'chat' | 'email';
 type EmailFolder = 'inbox' | 'sent' | 'drafts';
@@ -454,11 +455,28 @@ export default function AdminPhoneHub({ fullscreen = false }: { fullscreen?: boo
   const clearPhoneNotifs = async () => {
     const { data: auth } = await supabase.auth.getUser();
     if (!auth.user) return;
-    const { error } = await supabase.from('notifications').update({ read_at: new Date().toISOString() }).eq('user_id', auth.user.id).eq('category', 'message_updates').is('read_at', null);
-    if (error) return toast.error(error.message);
-    setPhoneNotifs([]); clearAppBadge(); setBellOpen(false);
-    toast.success('Phone notifications cleared');
+    const now = new Date().toISOString();
+    try {
+      await clearCommunicationUnread(supabase, now);
+      const { error } = await supabase.from('notifications').update({ read_at: now }).eq('user_id', auth.user.id).eq('category', 'message_updates').is('read_at', null).lte('created_at', now);
+      if (error) throw error;
+      setCalls(cur => cur.map(c => c.created_at <= now ? { ...c, read_at: c.read_at || now } : c));
+      setThreads(cur => cur.map(t => t.last_message_at <= now ? { ...t, unread_count: 0 } : t));
+      setEmails(cur => cur.map(e => e.at <= now ? { ...e, unread: false } : e));
+      setPhoneNotifs(cur => cur.filter(n => n.created_at > now));
+      clearAppBadge(); setBellOpen(false);
+      window.dispatchEvent(new Event(NOTIFICATIONS_CLEARED_EVENT));
+      toast.success('Phone notifications cleared');
+    } catch {
+      toast.error('Could not clear all phone alerts. Please try again.');
+    }
   };
+
+  useEffect(() => {
+    const refreshCleared = () => { void load(); void refreshBell(); };
+    window.addEventListener(NOTIFICATIONS_CLEARED_EVENT, refreshCleared);
+    return () => window.removeEventListener(NOTIFICATIONS_CLEARED_EVENT, refreshCleared);
+  }, [load, refreshBell]);
 
   const startText = async (phone: string) => {
     try {
@@ -557,7 +575,7 @@ export default function AdminPhoneHub({ fullscreen = false }: { fullscreen?: boo
   const screen = (
       <>
         {/* Screen stack: list (base) + detail (slides in) */}
-        <div className="relative h-full w-full overflow-hidden">
+        <div data-auto-refresh-blocked={hasDetail || scrolled || bellOpen || composeOpen || newTextOpen || dialOpen} className="relative h-full w-full overflow-hidden">
           <section style={dragging ? { transform: `translateX(calc(-25% + ${dragX}px * 0.25))`, opacity: 0.6 + 0.4 * Math.min(1, dragX! / 390), transition: 'none' } : undefined} className={cn('absolute inset-0 flex flex-col transition-transform duration-300 ease-out', hasDetail && '-translate-x-1/4 opacity-60 pointer-events-none')}>
             <StatusBar />
             {/* Compact nav bar */}
@@ -675,7 +693,7 @@ export default function AdminPhoneHub({ fullscreen = false }: { fullscreen?: boo
             <div className="flex items-center justify-between mb-2">
               <button onClick={() => setBellOpen(false)} className="text-[17px] text-[hsl(var(--ios-blue))]">Done</button>
               <span className="text-[17px] font-semibold">Phone Alerts</span>
-              <button onClick={clearPhoneNotifs} disabled={!phoneNotifs.length} className="text-[17px] text-[hsl(var(--ios-red))] disabled:opacity-40">Clear all</button>
+              <Button variant="ghost" onClick={clearPhoneNotifs} disabled={!phoneNotifs.length && !feed.some(item => item.unread)} className="text-[17px] text-[hsl(var(--ios-red))] disabled:opacity-40">Clear all</Button>
             </div>
             <div className="flex-1 min-h-0 overflow-y-auto">
               {phoneNotifs.length === 0 ? <p className="py-16 text-center text-[15px] text-[hsl(var(--ios-label-2))]">No new phone alerts.</p> : phoneNotifs.map(n => (

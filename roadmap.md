@@ -1,5 +1,9 @@
 # Roadmap
 
+## Notification clearing and message browsing
+- [x] Clear phone unread dots and counts together with dismissed notifications; signed-in Clear all removed dots and the bell stayed clear after reopening.
+- [x] Defer page reloads while scrolling or reading an open message thread; three regression tests passed and a real signed-in text thread survived notification and 30-second reload triggers.
+
 ## Remaining selected security findings
 - [x] Protect all six Twilio webhook handlers (10 findings) with account-bound signatures covering exact configured public URL/query and complete form. Three security tests and seven regression tests passed; all six deployed handlers reject unsigned requests (401) and accept signed no-action requests (200). No customer calls/texts initiated; next genuine carrier interaction remains unobserved.
 - [x] Restrict manual SMS/email to owner/admin and bind email/payment recipients to saved contacts (3 findings).

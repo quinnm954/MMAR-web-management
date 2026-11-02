@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { setAppBadge, clearAppBadge } from "@/lib/appBadge";
 import { isPhoneApp } from "@/lib/phoneApp";
+import { NOTIFICATIONS_CLEARED_EVENT } from '@/lib/clearCommunicationUnread';
 
 /**
  * Global hook: keeps the installed PWA app-icon badge in sync with the
@@ -53,6 +54,7 @@ export function useAppBadgeSync() {
     const onResume = () => { if (document.visibilityState === "visible") refresh(); };
     document.addEventListener("visibilitychange", onResume);
     window.addEventListener("focus", onResume);
+    window.addEventListener(NOTIFICATIONS_CLEARED_EVENT, refresh);
     const onSwMsg = (e: MessageEvent) => { if (e.data?.type === "badge-refresh") refresh(); };
     navigator.serviceWorker?.addEventListener?.("message", onSwMsg);
 
@@ -60,6 +62,7 @@ export function useAppBadgeSync() {
       cancelled = true;
       document.removeEventListener("visibilitychange", onResume);
       window.removeEventListener("focus", onResume);
+      window.removeEventListener(NOTIFICATIONS_CLEARED_EVENT, refresh);
       navigator.serviceWorker?.removeEventListener?.("message", onSwMsg);
       supabase.removeChannel(ch);
     };
