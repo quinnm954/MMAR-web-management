@@ -138,8 +138,10 @@ Respond ONLY with JSON: {"reply": string, "handoff": boolean, "slot": null or {"
           : `I've requested ${friendlyDate(slot.date)} at ${time}; Mike will review and text to confirm.`;
         reply += contactQuestion(saved);
       } else if (!ai.handoff && !deferDetails && missingTextIntake(saved).length) {
-        // Do not let a generic acknowledgment end an incomplete prospect intake.
-        reply = contactQuestion(saved).trim();
+        // Keep answers and checked offers; add intake only when no intake question is present.
+        if (!/\b(?:name|address|year|make|model|nombre|direcci[oó]n|año|marca|modelo)\b[^?]*\?/i.test(reply)) {
+          reply = (reply + contactQuestion(saved)).trim();
+        }
       }
     } catch (error) {
       console.error('sms booking save', error);
