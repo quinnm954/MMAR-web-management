@@ -1,9 +1,12 @@
 # Roadmap
 
 ## Remaining selected security findings
-- [ ] Protect all six Twilio webhook handlers with verified provider authentication while preserving live calls/texts (10 findings).
-- [ ] Restrict manual messaging permissions and bind email/payment recipients to saved contacts (3 findings).
-- [ ] Run targeted regression checks, deploy and verify protection, then mark only the 13 selected findings fixed.
+- [ ] Protect all six Twilio webhook handlers (10 findings). Blocked: TWILIO_AUTH_TOKEN request declined; leave live handlers unchanged to avoid disrupting calls/texts.
+- [x] Restrict manual SMS/email to owner/admin and bind email/payment recipients to saved contacts (3 findings).
+- [x] Five security tests and 11 regression tests passed; deployed three senders and verified signed-in rejection of unrelated recipients with HTTP 400. Marked those three findings fixed; no real messages sent. Remaining 10 stay active pending the verification credential.
+
+## Higher-margin SEO priorities
+- [x] Record alternator, starter and brake repair searches as higher priority than battery replacement because margins are higher; no SEO page or ad changes requested yet.
 
 ## Selected monitoring fixes
 - [x] Preserve numeric losses in CSV exports while retaining formula neutralization; signed-in report download verified 26 rows including numeric -100.00 and -600.00.
