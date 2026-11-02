@@ -19,7 +19,7 @@ const BookingRequestReceivedEmail = ({
 }: Props) => (
   <Html lang="en">
     <Head />
-    <Preview>We got your request — {SITE_NAME} will text you to confirm.</Preview>
+    <Preview>Booking request received — not a confirmed appointment yet.</Preview>
     <Body style={main}>
       <Container style={container}>
         <BrandHeader />
@@ -27,7 +27,7 @@ const BookingRequestReceivedEmail = ({
         <Heading style={h1}>Request Received</Heading>
         <Text style={text}>{customerName ? `Hi ${customerName},` : 'Hi there,'}</Text>
         <Text style={text}>
-          Thanks for reaching out to {SITE_NAME}. We've received your request and a team member will text you shortly to confirm a day and time.
+          Thanks for reaching out to {SITE_NAME}. We received your booking request. This is not a confirmed appointment yet — Mike will text you to confirm a day and time.
         </Text>
         <Section style={card}>
           {serviceType && <Text style={detail}><strong>Service:</strong> {serviceType}</Text>}
