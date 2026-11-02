@@ -4,6 +4,7 @@ import { twilioMediaPath, mediaExtension, boundedMedia } from '../_shared/inboun
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.95.0';
 import { handleBotReply } from '../_shared/booking-bot.ts';
 import { handleReceptionistText } from '../_shared/sms-receptionist.ts';
+import { readCompetitorQuote } from '../_shared/competitor-quote.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -93,6 +94,16 @@ Deno.serve(async (req) => {
     // Otherwise the AI text receptionist answers (in the background so Twilio gets a fast reply).
     if (body && !botHandled && !silent) {
       const job = handleReceptionistText(sb, from, body, thread.id).catch((e) => console.error('sms receptionist', e));
+      // @ts-ignore EdgeRuntime is provided by the runtime
+      if (typeof EdgeRuntime !== 'undefined') EdgeRuntime.waitUntil(job); else await job;
+    }
+
+    // Photos may be another shop's quote: read it for the owner to compare (never auto-replies).
+    const images = media.filter((m) => m.type.startsWith('image/'));
+    if (images.length) {
+      const job = Promise.all(images.map((m) => readCompetitorQuote(sb, {
+        path: m.path, type: m.type, phone: from, threadId: thread.id, customerId: thread.customer_id ?? null,
+      }).catch((e) => console.error('competitor quote', e))));
       // @ts-ignore EdgeRuntime is provided by the runtime
       if (typeof EdgeRuntime !== 'undefined') EdgeRuntime.waitUntil(job); else await job;
     }
