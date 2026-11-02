@@ -57,7 +57,7 @@ export async function readCompetitorQuote(
     method: 'POST',
     headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: 'google/gemini-2.5-flash',
+      model: 'google/gemini-3.8-flash',
       messages: [
         { role: 'system', content: 'Decide whether the image is an auto-repair price quote. If so, read every priced line (part, labor or fee) with its dollar total, the quote total, the issuing shop, and the customer name, address and vehicle if shown. Never guess values that are not visible.' },
         { role: 'user', content: [{ type: 'text', text: 'Read this image.' }, { type: 'image_url', image_url: { url: `data:${opts.type};base64,${b64}` } }] },
