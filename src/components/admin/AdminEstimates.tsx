@@ -20,6 +20,7 @@ import { shareLink } from '@/lib/share';
 import { startRepairOrderFromEstimate } from '@/lib/repairOrders';
 import DeleteButton from './DeleteButton';
 import { estimateStatusLabel } from '@/lib/estimateStatus';
+import CompetitorQuotePanel from './CompetitorQuotePanel';
 
 interface LineItem { description: string; quantity: number; unit_price: number; amount: number; catalog_item_id?: string; labor_hours?: number; kind?: 'part' | 'labor' | 'fee'; unit_cost?: number; }
 const PARTS_MARKUP = 1.30; // Imported PDF parts arrive already marked up 30% — divide to recover cost
@@ -731,6 +732,8 @@ const AdminEstimates = () => {
                   </Table>
                 </div>
               </div>
+
+              <CompetitorQuotePanel estimateId={editing.id} customerId={editing.customer_id} lines={editing.line_items || []} total={Number(editing.total) || 0} onApply={(li) => updateLines(li as LineItem[])} />
 
               <div><Label>Notes</Label><Textarea value={editing.notes ?? ''} onChange={e => setEditing({ ...editing, notes: e.target.value })} /></div>
 
