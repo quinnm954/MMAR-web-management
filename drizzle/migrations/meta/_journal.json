@@ -442,6 +442,13 @@
       "when": 1793485247863,
       "tag": "0062_preserve_authorized_internal_notifications",
       "breakpoints": true
+    },
+    {
+      "idx": 63,
+      "version": "7",
+      "when": 1793653793274,
+      "tag": "0063_competitor_quotes",
+      "breakpoints": true
     }
   ]
 }
