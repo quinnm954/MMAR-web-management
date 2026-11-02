@@ -16,17 +16,6 @@ export type AppNotification = {
   created_at: string;
 };
 
-function setAppBadge(count: number) {
-  try {
-    const nav: any = navigator;
-    if (count > 0 && typeof nav.setAppBadge === "function") {
-      nav.setAppBadge(count).catch(() => {});
-    } else if (typeof nav.clearAppBadge === "function") {
-      nav.clearAppBadge().catch(() => {});
-    }
-  } catch {}
-}
-
 export function useNotifications(limit = 50) {
   const { user, isAdmin } = useAuth();
   const [items, setItems] = useState<AppNotification[]>([]);
