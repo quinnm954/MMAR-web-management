@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
+import { clearCommunicationUnread, NOTIFICATIONS_CLEARED_EVENT } from '@/lib/clearCommunicationUnread';
 
 export type AppNotification = {
   id: string;
@@ -27,14 +28,13 @@ function setAppBadge(count: number) {
 }
 
 export function useNotifications(limit = 50) {
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const [items, setItems] = useState<AppNotification[]>([]);
   const [loading, setLoading] = useState(true);
 
   const refresh = useCallback(async () => {
     if (!user) {
       setItems([]);
-      setAppBadge(0);
       setLoading(false);
       return;
     }
@@ -47,7 +47,6 @@ export function useNotifications(limit = 50) {
     if (!error && data) {
       const list = data as unknown as AppNotification[];
       setItems(list);
-      setAppBadge(list.filter((n) => !n.read_at).length);
     }
     setLoading(false);
   }, [user, limit]);
@@ -93,8 +92,9 @@ export function useNotifications(limit = 50) {
   }, [user, limit, refresh]);
 
   useEffect(() => {
-    setAppBadge(items.filter((n) => !n.read_at).length);
-  }, [items]);
+    window.addEventListener(NOTIFICATIONS_CLEARED_EVENT, refresh);
+    return () => window.removeEventListener(NOTIFICATIONS_CLEARED_EVENT, refresh);
+  }, [refresh]);
 
   const markRead = useCallback(async (id: string) => {
     setItems((prev) => prev.map((n) => (n.id === id ? { ...n, read_at: new Date().toISOString() } : n)));
@@ -107,13 +107,21 @@ export function useNotifications(limit = 50) {
   const markAllRead = useCallback(async () => {
     if (!user) return;
     const now = new Date().toISOString();
-    setItems((prev) => prev.map((n) => (n.read_at ? n : { ...n, read_at: now })));
-    await supabase
+    try {
+      if (isAdmin) await clearCommunicationUnread(supabase, now);
+      const { error } = await supabase
       .from("notifications" as any)
       .update({ read_at: now })
       .eq("user_id", user.id)
-      .is("read_at", null);
-  }, [user]);
+      .is("read_at", null)
+      .lte('created_at', now);
+      if (error) throw error;
+      setItems((prev) => prev.map((n) => (n.read_at || n.created_at > now ? n : { ...n, read_at: now })));
+      window.dispatchEvent(new Event(NOTIFICATIONS_CLEARED_EVENT));
+    } catch {
+      toast.error('Could not clear all notifications. Please try again.');
+    }
+  }, [user, isAdmin]);
 
   const remove = useCallback(async (id: string) => {
     setItems((prev) => prev.filter((n) => n.id !== id));
