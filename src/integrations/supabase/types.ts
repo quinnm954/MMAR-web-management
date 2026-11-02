@@ -811,6 +811,97 @@ export type Database = {
           },
         ]
       }
+      competitor_quotes: {
+        Row: {
+          address: string | null
+          created_at: string
+          customer_id: string | null
+          customer_name: string | null
+          estimate_id: string | null
+          id: string
+          image_path: string
+          itemized: boolean
+          line_items: Json
+          matched_at: string | null
+          matched_by: string | null
+          phone: string | null
+          source_name: string | null
+          status: string
+          thread_id: string | null
+          total: number | null
+          updated_at: string
+          vehicle_make: string | null
+          vehicle_model: string | null
+          vehicle_year: number | null
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string
+          customer_id?: string | null
+          customer_name?: string | null
+          estimate_id?: string | null
+          id?: string
+          image_path: string
+          itemized?: boolean
+          line_items?: Json
+          matched_at?: string | null
+          matched_by?: string | null
+          phone?: string | null
+          source_name?: string | null
+          status?: string
+          thread_id?: string | null
+          total?: number | null
+          updated_at?: string
+          vehicle_make?: string | null
+          vehicle_model?: string | null
+          vehicle_year?: number | null
+        }
+        Update: {
+          address?: string | null
+          created_at?: string
+          customer_id?: string | null
+          customer_name?: string | null
+          estimate_id?: string | null
+          id?: string
+          image_path?: string
+          itemized?: boolean
+          line_items?: Json
+          matched_at?: string | null
+          matched_by?: string | null
+          phone?: string | null
+          source_name?: string | null
+          status?: string
+          thread_id?: string | null
+          total?: number | null
+          updated_at?: string
+          vehicle_make?: string | null
+          vehicle_model?: string | null
+          vehicle_year?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "competitor_quotes_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customer_marketing_export"
+            referencedColumns: ["customer_id"]
+          },
+          {
+            foreignKeyName: "competitor_quotes_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "competitor_quotes_estimate_id_fkey"
+            columns: ["estimate_id"]
+            isOneToOne: false
+            referencedRelation: "estimates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customer_satisfaction_feedback: {
         Row: {
           admin_notes: string | null

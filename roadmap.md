@@ -125,3 +125,6 @@
 - [x] Region tabs on booking requests, estimates, repair orders, invoices
 - [x] Region filter on calendar, appointments and Reports; manual region pickers; auto receptionist sync; auto tech assignment
 - [ ] Second Google Business Profile once a tech has a South Florida base address
+
+## Competitor quote matching
+- [x] Read itemized quote photos (lines, name, address, vehicle), show side-by-side in estimate editor with owner-only Match/Ignore; receptionists ask for itemized photos. 3 tests pass; deployed. No real customer photo tested yet.

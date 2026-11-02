@@ -12,3 +12,4 @@
 - PartsTech callbacks require an expiring hashed session capability and never create rows; why: session ids alone do not authorize quote writes.
 - Inbound MMS uses `_shared/inbound-media.ts` for account/message-bound provider URLs, allowed types and bounded downloads; why: arbitrary files and oversized uploads must not reach storage.
 - All six Twilio webhooks call `_shared/twilio-webhook.ts` before side effects; verification binds the configured account, public URL/query and every form parameter using the server-only Account Auth Token; why: forged callbacks must never alter logs, trigger messages or place calls.
+- Competitor quotes: inbound MMS images go through `_shared/competitor-quote.ts` into owner/admin-only `competitor_quotes`, filling only blank profile/vehicle fields; the admin match (`src/lib/competitorQuote.ts`) lowers labor only and never sends; why: the owner decides prices and AI cannot know parts cost.
