@@ -1,5 +1,10 @@
 # Roadmap
 
+## Remaining selected security findings
+- [ ] Protect all six Twilio webhook handlers with verified provider authentication while preserving live calls/texts (10 findings).
+- [ ] Restrict manual messaging permissions and bind email/payment recipients to saved contacts (3 findings).
+- [ ] Run targeted regression checks, deploy and verify protection, then mark only the 13 selected findings fixed.
+
 ## Selected monitoring fixes
 - [x] Preserve numeric losses in CSV exports while retaining formula neutralization; signed-in report download verified 26 rows including numeric -100.00 and -600.00.
 - [x] Preserve receptionist answers and checked time offers while continuing missing-detail intake; 23 regression tests passed and twilio-inbound-sms deployed. No real customer/carrier text was sent.
