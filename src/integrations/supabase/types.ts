@@ -4095,6 +4095,42 @@ export type Database = {
           },
         ]
       }
+      vehicle_name_aliases: {
+        Row: {
+          corrected_make: string
+          corrected_model: string | null
+          make_input: string
+          model_input: string
+        }
+        Insert: {
+          corrected_make: string
+          corrected_model?: string | null
+          make_input: string
+          model_input?: string
+        }
+        Update: {
+          corrected_make?: string
+          corrected_model?: string | null
+          make_input?: string
+          model_input?: string
+        }
+        Relationships: []
+      }
+      vehicle_name_catalog: {
+        Row: {
+          make: string
+          model: string
+        }
+        Insert: {
+          make: string
+          model: string
+        }
+        Update: {
+          make?: string
+          model?: string
+        }
+        Relationships: []
+      }
       vehicle_parts_catalog: {
         Row: {
           created_at: string
