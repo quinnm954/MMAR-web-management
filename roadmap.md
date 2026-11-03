@@ -1,5 +1,9 @@
 # Roadmap
 
+## Vehicle spelling corrections
+- [ ] Automatically correct clear make/model errors on save and clean up existing vehicles.
+- [ ] Show uncertain matches for owner review and verify corrected information reads back.
+
 ## Open Labor Project lookup
 - [x] Reproduced provider model-name rejections (Odessy and generic Box Truck); added real error messages and provider-listed, lookup-only model selection. Seven tests passed and signed-in Odyssey search returned 1.2 alternator hours, added to the unsaved editor then cancelled. Saved records unchanged; preview build clean.
 
