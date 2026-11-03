@@ -7,6 +7,8 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Phone, MessageSquare, Voicemail, PhoneMissed, PhoneIncoming, RefreshCw, Bot } from 'lucide-react';
 import { format } from 'date-fns';
+import { callCustomerName, callPhone, type CallContactProfile } from '@/lib/callContact';
+import { CustomerName } from '@/hooks/useCustomerHappiness';
 
 type CallLog = {
   id: string;
@@ -30,16 +32,18 @@ type Filter = 'all' | 'missed' | 'voicemail' | 'today';
 
 export default function AdminCalls() {
   const [calls, setCalls] = useState<CallLog[]>([]);
+  const [profiles, setProfiles] = useState<CallContactProfile[]>([]);
   const [loading, setLoading] = useState(false);
   const [filter, setFilter] = useState<Filter>('all');
 
   const load = async () => {
     setLoading(true);
-    const { data } = await supabase
+    const [{ data }, profileResult] = await Promise.all([supabase
       .from('call_logs')
       .select('*')
       .order('created_at', { ascending: false })
-      .limit(200);
+      .limit(200), supabase.from('profiles').select('id, full_name, phone')]);
+    setProfiles(profileResult.data ?? []);
     setCalls(((data ?? []) as any[]).map((row) => ({ ...row, ai_transcript: Array.isArray(row.ai_transcript) ? row.ai_transcript.filter((t: any) => typeof t?.message === 'string' && t.message.trim() && t.message.trim() !== '...') : null })) as CallLog[]);
     setLoading(false);
   };
@@ -105,7 +109,10 @@ export default function AdminCalls() {
           </div>
         ) : (
           <div className="space-y-2">
-            {filtered.map(c => (
+            {filtered.map(c => {
+              const number = callPhone(c);
+              const name = callCustomerName(c, profiles);
+              return (
               <div
                 key={c.id}
                 className={`border rounded-lg p-3 ${!c.read_at ? 'border-primary/40 bg-primary/5' : 'border-border'}`}
@@ -113,7 +120,8 @@ export default function AdminCalls() {
                 <div className="flex items-start justify-between gap-3 flex-wrap">
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-mono font-medium">{c.from_number || 'Unknown'}</span>
+                      <CustomerName id={c.customer_id} phone={number} className="font-medium">{name || number || 'Unknown caller'}</CustomerName>
+                      {name && number && <span className="text-xs text-muted-foreground">{number}</span>}
                       {statusBadge(c)}
                       <span className="text-xs text-muted-foreground">
                         {format(new Date(c.created_at), 'MMM d, h:mm a')} · {fmtDur(c.duration_seconds)}
@@ -139,13 +147,13 @@ export default function AdminCalls() {
                     )}
                   </div>
                   <div className="flex flex-col gap-1.5 shrink-0">
-                    {c.from_number && (
+                    {number && (
                       <Button variant="outline" size="sm" asChild>
-                        <a href={`sms:${c.from_number}`}><MessageSquare className="h-3.5 w-3.5 mr-1" />Text back</a>
+                        <a href={`sms:${number}`}><MessageSquare className="h-3.5 w-3.5 mr-1" />Text back</a>
                       </Button>
                     )}
-                    {c.from_number && (
-                      <Button variant="outline" size="sm" onClick={() => dialInApp(c.from_number!)}>
+                    {number && (
+                      <Button variant="outline" size="sm" onClick={() => dialInApp(number)}>
                         <Phone className="h-3.5 w-3.5 mr-1" />Call back
                       </Button>
                     )}
@@ -155,7 +163,7 @@ export default function AdminCalls() {
                   </div>
                 </div>
               </div>
-            ))}
+            ); })}
           </div>
         )}
       </CardContent>
