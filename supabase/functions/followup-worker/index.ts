@@ -1,5 +1,5 @@
 import { requireInternal } from '../_shared/internal-auth.ts';
-// Hourly (pg_cron): estimate nudges (24h, 72h), invoice auto-send + reminders (day 3, day 7),
+// Hourly (pg_cron): silent estimate expiry, invoice auto-send + reminders (day 3, day 7),
 // and a review request 2h after payment. Email always; text only once the A2P campaign is approved.
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import Stripe from 'npm:stripe@18.5.0';
@@ -41,56 +41,11 @@ Deno.serve(async (req) => {
     (await sb.from('profiles').select('full_name,email,phone').eq('id', id).maybeSingle()).data as { full_name?: string; email?: string; phone?: string } | null;
 
   try {
-    // 1) Estimate follow-ups
-    const { data: ests } = await sb.from('estimates')
-      .select('id,customer_id,estimate_number,total,approval_token,sent_at,followup_count,customer_phone')
-      .eq('status', 'sent').lt('followup_count', 2).not('sent_at', 'is', null)
-      .lte('sent_at', new Date(now.getTime() - D).toISOString()).order('sent_at').limit(BATCH);
-    for (const e of ests || []) {
-      const step = e.followup_count + 1;
-      const due = new Date(e.sent_at).getTime() + (step === 1 ? D : 3 * D);
-      if (now.getTime() < due) continue;
-      const p = await profile(e.customer_id);
-      const url = `${SITE}/estimate/${e.approval_token}`;
-      const final = step === 2;
-      // One channel per nudge: text when possible, otherwise email.
-      const phone = p?.phone || e.customer_phone;
-      if (textsOk && phone) {
-        const hi = first(p?.full_name) ? `Hi ${first(p?.full_name)}, ` : 'Hi, ';
-        const enr = await enrollSuffix(sb, e.customer_id);
-        await sendSms(sb, phone, (final
-          ? `${hi}this is Mike's Mobile Auto Repair checking in one last time on your estimate (${money(e.total)}). Approve it here and we'll book the earliest open time: ${url} Cash is not accepted - please pay the invoice online, not the technician. Reply STOP to opt out.`
-          : `${hi}this is Mike's Mobile Auto Repair. Your estimate (${money(e.total)}) is ready whenever you are. Approve all or part of it here: ${url} Cash is not accepted - please pay the invoice online, not the technician. Reply STOP to opt out.`) + enr);
-      } else if (p?.email) {
-        await sendAndLog({ templateName: 'estimate-reminder', recipientEmail: p.email, idempotencyKey: `estimate-reminder-${e.id}-${step}`,
-          templateData: { customerName: first(p.full_name), estimateNumber: e.estimate_number, total: money(e.total), approvalUrl: url, final } });
-      }
-      await sb.from('estimates').update({ followup_count: step, followup_last_at: now.toISOString() }).eq('id', e.id);
-      out.estimates++;
-    }
-
-    // 1a) Pre-expiry nudge (3 days before valid_until), then expire stale estimates.
+    // Estimates expire silently; automatic customer reminders are disabled.
     const etToday = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }));
     const ymd = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
     const todayStr = ymd(etToday);
     const in3 = ymd(new Date(etToday.getTime() + 3 * D));
-    const { data: soon } = await sb.from('estimates')
-      .select('id,customer_id,estimate_number,total,approval_token,customer_phone,valid_until')
-      .eq('status', 'sent').eq('followup_count', 2).gte('valid_until', todayStr).lte('valid_until', in3).limit(BATCH);
-    for (const e of soon || []) {
-      const p = await profile(e.customer_id);
-      const url = `${SITE}/estimate/${e.approval_token}`;
-      const phone = p?.phone || e.customer_phone;
-      if (textsOk && phone) {
-        const hi = first(p?.full_name) ? `Hi ${first(p?.full_name)}, ` : 'Hi, ';
-        await sendSms(sb, phone, `${hi}this is Mike's Mobile Auto Repair. Still interested? Your estimate (${money(e.total)}) expires ${e.valid_until}. Approve it here: ${url} Cash is not accepted - please pay the invoice online, not the technician. Reply STOP to opt out.`);
-      } else if (p?.email) {
-        await sendAndLog({ templateName: 'estimate-reminder', recipientEmail: p.email, idempotencyKey: `estimate-reminder-${e.id}-3`,
-          templateData: { customerName: first(p.full_name), estimateNumber: e.estimate_number, total: money(e.total), approvalUrl: url, final: true } });
-      }
-      await sb.from('estimates').update({ followup_count: 3, followup_last_at: now.toISOString() }).eq('id', e.id);
-      out.estimates++;
-    }
     await sb.from('estimates').update({ status: 'expired' }).eq('status', 'sent').lt('valid_until', todayStr);
 
     // 1a2) Once a day (first run at/after 9am ET): push a to-do summary to staff when something is waiting.
