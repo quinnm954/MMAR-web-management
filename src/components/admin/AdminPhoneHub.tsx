@@ -19,6 +19,7 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { clearAppBadge } from '@/lib/appBadge';
 import { clearCommunicationUnread, NOTIFICATIONS_CLEARED_EVENT } from '@/lib/clearCommunicationUnread';
+import { callCustomerName, callPhone, type CallContactProfile } from '@/lib/callContact';
 
 type Mode = 'inbox' | 'calls' | 'texts' | 'chat' | 'email';
 type EmailFolder = 'inbox' | 'sent' | 'drafts';
@@ -31,6 +32,7 @@ type NamedPhone = { name: string; tag: string };
 
 type CallRow = {
   id: string;
+  customer_id: string | null;
   direction: string;
   from_number: string | null;
   to_number: string | null;
@@ -104,6 +106,7 @@ export default function AdminPhoneHub({ fullscreen = false }: { fullscreen?: boo
   const [threads, setThreads] = useState<TextThread[]>([]);
   const [emails, setEmails] = useState<EmailItem[]>([]);
   const [names, setNames] = useState<Record<string, NamedPhone>>({});
+  const [callProfiles, setCallProfiles] = useState<CallContactProfile[]>([]);
   const [messages, setMessages] = useState<SmsMessage[]>([]);
   const [selected, setSelected] = useState<Selected>(null);
   const [search, setSearch] = useState('');
@@ -141,7 +144,7 @@ export default function AdminPhoneHub({ fullscreen = false }: { fullscreen?: boo
         return { data: all };
       })(),
       supabase.from('email_drafts').select('*').order('updated_at', { ascending: false }).limit(1000),
-      supabase.from('profiles').select('id, full_name, phone').not('phone', 'is', null),
+      supabase.from('profiles').select('id, full_name, phone'),
       supabase.from('employees').select('full_name, phone, user_id').not('phone', 'is', null),
       supabase.from('user_roles').select('user_id, role'),
     ]);
@@ -158,6 +161,7 @@ export default function AdminPhoneHub({ fullscreen = false }: { fullscreen?: boo
       if (key && row.full_name) nextNames[key] = { name: row.full_name, tag: roleByUser[row.user_id] || 'employee' };
     });
     setNames(nextNames);
+    setCallProfiles(profileResult.data ?? []);
     setCalls((callResult.data ?? []).map((row: any) => ({ ...row, ai_transcript: Array.isArray(row.ai_transcript) ? row.ai_transcript.filter((t: any) => typeof t?.message === 'string' && t.message.trim() && t.message.trim() !== '...') : null })) as CallRow[]);
     setThreads((threadResult.data ?? []) as TextThread[]);
 
@@ -277,6 +281,7 @@ export default function AdminPhoneHub({ fullscreen = false }: { fullscreen?: boo
 
   const displayPhone = (phone?: string | null) => names[phoneKey(phone)]?.name || phone || 'Unknown caller';
   const displayTag = (phone?: string | null) => names[phoneKey(phone)]?.tag;
+  const displayCallName = (call: CallRow) => callCustomerName(call, callProfiles) || displayPhone(callPhone(call));
   const happyCls = useCustomerHappiness();
 
   const chatTitle = (t: ChatThread) => {
@@ -291,7 +296,7 @@ export default function AdminPhoneHub({ fullscreen = false }: { fullscreen?: boo
 
   const feed = useMemo<FeedItem[]>(() => {
     const callItems: FeedItem[] = calls.map(call => ({
-      kind: 'call', id: call.id, phone: call.direction === 'outbound' ? call.to_number : call.from_number, title: displayPhone(call.direction === 'outbound' ? call.to_number : call.from_number),
+      kind: 'call', id: call.id, phone: callPhone(call), title: displayCallName(call),
       subtitle: `${call.status === 'missed' || call.status === 'no-answer' ? 'Missed' : call.direction === 'outbound' ? 'Outgoing' : 'Incoming'} call${call.ai_handled ? ' · AI answered' : ''}`,
       at: call.created_at, unread: !call.read_at,
     }));
@@ -305,11 +310,11 @@ export default function AdminPhoneHub({ fullscreen = false }: { fullscreen?: boo
       subtitle: `${item.subject} · ${item.snippet}`, at: item.at, unread: !!item.unread,
     }));
     return [...callItems, ...textItems, ...emailItems].sort((a, b) => b.at.localeCompare(a.at));
-  }, [calls, threads, emails, names, chats, chatNames, chatReads]);
+  }, [calls, threads, emails, names, callProfiles, chats, chatNames, chatReads]);
 
   const q = search.trim().toLowerCase();
   const visibleFeed = feed.filter(item => !q || `${item.title} ${item.subtitle}`.toLowerCase().includes(q));
-  const visibleCalls = calls.filter(call => !q || `${displayPhone(call.from_number)} ${call.from_number} ${call.ai_summary || ''}`.toLowerCase().includes(q));
+  const visibleCalls = calls.filter(call => !q || `${displayCallName(call)} ${callPhone(call)} ${call.ai_summary || ''}`.toLowerCase().includes(q));
   const visibleThreads = threads.filter(thread => !q || `${displayPhone(thread.phone)} ${thread.phone} ${thread.last_message_preview || ''}`.toLowerCase().includes(q));
   const folderKind = { inbox: 'inbound', sent: 'sent', drafts: 'draft' } as const;
   const visibleEmails = emails.filter(item => item.kind === folderKind[emailFolder])
@@ -532,7 +537,7 @@ export default function AdminPhoneHub({ fullscreen = false }: { fullscreen?: boo
   const listContent = mode === 'inbox'
     ? visibleFeed
     : mode === 'calls'
-      ? visibleCalls.map(call => ({ kind: 'call' as const, id: call.id, phone: call.direction === 'outbound' ? call.to_number : call.from_number, title: displayPhone(call.direction === 'outbound' ? call.to_number : call.from_number), subtitle: `${call.status === 'missed' || call.status === 'no-answer' ? 'Missed' : call.direction === 'outbound' ? 'Outgoing' : 'Incoming'} call · ${formatDuration(call.duration_seconds)}`, at: call.created_at, unread: !call.read_at }))
+      ? visibleCalls.map(call => ({ kind: 'call' as const, id: call.id, phone: callPhone(call), title: displayCallName(call), subtitle: `${call.status === 'missed' || call.status === 'no-answer' ? 'Missed' : call.direction.startsWith('outbound') ? 'Outgoing' : 'Incoming'} call · ${formatDuration(call.duration_seconds)}`, at: call.created_at, unread: !call.read_at }))
       : mode === 'texts'
         ? visibleThreads.map(thread => ({ kind: 'text' as const, id: thread.id, phone: thread.phone, title: displayPhone(thread.phone), subtitle: thread.last_message_preview || 'New conversation', at: thread.last_message_at, unread: thread.unread_count > 0 }))
         : mode === 'chat'
@@ -630,6 +635,7 @@ export default function AdminPhoneHub({ fullscreen = false }: { fullscreen?: boo
                         <span className={cn('truncate text-[17px] font-semibold', missed && 'text-[hsl(var(--ios-red))]', item.phone && happyCls(null, item.phone))}>{item.title}</span>
                         <span className="flex items-center gap-1 text-[15px] text-[hsl(var(--ios-label-2))] shrink-0">{shortTime(item.at)}<ChevronRight className="h-4 w-4 opacity-60" /></span>
                       </span>
+                      {item.kind === 'call' && item.phone && item.title !== item.phone && <span className="block text-[13px] text-[hsl(var(--ios-label-2))]">{item.phone}</span>}
                       <span className="block text-[15px] leading-snug text-[hsl(var(--ios-label-2))] line-clamp-2">{item.kind === 'call' && (missed ? <PhoneMissed className="inline h-3.5 w-3.5 mr-1 -mt-0.5" /> : <PhoneIncoming className="inline h-3.5 w-3.5 mr-1 -mt-0.5" />)}{item.subtitle}</span>
                     </span>
                   </button>
@@ -659,7 +665,7 @@ export default function AdminPhoneHub({ fullscreen = false }: { fullscreen?: boo
           <section onTouchStart={hasDetail ? onTouchStart : undefined} onTouchMove={hasDetail ? onTouchMove : undefined} onTouchEnd={hasDetail ? onTouchEnd : undefined} onTouchCancel={() => { swipe.current = null; setDragX(null); }} style={dragging ? { transform: `translateX(${dragX}px)`, transition: 'none', boxShadow: '-8px 0 24px hsl(var(--ios-bg) / 0.6)' } : undefined} className={cn('absolute inset-0 flex flex-col bg-[hsl(var(--ios-bg))] transition-transform duration-300 ease-out', hasDetail ? 'translate-x-0' : 'translate-x-full')}>
             {selected && <StatusBar />}
             {activeCall ? (
-              <CallDetail call={activeCall} name={displayPhone(activeCall.direction === 'outbound' ? activeCall.to_number : activeCall.from_number)} tag={displayTag(activeCall.from_number)} onBack={() => setSelected(null)} onCall={() => { const n = activeCall.direction === 'outbound' ? activeCall.to_number : activeCall.from_number; if (n) dialInApp(n); else toast.error('No phone number on this call'); }} onText={() => { const n = activeCall.direction === 'outbound' ? activeCall.to_number : activeCall.from_number; if (n) startText(n); else toast.error('No phone number on this call'); }} onMail={() => openEmailCompose()} onDelete={() => deleteItem('call', activeCall.id)} />
+              <CallDetail call={activeCall} name={displayCallName(activeCall)} tag={displayTag(callPhone(activeCall))} onBack={() => setSelected(null)} onCall={() => { const n = callPhone(activeCall); if (n) dialInApp(n); else toast.error('No phone number on this call'); }} onText={() => { const n = callPhone(activeCall); if (n) startText(n); else toast.error('No phone number on this call'); }} onMail={() => openEmailCompose()} onDelete={() => deleteItem('call', activeCall.id)} />
             ) : activeThread ? (
               <TextDetail photos={photos} onPhotos={setPhotos} thread={activeThread} name={displayPhone(activeThread.phone)} tag={displayTag(activeThread.phone)} messages={messages} reply={reply} sending={sending} onReply={setReply} onSend={sendText} onBack={() => setSelected(null)} onCall={() => dialInApp(activeThread.phone)} onDelete={() => deleteItem('text', activeThread.id)} onDeleteMessage={deleteSms} onAddCustomer={!activeThread.customer_id && !names[phoneKey(activeThread.phone)] ? () => setAddOpen(true) : undefined} />
             ) : activeChat ? (
@@ -952,7 +958,7 @@ function Group({ children }: { children: React.ReactNode }) {
 
 function CallDetail({ call, name, tag, onBack, onCall, onText, onMail, onDelete }: { call: CallRow; name: string; tag?: string; onBack: () => void; onCall: () => void; onText: () => void; onMail: () => void; onDelete: () => void }) {
   const missed = call.status === 'missed' || call.status === 'no-answer';
-  const number = call.direction === 'outbound' ? call.to_number : call.from_number;
+  const number = callPhone(call);
   return (
     <>
       <NavBar onBack={onBack} back="Recents" right={<button onClick={onDelete} title="Delete call" aria-label="Delete call" className="p-1 text-[hsl(var(--ios-red))]"><Trash2 className="h-5 w-5" /></button>} />
