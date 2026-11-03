@@ -4690,6 +4690,7 @@ export type Database = {
         Returns: boolean
       }
       unread_message_count: { Args: { _user_id: string }; Returns: number }
+      vehicle_name_distance: { Args: { a: string; b: string }; Returns: number }
       window_start_time: { Args: { _w: string }; Returns: string }
     }
     Enums: {
