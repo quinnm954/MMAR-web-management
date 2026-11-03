@@ -1,5 +1,8 @@
 # Roadmap
 
+## Open Labor Project lookup
+- [x] Reproduced provider model-name rejections (Odessy and generic Box Truck); added real error messages and provider-listed, lookup-only model selection. Seven tests passed and signed-in Odyssey search returned 1.2 alternator hours, added to the unsaved editor then cancelled. Saved records unchanged; preview build clean.
+
 ## Existing-customer check-ins
 - [x] Reuse pending requests without an age cutoff and route phone/text check-ins to existing open orders without changing times; multiple open orders go to staff.
 - [x] Twenty-one tests passed, both receptionists deployed and voice sync verified; Joel’s live account resolves his existing AC Hose order. No customer contacted; a new carrier check-in remains unobserved.

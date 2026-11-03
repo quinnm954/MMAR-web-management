@@ -21,6 +21,7 @@ import { startRepairOrderFromEstimate } from '@/lib/repairOrders';
 import DeleteButton from './DeleteButton';
 import { estimateStatusLabel } from '@/lib/estimateStatus';
 import CompetitorQuotePanel from './CompetitorQuotePanel';
+import { laborGuideFailure } from '@/lib/laborGuideError';
 
 interface LineItem { description: string; quantity: number; unit_price: number; amount: number; catalog_item_id?: string; labor_hours?: number; kind?: 'part' | 'labor' | 'fee'; unit_cost?: number; }
 const PARTS_MARKUP = 1.30; // Imported PDF parts arrive already marked up 30% — divide to recover cost
@@ -310,6 +311,15 @@ const AdminEstimates = () => {
   const [laborJob, setLaborJob] = useState('');
   const [laborResults, setLaborResults] = useState<{ engine: string; job: string; hours: number }[]>([]);
   const [laborLoading, setLaborLoading] = useState(false);
+  const [laborError, setLaborError] = useState('');
+  const [laborModels, setLaborModels] = useState<string[]>([]);
+  const [laborModel, setLaborModel] = useState('');
+  useEffect(() => {
+    setLaborResults([]);
+    setLaborError('');
+    setLaborModels([]);
+    setLaborModel('');
+  }, [editing?.vehicle_id, editing?.id]);
   const [fcOpen, setFcOpen] = useState(false);
   const fcWindowRef = useRef<Window | null>(null);
 
@@ -335,15 +345,23 @@ const AdminEstimates = () => {
     const vehicle = vehicles.find(v => v.id === editing?.vehicle_id);
     if (!vehicle?.year || !vehicle?.make || !vehicle?.model) return toast.error('Pick a vehicle with year, make and model first');
     setLaborLoading(true);
+    setLaborResults([]);
+    setLaborError('');
     try {
       const { data, error } = await supabase.functions.invoke('partstech-gateway?action=olp-labor', {
-        body: { year: vehicle.year, make: vehicle.make, model: vehicle.model, job: laborJob.trim() || undefined },
+        body: { year: vehicle.year, make: vehicle.make, model: laborModel || vehicle.model, job: laborJob.trim() || undefined },
       });
-      if (error) throw error;
-      if (data?.error) throw new Error(data.error);
+      if (error || data?.error) {
+        const payload = error?.context instanceof Response
+          ? await error.context.clone().json().catch(() => null) : data;
+        const failure = laborGuideFailure(payload);
+        setLaborModels(failure.models);
+        throw new Error(payload ? failure.message : error?.message || failure.message);
+      }
       setLaborResults(data.results ?? []);
       if (!data.results?.length) toast.info('No labor times found — try a shorter job name');
     } catch (e: any) {
+      setLaborError(e.message || 'Labor lookup failed');
       toast.error(e.message || 'Labor lookup failed');
     } finally { setLaborLoading(false); }
   };
@@ -659,6 +677,16 @@ const AdminEstimates = () => {
                 </div>
                 {laborOpen && (
                   <div className="border rounded p-3 space-y-2 bg-muted/30">
+                    {laborError && <p role="alert" className="text-sm text-destructive">{laborError}</p>}
+                    {laborModels.length > 0 && (
+                      <div className="space-y-1">
+                        <Label htmlFor="labor-guide-model">Guide model</Label>
+                        <Select value={laborModel} onValueChange={v => { setLaborModel(v); setLaborResults([]); }}>
+                          <SelectTrigger id="labor-guide-model"><SelectValue placeholder="Select exact model" /></SelectTrigger>
+                          <SelectContent>{laborModels.map(model => <SelectItem key={model} value={model}>{model}</SelectItem>)}</SelectContent>
+                        </Select>
+                      </div>
+                    )}
                     <div className="flex gap-2">
                       <Input className="h-8" placeholder="Job, e.g. brake pads, starter, alternator (blank = all)" value={laborJob}
                         onChange={e => setLaborJob(e.target.value)} onKeyDown={e => e.key === 'Enter' && searchLabor()} />
