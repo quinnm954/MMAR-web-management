@@ -1,5 +1,9 @@
 # Roadmap
 
+## Vehicle spelling corrections
+- [x] Loaded 2,442 official names and verified spelling aliases; save triggers correct clear makes/models while preserving trims and numeric variants. Cleaned 30 saved vehicle entries.
+- [x] Added Customers → Vehicle Corrections with 11 uncertain records and closest-name suggestions. Signed-in saves read back Odyssey and Hyundai; the unclear truck stayed unchanged. Five tests passed, preview build clean; no customer messages sent.
+
 ## Open Labor Project lookup
 - [x] Reproduced provider model-name rejections (Odessy and generic Box Truck); added real error messages and provider-listed, lookup-only model selection. Seven tests passed and signed-in Odyssey search returned 1.2 alternator hours, added to the unsaved editor then cancelled. Saved records unchanged; preview build clean.
 

@@ -449,6 +449,27 @@
       "when": 1793653793274,
       "tag": "0063_competitor_quotes",
       "breakpoints": true
+    },
+    {
+      "idx": 64,
+      "version": "7",
+      "when": 1793725719590,
+      "tag": "0064_vehicle_name_corrections",
+      "breakpoints": true
+    },
+    {
+      "idx": 65,
+      "version": "7",
+      "when": 1793725855799,
+      "tag": "0065_apply_vehicle_spelling_normalization",
+      "breakpoints": true
+    },
+    {
+      "idx": 66,
+      "version": "7",
+      "when": 1793725941241,
+      "tag": "0066_vehicle_make_spelling_correction",
+      "breakpoints": true
     }
   ]
 }
