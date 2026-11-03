@@ -1,5 +1,8 @@
 # Roadmap
 
+## Open Labor Project lookup
+- [ ] Reproduce the labor lookup failure, correct the cause and verify labor results in the estimate editor.
+
 ## Existing-customer check-ins
 - [x] Reuse pending requests without an age cutoff and route phone/text check-ins to existing open orders without changing times; multiple open orders go to staff.
 - [x] Twenty-one tests passed, both receptionists deployed and voice sync verified; Joel’s live account resolves his existing AC Hose order. No customer contacted; a new carrier check-in remains unobserved.
