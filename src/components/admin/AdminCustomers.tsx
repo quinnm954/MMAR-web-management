@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import VehicleMasterChecklist from "@/components/VehicleMasterChecklist";
+import VehicleNameReview from './VehicleNameReview';
 
 interface Customer {
   id: string;
@@ -243,6 +244,7 @@ const AdminCustomers = () => {
           <Download className="h-3.5 w-3.5" /> Marketing CSV
         </Button>
         <span className="text-xs text-muted-foreground ml-auto">{filtered.length} of {customers.length}</span>
+        <VehicleNameReview customerName={id => customers.find(c => c.id === id)?.full_name || 'Customer'} />
       </div>
 
       {loading ? (
