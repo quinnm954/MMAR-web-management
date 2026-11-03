@@ -1,5 +1,9 @@
 # Roadmap
 
+## Existing-customer check-ins
+- [ ] Reuse pending requests and open repair orders for phone/text follow-ups; do not create duplicate requests or change confirmed times.
+- [ ] Test request reuse and open-order updates, deploy affected receptionists, and verify saved updates.
+
 ## Notification clearing and message browsing
 - [x] Clear phone unread dots and counts together with dismissed notifications; signed-in Clear all removed dots and the bell stayed clear after reopening.
 - [x] Defer page reloads while scrolling or reading an open message thread; three regression tests passed and a real signed-in text thread survived notification and 30-second reload triggers.
