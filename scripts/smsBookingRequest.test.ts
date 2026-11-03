@@ -36,8 +36,8 @@ function client(existing: any[] = [], failure = false) {
   const writes: { table: string; operation: string; payload: any }[] = [];
   const notices: any[] = [];
   return { writes, notices, from(table: string) {
-    const query: any = { then(resolve: any) { return Promise.resolve({ data: existing, error: failure ? { message: 'failed' } : null }).then(resolve); } };
-    for (const method of ['select', 'gte', 'in', 'order', 'eq']) query[method] = () => query;
+    const query: any = { then(resolve: any) { return Promise.resolve({ data: table === 'booking_requests' ? existing.map(r => ({ status: 'new', ...r })) : [], error: failure ? { message: 'failed' } : null }).then(resolve); } };
+    for (const method of ['select', 'gte', 'in', 'order', 'eq', 'ilike', 'not']) query[method] = () => query;
     for (const operation of ['insert', 'update']) query[operation] = (payload: any) => {
       writes.push({ table, operation, payload }); return query;
     };

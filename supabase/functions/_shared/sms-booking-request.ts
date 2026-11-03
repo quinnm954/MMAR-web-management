@@ -1,5 +1,6 @@
 import { hhmm, label12 } from './booking-bot.ts';
 import { missingReceptionistDetails } from './receptionist-intake.ts';
+import { existingCustomerWork, recordRepairCheckIn } from './existing-repair.ts';
 
 export type TextSlot = { date: string; time: string; accepted: boolean };
 export type TextBooking = {
@@ -44,12 +45,11 @@ export function checkedTextSlot(value: unknown, days: OpenDay[]): TextSlot | nul
 // Only intake rows are written here; appointments remain exclusively staff-approved.
 export async function saveTextBookingRequest(sb: any, phone: string, booking: TextBooking, slot: TextSlot | null,
   profile?: CustomerDetails) {
-  const { data: requests, error: lookupError } = await sb.from('booking_requests')
-    .select('id, customer_phone, customer_name, customer_email, vehicle_info, description, service_address, notes').gte('created_at', new Date(Date.now() - 3 * 86400_000).toISOString())
-    .in('status', ['new', 'contacted']).order('created_at', { ascending: false });
-  if (lookupError) throw new Error('Could not check existing text requests');
-  const key = phone.replace(/\D/g, '').slice(-10);
-  const existing = (requests || []).find((r: any) => String(r.customer_phone || '').replace(/\D/g, '').slice(-10) === key);
+  const work = await existingCustomerWork(sb, phone);
+  if (await recordRepairCheckIn(sb, work.orders, booking.description || '')) {
+    return resolvedTextBooking(booking, profile);
+  }
+  const existing = work.request;
   const resolved = resolvedTextBooking(booking, profile, existing);
   const chosen = slot?.accepted ? slot : null;
   const payload = {

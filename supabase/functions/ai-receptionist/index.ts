@@ -14,6 +14,7 @@ import { receptionistSlots, receptionistFromDate, RECEPTIONIST_RESUME_DATE, defa
 import { buildLaborQuote, quoteSentence, createDraftEstimate } from '../_shared/labor-quote.ts';
 import { hasOilChangeMembership, oilChangeBlocked, OIL_CHANGE_MEMBERSHIP_REPLY } from '../_shared/oil-change-eligibility.ts';
 import { missingReceptionistDetails } from '../_shared/receptionist-intake.ts';
+import { existingCustomerWork, recordRepairCheckIn } from '../_shared/existing-repair.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -334,7 +335,9 @@ Deno.serve(async (req) => {
       const veh = [...new Set((vs || []).map((v: any) => [v.year, v.make, v.model, v.engine].filter(Boolean).join(' ').toLowerCase()))].join('; ');
       const addr = [p.address_line1, p.city].filter(Boolean).join(', ');
       const member = await hasOilChangeMembership(sb, String(body.caller_number || ''), p.id);
-      return json({ result: `Existing customer on file. Name: ${p.full_name || 'unknown'}. Vehicles: ${veh || 'none on file'}. Service address: ${addr || 'none on file'}. MMAR Care active subscription: ${member ? 'verified' : 'NOT verified — no oil-change times or booking'}. Verify these with the caller instead of asking from scratch; only ask for what is missing or changed.` });
+      const work = await existingCustomerWork(sb, String(body.caller_number || ''), p.id);
+      const current = work.orders.length ? ` Open repair orders: ${work.orders.map((o: any) => `${o.repair_order_number || o.id}: ${o.service_type}, ${o.status}, scheduled ${o.scheduled_at || 'not confirmed'}`).join('; ')}. This is an existing-job check-in: do not offer new times or create a new request. Use create_booking_request only to record the caller's update on existing work; Mike handles scheduling changes.` : work.request ? ' An existing booking request is pending; reuse it, never create another.' : '';
+      return json({ result: `Existing customer on file. Name: ${p.full_name || 'unknown'}. Vehicles: ${veh || 'none on file'}. Service address: ${addr || 'none on file'}. MMAR Care active subscription: ${member ? 'verified' : 'NOT verified — no oil-change times or booking'}. Verify these with the caller instead of asking from scratch; only ask for what is missing or changed.${current}` });
     }
 
     if (action === 'quote') {
@@ -359,6 +362,10 @@ Deno.serve(async (req) => {
       if (!phone && sid) {
         const { data: c } = await sb.from('call_logs').select('from_number').eq('twilio_call_sid', sid).maybeSingle();
         phone = c?.from_number || '';
+      }
+      const work = await existingCustomerWork(sb, phone);
+      if (await recordRepairCheckIn(sb, work.orders, [body.description, body.notes].filter(Boolean).join('\n'))) {
+        return json({ result: 'Update recorded for existing repair work; no new booking request was created and no appointment time was changed. Tell the caller Mike will review their update.' });
       }
       if (await oilChangeBlocked(sb, { customer_phone: phone, description: body.description, notes: body.notes })) {
         return json({ result: OIL_CHANGE_MEMBERSHIP_REPLY, membershipRequired: true });
@@ -409,20 +416,23 @@ Deno.serve(async (req) => {
         window = label;
         slotTime = `${tm[1].padStart(2, '0')}:${tm[2]}`;
       }
-      const notes = [body.notes && String(body.notes).startsWith('WAITLIST') && 'WAITLIST – no tech in this area yet', window && `Requested appointment: ${dateStr} at ${window}`, 'Booked by AI receptionist']
+      const notes = [work.request?.notes, body.notes && String(body.notes).startsWith('WAITLIST') && 'WAITLIST – no tech in this area yet', window && `Requested appointment: ${dateStr} at ${window}`, 'Booked by AI receptionist']
         .filter(Boolean).join('\n');
-      const { data: ins, error } = await sb.from('booking_requests').insert({
-        customer_name: String(body.customer_name || 'Phone caller').slice(0, 200),
+      const payload = {
+        customer_name: String(body.customer_name || work.request?.customer_name || 'Phone caller').slice(0, 200),
         customer_phone: phone || 'unknown',
-        vehicle_info: body.vehicle_info ? String(body.vehicle_info).slice(0, 200) : null,
-        description: body.description ? String(body.description).slice(0, 2000) : null,
-        service_address: body.service_address ? String(body.service_address).slice(0, 300) : null,
+        vehicle_info: body.vehicle_info ? String(body.vehicle_info).slice(0, 200) : work.request?.vehicle_info || null,
+        description: body.description ? String(body.description).slice(0, 2000) : work.request?.description || null,
+        service_address: body.service_address ? String(body.service_address).slice(0, 300) : work.request?.service_address || null,
         service_type: 'General Repair',
         source: 'ai_phone',
-        requested_date: window ? dateStr : null,
-        requested_time_window: window,
+        requested_date: window ? dateStr : work.request?.requested_date || null,
+        requested_time_window: window || work.request?.requested_time_window || null,
         notes,
-      }).select('id').single();
+      };
+      const { data: ins, error } = work.request
+        ? await sb.from('booking_requests').update(payload).eq('id', work.request.id).select('id').single()
+        : await sb.from('booking_requests').insert(payload).select('id').single();
       if (ins?.id) { await sb.from('booking_requests').update({ geo_source: 'caller' }).eq('id', ins.id); await geocodeRow(sb, 'booking_requests', ins.id); }
       if (error) {
         console.error('booking insert', error);

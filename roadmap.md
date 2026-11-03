@@ -1,5 +1,9 @@
 # Roadmap
 
+## Existing-customer check-ins
+- [x] Reuse pending requests without an age cutoff and route phone/text check-ins to existing open orders without changing times; multiple open orders go to staff.
+- [x] Twenty-one tests passed, both receptionists deployed and voice sync verified; Joel’s live account resolves his existing AC Hose order. No customer contacted; a new carrier check-in remains unobserved.
+
 ## Notification clearing and message browsing
 - [x] Clear phone unread dots and counts together with dismissed notifications; signed-in Clear all removed dots and the bell stayed clear after reopening.
 - [x] Defer page reloads while scrolling or reading an open message thread; three regression tests passed and a real signed-in text thread survived notification and 30-second reload triggers.
