@@ -45,7 +45,8 @@ Deno.serve(async req => {
       if (candidates.some(m => nameKey(m) === nameKey(v.model))) return [];
       // Preserve trim-bearing models; the owner can still edit them elsewhere.
       if (candidates.some(m => nameKey(m).length >= 3 && nameKey(v.model).startsWith(nameKey(m)))) return [];
-      return [{ ...v, suggestedMake: exactMake || closestNames(v.make, makes)[0]?.name || v.make,
+      const nearestMake = closestNames(v.make, makes)[0];
+      return [{ ...v, suggestedMake: exactMake || (nearestMake?.distance <= 2 ? nearestMake.name : v.make),
         suggestions: closestNames(v.model, candidates).filter(c => c.distance <= Math.max(3, nameKey(v.model).length / 2)).map(c => c.name) }];
     });
     return json({ reviews });
