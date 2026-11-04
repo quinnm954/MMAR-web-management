@@ -1,8 +1,8 @@
 # Roadmap
 
 ## Missed receptionist transfers
-- [ ] Route unanswered or declined transfers to standard voicemail, preserving answered calls and existing transcript-only Phone handling.
-- [ ] Test fallback statuses and deploy; verify signed callbacks without contacting customers.
+- [x] Unanswered or unaccepted transfers now use standard voicemail with a beep and existing Phone transcription handlers; press-1 acceptance preserves answered calls.
+- [x] Eight tests passed; deployed ai-receptionist and verified signed no-answer/busy/failed/unaccepted-completed callbacks, finish action, and unsigned rejection without contacting anyone. A real missed-transfer call remains untested.
 
 ## Vehicle spelling corrections
 - [x] Loaded 2,442 official names and verified spelling aliases; save triggers correct clear makes/models while preserving trims and numeric variants. Cleaned 30 saved vehicle entries.
