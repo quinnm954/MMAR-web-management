@@ -1,5 +1,7 @@
 import { contactBlocked } from '../_shared/contact-block.ts';
 import { requireInternal } from '../_shared/internal-auth.ts';
+import { requireTwilio } from '../_shared/twilio-webhook.ts';
+import { screenedTransferXml, standardVoicemailXml, transferNeedsVoicemail, escapeVoiceXml } from '../_shared/transfer-voicemail.ts';
 // AI receptionist (ElevenLabs Agents) for missed calls.
 // Actions (via ?action=):
 //   setup     – admin only: create/update the ElevenLabs agent
@@ -133,16 +135,38 @@ Deno.serve(async (req) => {
   const EL_KEY = Deno.env.get('ELEVENLABS_API_KEY');
 
   try {
+    // These callbacks are provider-signed, not agent tools. Never send a missed transfer back to AI.
+    if (action === 'transfer_complete' || action === 'voicemail_done') {
+      const form = await requireTwilio(req, 'ai-receptionist');
+      if (form instanceof Response) return form;
+      const xml = (body: string) => new Response(body, { headers: { ...corsHeaders, 'Content-Type': 'text/xml' } });
+      if (action === 'voicemail_done') return xml('<Response><Say voice="alice">Thank you. Your message has been received.</Say><Hangup/></Response>');
+      const sid = String(form.get('CallSid') || '');
+      if (!/^CA[a-f0-9]{32}$/i.test(sid)) return xml('<Response><Hangup/></Response>');
+      const { data: call } = await sb.from('call_logs').select('answered_at').eq('twilio_call_sid', sid).maybeSingle();
+      if (!transferNeedsVoicemail(String(form.get('DialCallStatus') || ''), Boolean(call?.answered_at))) {
+        return xml('<Response><Hangup/></Response>');
+      }
+      const { data: settings } = await sb.from('phone_settings').select('voicemail_greeting').eq('id', 1).maybeSingle();
+      return xml(standardVoicemailXml(`${supabaseUrl}/functions/v1`, settings?.voicemail_greeting?.trim() ||
+        'Mike is unavailable right now. Please leave your name, callback number, and message after the tone.'));
+    }
     // ---------- Transfer screening (Twilio hits these when Mike's cell answers) ----------
     if (action === 'whisper' || action === 'whisper_ack') {
       const twiml = (x: string) => new Response(`<?xml version="1.0" encoding="UTF-8"?><Response>${x}</Response>`, { headers: { 'Content-Type': 'text/xml' } });
       if (url.searchParams.get('token') !== TOKEN) return twiml('<Hangup/>');
+      const form = await requireTwilio(req, 'ai-receptionist');
+      if (form instanceof Response) return form;
+      const parentSid = url.searchParams.get('parent_call_sid') || '';
+      if (!/^CA[a-f0-9]{32}$/i.test(parentSid)) return twiml('<Hangup/>');
       if (action === 'whisper') {
-        const ack = `${supabaseUrl}/functions/v1/ai-receptionist?action=whisper_ack&amp;token=${TOKEN}`;
+        const ack = escapeVoiceXml(`${supabaseUrl}/functions/v1/ai-receptionist?action=whisper_ack&token=${encodeURIComponent(TOKEN)}&parent_call_sid=${encodeURIComponent(parentSid)}`);
         return twiml(`<Gather numDigits="1" timeout="8" action="${ack}"><Say voice="alice">Mike's Mobile Auto Repair customer asking for you. Press 1 to take the call.</Say></Gather><Hangup/>`);
       }
-      const form = await req.formData().catch(() => null);
-      return twiml(form?.get('Digits') === '1' ? '' : '<Hangup/>');
+      if (form.get('Digits') !== '1') return twiml('<Hangup/>');
+      const { error } = await sb.from('call_logs').update({ answered_at: new Date().toISOString() }).eq('twilio_call_sid', parentSid);
+      if (error) return twiml('<Hangup/>');
+      return twiml('');
     }
 
     // ---------- Admin setup ----------
@@ -461,7 +485,8 @@ Deno.serve(async (req) => {
       const sid = String(body.call_sid || '');
       const { data: s } = await sb.from('phone_settings').select('forward_to_number').eq('id', 1).maybeSingle();
       const fwd = s?.forward_to_number?.trim();
-      if (!sid || !fwd) return json({ result: 'Transfer unavailable. Offer to take a message for Mike.' });
+      if (!/^CA[a-f0-9]{32}$/i.test(sid) || !fwd) return json({ result: 'Transfer unavailable. Offer to take a message for Mike.' });
+      await sb.from('call_logs').update({ answered_at: null }).eq('twilio_call_sid', sid);
       const r = await fetch(`${TWILIO_GW}/Calls/${sid}.json`, {
         method: 'POST',
         headers: {
@@ -470,7 +495,7 @@ Deno.serve(async (req) => {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
         body: new URLSearchParams({
-          Twiml: `<Response><Say voice="alice">Connecting you to Mike now.</Say><Dial timeout="25" callerId="+18135017572"><Number url="${supabaseUrl}/functions/v1/ai-receptionist?action=whisper&amp;token=${TOKEN}">${fwd}</Number></Dial><Say voice="alice">Sorry, Mike could not pick up right now. He has your details and will call you back shortly.</Say></Response>`,
+          Twiml: screenedTransferXml(`${supabaseUrl}/functions/v1`, TOKEN, sid, fwd),
         }),
       });
       if (!r.ok) {
