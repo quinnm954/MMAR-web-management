@@ -1,5 +1,9 @@
 # Roadmap
 
+## Missed receptionist transfers
+- [ ] Route unanswered or declined transfers to standard voicemail, preserving answered calls and existing transcript-only Phone handling.
+- [ ] Test fallback statuses and deploy; verify signed callbacks without contacting customers.
+
 ## Vehicle spelling corrections
 - [x] Loaded 2,442 official names and verified spelling aliases; save triggers correct clear makes/models while preserving trims and numeric variants. Cleaned 30 saved vehicle entries.
 - [x] Added Customers → Vehicle Corrections with 11 uncertain records and closest-name suggestions. Signed-in saves read back Odyssey and Hyundai; the unclear truck stayed unchanged. Five tests passed, preview build clean; no customer messages sent.
