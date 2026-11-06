@@ -22,8 +22,9 @@ import DeleteButton from './DeleteButton';
 import { estimateStatusLabel } from '@/lib/estimateStatus';
 import CompetitorQuotePanel from './CompetitorQuotePanel';
 import { laborGuideFailure } from '@/lib/laborGuideError';
+import { diagnosticRebateAmount, isDiagnosticRebate, withDiagnosticRebate } from '@/lib/diagnosticRebate';
 
-interface LineItem { description: string; quantity: number; unit_price: number; amount: number; catalog_item_id?: string; labor_hours?: number; kind?: 'part' | 'labor' | 'fee'; unit_cost?: number; }
+interface LineItem { description: string; quantity: number; unit_price: number; amount: number; catalog_item_id?: string; labor_hours?: number; kind?: 'part' | 'labor' | 'fee'; unit_cost?: number; credit_type?: 'diagnostic_rebate'; }
 const PARTS_MARKUP = 1.30; // Imported PDF parts arrive already marked up 30% — divide to recover cost
 interface Estimate {
   id: string;
@@ -284,8 +285,14 @@ const AdminEstimates = () => {
   };
 
   const updateLines = (lines: LineItem[]) => {
-    const totals = recalc(lines);
-    setEditing((p: any) => ({ ...p, line_items: lines, ...totals }));
+    const normalized = withDiagnosticRebate(lines);
+    const totals = recalc(normalized);
+    setEditing((p: any) => ({ ...p, line_items: normalized, ...totals }));
+  };
+
+  const toggleDiagnosticRebate = () => {
+    const lines: LineItem[] = editing?.line_items || [];
+    updateLines(withDiagnosticRebate(lines, !lines.some(isDiagnosticRebate)));
   };
 
   const addLine = (catalogId?: string) => {
@@ -667,6 +674,11 @@ const AdminEstimates = () => {
                     <Button size="sm" variant="outline" onClick={addLaborLine}><Plus className="h-3 w-3 mr-1" /> Labor</Button>
                     <Button size="sm" variant="outline" onClick={() => { setLaborOpen(o => !o); setLaborResults([]); }}><Wrench className="h-3 w-3 mr-1" /> Labor Guide</Button>
                     <Button size="sm" variant="outline" onClick={addDiagnosisFee}><Plus className="h-3 w-3 mr-1" /> Diagnosis Fee</Button>
+                    <Button size="sm" variant={editing.line_items.some(isDiagnosticRebate) ? 'secondary' : 'outline'} onClick={toggleDiagnosticRebate}
+                      disabled={!editing.line_items.some(isDiagnosticRebate) && diagnosticRebateAmount(editing.line_items) <= 0}
+                      title="Apply the advertised $50 diagnosis credit toward repair labor">
+                      <RotateCcw className="h-3 w-3 mr-1" />{editing.line_items.some(isDiagnosticRebate) ? 'Remove Diag rebate' : 'Diag rebate'}
+                    </Button>
                     <Button size="sm" variant="outline" onClick={() => fileRef.current?.click()} disabled={importing}>
                       {importing ? <Loader2 className="h-3 w-3 mr-1 animate-spin" /> : <Upload className="h-3 w-3 mr-1" />} Parts from PDF
                     </Button>
@@ -730,7 +742,7 @@ const AdminEstimates = () => {
                         return (
                           <TableRow key={i} className="max-sm:grid max-sm:grid-cols-2 max-sm:gap-2 max-sm:p-3 max-sm:border-b [&>td]:max-sm:p-0 [&>td]:max-sm:before:block [&>td]:max-sm:before:text-[10px] [&>td]:max-sm:before:uppercase [&>td]:max-sm:before:text-muted-foreground [&>td]:max-sm:before:content-[attr(data-label)]">
                             <TableCell data-label="Type">
-                              <Select value={kind} onValueChange={(v) => updateLine(i, { kind: v as 'part' | 'labor' | 'fee' })}>
+                              <Select value={kind} disabled={isDiagnosticRebate(l)} onValueChange={(v) => updateLine(i, { kind: v as 'part' | 'labor' | 'fee' })}>
                                 <SelectTrigger className="h-8"><SelectValue /></SelectTrigger>
                                 <SelectContent>
                                   <SelectItem value="part">Part</SelectItem>
@@ -740,14 +752,14 @@ const AdminEstimates = () => {
                               </Select>
                             </TableCell>
                             <TableCell data-label="Description" className="max-sm:col-span-2">
-                              <Input value={l.description} onChange={e => updateLine(i, { description: e.target.value })} />
+                              <Input value={l.description} readOnly={isDiagnosticRebate(l)} onChange={e => updateLine(i, { description: e.target.value })} />
                               {kind === 'fee' && <span className="text-[10px] text-muted-foreground ml-1">Flat fee · no tax/shop</span>}
                               {kind === 'labor' && <span className="text-[10px] text-muted-foreground ml-1">Labor · no tax/shop</span>}
                               {kind === 'part' && <span className="text-[10px] text-muted-foreground ml-1">Auto-saved to catalog</span>}
                             </TableCell>
-                            <TableCell data-label="Qty"><Input type="number" step="0.5" value={l.quantity} onChange={e => updateLine(i, { quantity: parseFloat(e.target.value) || 0 })} /></TableCell>
-                            <TableCell data-label="Hrs"><Input type="number" step="0.1" value={l.labor_hours ?? 0} onChange={e => updateLine(i, { labor_hours: parseFloat(e.target.value) || 0 })} title="Billable labor hours" disabled={kind === 'part'} /></TableCell>
-                            <TableCell data-label="Unit price"><Input type="number" step="0.01" value={l.unit_price} onChange={e => updateLine(i, { unit_price: parseFloat(e.target.value) || 0 })} /></TableCell>
+                            <TableCell data-label="Qty"><Input type="number" step="0.5" value={l.quantity} disabled={isDiagnosticRebate(l)} onChange={e => updateLine(i, { quantity: parseFloat(e.target.value) || 0 })} /></TableCell>
+                            <TableCell data-label="Hrs"><Input type="number" step="0.1" value={l.labor_hours ?? 0} onChange={e => updateLine(i, { labor_hours: parseFloat(e.target.value) || 0 })} title="Billable labor hours" disabled={kind === 'part' || isDiagnosticRebate(l)} /></TableCell>
+                            <TableCell data-label="Unit price"><Input type="number" step="0.01" value={l.unit_price} disabled={isDiagnosticRebate(l)} onChange={e => updateLine(i, { unit_price: parseFloat(e.target.value) || 0 })} /></TableCell>
                             <TableCell data-label="Unit cost">
                               <Input type="number" step="0.01" value={l.unit_cost ?? 0} onChange={e => updateLine(i, { unit_cost: parseFloat(e.target.value) || 0 })} disabled={kind !== 'part'} title="Part cost (for margin & catalog)" />
                             </TableCell>
