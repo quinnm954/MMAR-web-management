@@ -20,6 +20,7 @@ import { cn } from '@/lib/utils';
 import { clearAppBadge } from '@/lib/appBadge';
 import { clearCommunicationUnread, NOTIFICATIONS_CLEARED_EVENT } from '@/lib/clearCommunicationUnread';
 import { callCustomerName, callPhone, type CallContactProfile } from '@/lib/callContact';
+import { singleFlight } from '@/lib/singleFlight';
 
 type Mode = 'inbox' | 'calls' | 'texts' | 'chat' | 'email';
 type EmailFolder = 'inbox' | 'sent' | 'drafts';
@@ -128,7 +129,7 @@ export default function AdminPhoneHub({ fullscreen = false }: { fullscreen?: boo
   const [me, setMe] = useState<string | null>(null);
   const [addOpen, setAddOpen] = useState(false);
 
-  const load = useCallback(async () => {
+  const load = useMemo(() => singleFlight(async () => {
     setLoading(true);
     const [callResult, threadResult, inboundResult, sentResult, draftResult, profileResult, employeeResult, roleResult] = await Promise.all([
       supabase.from('call_logs').select('*').order('created_at', { ascending: false }).limit(1000),
@@ -205,14 +206,9 @@ export default function AdminPhoneHub({ fullscreen = false }: { fullscreen?: boo
       (ps ?? []).forEach((p: any) => { map[p.id] = p.full_name || p.email || 'Customer'; });
       setChatNames(map);
     }
-    if (uid) {
-      const { data: rd } = await supabase.from('message_reads').select('thread_id, last_read_at').eq('user_id', uid);
-      const rm: Record<string, string> = {};
-      (rd ?? []).forEach((x: any) => { rm[x.thread_id] = x.last_read_at; });
-      setChatReads(rm);
-    }
+    setChatReads({});
     setLoading(false);
-  }, []);
+  }), []);
 
   useEffect(() => { load(); }, [load]);
 
@@ -246,11 +242,6 @@ export default function AdminPhoneHub({ fullscreen = false }: { fullscreen?: boo
         .on('postgres_changes', { event: '*', schema: 'public', table: 'sms_threads' }, scheduleLoad)
         .on('postgres_changes', { event: '*', schema: 'public', table: 'inbound_messages' }, scheduleLoad)
         .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'email_send_log' }, scheduleLoad)
-        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, (payload: any) => {
-          const row = payload.new; const sel = selectedRef.current;
-          if (row && sel?.kind === 'chat' && row.thread_id === sel.id) setChatMsgs(cur => cur.some(m => m.id === row.id) ? cur : [...cur, row as ChatMessage]);
-          scheduleLoad();
-        })
         .subscribe(status => {
           if (!stopped && (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED')) setTimeout(() => { if (!stopped) subscribe(); }, 2000);
         });
@@ -275,6 +266,7 @@ export default function AdminPhoneHub({ fullscreen = false }: { fullscreen?: boo
       document.removeEventListener('visibilitychange', onResume);
       window.removeEventListener('focus', onResume);
       window.clearInterval(poll);
+      if (reloadTimer.current) window.clearTimeout(reloadTimer.current);
       if (channel) supabase.removeChannel(channel);
     };
   }, [scheduleLoad]);
