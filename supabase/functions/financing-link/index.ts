@@ -33,7 +33,7 @@ Deno.serve(async (req) => {
       const contractId = s.metadata?.contract_id;
       const sub = s.subscription as Stripe.Subscription | null;
       if (contractId && PLANS[contractId] && sub && s.status === "complete") {
-        const { data: ps } = await admin.from("financing_payments").select("id,seq,due_date").eq("contract_id", contractId).order("seq");
+        const { data: ps } = await admin.from("financing_payments").select("id,seq,due_date,status").eq("contract_id", contractId).order("seq");
         const last = ps?.[ps.length - 1];
         if (last && !sub.cancel_at) {
           await stripe.subscriptions.update(sub.id, {
@@ -47,7 +47,7 @@ Deno.serve(async (req) => {
           stripe_payment_method_id: pm?.id ?? null, bank_last4: pm?.card?.last4 ?? null,
         }).eq("id", contractId);
         const down = ps?.find((p) => p.seq === 0);
-        if (down && s.payment_status === "paid") {
+        if (down && down.status !== "paid" && s.payment_status === "paid") {
           await admin.from("financing_payments").update({ status: "paid", paid_at: new Date().toISOString(), stripe_payment_intent_id: sub.id }).eq("id", down.id);
         }
       }
