@@ -1,5 +1,9 @@
 # Roadmap
 
+## Database performance and running credits
+- [ ] Measure project running usage, query plans, indexes, storage and scheduled activity.
+- [ ] Apply and verify measured, behavior-preserving optimizations; obtain approval for any retention or scheduling changes.
+
 ## Missed receptionist transfers
 - [x] Unanswered or unaccepted transfers now use standard voicemail with a beep and existing Phone transcription handlers; press-1 acceptance preserves answered calls.
 - [x] Eight tests passed; deployed ai-receptionist and verified signed no-answer/busy/failed/unaccepted-completed callbacks, finish action, and unsigned rejection without contacting anyone. A real missed-transfer call remains untested.
