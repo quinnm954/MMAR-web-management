@@ -47,6 +47,7 @@ import PortalServiceHistory from "./pages/portal/PortalServiceHistory";
 import PortalInvoices from "./pages/portal/PortalInvoices";
 import FinancingPayments from "./pages/FinancingPayments";
 import FinancingContract from "./pages/FinancingContract";
+import JosePaymentOptions from "./pages/JosePaymentOptions";
 import PortalInvoiceDetail from "./pages/portal/PortalInvoiceDetail";
 import PortalEstimates from "./pages/portal/PortalEstimates";
 import FinishEnrollment from "./pages/FinishEnrollment";
@@ -168,6 +169,7 @@ const App = () => (
             <Route path="/portal/appointments" element={<CustomerProtectedRoute><PortalAppointments /></CustomerProtectedRoute>} />
             <Route path="/portal/service-history" element={<CustomerProtectedRoute><PortalServiceHistory /></CustomerProtectedRoute>} />
             <Route path="/financing-contract" element={<FinancingContract />} />
+            <Route path="/pay/jose" element={<JosePaymentOptions />} />
             <Route path="/portal/financing" element={<CustomerProtectedRoute><FinancingPayments /></CustomerProtectedRoute>} />
             <Route path="/admin/financing" element={<ProtectedRoute><FinancingPayments adminView /></ProtectedRoute>} />
             <Route path="/portal/invoices" element={<CustomerProtectedRoute><PortalInvoices /></CustomerProtectedRoute>} />
