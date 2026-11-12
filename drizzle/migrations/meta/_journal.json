@@ -470,6 +470,13 @@
       "when": 1793725941241,
       "tag": "0066_vehicle_make_spelling_correction",
       "breakpoints": true
+    },
+    {
+      "idx": 67,
+      "version": "7",
+      "when": 1794485340617,
+      "tag": "0067_index_approved_prospect_queue",
+      "breakpoints": true
     }
   ]
 }

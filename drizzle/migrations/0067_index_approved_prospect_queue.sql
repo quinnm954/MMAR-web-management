@@ -1,0 +1,1 @@
+CREATE INDEX IF NOT EXISTS idx_prospects_approved_queue ON public.prospects (created_at, next_email_at) WHERE email_status = 'approved' AND do_not_contact = false AND email IS NOT NULL;
