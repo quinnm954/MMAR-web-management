@@ -1,5 +1,10 @@
 # Roadmap
 
+## Database performance and running credits
+- [x] Measured Oct 30–Nov 12 requested running usage (16.1045 credits, including 278 pico hours / 10.7613 credits), health, indexes, query plans and bounded Outlook worker logs. Query statistics reset Nov 12 12:03 UTC; safe schedule inventory/history interface unavailable.
+- [x] Added and verified approved-prospect queue index (111 → 1 buffer hits; empty eligible queue, 0.345 → 0.102ms execution). Phone refreshes now coalesce overlapping work and skip retired chat receipts; identical signed-in 17-second check removed 2 receipt requests, 12 regression tests passed, preview build clean.
+- [x] Identified 3.666GB of managed scheduled-job history as the dominant storage candidate; no deletion, cadence, instance or customer communication changes made. Retention cleanup requires approval and a supported managed cleanup path; actual credit savings require later usage comparison.
+
 ## Missed receptionist transfers
 - [x] Unanswered or unaccepted transfers now use standard voicemail with a beep and existing Phone transcription handlers; press-1 acceptance preserves answered calls.
 - [x] Eight tests passed; deployed ai-receptionist and verified signed no-answer/busy/failed/unaccepted-completed callbacks, finish action, and unsigned rejection without contacting anyone. A real missed-transfer call remains untested.
